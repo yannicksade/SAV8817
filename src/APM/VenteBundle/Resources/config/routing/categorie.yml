@@ -1,0 +1,63 @@
+#------------------------- Objects Factory ---------------------------------
+apm_vente_categorie_index:
+    path:     /
+    defaults: { _controller: "APMVenteBundle:Categorie:index" }
+    methods:  GET
+
+apm_vente_categorie_show:
+    path:     /{id}/show
+    defaults: { _controller: "APMVenteBundle:Categorie:show" }
+    methods:  GET
+
+apm_vente_categorie_new:
+    path:     /new
+    defaults: { _controller: "APMVenteBundle:Categorie:new" }
+    methods:  [GET, POST]
+
+apm_vente_categorie_edit:
+    path:     /{id}/edit
+    defaults: { _controller: "APMVenteBundle:Categorie:edit" }
+    methods:  [GET, POST]
+
+apm_vente_categorie_delete:
+    path:     /{id}/delete
+    defaults: { _controller: "APMVenteBundle:Categorie:delete" }
+    methods:  DELETE
+
+apm_vente_categorie_deleteFromList:
+    path:     /list/{id}/delete
+    defaults: { _controller: "APMVenteBundle:Categorie:deleteFromList" }
+
+#----------------- Handle offers -------------------------------------------------
+#-------Insertiontion/desinsertion----
+apm_vente_categorie_inserer_offre:
+    path:     /{id}/inserer-offre/{categorie_id}
+    defaults: { _controller: "APMVenteBundle:Trade:insererOffreDansCategorie" }
+    #methods:  POST
+apm_vente_categorie_desinserer_offre:
+    path:     /{id}/desinserer-offre/{categorie_id}
+    defaults: { _controller: "APMVenteBundle:Trade:desinsererOffreDansCategorie" }
+    #methods:  POST
+#-----
+apm_vente_categorie_inserer_categorie:
+    path:     /{id}/inserer-categorie/{categorieParent_id}
+    defaults: { _controller: "APMVenteBundle:Trade:insererCategorieParent" }
+    #methods:  POST
+
+apm_vente_categorie_desinserer_categorie:
+    path:     /{id}/desinserer-categorie/{categorieParent_id}
+    defaults: { _controller: "APMVenteBundle:Trade:desinsererCategorieParent" }
+    #methods:  POST
+#-------Publication/depublication----
+apm_vente_categorie_publier:
+    path:     /{id}/publier-categorie/{boutique_id}
+    defaults: { _controller: "APMVenteBundle:Trade:publierCategorie" }
+#    methods:  [GET]
+apm_vente_categorie_depublier:
+    path:     /{id}/depublier-categorie/{boutique_id}
+    defaults: { _controller: "APMVenteBundle:Trade:depublierCategorie" }
+#    methods:  [GET]
+#-------------------------- Handle Categorie ---------------------------------------------------
+apm_vente_categorie_transferer:
+    path:     /{id}/transferer-categorie/{source_id}/{destinataire_id}/{ordre_id}/{livraison_id}
+    defaults: { _controller: "APMVenteBundle:Trade:transfererCategorie" }

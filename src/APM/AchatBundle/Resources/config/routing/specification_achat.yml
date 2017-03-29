@@ -1,0 +1,28 @@
+apm_achat_specification_achat_index:
+    path:     /
+    defaults: { _controller: "APMAchatBundle:Specification_achat:index" }
+    methods:  GET
+
+apm_achat_specification_achat_show:
+    path:     /{id}/show
+    defaults: { _controller: "APMAchatBundle:Specification_achat:show" }
+    methods:  GET
+
+apm_achat_specification_achat_new:
+    path:     /new
+    defaults: { _controller: "APMAchatBundle:Specification_achat:new" }
+    methods:  [GET, POST]
+
+apm_achat_specification_achat_edit:
+    path:     /{id}/edit
+    defaults: { _controller: "APMAchatBundle:Specification_achat:edit" }
+    methods:  [GET, POST]
+
+apm_achat_specification_achat_delete:
+    path:     /{id}/delete
+    defaults: { _controller: "APMAchatBundle:Specification_achat:delete" }
+    methods:  DELETE
+apm_achat_specification_achat_deleteFromList:
+    path:     /list/{id}/delete
+    defaults: { _controller: "APMAchatBundle:Specification_achat:deleteFromList" }
+

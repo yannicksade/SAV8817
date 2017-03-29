@@ -1,0 +1,32 @@
+{% extends "APMAdminBundle:_Main:layout.html.twig" %}
+
+{% block body %}
+    <h1>Suggestion_produit</h1>
+
+    <table>
+        <tbody>
+        <tr>
+            <th>Code</th>
+            <td>{{ suggestion_produit.code }}</td>
+        </tr>
+        </tbody>
+    </table>
+
+    <ul>
+        <li>
+            <a href="{{ path('apm_vente_suggestion_offre_index') }}">Back to the list</a>
+        </li>
+        <li>
+            <a href="{{ path('apm_vente_suggestion_offre_edit', { 'id': suggestion_produit.id }) }}">Edit</a>
+        </li>
+        <li>
+            <a href="{{ path('apm_vente_suggestion_offre_new') }}">Add a new one</a>
+        </li>
+
+        <li>
+            {{ form_start(delete_form) }}
+            <input type="submit" value="Delete">
+            {{ form_end(delete_form) }}
+        </li>
+    </ul>
+{% endblock %}

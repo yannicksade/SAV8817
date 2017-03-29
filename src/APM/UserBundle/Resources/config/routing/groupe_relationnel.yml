@@ -1,0 +1,30 @@
+apm_user_groupe-relationnel_index:
+    path:     /
+    defaults: { _controller: "APMUserBundle:Groupe_relationnel:index" }
+    methods:  GET
+
+apm_user_groupe-relationnel_show:
+    path:     /{id}/show
+    defaults: { _controller: "APMUserBundle:Groupe_relationnel:show" }
+    methods:  GET
+
+apm_user_groupe-relationnel_new:
+    path:     /new
+    defaults: { _controller: "APMUserBundle:Groupe_relationnel:new" }
+    methods:  [GET, POST]
+
+apm_user_groupe-relationnel_edit:
+    path:     /{id}/edit
+    defaults: { _controller: "APMUserBundle:Groupe_relationnel:edit" }
+    methods:  [GET, POST]
+
+apm_user_groupe-relationnel_delete:
+    path:     /{id}/delete
+    defaults: { _controller: "APMUserBundle:Groupe_relationnel:delete" }
+    methods:  DELETE
+
+apm_user_groupe-relationnel_deleteFromList:
+    path:     /list/{id}/delete
+    defaults: { _controller: "APMUserBundle:Groupe_relationnel:deleteFromList" }
+
+

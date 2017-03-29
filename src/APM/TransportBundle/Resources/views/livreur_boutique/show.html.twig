@@ -1,0 +1,41 @@
+{% extends "APMAdminBundle:_Main:layout.html.twig" %}
+
+{% block body %}
+    <h1>Livreur_boutique</h1>
+
+    <table>
+        <tbody>
+        <tr>
+            <th>Code</th>
+            {% if livreur_boutique.transporteur==null %} {% else %}{{ livreur_boutique.transporteur.code }}{% endif %}
+        </tr>
+
+        <tr>
+            <th>Matricule</th>
+            <td>{{ livreur_boutique.transporteur.matricule }}</td>
+        </tr>
+        <tr>
+            <th>Reférence</th>
+            <td>{{ livreur_boutique.reference }}</td>
+        </tr>
+        </tbody>
+    </table>
+
+    <ul>
+        <li>
+            <a href="{{ path('apm_transport_livreur_boutique_index') }}">Back to the list</a>
+        </li>
+        <li>
+            <a href="{{ path('apm_transport_livreur_boutique_edit', { 'id': livreur_boutique.id }) }}"> Edit </a>
+        </li>
+        <li>
+            <a href="{{ path('apm_transport_livreur_boutique_new') }}"> Add a new one </a>
+        </li>
+
+        <li>
+            {{ form_start(delete_form) }}
+            <input type="submit" value="Delete">
+            {{ form_end(delete_form) }}
+        </li>
+    </ul>
+{% endblock %}

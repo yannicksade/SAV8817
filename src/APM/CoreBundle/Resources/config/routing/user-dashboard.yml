@@ -1,0 +1,4 @@
+apm_core_dashboard_show:
+    path:     /show/{id}
+    defaults: { _controller: "APMCoreBundle:UserDashboard:show" }
+    methods:  GET

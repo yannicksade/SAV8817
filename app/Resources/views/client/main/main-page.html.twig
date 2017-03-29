@@ -1,0 +1,108 @@
+{% extends ":base:user_base.html.twig" %}
+
+
+ {%- block title -%} Easy Trade | main {% endblock %}
+{% block stylesheets %}
+    {% stylesheets 'client/assets/css/custom_style/main.css' %}
+    <link rel="stylesheet" href="{{ asset_url }}" xmlns="http://www.w3.org/1999/html"/>
+    {% endstylesheets %}
+{% endblock stylesheets %}
+
+{% block body %}
+    {% block header %}
+        {% include ":base/main:header.html.twig" %}
+    {% endblock header %}
+
+    {% block nav %}
+        {%- block paginage -%} Easy > <a href="{{ path('apm_core_main_show') }}">
+            Plateforme </a>  {% endblock paginage %}
+        {% include ":base/main:navbar.html.twig" %}
+    {% endblock nav %}
+
+    {% block banner %}
+        {# banniere de la page principale d#}
+        {% include ":base/main:banner.html.twig" %}
+    {% endblock banner %}
+
+    {% block firstsections %}
+        {# section des offres mises en avant  #}
+        {% include ":base/main:firstsectionbar.html.twig" %}
+    {% endblock firstsections %}
+
+    {# Section des articles #}
+    {% block productsection %}
+    <section class="container produit">
+        {# exposition des articles ou produits#}
+        <div class="row">
+            {% for i in 1..4 %}
+                <article class="col-md-3 thumbnail">
+                    <a href="#">
+                        {% image 'client/assets/img/4.jpg' %}
+                        <img src="{{ asset_url }} " class="img-responsive">
+                        {% endimage %}
+                        <p>Habillement adultes </p>
+                    </a>
+                </article>
+            {% endfor %}
+        </div>
+        <div class="row">
+            {% for i in 1..4 %}
+                <article class="col-md-3 thumbnail">
+                    <a href="#">
+                        {% image 'client/assets/img/9.jpg' %}
+                        <img src="{{ asset_url }} " class="img-responsive">
+                        {% endimage %}
+                        <p> Outils embarquable </p>
+                    </a>
+                </article>
+            {% endfor %}
+        </div>
+    </section>
+    {% endblock productsection %}
+
+
+    {% block learnhowtobar %}
+        {# donne des informations sur le systeme: Comment ça marche ! #}
+        {% include ":base/main:howtobar.html.twig" %}
+    {% endblock %}
+
+    {% block servicesection %}
+        {# exposition des services #}
+    <section class="container service">
+        {# services #}
+        <div class="row">
+            {% for i in 1..4 %}
+                <article class="col-md-3 thumbnail">
+                    <a href="#">
+                        {% image 'client/assets/img/crypto.jpg' %}
+                        <img src="{{ asset_url }} " class="img-responsive">
+                        {% endimage %}
+                        <p> Service Electronique </p>
+                    </a>
+                </article>
+            {% endfor %}
+        </div>
+        <div class="row">
+            {% for i in 1..4 %}
+                <article class="col-md-3 thumbnail">
+                    <a href="#">
+                        {% image 'client/assets/img/ban.jpg' %}
+                        <img src="{{ asset_url }} " class="img-responsive">
+                        {% endimage %}
+                        <p> Formations &Education </p>
+                    </a>
+                </article>
+            {% endfor %}
+        </div>
+    </section>
+    {% endblock servicesection %}
+    {% block user_content %}
+        <div>
+            {% include(':base:user-connexion.html.twig') %}
+        </div>
+    {% endblock user_content %}
+{% endblock body %}
+
+{% block footer %}
+    {% include ":base/main:footer.html.twig" %}
+{% endblock footer %}

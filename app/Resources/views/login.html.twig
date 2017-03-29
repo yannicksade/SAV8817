@@ -1,0 +1,32 @@
+{% block apm_user_content %}
+    {% if login is defined %} {# the login is not defined when visiting the boutiques#}
+        {% trans_default_domain 'FOSUserBundle' %}
+
+        <form class="formlogin" action="{{ path("fos_user_security_check") }}" method="post">
+            {% if login.csrf_token %}
+                <input type="hidden" name="_csrf_token" value="{{ login.csrf_token }}"/>
+            {% endif %}
+            <label for="username">{{ 'security.login.username'|trans }}</label>
+            <input type="text" id="username" name="_username" value="{{ login.last_username }}" required="required"
+                   placeholder="ex: john@avm.com"/> <br/>
+
+            <label for="password">{{ 'security.login.password'|trans }}</label>
+            <input type="password" id="password" name="_password" required="required"/><br/>
+
+            <label for="remember_me">{{ 'security.login.remember_me'|trans }}</label>
+            <input type="checkbox" id="remember_me" name="_remember_me" value="on"/>
+
+
+            <input type="submit" id="_submit" name="_submit" value="{{ 'security.login.submit'|trans }}"/>
+        </form>
+        <a href="{{ path('fos_user_resetting_request') }}">mot de passe oublié?</a>
+    {% else %}
+        <em>
+            <a href="{{ path('fos_user_security_login') }}">{{ 'layout.login'|trans({}, 'FOSUserBundle') }}</a>
+            |
+            <a href="{{ path('apm_utilisateur_avm_registration') }}">enregistrez-vous</a>
+            |
+            <a href="{{ path('fos_user_resetting_request') }}">mot de passe oublié?</a>
+        </em>
+    {% endif %}
+{% endblock apm_user_content %}

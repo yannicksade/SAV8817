@@ -1,0 +1,154 @@
+<nav class="navbar-default navbar-static-side" role="navigation">
+    <!-- sidebar-collapse -->
+    <div class="sidebar-collapse">
+        <!-- side-menu -->
+        <ul class="nav" id="side-menu">
+            <li>
+                <!-- user image section-->
+                <div class="user-section">
+                    <div class="user-section-inner">
+                        {% image '@AppBundle/Resources/public/user.jpg' %}
+                        <img src="{{ asset_url }}" alt="photo">
+                        {% endimage %}
+                    </div>
+                    <div class="user-info">
+                        <div><strong>{{ app.user }}</strong></div>
+                        <div class="user-text-online">
+                            <span class="user-circle-online btn btn-success btn-circle "></span>&nbsp;Online
+                        </div>
+                    </div>
+                </div>
+                <!--end user image section-->
+            </li>
+            <li class="sidebar-search">
+                <!-- search section-->
+                <div class="input-group custom-search-form">
+                    <input type="text" class="form-control" placeholder="Search...">
+                    <span class="input-group-btn">
+                        <button class="btn btn-default" type="button">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </span>
+                </div>
+                <!--end search section-->
+            </li>
+            <li class="selected">
+                <a href="{{ path("apm_admin_homepage") }}"><i class="fa fa-dashboard fa-fw"></i>Dashboard</a>
+            </li>
+            <li>
+                <a href="#"><i class="fa fa-users"></i>UTILISATEUR<span class="fa arrow"></span></a>
+                <ul class="nav nav-second-level">
+                    <li>
+                        <a href="{{ path("apm_admin_index") }}">Administrateur</a>
+                    </li>
+                    <li>
+                        <a href="{{ path("apm_utilisateur_index") }}">Utilisateurs AVM</a>
+                    </li>
+                </ul>
+                <!-- second-level-items -->
+            </li>
+            <li>
+                <a href="#"><i></i>ACHAT<span class="fa arrow"></span></a>
+                <ul class="nav nav-second-level">
+                    <li>
+                        <a href="{{ path("apm_achat_groupe_index") }}">Groupe offre</a>
+                    </li>
+                    <li>
+                        <a href="{{ path("apm_achat_service_apres_vente_index") }}">Service apres vente</a>
+                    </li>
+                    <li>
+                        <a href="{{ path('apm_achat_specification_achat_index') }}">Specification achat</a>
+                    </li>
+                </ul>
+                <!-- second-level-items -->
+            </li>
+            <li>
+                <a href="#"><i class="fa fa-fla"></i>VENTE<span class="fa arrow"></span></a>
+                <ul class="nav nav-second-level">
+                    <li>
+                        <a href="{{ path("apm_vente_boutique_index") }}">Boutique</a>
+                    </li>
+                    <li>
+                        <a href="{{ path("apm_vente_categorie_index") }}">Catégorie offres</a>
+                    </li>
+                    <li>
+                        <a href="{{ path('apm_vente_offre_index') }}">Offre</a>
+                    </li>
+                    <li>
+                        <a href="{{ path("apm_vente_rabais_offre_index") }}">Rabais sur offre</a>
+                    </li>
+                    <li>
+                        <a href="{{ path("apm_vente_remise_index") }}">Remise</a>
+                    </li>
+                    <li>
+                        <a href="{{ path('apm_vente_suggestion_offre_index') }}">Suggestion produit</a>
+                    </li>
+                    <li>
+                        <a href="{{ path("apm_vente_transaction_index") }}">Transaction</a>
+                    </li>
+                    <li>
+                        <a href="{{ path("apm_vente_transaction_produit_index") }}">Transaction produit</a>
+                    </li>
+
+                </ul>
+            </li>
+
+            <li>
+                <a href="#"><i class="fa fa-fla"></i>ANIMATION<span class="fa arrow"></span></a>
+                <ul class="nav nav-second-level">
+                    <li>
+                        <a href="{{ path('apm_animation_base_documentaire_index') }}">Base documentaire</a>
+                    </li>
+                </ul>
+            </li>
+
+            <li>
+                <a href="#"><i class="fa fa-fla"></i>MARKETING<span class="fa arrow"></span></a>
+                <ul class="nav nav-second-level">
+                    <li>
+                        <a href="#"><i class="fa fa-fla"></i>MARKETING DISTRIBUE<span class="fa arrow"></span></a>
+                        <ul class="nav nav-second-level">
+                            <li>
+                                <a href="{{ path("apm_marketing_conseiller_index") }}">Conseiller</a>
+                            </li>
+                            <li>
+                                <a href="{{ path("apm_marketing_quota_index") }}">Quota</a>
+                            </li>
+                            <li>
+                                <a href="{{ path("apm_marketing_commissionnement_index") }}">Commissionnement</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li>
+                        <a href="#"><i class="fa fa-fla"> </i> MARKETING RESEAU<span class="fa arrow"></span></a>
+                        <ul class="nav nav-second-level">
+                            <li>
+                                <a href="{{ path("apm_marketing_reseau_conseillers_index") }}">Reseautage</a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </li>
+
+            <li>
+                <a href="#"><i class="fa fa-fla"></i>TRANSPORT<span class="fa arrow"></span></a>
+                <ul class="nav nav-second-level">
+                    <li>
+                        <a href="{{ path("apm_transport_livraison_index") }}">Livraison</a>
+                    <li>
+                    <li>
+                        <a href="{{ path("apm_transport_livreur_boutique_index") }}">Livreur Boutique</a>
+                    </li>
+                    <li>
+                        <a href="{{ path("apm_transport_transporteur_index") }}">Transporteur indépendent</a>
+                    </li>
+                    <li>
+                        <a href="{{ path("apm_zone_intervention_index") }}">Zone d'intervention</a>
+                    </li>
+                </ul>
+            </li>
+        </ul>
+        <!-- end side-menu -->
+    </div>
+    <!-- end sidebar-collapse -->
+</nav>

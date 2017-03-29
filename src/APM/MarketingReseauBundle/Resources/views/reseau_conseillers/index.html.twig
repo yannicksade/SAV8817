@@ -1,0 +1,45 @@
+{% extends "APMAdminBundle:_Main:layout.html.twig" %}
+
+{% block body %}
+    <h1>Reseau_conseillers list</h1>
+
+    <table>
+        <thead>
+        <tr>
+            <th>Code</th>
+            <th>Description</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for reseau_conseiller in reseau_conseillers %}
+            <tr>
+                <td>
+                    <a href="{{ path('apm_marketing_reseau_conseillers_show', { 'id': reseau_conseiller.id }) }}">{{ reseau_conseiller.code }}</a>
+                </td>
+                <td>{{ reseau_conseiller.description }}</td>
+                <td>
+                    <ul>
+                        <li>
+                            <a href="{{ path('apm_marketing_reseau_conseillers_show', { 'id': reseau_conseiller.id }) }}">show</a>
+                        </li>
+                        <li>
+                            <a href="{{ path('apm_marketing_reseau_conseillers_edit', { 'id': reseau_conseiller.id }) }}">edit</a>
+                        </li>
+                        <li>
+                            <a href="{{ path('apm_marketing_reseau_conseillers_deleteFromList', { 'id': reseau_conseiller.id }) }}">delete</a>
+                        </li>
+
+                    </ul>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <ul>
+        <li>
+            <a href="{{ path('apm_marketing_reseau_conseillers_new') }}">Create a new entry</a>
+        </li>
+    </ul>
+{% endblock %}

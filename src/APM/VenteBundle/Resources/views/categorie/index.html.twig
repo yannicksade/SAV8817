@@ -1,0 +1,53 @@
+{% extends "APMAdminBundle:_Main:layout.html.twig" %}
+
+{% block body %}
+    <h1>Liste des Categories</h1>
+
+    <table>
+        <thead>
+        <tr>
+            <th>Code</th>
+            <th>Designation</th>
+            <th>Livrable</th>
+            <th>Etat</th>
+            <th>Image</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for categorie in categories %}
+            {% if categorie.publiable %}
+            <tr>
+                <td>
+                    <a href="{{ path('apm_vente_categorie_show', { 'id': categorie.id }) }}">{{ categorie.code }}</a>
+                </td>
+                <td>{{ categorie.designation }}</td>
+                <td>{% if categorie.livrable %}Yes{% else %}No{% endif %}</td>
+                <td>{{ categorie.etat }}</td>
+                <td>{{ categorie.image }}</td>
+                <td>
+                    <ul>
+                        <li>
+                            <a href="{{ path('apm_vente_categorie_show', { 'id': categorie.id }) }}">show</a>
+                        </li>
+                        <li>
+                            <a href="{{ path('apm_vente_categorie_edit', { 'id': categorie.id }) }}">edit</a>
+                        </li>
+                        <li>
+                            <a href="{{ path('apm_vente_categorie_deleteFromList', { 'id': categorie.id }) }}">delete</a>
+                        </li>
+
+                    </ul>
+                </td>
+            </tr>
+            {% endif %}
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <ul>
+        <li>
+            <a href="{{ path('apm_vente_categorie_new') }}">Create a new entry</a>
+        </li>
+    </ul>
+{% endblock %}

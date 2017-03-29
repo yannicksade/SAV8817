@@ -1,0 +1,4 @@
+apm_core_explorateur_index:
+    path:     /
+    defaults: { _controller: "APMCoreBundle:Explorateur:index" }
+    methods:  GET

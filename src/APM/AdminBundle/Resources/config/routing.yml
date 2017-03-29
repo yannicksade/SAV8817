@@ -1,0 +1,7 @@
+apm_admin:
+    resource: "@APMAdminBundle/Resources/config/routing/admin.yml"
+    prefix:   /general
+
+apm_gestionnaire:
+    resource: "@APMAdminBundle/Resources/config/routing/gestion.yml"
+    prefix:   /gestionnaire

@@ -1,0 +1,43 @@
+{% extends "APMAdminBundle:_Main:layout.html.twig" %}
+{% block body %}
+    <h1>Commentaire</h1>
+
+    <table>
+        <tbody>
+        <tr>
+            <th>Code</th>
+            <td>{{ commentaire.code }}</td>
+        </tr>
+        <tr>
+            <th>Date</th>
+            <td>{% if commentaire.date %}{{ commentaire.date|date('Y-m-d H:i:s') }}{% endif %}</td>
+        </tr>
+        <tr>
+            <th>Evaluation</th>
+            <td>{{ commentaire.evaluation }}</td>
+        </tr>
+        <tr>
+            <th>Utilisateur</th>
+            <td>{{ commentaire.utilisateur }}</td>
+        </tr>
+        </tbody>
+    </table>
+
+    <ul>
+        <li>
+            <a href="{{ path('apm_user_commentaire_index') }}">Back to the list</a>
+        </li>
+        <li>
+            <a href="{{ path('apm_user_commentaire_edit', { 'id': commentaire.id }) }}">Edit</a>
+        </li>
+        <li>
+            <a href="{{ path('apm_user_commentaire_new') }}">Add a new one</a>
+        </li>
+
+        <li>
+            {{ form_start(delete_form) }}
+            <input type="submit" value="Delete">
+            {{ form_end(delete_form) }}
+        </li>
+    </ul>
+{% endblock %}

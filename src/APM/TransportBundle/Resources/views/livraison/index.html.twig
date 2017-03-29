@@ -1,0 +1,53 @@
+{% extends "APMAdminBundle:_Main:layout.html.twig" %}
+
+{% block body %}
+    <h1>Livraison list</h1>
+
+    <table>
+        <thead>
+        <tr>
+            <th>Code</th>
+            <th>Description</th>
+            <th>Dateetheurelivraison</th>
+            <th>Etatlivraison</th>
+            <th>Priorite</th>
+            <th>Valide</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for livraison in livraisons %}
+            <tr>
+                <td>
+                    <a href="{{ path('apm_transport_livraison_show', { 'id': livraison.id }) }}">{{ livraison.code }}</a>
+                </td>
+                <td>{{ livraison.description }}</td>
+                <td>{{ livraison.dateEtHeureLivraison|date() }}</td>
+                <td>{{ livraison.etatLivraison }}</td>
+                <td>{{ livraison.priorite }}</td>
+                <td>{% if livraison.valide %}Yes{% else %}No{% endif %}</td>
+                <td>
+                    <ul>
+                        <li>
+                            <a href="{{ path('apm_transport_livraison_show', { 'id': livraison.id }) }}">show</a>
+                        </li>
+                        <li>
+                            <a href="{{ path('apm_transport_livraison_edit', { 'id': livraison.id }) }}">edit</a>
+                        </li>
+                        <li>
+                            <a href="{{ path('apm_transport_livraison_deleteFromList', { 'id': livraison.id }) }}">delete</a>
+                        </li>
+
+                    </ul>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <ul>
+        <li>
+            <a href="{{ path('apm_transport_livraison_new') }}">Create a new entry</a>
+        </li>
+    </ul>
+{% endblock %}

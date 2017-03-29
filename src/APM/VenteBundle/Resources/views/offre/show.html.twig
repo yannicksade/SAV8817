@@ -1,0 +1,109 @@
+{% extends "APMAdminBundle:_Main:layout.html.twig" %}
+
+{% block body %}
+    <h1>Offre</h1>
+
+    <table>
+        <tbody>
+        <tr>
+            <th>Garantie</th>
+            <td>{% if offre.garantie %}Yes{% else %}No{% endif %}</td>
+        </tr>
+        <tr>
+            <th>Code</th>
+            <td>{{ offre.code }}</td>
+        </tr>
+        <tr>
+            <th>Catégorie</th>
+            <td>{% if offre.categorie %}{{ offre.categorie.designation }}{% endif %}</td>
+        </tr>
+        <tr>
+            <th>Datecreation</th>
+            <td>{% if offre.dateCreation %}{{ offre.dateCreation|date('Y-m-d H:i:s') }}{% endif %}</td>
+        </tr>
+        <tr>
+            <th>Dateexpiration</th>
+            <td>{% if offre.dateExpiration %}{{ offre.dateExpiration|date('Y-m-d H:i:s') }}{% endif %}</td>
+        </tr>
+        <tr>
+            <th>Description</th>
+            <td>{{ offre.description }}</td>
+        </tr>
+        <tr>
+            <th>Designation</th>
+            <td>{{ offre.designation }}</td>
+        </tr>
+        <tr>
+            <th>Boutique</th>
+            <td>{% if offre.boutique %}{{ offre.boutique.designation }}{% endif %}</td>
+        </tr>
+        <tr>
+            <th>Retourne</th>
+            <td>{% if offre.retourne %}Yes{% else %}No{% endif %}</td>
+        </tr>
+        <tr>
+            <th>Etat</th>
+            <td>{{ offre.etat }}</td>
+        </tr>
+        <tr>
+            <th>Image</th>
+            <td>{{ offre.image }}</td>
+        </tr>
+        <tr>
+            <th>Modevente</th>
+            <td>{{ offre.modeVente }}</td>
+        </tr>
+        <tr>
+            <th>Numerodeserie</th>
+            <td>{{ offre.numeroDeSerie }}</td>
+        </tr>
+
+        <tr>
+            <th>Prixunitaire</th>
+            <td>{{ offre.prixUnitaire }}</td>
+        </tr>
+        <tr>
+            <th>Quantite</th>
+            <td>{{ offre.quantite }}</td>
+        </tr>
+        <tr>
+            <th>Evaluation</th>
+            <td>{{ offre.evaluation }}</td>
+        </tr>
+        <tr>
+            <th>Reference</th>
+            <td>{{ offre.reference }}</td>
+        </tr>
+        <tr>
+            <th>Remiseproduit</th>
+            <td>{{ offre.remiseProduit }}</td>
+        </tr>
+        <tr>
+            <th>Typeoffre</th>
+            <td>{{ offre.typeOffre }}</td>
+        </tr>
+        <tr>
+            <th>Valide</th>
+            <td>{% if offre.valide %}Yes{% else %}No{% endif %}</td>
+        </tr>
+        </tbody>
+    </table>
+
+    <ul>
+        <li>
+            <a href="{{ path('apm_vente_offre_index') }}">Back to the list</a>
+        </li>
+        <li>
+            <a href="{{ path('apm_vente_offre_edit', { 'id': offre.id }) }}">Edit</a>
+        </li>
+        <li>
+            <a href="{{ path('apm_vente_offre_new') }}">Add a new one</a>
+        </li>
+
+        <li>
+            {{ form_start(delete_form) }}
+            <input type="submit" value="Delete">
+            {{ form_end(delete_form) }}
+        </li>
+    </ul>
+{% endblock %}

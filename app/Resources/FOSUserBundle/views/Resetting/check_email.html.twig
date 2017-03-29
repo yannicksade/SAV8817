@@ -1,0 +1,9 @@
+{% trans_default_domain 'FOSUserBundle' %}
+
+<h1>Confirmation par e-mail requise</h1>
+    <p>
+        {{ 'resetting.check_email'|trans({'%tokenLifetime%': tokenLifetime})|nl2br }}
+    </p>
+<a href="{{ path('apm_core_main_show') }}">
+    <button class="btn btn-default">Retour</button>
+</a>

@@ -1,0 +1,39 @@
+{% extends "APMAdminBundle:_Main:layout.html.twig" %}
+{% block body %}
+    <h1>Piece_jointe</h1>
+
+    <table>
+        <tbody>
+        <tr>
+            <th>Extension</th>
+            <td>{{ piece_jointe.code }}</td>
+        </tr>
+        <tr>
+            <th>Lien</th>
+            <td>{{ piece_jointe.lien }}</td>
+        </tr>
+        <tr>
+            <th>Id</th>
+            <td>{{ piece_jointe.extension }}</td>
+        </tr>
+        </tbody>
+    </table>
+
+    <ul>
+        <li>
+            <a href="{{ path('apm_user_piece-jointe_index') }}">Back to the list</a>
+        </li>
+        <li>
+            <a href="{{ path('apm_user_piece-jointe_edit', { 'id': piece_jointe.id }) }}">Edit</a>
+        </li>
+        <li>
+            <a href="{{ path('apm_user_piece-jointe_new') }}">Add a new one</a>
+        </li>
+
+        <li>
+            {{ form_start(delete_form) }}
+            <input type="submit" value="Delete">
+            {{ form_end(delete_form) }}
+        </li>
+    </ul>
+{% endblock %}

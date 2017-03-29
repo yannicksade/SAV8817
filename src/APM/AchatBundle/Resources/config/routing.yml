@@ -1,0 +1,15 @@
+apm_achat_groupe:
+    resource: "@APMAchatBundle/Resources/config/routing/groupe_offre.yml"
+    prefix:   /apm_achat_groupe
+
+apm_achat_service_apres_vente:
+    resource: "@APMAchatBundle/Resources/config/routing/service_apres_vente.yml"
+    prefix:   /apm_achat_service_apres_vente
+
+apm_achat_specification_achat:
+    resource: "@APMAchatBundle/Resources/config/routing/specification_achat.yml"
+    prefix:   /apm_achat_specification_achat
+
+apm_achat_homepage:
+    path:     /achat
+    defaults: { _controller: "APMAchatBundle:Default:index" }

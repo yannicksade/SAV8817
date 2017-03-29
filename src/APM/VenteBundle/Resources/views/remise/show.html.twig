@@ -1,0 +1,55 @@
+{% extends "APMAdminBundle:_Main:layout.html.twig" %}
+{% block body %}
+    <h1>Remise</h1>
+
+    <table>
+        <tbody>
+        <tr>
+            <th>Code</th>
+            <td>{{ remise.code }}</td>
+        </tr>
+        <tr>
+            <th>Dateexpiration</th>
+            <td>{% if remise.dateExpiration %}{{ remise.dateExpiration|date('Y-m-d H:i:s') }}{% endif %}</td>
+        </tr>
+        <tr>
+            <th>Restreint</th>
+            <td>{% if remise.restreint %}Yes{% else %}No{% endif %}</td>
+        </tr>
+        <tr>
+            <th>Nombreutilisation</th>
+            <td>{{ remise.nombreUtilisation }}</td>
+        </tr>
+        <tr>
+            <th>Quantitemin</th>
+            <td>{{ remise.quantiteMin }}</td>
+        </tr>
+        <tr>
+            <th>Valeur</th>
+            <td>{{ remise.valeur }}</td>
+        </tr>
+        <tr>
+            <th>Id</th>
+            <td>{{ remise.id }}</td>
+        </tr>
+        </tbody>
+    </table>
+
+    <ul>
+        <li>
+            <a href="{{ path('apm_vente_remise_index') }}">Back to the list</a>
+        </li>
+        <li>
+            <a href="{{ path('apm_vente_remise_edit', { 'id': remise.id }) }}">Edit</a>
+        </li>
+        <li>
+            <a href="{{ path('apm_vente_remise_new') }}">Add a new</a>
+        </li>
+
+        <li>
+            {{ form_start(delete_form) }}
+            <input type="submit" value="Delete">
+            {{ form_end(delete_form) }}
+        </li>
+    </ul>
+{% endblock %}

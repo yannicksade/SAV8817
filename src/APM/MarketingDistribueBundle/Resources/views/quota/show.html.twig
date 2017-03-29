@@ -1,0 +1,44 @@
+{% extends "APMAdminBundle:_Main:layout.html.twig" %}
+
+{% block body %}
+    <h1>Quota</h1>
+
+    <table>
+        <tbody>
+        <tr>
+            <th>Description</th>
+            <td>{{ quotum.description }}</td>
+        </tr>
+        <tr>
+            <th>Libellé</th>
+            <td>{{ quotum.libelleQuota }}</td>
+        </tr>
+        <tr>
+            <th>Valeur</th>
+            <td>{{ quotum.valeurQuota }}</td>
+        </tr>
+        <tr>
+            <th>Code</th>
+            <td>{{ quotum.code }}</td>
+        </tr>
+        </tbody>
+    </table>
+
+    <ul>
+        <li>
+            <a href="{{ path('apm_marketing_quota_index') }}">Back to the list</a>
+        </li>
+        <li>
+            <a href="{{ path('apm_marketing_quota_edit', { 'id': quotum.id }) }}">Edit</a>
+        </li>
+        <li>
+            <a href="{{ path('apm_marketing_quota_new') }}">Add a new one</a>
+        </li>
+
+        <li>
+            {{ form_start(delete_form) }}
+            <input type="submit" value="Delete">
+            {{ form_end(delete_form) }}
+        </li>
+    </ul>
+{% endblock %}

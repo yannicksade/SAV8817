@@ -1,0 +1,3 @@
+apm_core_main_show:
+    path:     /
+    defaults: { _controller: "APMCoreBundle:MainSite:show" }

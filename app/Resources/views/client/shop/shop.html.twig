@@ -1,0 +1,101 @@
+{% extends ":client/main:main-page.html.twig" %}
+
+{%- block title -%} Easy Trade | boutique {% endblock %}
+
+{% block stylesheets %}
+    {% stylesheets 'client/assets/css/custom_style/shop.css' %}
+    <link rel="stylesheet" href="{{ asset_url }}"/>
+    {% endstylesheets %}
+{% endblock stylesheets %}
+
+{% block body %}
+    {# Le Header contient le logo et la bannière #}
+    {% block header %}
+        {% include ":base/shop:header_shop.html.twig" %}
+    {% endblock header %}
+
+    {% block nav %}
+        {%- block paginage -%}  {{ parent() }} > boutique   {% endblock paginage %}
+        {% include ":base/shop:navbar_shop.html.twig" %}
+    {% endblock nav %}
+
+    {% block banner %}
+    {% endblock banner %}
+
+    {% block firstsections %}
+    {% endblock firstsections %}
+
+    {% block sidebar %}
+        {% include ":base/shop:sidebar_shop.html.twig" %}
+    {% endblock sidebar %}
+
+    {% block productsection %}
+    <div>
+        <div class="row">
+            <div class="col-lg-2">
+                <p>produit 1</p>
+            </div>
+            <div class="col-lg-2">
+                <p>produit 2</p>
+            </div>
+            <div class="col-lg-2">
+                <p>produit 3</p>
+            </div>
+            <div class="col-lg-2">
+                <p>produit 4</p>
+            </div>
+            <div class="col-lg-2">
+                <p>produit 5</p>
+            </div>
+            <div class="col-lg-2">
+                <p>produit 6</p>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-2">
+                <p>produit 1</p>
+            </div>
+            <div class="col-lg-2">
+                <p>produit 2</p>
+            </div>
+            <div class="col-lg-2">
+                <p>produit 3</p>
+            </div>
+            <div class="col-lg-2">
+                <p>produit 4</p>
+            </div>
+            <div class="col-lg-2">
+                <p>produit 5</p>
+            </div>
+            <div class="col-lg-2">
+                <p>produit 6</p>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-2">
+                <p>produit 1</p>
+            </div>
+            <div class="col-lg-2">
+                <p>produit 2</p>
+            </div>
+            <div class="col-lg-2">
+                <p>produit 3</p>
+            </div>
+            <div class="col-lg-2">
+                <p>produit 4</p>
+            </div>
+            <div class="col-lg-2">
+                <p>produit 5</p>
+            </div>
+            <div class="col-lg-2">
+                <p>produit 6</p>
+            </div>
+        </div>
+    </div>
+
+    <p> rien de disponible pour le moment, revenez plutard!</p>
+    {% endblock productsection %}
+
+    {% block servicesection %}
+    {% endblock servicesection %}
+{% endblock body %}

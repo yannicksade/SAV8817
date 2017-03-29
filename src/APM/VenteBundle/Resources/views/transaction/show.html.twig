@@ -1,0 +1,54 @@
+{% extends "APMAdminBundle:_Main:layout.html.twig" %}
+
+{% block body %}
+    <h1>Transaction</h1>
+
+    <table>
+        <tbody>
+
+        <tr>
+            <th>Code</th>
+            <td>{{ transaction.code }}</td>
+        </tr>
+        <tr>
+            <th>Date</th>
+            <td>{% if transaction.date %}{{ transaction.date|date('Y-m-d H:i:s') }}{% endif %}</td>
+        </tr>
+        <tr>
+            <th>Destinatairenonavm</th>
+            <td>{{ transaction.destinataireNonAvm }}</td>
+        </tr>
+        <tr>
+            <th>Montant</th>
+            <td>{{ transaction.montant }}</td>
+        </tr>
+        <tr>
+            <th>Nature</th>
+            <td>{{ transaction.nature }}</td>
+        </tr>
+        <tr>
+            <th>Statut</th>
+            <td>{{ transaction.statut }}</td>
+        </tr>
+
+        </tbody>
+    </table>
+
+    <ul>
+        <li>
+            <a href="{{ path('apm_vente_transaction_index') }}">Back to the list</a>
+        </li>
+        <li>
+            <a href="{{ path('apm_vente_transaction_edit', { 'id': transaction.id }) }}">Edit</a>
+        </li>
+        <li>
+            <a href="{{ path('apm_vente_transaction_new') }}">Add a new one</a>
+        </li>
+
+        <li>
+            {{ form_start(delete_form) }}
+            <input type="submit" value="Delete">
+            {{ form_end(delete_form) }}
+        </li>
+    </ul>
+{% endblock %}

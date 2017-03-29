@@ -1,0 +1,30 @@
+apm_vente_transaction_index:
+    path:     /
+    defaults: { _controller: "APMVenteBundle:Transaction:index" }
+    methods:  GET
+
+apm_vente_transaction_show:
+    path:     /{id}/show
+    defaults: { _controller: "APMVenteBundle:Transaction:show" }
+    methods:  GET
+
+apm_vente_transaction_new:
+    path:     /new
+    defaults: { _controller: "APMVenteBundle:Transaction:new" }
+    methods:  [GET, POST]
+
+apm_vente_transaction_edit:
+    path:     /{id}/edit
+    defaults: { _controller: "APMVenteBundle:Transaction:edit" }
+    methods:  [GET, POST]
+
+apm_vente_transaction_delete:
+    path:     /{id}/delete
+    defaults: { _controller: "APMVenteBundle:Transaction:delete" }
+    methods:  DELETE
+
+apm_vente_transaction_deleteFromList:
+    path:     /list/{id}/delete
+    defaults: { _controller: "APMVenteBundle:Transaction:deleteFromList" }
+
+

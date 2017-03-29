@@ -1,0 +1,44 @@
+{% extends "APMAdminBundle:_Main:layout.html.twig" %}
+
+{% block body %}
+    <h1>Message list</h1>
+
+    <table>
+        <thead>
+        <tr>
+            <th>Code</th>
+            <th>Date Emission</th>
+            <th>Contenu</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for message in messages %}
+            <tr>
+                <td><a href="{{ path('apm_user_message_show', { 'id': message.id }) }}">{{ message.code }}</a></td>
+                <td>{% if message.dateEmission %}{{ message.dateEmission|date('Y-m-d H:i:s') }}{% endif %}</td>
+                <td>{{ message.contenu }}</td>
+                <td>
+                    <ul>
+                        <li>
+                            <a href="{{ path('apm_user_message_show', { 'id': message.id }) }}">show</a>
+                        </li>
+                        <li>
+                            <a href="{{ path('apm_user_message_edit', { 'id': message.id }) }}">edit</a>
+                        </li>
+                        <li>
+                            <a href="{{ path('apm_user_message_deleteFromList', { 'id': message.id }) }}">delete</a>
+                        </li>
+                    </ul>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <ul>
+        <li>
+            <a href="{{ path('apm_user_message_new') }}">Create a new entry</a>
+        </li>
+    </ul>
+{% endblock %}

@@ -1,0 +1,49 @@
+{% extends "APMAdminBundle:_Main:layout.html.twig" %}
+
+{% block body %}
+    <h1>Zone_intervention list</h1>
+
+    <table>
+        <thead>
+        <tr>
+            <th>Code</th>
+            <th>Désignation</th>
+            <th>Pays</th>
+            <th>Description</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for zone_intervention in zone_interventions %}
+            <tr>
+                <td>
+                    <a href="{{ path('apm_zone_intervention_show', { 'id': zone_intervention.id }) }}">{{ zone_intervention.code }}</a>
+                </td>
+                <td>{{ zone_intervention.designation }}</td>
+                <td>{{ zone_intervention.pays }}</td>
+                <td>{{ zone_intervention.description }}</td>
+                <td>
+                    <ul>
+                        <li>
+                            <a href="{{ path('apm_zone_intervention_show', { 'id': zone_intervention.id }) }}">show</a>
+                        </li>
+                        <li>
+                            <a href="{{ path('apm_zone_intervention_edit', { 'id': zone_intervention.id }) }}">edit</a>
+                        </li>
+                        <li>
+                            <a href="{{ path('apm_zone_intervention_deleteFromList', { 'id': zone_intervention.id }) }}">delete</a>
+                        </li>
+
+                    </ul>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <ul>
+        <li>
+            <a href="{{ path('apm_zone_intervention_new') }}">Create a new entry</a>
+        </li>
+    </ul>
+{% endblock %}

@@ -1,0 +1,52 @@
+{% extends "APMAdminBundle:_Main:layout.html.twig" %}
+
+{% block body %}
+    <h1>Conseiller</h1>
+
+    <table>
+        <tbody>
+        <tr>
+            <th>Code</th>
+            <td>{{ conseiller.code }}</td>
+        </tr>
+        <tr>
+            <th>Date d'enregistrement</th>
+            <td>{% if conseiller.dateEnregistrement %}{{ conseiller.dateEnregistrement|date('Y-m-d H:i:s') }}{% endif %}</td>
+        </tr>
+        <tr>
+            <th>Description</th>
+            <td>{{ conseiller.description }}</td>
+        </tr>
+        <tr>
+            <th>Conseiller A2?</th>
+            <td>{% if conseiller.conseillerA2 %}Yes{% else %}No{% endif %}</td>
+        </tr>
+        <tr>
+            <th>Matricule</th>
+            <td>{{ conseiller.matricule }}</td>
+        </tr>
+        <tr>
+            <th>Valeur quota</th>
+            <td>{{ conseiller.valeurQuota }}</td>
+        </tr>
+        </tbody>
+    </table>
+
+    <ul>
+        <li>
+            <a href="{{ path('apm_marketing_conseiller_index') }}">Back to the list</a>
+        </li>
+        <li>
+            <a href="{{ path('apm_marketing_conseiller_edit', { 'id': conseiller.id }) }}">Edit</a>
+        </li>
+        <li>
+            <a href="{{ path('apm_marketing_conseiller_new') }}">Add a new one</a>
+        </li>
+
+        <li>
+            {{ form_start(delete_form) }}
+            <input type="submit" value="Delete">
+            {{ form_end(delete_form) }}
+        </li>
+    </ul>
+{% endblock %}

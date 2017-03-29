@@ -1,0 +1,73 @@
+<?php
+
+namespace App\UserBundle\Entity;
+
+use Doctrine\ORM\Mapping as ORM;
+use FOS\UserBundle\Model\User as BaseUser;
+
+/**
+ * @ORM\Entity
+ * @ORM\Table(name="app_user")
+ * @ORM\InheritanceType("JOINED")
+ * @ORM\DiscriminatorColumn(name="type", type="string")
+ * @ORM\DiscriminatorMap({"user_one" = "UserOne", "user_two" = "UserTwo"})
+ *
+ */
+abstract class User extends BaseUser
+{
+    /**
+     * @ORM\Id
+     * @ORM\Column(type="integer")
+     * @ORM\GeneratedValue(strategy="AUTO")
+     */
+    protected $id;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="nom", type="string", length=255, nullable=true)
+     */
+    private $nom;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="prenom", type="string", length=255, nullable=true)
+     */
+    private $prenom;
+
+    /**
+     * @var \DateTime
+     *
+     * @ORM\Column(name="dateNaissance", type="date", nullable=true)
+     */
+    private $dateNaissance;
+
+    /**
+     * @var \DateTime
+     *
+     * @ORM\Column(name="nationalite", type="datetime", nullable=true)
+     */
+    private $nationalite;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="pays", type="string", length=255, nullable=true)
+     */
+    private $pays;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="genre", type="string", length=255, nullable=true)
+     */
+    private $genre;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="telephone", type="string", length=255, nullable=true)
+     */
+    private $telephone;
+}

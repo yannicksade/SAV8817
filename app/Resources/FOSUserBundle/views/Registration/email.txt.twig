@@ -1,0 +1,18 @@
+{% trans_default_domain 'FOSUserBundle' %}
+{% block subject %}
+{%- autoescape false -%}
+{{ 'registration.email.subject'|trans({'%username%': user.username, '%confirmationUrl%': confirmationUrl}) }}
+{%- endautoescape -%}
+{% endblock %}
+
+{% block body_text %}
+{% autoescape false %}
+{{ 'registration.email.message'|trans({'%username%': user.username, '%confirmationUrl%': confirmationUrl}) }}
+{% endautoescape %}
+{% endblock %}
+{% block body_html %}
+        <h1> EASY TRADE A VOTRE SERVICE</h1>
+        <p> Merci d'avoir choisi Easy Trade, profitez de l'intégralité de nos services</p>
+        Vous pouvez activer votre compte en cliquant sur le lien suivant:
+        <a href="{{ confirmationUrl }}">{{ confirmationUrl }}</a>
+{% endblock %}

@@ -1,0 +1,49 @@
+{% extends 'APMAdminBundle:_Main:layout.html.twig' %}
+
+{% block body %}
+    <h1>Groupe_offre list</h1>
+
+    <table>
+        <thead>
+        <tr>
+            <th>Code</th>
+            <th>Designation</th>
+            <th>Datedevigueur</th>
+            <th>Description</th>
+            <th>Recurrent</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for groupe_offre in groupe_offres %}
+            <tr>
+                <td><a href="{{ path('apm_achat_groupe_show', { 'id': groupe_offre.id}) }}">{{ groupe_offre.code }}</a>
+                </td>
+                <td>{{ groupe_offre.designation }}</td>
+                <td>{{ groupe_offre.description }}</td>
+                <td>{% if groupe_offre.recurrent %}Yes{% else %}No{% endif %}</td>
+                <td>
+                    <ul>
+                        <li>
+                            <a href="{{ path('apm_achat_groupe_show', { 'id': groupe_offre.id }) }}">show</a>
+                        </li>
+                        <li>
+                            <a href="{{ path('apm_achat_groupe_edit', { 'id': groupe_offre.id }) }}">edit</a>
+                        </li>
+                        <li>
+                            <a href="{{ path('apm_achat_groupe_deleteFromList', { 'id': groupe_offre.id }) }}">delete</a>
+                        </li>
+
+                    </ul>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <ul>
+        <li>
+            <a href="{{ path('apm_achat_groupe_new') }}">Create a new entry</a>
+        </li>
+    </ul>
+{% endblock %}

@@ -1,0 +1,72 @@
+{% extends "APMAdminBundle:_Main:layout.html.twig" %}
+
+{% block body %}
+    <h1>Boutique</h1>
+
+    <table>
+        <tbody>
+        <tr>
+            <th>Code</th>
+            <td>{{ boutique.code }}</td>
+        </tr>
+        <tr>
+            <th>Nom</th>
+            <td>{{ boutique.designation }}</td>
+        </tr>
+        <tr>
+            <th>Description</th>
+            <td>{{ boutique.description }}</td>
+        </tr>
+        <tr>
+            <th>Nationalite</th>
+            <td>{{ boutique.nationalite }}</td>
+        </tr>
+
+        <tr>
+            <th>Raisonsociale</th>
+            <td>{{ boutique.raisonSociale }}</td>
+        </tr>
+        <tr>
+            <th>Statutsocial</th>
+            <td>{{ boutique.statutSocial }}</td>
+        </tr>
+        <tr>
+            <th>Offres</th>
+            {% for offre in boutique.offres %}
+                <td>  {{ offre.designation }}</td>
+            {% endfor %}
+        </tr>
+        <tr>
+            <th>Categories</th>
+            {% for categorie in boutique.categories %}
+                <td>  {{ categorie.designation }}</td>
+            {% endfor %}
+        </tr>
+        <tr>
+            <th>Propriétaire</th>
+            <td>{{ boutique.proprietaire }}</td>
+        </tr>
+
+        </tbody>
+    </table>
+
+    <ul>
+        <li>
+            <a href="{{ path('apm_vente_boutique_index') }}">Back to the list</a>
+        </li>
+        <li>
+            <a href="{{ path('apm_vente_boutique_edit', { 'id': boutique.id }) }}">Edit</a>
+        </li>
+        <li>
+            <a href="{{ path('apm_vente_boutique_new') }}">Add a new one</a>
+        </li>
+
+        {% if delete_form %}
+        <li>
+            {{ form_start(delete_form) }}
+            <input type="submit" value="Delete">
+            {{ form_end(delete_form) }}
+        </li>
+        {% endif %}
+    </ul>
+{% endblock %}

@@ -1,0 +1,53 @@
+{% extends "APMAdminBundle:_Main:layout.html.twig" %}
+{% block body %}
+    <h1>Conseiller list</h1>
+
+    <table>
+        <thead>
+        <tr>
+            <th>Code</th>
+            <th>Date d'enregistrement</th>
+            <th>Description</th>
+            <th>Conseiller A2 ?</th>
+            <th>Matricule</th>
+            <th>Valeur</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for conseiller in conseillers %}
+            <tr>
+                <td>
+                    <a href="{{ path('apm_marketing_conseiller_show', { 'id': conseiller.id }) }}">{{ conseiller.code }}</a>
+                </td>
+                <td>{% if conseiller.dateEnregistrement %}{{ conseiller.dateEnregistrement|date('Y-m-d H:i:s') }}{% endif %}</td>
+                <td>{{ conseiller.description }}</td>
+                <td>{% if conseiller.conseillerA2 %}Yes{% else %}No{% endif %}</td>
+                <td>{{ conseiller.matricule }}</td>
+                <td>{{ conseiller.valeurQuota }}</td>
+                <td>
+                    <ul>
+                        <li>
+                            <a href="{{ path('apm_marketing_conseiller_show', { 'id': conseiller.id }) }}">show</a>
+                        </li>
+                        <li>
+                            <a href="{{ path('apm_marketing_conseiller_edit', { 'id': conseiller.id }) }}">edit</a>
+                        </li>
+                        <li>
+                            <a href="{{ path('apm_marketing_conseiller_deleteFromList', { 'id': conseiller.id }) }}">delete</a>
+                        </li>
+
+
+                    </ul>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <ul>
+        <li>
+            <a href="{{ path('apm_marketing_conseiller_new') }}">Create a new entry</a>
+        </li>
+    </ul>
+{% endblock %}

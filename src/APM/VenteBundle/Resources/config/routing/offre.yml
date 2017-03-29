@@ -1,0 +1,41 @@
+apm_vente_offre_index:
+    path:     /
+    defaults: { _controller: "APMVenteBundle:Offre:index" }
+    methods:  GET
+
+apm_vente_offre_show:
+    path:     /{id}/show
+    defaults: { _controller: "APMVenteBundle:Offre:show" }
+    methods:  GET
+
+apm_vente_offre_new:
+    path:     /new
+    defaults: { _controller: "APMVenteBundle:Offre:new" }
+    methods:  [GET, POST]
+
+apm_vente_offre_edit:
+    path:     /{id}/edit
+    defaults: { _controller: "APMVenteBundle:Offre:edit" }
+    methods:  [GET, POST]
+
+apm_vente_offre_delete:
+    path:     /{id}/delete
+    defaults: { _controller: "APMVenteBundle:Offre:delete" }
+    methods:  DELETE
+
+apm_vente_offre_deleteFromList:
+    path:     /list/{id}/delete
+    defaults: { _controller: "APMVenteBundle:Offre:deleteFromList" }
+
+#---------------------- Handle offre on Trade-------------------------------------------------
+#--------- accès exclusif----
+apm_vente_offre_restreindre:
+    path:     /{id}/admettre-utilisateur/{user_id}
+    defaults: { _controller: "APMVenteBundle:Trade:restreindreOffreAUtilisateur" }
+apm_vente_offre_exclure:
+    path:     /{id}/exclure-utilisateur/{user_id}
+    defaults: { _controller: "APMVenteBundle:Trade:exclureOffreAUtilisateur" }
+#--------- transferer offre----
+apm_vente_offre_transferer:
+    path:     /{id}/transferer-offre/{source_id}/{destinataire_id}/{ordre_id}/{livraison_id}
+    defaults: { _controller: "APMVenteBundle:Trade:transfererOffre" }

@@ -1,0 +1,49 @@
+{% extends 'APMAdminBundle:_Main:layout.html.twig' %}
+
+{% block body %}
+    <h1>Service_apres_vente list</h1>
+
+    <table>
+        <thead>
+        <tr>
+            <th>Codesav</th>
+            <th>Date</th>
+            <th>Descriptionpanne</th>
+            <th>Etat</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for service_apres_vente in service_apres_ventes %}
+            <tr>
+                <td>
+                    <a href="{{ path('apm_achat_service_apres_vente_show', { 'id': service_apres_vente.id }) }}">{{ service_apres_vente.codeSav }}</a>
+                </td>
+                <td>{% if service_apres_vente.dateDue %}{{ service_apres_vente.dateDue|date('Y-m-d H:i:s') }}{% endif %}</td>
+                <td>{{ service_apres_vente.descriptionPanne }}</td>
+                <td>{{ service_apres_vente.etat }}</td>
+                <td>
+                    <ul>
+                        <li>
+                            <a href="{{ path('apm_achat_service_apres_vente_show', { 'id': service_apres_vente.id }) }}">show</a>
+                        </li>
+                        <li>
+                            <a href="{{ path('apm_achat_service_apres_vente_edit', { 'id': service_apres_vente.id }) }}">edit</a>
+                        </li>
+                        <li>
+                            <a href="{{ path('apm_achat_service_apres_vente_deleteFromList', { 'id': service_apres_vente.id }) }}">delete</a>
+                        </li>
+
+                    </ul>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <ul>
+        <li>
+            <a href="{{ path('apm_achat_service_apres_vente_new') }}">Create a new entry</a>
+        </li>
+    </ul>
+{% endblock %}

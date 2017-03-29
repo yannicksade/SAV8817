@@ -1,0 +1,48 @@
+{% extends "APMAdminBundle:_Main:layout.html.twig" %}
+{% block body %}
+    <h1>Commentaire list</h1>
+
+    <table>
+        <thead>
+        <tr>
+            <th>Code</th>
+            <th>Date</th>
+            <th>Evaluation</th>
+            <th>Utilisateur</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for commentaire in commentaires %}
+            <tr>
+                <td>
+                    <a href="{{ path('apm_user_commentaire_show', { 'id': commentaire.id }) }}">{{ commentaire.code }}</a>
+                </td>
+                <td>{% if commentaire.date %}{{ commentaire.date|date('Y-m-d H:i:s') }}{% endif %}</td>
+                <td>{{ commentaire.evaluation }}</td>
+                <td>{{ commentaire.utilisateur }}</td>
+                <td>
+                    <ul>
+                        <li>
+                            <a href="{{ path('apm_user_commentaire_show', { 'id': commentaire.id}) }}">show</a>
+                        </li>
+                        <li>
+                            <a href="{{ path('apm_user_commentaire_edit', { 'id': commentaire.id }) }}">edit</a>
+                        </li>
+                        <li>
+                            <a href="{{ path('apm_user_commentaire_deleteFromList', { 'id': commentaire.id }) }}">delete</a>
+                        </li>
+
+                    </ul>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <ul>
+        <li>
+            <a href="{{ path('apm_user_commentaire_new') }}">Create a new entry</a>
+        </li>
+    </ul>
+{% endblock %}
