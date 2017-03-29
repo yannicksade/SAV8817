@@ -2,6 +2,7 @@
 /app/config/config.yml
 /app/AppKernel.php
 
+symfony
 /app/config/parameters.yml
 /build/
 /var/*
