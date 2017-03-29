@@ -1,0 +1,12 @@
+#http://symfony.com/doc/current/service_container.html
+
+parameters:
+    value1: 20
+    value2: 80
+
+services:
+    apm_service.test:
+        class: APM\AchatBundle\Resources\Util\Task
+#        arguments: ["%val1%","%val2%"]
+        calls:
+              - ['setValues', ["%val1%","%val2%"]]

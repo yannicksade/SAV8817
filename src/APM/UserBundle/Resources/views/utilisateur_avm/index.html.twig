@@ -1,0 +1,79 @@
+{% extends "APMAdminBundle:_Main:layout.html.twig" %}
+
+{% block body %}
+    <h1>Utilisateur_avm list</h1>
+
+    <table>
+        <thead>
+        <tr>
+            <th>Code</th>
+            <th>Dateenregistrement</th>
+            <th>Acheteur</th>
+            <th>Conseillera1</th>
+            <th>Conseillera2</th>
+            <th>Gerantboutique</th>
+            <th>Transporteurlivreur</th>
+            <th>Vendeur</th>
+            <th>Etatducompte</th>
+            <th>Latitudex</th>
+            <th>Longitudey</th>
+            <th>Pointsdefidelite</th>
+            <th>Urlimageprofile</th>
+            <th>Nom</th>
+            <th>Prenom</th>
+            <th>Datenaissance</th>
+            <th>Pays</th>
+            <th>Genre</th>
+            <th>Telephone</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for utilisateur_avm in utilisateur_avms %}
+            <tr>
+                <td>
+                    <a href="{{ path('apm_user_profile-utilisateur_show', { 'id': utilisateur_avm.id }) }}">{{ utilisateur_avm.code }}</a>
+                </td>
+                <td>{% if utilisateur_avm.dateEnregistrement %}{{ utilisateur_avm.dateEnregistrement|date('Y-m-d H:i:s') }}{% endif %}</td>
+                <td>{% if utilisateur_avm.acheteur %}Yes{% else %}No{% endif %}</td>
+                <td>{% if utilisateur_avm.conseillerA1 %}Yes{% else %}No{% endif %}</td>
+                <td>{% if utilisateur_avm.conseillerA2 %}Yes{% else %}No{% endif %}</td>
+                <td>{% if utilisateur_avm.gerantBoutique %}Yes{% else %}No{% endif %}</td>
+                <td>{% if utilisateur_avm.transporteurLivreur %}Yes{% else %}No{% endif %}</td>
+                <td>{% if utilisateur_avm.vendeur %}Yes{% else %}No{% endif %}</td>
+                <td>{{ utilisateur_avm.etatDuCompte }}</td>
+                <td>{{ utilisateur_avm.latitudeX }}</td>
+                <td>{{ utilisateur_avm.longitudeY }}</td>
+                <td>{{ utilisateur_avm.pointsDeFidelite }}</td>
+                <td>{{ utilisateur_avm.urlImageProfile }}</td>
+                <td>{{ utilisateur_avm.nom }}</td>
+                <td>{{ utilisateur_avm.prenom }}</td>
+                <td>{% if utilisateur_avm.dateNaissance %}{{ utilisateur_avm.dateNaissance|date('d-m-Y') }}{% endif %}</td>
+                <td>{{ utilisateur_avm.pays }}</td>
+                <td>{{ utilisateur_avm.genre }}</td>
+                <td>{{ utilisateur_avm.telephone }}</td>
+                <td>
+                    <ul>
+                        <li>
+                            <a href="{{ path('apm_user_profile-utilisateur_show', { 'id': utilisateur_avm.id }) }}">show</a>
+                        </li>
+                        <li>
+                            <a href="{{ path('apm_user_profile-utilisateur_edit', { 'id': utilisateur_avm.id }) }}">edit</a>
+                        </li>
+                        <li>
+                            <a href="{{ path('apm_user_profile-utilisateur_deleteFromList', { 'id': utilisateur_avm.id }) }}">delete</a>
+                        </li>
+
+                    </ul>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <ul>
+        <li>
+            <a href="{{ path('apm_user_profile-utilisateur_new') }}">Create a new entry</a>
+        </li>
+    </ul>
+{% endblock %}

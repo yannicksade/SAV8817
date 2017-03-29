@@ -1,0 +1,55 @@
+{% extends "APMAdminBundle:_Main:layout.html.twig" %}
+
+{% block body %}
+    <h1>Boutique list</h1>
+
+    <table>
+        <thead>
+        <tr>
+            <th>Code</th>
+            <th>Nationalite</th>
+            <th>Designation</th>
+            <th>Raison Sociale</th>
+            <th>Statut Social</th>
+            <th>Proprietaire</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for boutique in boutiques %}
+            {% if boutique.publiable %}
+            <tr>
+                <td>
+                    <a href="{{ path('apm_vente_boutique_show', { 'id': boutique.id }) }}">{{ boutique.code }}</a>
+                </td>
+                <td>{{ boutique.nationalite }}</td>
+                <td>{{ boutique.designation }}</td>
+                <td>{{ boutique.raisonSociale }}</td>
+                <td>{{ boutique.statutSocial }}</td>
+                <td>{{ boutique.proprietaire }}</td>
+                <td>
+                    <ul>
+                        <li>
+                            <a href="{{ path('apm_vente_boutique_show', { 'id': boutique.id }) }}">show</a>
+                        </li>
+                        <li>
+                            <a href="{{ path('apm_vente_boutique_edit', { 'id': boutique.id }) }}">edit</a>
+                        </li>
+                        <li>
+                            <a href="{{ path('apm_vente_boutique_deleteFromList', { 'id': boutique.id }) }}">delete</a>
+                        </li>
+
+                    </ul>
+                </td>
+            </tr>
+            {% endif %}
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <ul>
+        <li>
+            <a href="{{ path('apm_vente_boutique_new') }}">Create a new entry</a>
+        </li>
+    </ul>
+{% endblock %}

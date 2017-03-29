@@ -1,0 +1,40 @@
+{% extends "APMAdminBundle:_Main:layout.html.twig" %}
+{% block body %}
+    <h1>Reseau_conseillers</h1>
+
+    <table>
+        <tbody>
+        <tr>
+            <th>Code</th>
+            <td>{{ reseau_conseiller.code }}</td>
+        </tr>
+        <tr>
+            <th>Description</th>
+            <td>{{ reseau_conseiller.description }}</td>
+        </tr>
+        <tr>
+            <th>Nom</th>
+            <td>{{ reseau_conseiller.designation }}</td>
+        </tr>
+
+        </tbody>
+    </table>
+
+    <ul>
+        <li>
+            <a href="{{ path('apm_marketing_reseau_conseillers_index') }}">Back to the list</a>
+        </li>
+        <li>
+            <a href="{{ path('apm_marketing_reseau_conseillers_edit', { 'id': reseau_conseiller.id }) }}">Edit</a>
+        </li>
+        <li>
+            <a href="{{ path('apm_marketing_reseau_conseillers_new') }}">Add a new one</a>
+        </li>
+
+        <li>
+            {{ form_start(delete_form) }}
+            <input type="submit" value="Delete">
+            {{ form_end(delete_form) }}
+        </li>
+    </ul>
+{% endblock %}

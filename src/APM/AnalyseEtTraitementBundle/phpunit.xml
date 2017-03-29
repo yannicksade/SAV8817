@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/5.7phpunit.xsd"
+         bootstrap="Tests/bootstrap.php"
+         backupGlobals="false"
+         beStrictAboutCoversAnnotation="true"
+         beStrictAboutOutputDuringTests="true"
+         beStrictAboutTestsThatDoNotTestAnything="true"
+         beStrictAboutTodoAnnotatedTests="true"
+         verbose="true">
+    <testsuite>
+        <directory suffix="Test.php">Tests/Controller</directory>
+    </testsuite>
+    <testsuite>
+        <directory suffix="Test.php">Tests/Resources</directory>
+    </testsuite>
+
+
+    <php>
+        <server name="KERNEL_DIR" value="../../../app/"/>
+    </php>
+
+    <filter>
+        <whitelist processUncoveredFilesFromWhitelist="true">
+            <directory suffix=".php">Controller</directory>
+        </whitelist>
+        <whitelist processUncoveredFilesFromWhitelist="true">
+            <directory suffix=".php">Resources</directory>
+        </whitelist>
+    </filter>
+</phpunit>

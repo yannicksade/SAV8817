@@ -1,0 +1,3 @@
+apm_analyse_et_traitement_homepage:
+    path:     /analyse
+    defaults: { _controller: APMAnalyseEtTraitementBundle:Default:index }

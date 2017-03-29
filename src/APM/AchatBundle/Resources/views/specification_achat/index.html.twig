@@ -1,0 +1,51 @@
+{% extends 'APMAdminBundle:_Main:layout.html.twig' %}
+
+{% block body %}
+    <h1>Specification_achat list</h1>
+
+    <table>
+        <thead>
+        <tr>
+            <th>Code</th>
+            <th>Livraison</th>
+            <th>Avis</th>
+            <th>Datelivraisonsouhaite</th>
+            <th>Echantillon</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for specification_achat in specification_achats %}
+            <tr>
+                <td>
+                    <a href="{{ path('apm_achat_specification_achat_show', { 'id': specification_achat.id }) }}">{{ specification_achat.code }}</a>
+                </td>
+                <td>{% if specification_achat.livraison %}Yes{% else %}No{% endif %}</td>
+                <td>{{ specification_achat.avis }}</td>
+                <td>{% if specification_achat.dateLivraisonSouhaite %}{{ specification_achat.dateLivraisonSouhaite|date('Y-m-d H:i:s') }}{% endif %}</td>
+                <td>{% if specification_achat.echantillon %}Yes{% else %}No{% endif %}</td>
+                <td>
+                    <ul>
+                        <li>
+                            <a href="{{ path('apm_achat_specification_achat_show', { 'id': specification_achat.id }) }}">show</a>
+                        </li>
+                        <li>
+                            <a href="{{ path('apm_achat_specification_achat_edit', { 'id': specification_achat.id }) }}">edit</a>
+                        </li>
+                        <li>
+                            <a href="{{ path('apm_achat_specification_achat_deleteFromList', { 'id': specification_achat.id }) }}">delete</a>
+                        </li>
+
+                    </ul>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <ul>
+        <li>
+            <a href="{{ path('apm_achat_specification_achat_new') }}">Create a new entry</a>
+        </li>
+    </ul>
+{% endblock %}

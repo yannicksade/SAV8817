@@ -1,0 +1,48 @@
+{% extends "APMAdminBundle:_Main:layout.html.twig" %}
+
+{% block body %}
+    <h1>Rabais_offre list</h1>
+
+    <table>
+        <thead>
+        <tr>
+            <th>Code</th>
+            <th>Nombredefois</th>
+            <th>prixUpdate</th>
+            <th>Quantitemin</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for rabais_offre in rabais_offres %}
+            <tr>
+                <td>
+                    <a href="{{ path('apm_vente_rabais_offre_show', { 'id': rabais_offre.id }) }}">{{ rabais_offre.code }}</a>
+                </td>
+                <td>{{ rabais_offre.nombreDefois }}</td>
+                <td>{{ rabais_offre.prixUpdate }}</td>
+                <td>{{ rabais_offre.quantiteMin }}</td>
+                <td>
+                    <ul>
+                        <li>
+                            <a href="{{ path('apm_vente_rabais_offre_show', { 'id': rabais_offre.id }) }}">show</a>
+                        </li>
+                        <li>
+                            <a href="{{ path('apm_vente_rabais_offre_edit', { 'id': rabais_offre.id }) }}">edit</a>
+                        </li>
+                        <li>
+                            <a href="{{ path('apm_vente_rabais_offre_deleteFromList', { 'id': rabais_offre.id }) }}">delete</a>
+                        </li>
+                    </ul>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <ul>
+        <li>
+            <a href="{{ path('apm_vente_rabais_offre_new') }}">Create a new entry</a>
+        </li>
+    </ul>
+{% endblock %}

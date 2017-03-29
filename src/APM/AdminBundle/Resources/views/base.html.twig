@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>APM Dashboad</title>
+    <!-- Core CSS - Include with every page -->
+    <link href="{{ asset('admin/assets/plugins/bootstrap/bootstrap.css') }}" rel="stylesheet" />
+    <link href="{{ asset('admin/assets/font-awesome/css/font-awesome.css') }}" rel="stylesheet" />
+    <link href="{{ asset('admin/assets/plugins/pace/pace-theme-big-counter.css') }}" rel="stylesheet" />
+    <link href="{{ asset('admin/assets/css/style.css') }}" rel="stylesheet" />
+    <link href="{{ asset('admin/assets/css/main-style.css') }}" rel="stylesheet" />
+    <!-- Page-Level CSS -->
+    <link href="{{ asset('admin/assets/plugins/morris/morris-0.4.3.min.css') }}" rel="stylesheet" />
+
+    {% block stylesheets %}
+
+    {% endblock %}
+</head>
+<body>
+
+<div id="wrapper">
+
+    <!-- navbar top -->
+    {% include "APMAdminBundle::navbar.html.twig" %}
+    <!-- end navbar top -->
+
+    <!-- sidebar side -->
+    {% include "APMAdminBundle::sidebar.html.twig" %}
+    <!-- end sidebar side -->
+
+    <!--  page-wrapper -->
+    <div id="page-wrapper">
+
+        <div class="row">
+            <!-- Page Header -->
+            <div class="col-lg-12">
+                <h1 class="page-header">
+                    {% block titlePage %}
+
+                    {% endblock %}
+                </h1>
+            </div>
+            <!--End Page Header -->
+        </div>
+
+        <!-- page content -->
+        {% block body %}
+
+        {% endblock %}
+        <!-- /page content -->
+
+    </div>
+    <!-- end page-wrapper -->
+
+</div>
+
+<!-- Core Scripts - Include with every page -->
+
+{% block javascripts %}{% endblock %}
+
+<script src="{{ asset('admin/assets/plugins/jquery-1.10.2.js') }}"></script>
+<script src="{{ asset('admin/assets/plugins/bootstrap/bootstrap.min.js') }}"></script>
+<script src="{{ asset('admin/assets/plugins/metisMenu/jquery.metisMenu.js') }}"></script>
+<script src="{{ asset('admin/assets/plugins/pace/pace.js') }}"></script>
+<script src="{{ asset('admin/assets/scripts/siminta.js') }}"></script>
+<!-- Page-Level Plugin Scripts-->
+<script src="{{ asset('admin/assets/plugins/morris/raphael-2.1.0.min.js') }}"></script>
+<script src="{{ asset('admin/assets/plugins/morris/morris.js') }}"></script>
+<script src="{{ asset('admin/assets/scripts/dashboard-demo.js') }}"></script>
+
+</body>
+
+</html>

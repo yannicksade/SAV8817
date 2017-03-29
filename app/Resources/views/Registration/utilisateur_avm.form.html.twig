@@ -1,0 +1,15 @@
+{% extends "FOSUserBundle::layout.html.twig" %}
+
+{% block fos_user_content %}
+    <h1>Utilisateur AVM</h1>
+    {% trans_default_domain 'FOSUserBundle' %}
+
+    <form action="{{ path('apm_utilisateur_avm_registration') }}" method="POST">
+        {{ form_start(form) }}
+        {{ form_widget(form) }}
+        <div>
+            <input type="submit" value="{{ 'registration.submit'|trans }}" />
+        </div>
+        {{ form_end(form) }}
+    </form>
+{% endblock fos_user_content %}

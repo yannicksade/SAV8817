@@ -1,0 +1,19 @@
+apm_marketing_distribue_commissionnement:
+    resource: "@APMMarketingDistribueBundle/Resources/config/routing/commissionnement.yml"
+    prefix:   /apm_marketing_commissionnement
+
+apm_marketing_distribue_conseiller:
+    resource: "@APMMarketingDistribueBundle/Resources/config/routing/conseiller.yml"
+    prefix:   /apm_marketing_conseiller
+
+apm_marketing_distribue_quota:
+    resource: "@APMMarketingDistribueBundle/Resources/config/routing/quota.yml"
+    prefix:   /apm_marketing_quota
+
+apm_marketing_distribue_homepage:
+    path:     /marketing
+    defaults: { _controller: APMMarketingDistribueBundle:Default:index }
+
+apm_marketing_distribue_conseiller_boutique:
+    resource: "@APMMarketingDistribueBundle/Resources/config/routing/conseiller_boutique.yml"
+    prefix:   /apm_marketing_conseiller_boutique

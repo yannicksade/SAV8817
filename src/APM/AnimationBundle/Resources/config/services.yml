@@ -1,0 +1,4 @@
+services:
+#    apm_animation.example:
+#        class: APM\AnimationBundle\Example
+#        arguments: ["@service_id", "plain_value", %parameter%]

@@ -1,0 +1,4 @@
+services:
+#    apm_transport.example:
+#        class: APM\TransportBundle\Example
+#        arguments: ["@service_id", "plain_value", "%parameter%"]

@@ -1,0 +1,11 @@
+{% extends "APMAdminBundle:_Main:layout.html.twig" %}
+
+{% block body %}
+    <h1> PROMPT </h1>
+
+    {{ form_start(form) }}
+    {{ form_widget(form) }}
+    <input type="submit" value="Valider"/>
+    {{ form_end(form) }}
+
+{% endblock %}

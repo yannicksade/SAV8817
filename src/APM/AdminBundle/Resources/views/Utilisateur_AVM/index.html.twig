@@ -1,0 +1,140 @@
+{% extends "APMAdminBundle:_Main:layout.html.twig" %}
+
+{% block titlePage %} Utilisateurs AVM {% endblock %}
+
+{% block body %}
+    <div class="row">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                Enrégistrer.
+            </div>
+            <div class="panel-body">
+                <div class="row">
+                    {% trans_default_domain 'FOSUserBundle' %}
+                    <form method="post" autocomplete="off" action="{{ path('apm_utilisateur_index') }}">
+                        <span> {{ form_start(form) }} </span>
+
+                        {{ form_errors(form) }}
+
+                        <div class="col-xs-12 col-sm-6 col-md-6">
+                            <div class="form-group">
+                                {{ form_label(form.email, 'Email', { 'attr' : { 'class' : 'control-label col-md-3 col-sm-3 col-xs-12'} }) }} <span class="asterisk-color-red">*</span>
+                                {{ form_widget(form.email, { 'attr' : { 'class' : 'form-control col-md-7 col-xs-12'} }) }}
+                            </div>
+
+                            <div class="form-group">
+                                {{ form_label(form.username, 'Pseudo', { 'attr' : { 'class' : 'control-label col-md-3 col-sm-3 col-xs-12'} }) }} <span class="asterisk-color-red">*</span>
+                                {{ form_widget(form.username, { 'attr' : { 'class' : 'form-control col-md-7 col-xs-12'} }) }}
+                            </div>
+
+                            <div class="form-group">
+                                {{ form_label(form.plainPassword.first, 'Mot de passe', { 'attr' : { 'class' : 'control-label col-md-3 col-sm-3 col-xs-12'} }) }} <span class="asterisk-color-red">*</span>
+                                {{ form_widget(form.plainPassword.first, { 'attr' : { 'class' : 'form-control col-md-7 col-xs-12'} }) }}
+                            </div>
+
+                            <div class="form-group">
+                                {{ form_label(form.plainPassword.second, 'Confirmer Mot de passe', { 'attr' : { 'class' : 'control-label col-md-3 col-sm-3 col-xs-12'} }) }} <span class="asterisk-color-red">*</span>
+                                {{ form_widget(form.plainPassword.second, { 'attr' : { 'class' : 'form-control col-md-7 col-xs-12'} }) }}
+                            </div>
+                        </div>
+
+                        <div class="col-xs-12 col-sm-6 col-md-6">
+                            <div class="form-group">
+                                {{ form_label(form.nom, 'Nom', { 'attr' : { 'class' : 'control-label col-md-3 col-sm-3 col-xs-12'} }) }}
+                                {{ form_widget(form.nom, { 'attr' : { 'class' : 'form-control col-md-7 col-xs-12'} }) }}
+                            </div>
+
+                            <div class="form-group">
+                                {{ form_label(form.prenom, 'Prénom', { 'attr' : { 'class' : 'control-label col-md-3 col-sm-3 col-xs-12'} }) }}
+                                {{ form_widget(form.prenom, { 'attr' : { 'class' : 'form-control col-md-7 col-xs-12'} }) }}
+                            </div>
+
+                            <div class="form-group">
+                                {{ form_label(form.telephone, 'Numéro de Téléphone', { 'attr' : { 'class' : 'control-label col-md-3 col-sm-3 col-xs-12'} }) }}
+                                {{ form_widget(form.telephone, { 'attr' : { 'class' : 'form-control col-md-7 col-xs-12'} }) }}
+                            </div>
+                        </div>
+
+                        <div class="col-sm-9 col-sm-offset-3" style="margin-top: 40px;">
+                            <div class="pull-right">
+                                <input type="submit" value="{{ 'registration.submit'|trans }}" class="btn btn-info"/>
+                                <button type="reset" class="btn btn-success">Annuler</button>
+                            </div>
+                        </div>
+                        <span class="hidden"> {{ form_rest(form) }} </span>
+
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                Liste.
+            </div>
+            <div class="panel-body">
+                <div class="table-responsive">
+                    <table class="table table-striped table-bordered table-hover dataTables-example">
+                        <thead>
+                        <tr>
+                            <th>Prénoms & Noms</th>
+                            <th>Pseudo</th>
+                            <th>Email</th>
+                            <th>Téléphone</th>
+                            <th>Activé ?</th>
+                            <th>Options</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for u in users %}
+                            <tr>
+                                <td>
+                                    {{ u.prenom }} {{ u.nom }}
+                                </td>
+                                <td>
+                                    {{ u.username }}
+                                </td>
+                                <td>
+                                    {{ u.email }}
+                                </td>
+                                <td>
+                                    {{ u.telephone }}
+                                </td>
+                                <td style="text-align: center;">
+                                    {% if u.enabled == true %}
+                                        <a class="btn btn-success" title="Désactiver"
+                                           href="{{ path('apm_utilisateur_ableOrEnable', {'id' : u.id, 'val' : 0}) }}">
+                                            Oui
+                                        </a>
+                                    {%else%}
+                                        <a class="btn btn-danger" title="Activer"
+                                           href="{{ path('apm_utilisateur_ableOrEnable', {'id' : u.id, 'val' : 1}) }}">
+                                            Non
+                                        </a>
+                                    {% endif %}
+                                </td>
+                                <td style="text-align: center;">
+                                    <a class="btn btn-success" title="Visualiser"
+                                       data-toggle="modal" data-target=".bs-view-{{u.id}}-modal-sm">
+                                        <i class="fa fa-eye"></i>
+                                    </a>
+                                    <a class="btn btn-danger tooltipster-punk" title="Supprimer"
+                                       data-toggle="modal" data-target=".bs-{{u.id}}-modal-sm">
+                                        <i class="fa fa-trash-o"></i>
+                                    </a>
+
+                                    {% include 'APMAdminBundle:Utilisateur_AVM:delete.html.twig' with { 'u': u } %}
+                                    {% include 'APMAdminBundle:Utilisateur_AVM:view.html.twig' with { 'u': u } %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+        </div>
+    </div>
+{% endblock %}

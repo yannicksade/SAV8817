@@ -1,0 +1,52 @@
+<!-- Ce code definit la barre d'état du pied de page-->
+<html>
+<body>
+<nav class="row navbar navbar-fixed-bottom" id="authcontrol">
+    <div class="col-lg-3">
+        {% if is_granted("IS_AUTHENTICATED_REMEMBERED") %}
+            {{ 'layout.logged_in_as'|trans({'%username%': app.user.username}, 'FOSUserBundle') }},
+            <a href="{{ path('apm_core_dashboard_show', {'id': app.user.id}) }}"> accedez à votre dashboard ici </a> |
+            <a href="{{ path('fos_user_security_logout') }}">
+                {{ 'layout.logout'|trans({}, 'FOSUserBundle') }}
+            </a>
+        {% else %}
+            <p>
+                {# inclure le template de connexion#}
+                {% include "::login.html.twig" %}
+            </p>
+        {% endif %}
+
+    {% if app.request.hasPreviousSession %}
+        {% for type, messages in app.session.flashbag.all() %}
+            {% for message in messages %}
+                <div class="flash-{{ type }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endfor %}
+    {% endif %}
+    </div> <!-- fin col-lg-3 -->
+
+    <div class="col-lg-6">
+        {% if is_granted("IS_AUTHENTICATED_REMEMBERED") %}
+            <p>............................................................................</p>
+            <p>........... les messages et autres notification de l'utilisateur connecté .............</p>
+            <p>............................................................................</p>
+        {% else %}
+            <p><em>Welcome to Easy Trade! please, sign-in to experience more about our services.
+                </em> {#Utilisateur anonyme#}
+            </p>
+        {% endif %}
+    </div>
+    <div class="col-lg-3">
+        {% block notification_content %}
+            {% if is_granted("IS_AUTHENTICATED_REMEMBERED") %}
+                <p> Le pannier prévisionnel de l'utilisateur connecté</p>
+            {% else %}
+                <p> Le pannier de shopping de l'utilisateur non connecté</p>
+            {% endif %}
+        {% endblock notification_content %}
+    </div>
+</nav> <!--fin ligne nav-->
+</body>
+</html>

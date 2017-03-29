@@ -1,0 +1,28 @@
+apm_marketing_conseiller_index:
+    path:     /
+    defaults: { _controller: "APMMarketingDistribueBundle:Conseiller:index" }
+    methods:  GET
+
+apm_marketing_conseiller_show:
+    path:     /{id}/show
+    defaults: { _controller: "APMMarketingDistribueBundle:Conseiller:show" }
+    methods:  GET
+
+apm_marketing_conseiller_new:
+    path:     /new
+    defaults: { _controller: "APMMarketingDistribueBundle:Conseiller:new" }
+    methods:  [GET, POST]
+
+apm_marketing_conseiller_edit:
+    path:     /{id}/edit
+    defaults: { _controller: "APMMarketingDistribueBundle:Conseiller:edit" }
+    methods:  [GET, POST]
+
+apm_marketing_conseiller_delete:
+    path:     /{id}/delete
+    defaults: { _controller: "APMMarketingDistribueBundle:Conseiller:delete" }
+    methods:  DELETE
+
+apm_marketing_conseiller_deleteFromList:
+    path:     /list/{id}/delete
+    defaults: { _controller: "APMMarketingDistribueBundle:Conseiller:deleteFromlist" }

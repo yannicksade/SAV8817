@@ -1,0 +1,100 @@
+{% extends "APMAdminBundle:_Main:layout.html.twig" %}
+
+{% block body %}
+    <h1>Utilisateur_avm</h1>
+
+    <table>
+        <tbody>
+        <tr>
+            <th>Id</th>
+            <td>{{ utilisateur_avm.id }}</td>
+        </tr>
+        <tr>
+            <th>Dateenregistrement</th>
+            <td>{% if utilisateur_avm.dateEnregistrement %}{{ utilisateur_avm.dateEnregistrement|date('Y-m-d H:i:s') }}{% endif %}</td>
+        </tr>
+        <tr>
+            <th>Acheteur</th>
+            <td>{% if utilisateur_avm.acheteur %}Yes{% else %}No{% endif %}</td>
+        </tr>
+        <tr>
+            <th>Conseillera1</th>
+            <td>{% if utilisateur_avm.conseillerA1 %}Yes{% else %}No{% endif %}</td>
+        </tr>
+        <tr>
+            <th>Conseillera2</th>
+            <td>{% if utilisateur_avm.conseillerA2 %}Yes{% else %}No{% endif %}</td>
+        </tr>
+        <tr>
+            <th>Gerantboutique</th>
+            <td>{% if utilisateur_avm.gerantBoutique %}Yes{% else %}No{% endif %}</td>
+        </tr>
+        <tr>
+            <th>Transporteurlivreur</th>
+            <td>{% if utilisateur_avm.transporteurLivreur %}Yes{% else %}No{% endif %}</td>
+        </tr>
+        <tr>
+            <th>Vendeur</th>
+            <td>{% if utilisateur_avm.vendeur %}Yes{% else %}No{% endif %}</td>
+        </tr>
+        <tr>
+            <th>Etatducompte</th>
+            <td>{{ utilisateur_avm.etatDuCompte }}</td>
+        </tr>
+        <tr>
+            <th>Latitudex</th>
+            <td>{{ utilisateur_avm.latitudeX }}</td>
+        </tr>
+        <tr>
+            <th>Longitudey</th>
+            <td>{{ utilisateur_avm.longitudeY }}</td>
+        </tr>
+        <tr>
+            <th>Pointsdefidelite</th>
+            <td>{{ utilisateur_avm.pointsDeFidelite }}</td>
+        </tr>
+        <tr>
+            <th>Urlimageprofile</th>
+            <td>{{ utilisateur_avm.urlImageProfile }}</td>
+        </tr>
+        <tr>
+            <th>Nom</th>
+            <td>{{ utilisateur_avm.nom }}</td>
+        </tr>
+        <tr>
+            <th>Prenom</th>
+            <td>{{ utilisateur_avm.prenom }}</td>
+        </tr>
+        <tr>
+            <th>Datenaissance</th>
+            <td>{% if utilisateur_avm.dateNaissance %}{{ utilisateur_avm.dateNaissance|date('Y-m-d') }}{% endif %}</td>
+        </tr>
+        <tr>
+            <th>Pays</th>
+            <td>{{ utilisateur_avm.pays }}</td>
+        </tr>
+        <tr>
+            <th>Genre</th>
+            <td>{{ utilisateur_avm.genre }}</td>
+        </tr>
+        <tr>
+            <th>Telephone</th>
+            <td>{{ utilisateur_avm.telephone }}</td>
+        </tr>
+        </tbody>
+    </table>
+
+    <ul>
+        <li>
+            <a href="{{ path('apm_user_profile-utilisateur_index') }}">Back to the list</a>
+        </li>
+        <li>
+            <a href="{{ path('apm_user_profile-utilisateur_edit', { 'id': utilisateur_avm.id }) }}">Edit</a>
+        </li>
+        <li>
+            {{ form_start(delete_form) }}
+            <input type="submit" value="Delete">
+            {{ form_end(delete_form) }}
+        </li>
+    </ul>
+{% endblock %}

@@ -1,0 +1,4 @@
+apm_core_analyste_index:
+    path:     /
+    defaults: { _controller: "APMCoreBundle:Analyste:index" }
+    methods:  GET

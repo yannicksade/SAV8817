@@ -1,0 +1,49 @@
+{% extends "APMAdminBundle:_Main:layout.html.twig" %}
+
+{% block body %}
+    <h1>Documents list</h1>
+
+    <table>
+        <thead>
+        <tr>
+            <th>Code</th>
+            <th>Objet</th>
+            <th>Description</th>
+            <th>Urlcontenu</th>
+
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for document in documents %}
+            <tr>
+                <td>
+                    <a href="{{ path('apm_animation_base_documentaire_show', { 'id': document.id }) }}">{{ document.code }}</a>
+                </td>
+                <td>{{ document.objet }}</td>
+                <td>{{ document.description }}</td>
+                <td>{{ document.urlContenu }}</td>
+                <td>
+                    <ul>
+                        <li>
+                            <a href="{{ path('apm_animation_base_documentaire_show', { 'id': document.id }) }}">show</a>
+                        </li>
+                        <li>
+                            <a href="{{ path('apm_animation_base_documentaire_edit', { 'id': document.id }) }}">edit</a>
+                        </li>
+                        <li>
+                            <a href="{{ path('apm_animation_base_documentaire_deleteFromList', { 'id': document.id }) }}">delete</a>
+                        </li>
+                    </ul>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <ul>
+        <li>
+            <a href="{{ path('apm_animation_base_documentaire_new') }}">Create a new entry</a>
+        </li>
+    </ul>
+{% endblock %}

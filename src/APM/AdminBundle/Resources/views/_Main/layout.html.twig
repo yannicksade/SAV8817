@@ -1,0 +1,15 @@
+{% extends "APMAdminBundle::base.html.twig" %}
+
+{% block stylesheets %}
+    <link href="{{ asset('admin/assets/plugins/dataTables/dataTables.bootstrap.css') }}" rel="stylesheet" />
+{% endblock %}
+
+{% block javascripts %}
+    <script src="{{ asset('admin/assets/plugins/dataTables/jquery.dataTables.js') }}"></script>
+    <script src="{{ asset('admin/assets/plugins/dataTables/dataTables.bootstrap.js') }}"></script>
+    <script>
+        $(document).ready(function () {
+            $('.dataTables-example').dataTable();
+        });
+    </script>
+{% endblock %}

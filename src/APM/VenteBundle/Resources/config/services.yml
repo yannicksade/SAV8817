@@ -1,0 +1,27 @@
+services:
+
+#---------- Fournir les fonctionalités utilisateur ---------
+    apm_vente.operation:
+        class: APM\VenteBundle\Trade\OperationHandler
+
+    apm_vente.boutique:
+        class: APM\VenteBundle\Trade\BoutiqueHandler
+        arguments: ['@apm_vente.operation']
+
+    apm_vente.categorie:
+        class: APM\VenteBundle\Trade\CategorieHandler
+        arguments: ['@apm_vente.operation']
+
+    apm_vente.offre:
+        class: APM\VenteBundle\Trade\OffreHandler
+        arguments: ['@apm_vente.operation']
+
+#------------ Entités Factory: fabrice des entités du module vente ---------------------------
+#services:
+#    apm_vente.code_generator:
+#        class: APM\VenteBundle\Trade\CodeGenerator
+#
+#    apm_vente.trade:
+#        class: APM\VenteBundle\TradeAbstraction\Trade
+#        calls:
+#              - ['setCodeGenerator', ['@apm_vente.code_generator']]

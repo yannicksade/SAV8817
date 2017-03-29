@@ -1,0 +1,63 @@
+{% extends "APMAdminBundle:_Main:layout.html.twig" %}
+
+{% block body %}
+    <h1>Offre list</h1>
+
+    <table>
+        <thead>
+        <tr>
+            <th>Code</th>
+            <th>Designation</th>
+            <th>Date d'expiration</th>
+            <th>Description</th>
+            <th>Garantie</th>
+            <th>Retourne</th>
+            <th>Etat</th>
+            <th>Prixunitaire</th>
+            <th>Quantite</th>
+            <th>Evaluation</th>
+            <th>Reference</th>
+            <th>Valide</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for offre in offres %}
+            <tr>
+                <td><a href="{{ path('apm_vente_offre_show', { 'id': offre.id }) }}">{{ offre.code }}</a></td>
+                <td>{{ offre.designation }}</td>
+                <td>{% if offre.dateExpiration %}{{ offre.dateExpiration|date('Y-m-d H:i:s') }}{% endif %}</td>
+                <td>{{ offre.description }}</td>
+                <td>{{ offre.garantie }}</td>
+                <td>{% if offre.retourne %}Yes{% else %}No{% endif %}</td>
+                <td>{{ offre.etat }}</td>
+                <td>{{ offre.prixUnitaire }}</td>
+                <td>{{ offre.quantite }}</td>
+                <td>{{ offre.evaluation }}</td>
+                <td>{{ offre.reference }}</td>
+                <td>{% if offre.valide %}Yes{% else %}No{% endif %}</td>
+                <td>
+                    <ul>
+                        <li>
+                            <a href="{{ path('apm_vente_offre_show', { 'id': offre.id }) }}">show</a>
+                        </li>
+                        <li>
+                            <a href="{{ path('apm_vente_offre_edit', { 'id': offre.id }) }}">edit</a>
+                        </li>
+                        <li>
+                            <a href="{{ path('apm_vente_offre_deleteFromList', { 'id': offre.id }) }}">delete</a>
+                        </li>
+
+                    </ul>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <ul>
+        <li>
+            <a href="{{ path('apm_vente_offre_new') }}">Create a new entry</a>
+        </li>
+    </ul>
+{% endblock %}

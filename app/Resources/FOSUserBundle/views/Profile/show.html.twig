@@ -1,0 +1,19 @@
+<h1>Votre Profile</h1>
+{% trans_default_domain 'FOSUserBundle' %}
+
+
+<div class="fos_user_user_show">
+    <p>{{ 'profile.show.username'|trans }}: {{ user.username }}</p>
+    <p>{{ 'profile.show.email'|trans }}: {{ user.email }}</p>
+
+
+    <a href="{{ path('fos_user_profile_edit') }}">
+        <button class="btn btn-default">Modifier</button>
+    </a>
+
+    <a href="{{ path('apm_core_dashboard_show', {'id': app.user.id}) }}">
+        <button class="btn btn-default">Retour</button>
+    </a>
+
+</div>
+

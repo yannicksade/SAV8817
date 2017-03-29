@@ -1,0 +1,57 @@
+#-------- DANGER: creer toute route dans le path correct pour garantir un accès dédiée ex: /easy-trade/user dédié aux utilisateurs ayant le role USERAVM---------
+
+apm_core_homepage:
+    path:     /
+    defaults: { _controller: APMCoreBundle:Default:index }
+
+#--------------------- pages utilisateur ----------------------------------------------
+apm_core_user-registration:
+    resource: "@APMCoreBundle/Resources/config/user/user-registration.yml"
+    prefix:   /register/utilisateur-avm
+
+apm_core_shop:
+    resource: "@APMCoreBundle/Resources/config/routing/shop.yml"
+    prefix:   /easy-trade/costumer/shop
+
+apm_core_main:
+    resource: "@APMCoreBundle/Resources/config/routing/main-site.yml"
+    prefix:   /easy-trade/costumer/main-site
+
+apm_core_user-dashboard:
+    resource: "@APMCoreBundle/Resources/config/routing/user-dashboard.yml"
+    prefix:   /easy-trade/user/dashboard
+#----------- ajouter d'autre accessibilité aux droits des utilisateurs AVM ici ---------
+#------- ex: /easy-trade/user/...
+
+
+#-------------------------- pages staff ------------------------------------------------
+apm_core_staff_analyste:
+    resource: "@APMCoreBundle/Resources/config/staff/analyste.yml"
+    prefix:   /easy-trade/staff/analyste
+
+apm_core_staff_auditeur:
+    resource: "@APMCoreBundle/Resources/config/staff/auditeur.yml"
+    prefix:   /easy-trade/staff/auditeur
+
+apm_core_staff_explorateur:
+    resource: "@APMCoreBundle/Resources/config/staff/explorateur.yml"
+    prefix:   /easy-trade/staff/explorateur
+
+apm_core_staff_comptable:
+    resource: "@APMCoreBundle/Resources/config/staff/comptable.yml"
+    prefix:   /easy-trade/staff/comptable
+
+#--------------------------- pages du gerant ou du proprietaire de boutique ---------------
+apm_core_gerant-boutique:
+    resource: "@APMCoreBundle/Resources/config/user/boutique.yml"
+    prefix:   /easy-trade/gerant-boutique
+
+apm_core_conseillerA2:
+    resource: "@APMCoreBundle/Resources/config/user/conseillera2.yml"
+    prefix:   /easy-trade/conseiller
+
+apm_core_transport:
+    resource: "@APMCoreBundle/Resources/config/user/transport.yml"
+    prefix:   /easy-trade/transport
+
+#---------------------------------------- ------------------------------------------------

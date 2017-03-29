@@ -1,0 +1,4 @@
+apm_core_transport_index:
+    path:     /
+    defaults: { _controller: "APMCoreBundle:Transport:index" }
+    methods:  GET

@@ -1,0 +1,53 @@
+{% extends "APMAdminBundle:_Main:layout.html.twig" %}
+
+{% block body %}
+    <h1>Remise list</h1>
+
+    <table>
+        <thead>
+        <tr>
+            <th>Code</th>
+            <th>Dateexpiration</th>
+            <th>Restreint</th>
+            <th>Nombreutilisation</th>
+            <th>Quantitemin</th>
+            <th>Valeur</th>
+            <th>Id</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for remise in remises %}
+            <tr>
+                <td><a href="{{ path('apm_vente_remise_show', { 'id': remise.id }) }}">{{ remise.code }}</a></td>
+                <td>{% if remise.dateExpiration %}{{ remise.dateExpiration|date('Y-m-d H:i:s') }}{% endif %}</td>
+                <td>{% if remise.restreint %}Yes{% else %}No{% endif %}</td>
+                <td>{{ remise.nombreUtilisation }}</td>
+                <td>{{ remise.quantiteMin }}</td>
+                <td>{{ remise.valeur }}</td>
+                <td>{{ remise.id }}</td>
+                <td>
+                    <ul>
+                        <li>
+                            <a href="{{ path('apm_vente_remise_show', { 'id': remise.id }) }}">show</a>
+                        </li>
+                        <li>
+                            <a href="{{ path('apm_vente_remise_edit', { 'id': remise.id }) }}">edit</a>
+                        </li>
+                        <li>
+                            <a href="{{ path('apm_vente_remise_deleteFromList', { 'id': remise.id }) }}">delete</a>
+                        </li>
+
+                    </ul>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <ul>
+        <li>
+            <a href="{{ path('apm_vente_remise_new') }}">Create a new entry</a>
+        </li>
+    </ul>
+{% endblock %}

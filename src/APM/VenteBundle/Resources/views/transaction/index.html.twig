@@ -1,0 +1,70 @@
+{% extends "APMAdminBundle:_Main:layout.html.twig" %}
+{% block body %}
+    <h1>Transaction list</h1>
+
+    <table>
+        <thead>
+        <tr>
+            <th>Code</th>
+            <th>Montant</th>
+            <th>Nature</th>
+            <th>Statut</th>
+            <th>Ordre</th>
+            <th>Auteur</th>
+            <th>Livraison</th>
+            <th>Objet</th>
+            <th>Bénéficiaire</th>
+
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for transaction in transactions %}
+            <tr>
+                <td>
+                    <a href="{{ path('apm_vente_transaction_show', { 'id': transaction.id }) }}">{{ transaction.code }}</a>
+                </td>
+                <td>{{ transaction.montant }}</td>
+                <td>{{ transaction.nature }}</td>
+                <td>{{ transaction.statut }}</td>
+                {% if transaction.ordre %}
+                    <td> {{ transaction.ordre.code }}</td>{% endif %}
+                {% if transaction.auteur %}
+                    <td> {{ transaction.auteur.username }}</td>{% endif %}
+                {% if transaction.livraison %}
+                    <td> {{ transaction.livraison.code }}</td>{% endif %}
+                {% if transaction.transactionProduits %}
+                    {% for transaction in transaction.transactionProduits %}
+                        <td> {{ transaction.produit.designation }}</td>
+                        <td> {{ transaction.produit.vendeur.username }}</td>
+                    {% endfor %}
+                {% endif %}
+                {% if transaction.boutique %}
+                    <td> {{ transaction.boutique.designation }}</td>
+                    <td> {{ transaction.boutique.proprietaire.username }}</td>
+                {% endif %}
+                <td>
+                    <ul>
+                        <li>
+                            <a href="{{ path('apm_vente_transaction_show', { 'id': transaction.id }) }}">show</a>
+                        </li>
+                        <li>
+                            <a href="{{ path('apm_vente_transaction_edit', { 'id': transaction.id }) }}">edit</a>
+                        </li>
+                        <li>
+                            <a href="{{ path('apm_vente_transaction_deleteFromList', { 'id': transaction.id }) }}">delete</a>
+                        </li>
+
+                    </ul>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <ul>
+        <li>
+            <a href="{{ path('apm_vente_transaction_new') }}">Create a new entry</a>
+        </li>
+    </ul>
+{% endblock %}

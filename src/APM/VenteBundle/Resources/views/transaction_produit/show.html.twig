@@ -1,0 +1,40 @@
+{% extends "APMAdminBundle:_Main:layout.html.twig" %}
+
+{% block body %}
+    <h1>Transaction_produit</h1>
+
+    <table>
+        <tbody>
+        <tr>
+            <th>Code</th>
+            <td>{{ transaction_produit.transaction.code }}</td>
+        </tr>
+        <tr>
+            <th>Reférence</th>
+            <td>{{ transaction_produit.reference }}</td>
+        </tr>
+        <tr>
+            <th>Quantite</th>
+            <td>{{ transaction_produit.quantite }}</td>
+        </tr>
+        </tbody>
+    </table>
+
+    <ul>
+        <li>
+            <a href="{{ path('apm_vente_transaction_produit_index') }}">Back to the list</a>
+        </li>
+        <li>
+            <a href="{{ path('apm_vente_transaction_produit_edit', { 'id': transaction_produit.id }) }}">Edit</a>
+        </li>
+        <li>
+            <a href="{{ path('apm_vente_transaction_produit_new') }}">Add a new one</a>
+        </li>
+
+        <li>
+            {{ form_start(delete_form) }}
+            <input type="submit" value="Delete">
+            {{ form_end(delete_form) }}
+        </li>
+    </ul>
+{% endblock %}

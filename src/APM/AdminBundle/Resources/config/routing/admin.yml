@@ -1,0 +1,33 @@
+apm_admin_homepage:
+    path:     /
+    defaults: { _controller: APMAdminBundle:Default:index }
+
+#Gestion des administrateurs
+apm_admin_index:
+    path:     /administrateurs
+    defaults: { _controller: APMAdminBundle:Admin:index }
+
+apm_admin_ableOrEnable:
+    path:     /administrateur/ableOrEnable/{id}/{val}
+    defaults: { _controller: APMAdminBundle:Admin:AbleOrEnable }
+
+apm_admin_delete:
+    path:     /administrateur/delete/{id}
+    defaults: { _controller: APMAdminBundle:Admin:delete }
+
+apm_admin_update:
+    path:     /administrateur/update/{id}
+    defaults: { _controller: APMAdminBundle:Admin:update }
+
+#Gestion des utilisateurs avm
+apm_utilisateur_index:
+    path:     /utilisateurs-avm
+    defaults: { _controller: APMAdminBundle:UtilisateurAvm:index }
+
+apm_utilisateur_ableOrEnable:
+    path:     /utilisateur/disableOrEnable/{id}/{val}
+    defaults: { _controller: APMAdminBundle:UtilisateurAvm:AbleOrEnable }
+
+apm_utilisateur_delete:
+    path:     /utilisateur/delete/{id}
+    defaults: { _controller: APMAdminBundle:UtilisateurAvm:delete }

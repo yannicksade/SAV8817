@@ -1,0 +1,48 @@
+{% extends "APMAdminBundle:_Main:layout.html.twig" %}
+
+{% block body %}
+    <h1>Commissionnement list</h1>
+
+    <table>
+        <thead>
+        <tr>
+            <th>Code</th>
+            <th>Crédit dépensé</th>
+            <th>Libellé</th>
+            <th>Quantité</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for commissionnement in commissionnements %}
+            <tr>
+                <td>
+                    <a href="{{ path('apm_marketing_commissionnement_show', { 'id': commissionnement.id }) }}">{{ commissionnement.code }}</a>
+                </td>
+                <td>{{ commissionnement.creditDepense }}</td>
+                <td>{{ commissionnement.libelle }}</td>
+                <td>{{ commissionnement.quantite }}</td>
+                <td>
+                    <ul>
+                        <li>
+                            <a href="{{ path('apm_marketing_commissionnement_show', { 'id': commissionnement.id }) }}">show</a>
+                        </li>
+                        <li>
+                            <a href="{{ path('apm_marketing_commissionnement_edit', { 'id': commissionnement.id }) }}">edit</a>
+                        </li>
+                        <li>
+                            <a href="{{ path('apm_marketing_commissionnement_deleteFromList', { 'id': commissionnement.id }) }}">delete</a>
+                        </li>
+                    </ul>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <ul>
+        <li>
+            <a href="{{ path('apm_marketing_commissionnement_new') }}">Create a new entry</a>
+        </li>
+    </ul>
+{% endblock %}

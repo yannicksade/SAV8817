@@ -1,0 +1,48 @@
+{% extends 'APMAdminBundle:_Main:layout.html.twig' %}
+
+{% block body %}
+    <h1>Specification_achat</h1>
+
+    <table>
+        <tbody>
+        <tr>
+            <th>Demanderabais</th>
+            <td>{% if specification_achat.demandeRabais %}Yes{% else %}No{% endif %}</td>
+        </tr>
+        <tr>
+            <th>Livraison</th>
+            <td>{% if specification_achat.livraison %}Yes{% else %}No{% endif %}</td>
+        </tr>
+        <tr>
+            <th>Avis</th>
+            <td>{{ specification_achat.code }}</td>
+        </tr>
+        <tr>
+            <th>Datelivraisonsouhaite</th>
+            <td>{% if specification_achat.dateLivraisonSouhaite %}{{ specification_achat.dateLivraisonSouhaite|date('Y-m-d H:i:s') }}{% endif %}</td>
+        </tr>
+        <tr>
+            <th>Echantillon</th>
+            <td>{% if specification_achat.echantillon %}Yes{% else %}No{% endif %}</td>
+        </tr>
+        </tbody>
+    </table>
+
+    <ul>
+        <li>
+            <a href="{{ path('apm_achat_specification_achat_index') }}">Back to the list</a>
+        </li>
+        <li>
+            <a href="{{ path('apm_achat_specification_achat_edit', { 'id': specification_achat.id }) }}">Edit</a>
+        </li>
+        <li>
+            <a href="{{ path('apm_achat_specification_achat_new') }}">Add a new one</a>
+        </li>
+
+        <li>
+            {{ form_start(delete_form) }}
+            <input type="submit" value="Delete">
+            {{ form_end(delete_form) }}
+        </li>
+    </ul>
+{% endblock %}

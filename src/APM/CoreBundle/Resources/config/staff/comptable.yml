@@ -1,0 +1,4 @@
+apm_core_comptable_index:
+    path:     /
+    defaults: { _controller: "APMCoreBundle:Comptable:index" }
+    methods:  GET

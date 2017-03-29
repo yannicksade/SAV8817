@@ -1,0 +1,44 @@
+{% extends "APMAdminBundle:_Main:layout.html.twig" %}
+
+{% block body %}
+    <h1>Commissionnement</h1>
+
+    <table>
+        <tbody>
+        <tr>
+            <th>Credit dépensé</th>
+            <td>{{ commissionnement.creditDepense }}</td>
+        </tr>
+        <tr>
+            <th>Quantité</th>
+            <td>{{ commissionnement.quantite }}</td>
+        </tr>
+        <tr>
+            <th>Code</th>
+            <td>{{ commissionnement.code }}</td>
+        </tr>
+        <tr>
+            <th>Libellé</th>
+            <td>{{ commissionnement.libelle }}</td>
+        </tr>
+        </tbody>
+    </table>
+
+    <ul>
+        <li>
+            <a href="{{ path('apm_marketing_commissionnement_index') }}">Back to the list</a>
+        </li>
+        <li>
+            <a href="{{ path('apm_marketing_commissionnement_edit', { 'id': commissionnement.id }) }}">Edit</a>
+        </li>
+        <li>
+            <a href="{{ path('apm_marketing_commissionnement_new') }}">Add a new one</a>
+        </li>
+
+        <li>
+            {{ form_start(delete_form) }}
+            <input type="submit" value="Delete">
+            {{ form_end(delete_form) }}
+        </li>
+    </ul>
+{% endblock %}

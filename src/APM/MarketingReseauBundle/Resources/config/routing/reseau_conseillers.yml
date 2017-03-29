@@ -1,0 +1,29 @@
+apm_marketing_reseau_conseillers_index:
+    path:     /
+    defaults: { _controller: "APMMarketingReseauBundle:Reseau_conseillers:index" }
+    methods:  GET
+
+apm_marketing_reseau_conseillers_show:
+    path:     /{id}/show
+    defaults: { _controller: "APMMarketingReseauBundle:Reseau_conseillers:show" }
+    methods:  GET
+
+apm_marketing_reseau_conseillers_new:
+    path:     /new
+    defaults: { _controller: "APMMarketingReseauBundle:Reseau_conseillers:new" }
+    methods:  [GET, POST]
+
+apm_marketing_reseau_conseillers_edit:
+    path:     /{id}/edit
+    defaults: { _controller: "APMMarketingReseauBundle:Reseau_conseillers:edit" }
+    methods:  [GET, POST]
+
+apm_marketing_reseau_conseillers_delete:
+    path:     /{id}/delete
+    defaults: { _controller: "APMMarketingReseauBundle:Reseau_conseillers:delete" }
+    methods:  DELETE
+
+apm_marketing_reseau_conseillers_deleteFromList:
+    path:     /list/{id}/delete
+    defaults: { _controller: "APMMarketingReseauBundle:Reseau_conseillers:deleteFromList" }
+
