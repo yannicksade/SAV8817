@@ -13,7 +13,7 @@ class Rabais_offreControllerTest extends WebTestCase
         //run this client to a separate client
         $client->insulate();
         // Create a new entry in the database
-        $client->request('GET', '/apm_vente_rabais_offre');
+        $client->request('GET', '/apm/vente_rabais_offre');
         $crawler = $client->followRedirect();
         $this->assertEquals(200, $client->getResponse()->getStatusCode(), "Unexpected HTTP status code for GET /apm_vente_rabais_offre");
 
@@ -26,7 +26,7 @@ class Rabais_offreControllerTest extends WebTestCase
         $crawler = $client->followRedirect();
 
         // Check data in the show view
-        $this->assertGreaterThan(0, $crawler->filter('td:contains("125.00")')->count(), 'Missing element "125.00"');
+        $this->assertGreaterThan(0, $crawler->filter('td:contains("125")')->count(), 'Missing element "125.00"');
         // Edit the entity from the show view
         $crawler = $client->click($crawler->selectLink('Edit')->link());
 
@@ -42,7 +42,7 @@ class Rabais_offreControllerTest extends WebTestCase
 
         // Delete the entity and redirect to the list
         $client->submit($crawler->selectButton('Delete')->form());
-        $this->assertTrue($client->getResponse()->isRedirect('/apm_vente_rabais_offre/'), 'The response is redirect not to /apm_vente_rabais_offre/');
+        $this->assertTrue($client->getResponse()->isRedirect('/apm/vente_rabais_offre/'), 'The response is redirect not to /apm_vente_rabais_offre/');
         $client->followRedirect();
 
         $this->assertEquals(200, $client->getResponse()->getStatusCode(), "Unexpected HTTP status code for GET /apm_vente_rabais_offre/index");

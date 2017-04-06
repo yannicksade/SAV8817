@@ -17,7 +17,7 @@ class Individu_to_groupeType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('code')
+            ->add('individu')
             ->add('propriete', ChoiceType::class, array(
                 'choices' => array(
                     'A SUIVRE' => 0,
@@ -29,7 +29,7 @@ class Individu_to_groupeType extends AbstractType
                 'choice_label' => 'code',
                 'required' => true
             ])
-            ->add('individu');
+        ;
     }
 
     /**

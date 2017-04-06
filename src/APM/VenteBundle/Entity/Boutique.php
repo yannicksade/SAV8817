@@ -4,9 +4,10 @@ namespace APM\VenteBundle\Entity;
 
 use APM\MarketingDistribueBundle\Entity\Conseiller_boutique;
 use APM\MarketingDistribueBundle\Entity\Quota;
+use APM\TransportBundle\Entity\Livraison;
 use APM\TransportBundle\Entity\Livreur_boutique;
 use APM\UserBundle\Entity\Utilisateur_avm;
-use APM\VenteBundle\TradeAbstraction\Trade;
+use APM\VenteBundle\Factory\TradeFactory;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -19,7 +20,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @ORM\Entity(repositoryClass="APM\VenteBundle\Repository\BoutiqueRepository")
  * @UniqueEntity("code")
  */
-class Boutique extends Trade
+class Boutique extends TradeFactory
 {
     /**
      * @var string
@@ -112,7 +113,7 @@ class Boutique extends Trade
     /**
      * @var Collection
      *
-     * @ORM\OneToMany(targetEntity="APM\TransportBundle\Entity\Livreur_boutique", mappedBy="boutique")
+     * @ORM\ManyToMany(targetEntity="APM\TransportBundle\Entity\Livreur_boutique", mappedBy="boutiques")
      *
      */
     private $livreurs;
@@ -142,6 +143,12 @@ class Boutique extends Trade
     private $transactions;
 
     /**
+     * @var Collection
+     * @ORM\OneToMany(targetEntity="APM\TransportBundle\Entity\Livraison", mappedBy="boutique")
+     */
+    private $livraisons;
+
+    /**
      * Constructor
      * @param string $var
      */
@@ -153,6 +160,7 @@ class Boutique extends Trade
         $this->boutiqueConseillers = new ArrayCollection();
         $this->categories = new ArrayCollection();
         $this->transactions = new ArrayCollection();
+        $this->livraisons = new ArrayCollection();
         $this->code = "BQ" . $var;
     }
 
@@ -579,10 +587,44 @@ class Boutique extends Trade
     /**
      * Get transactions
      *
-     * @return \Doctrine\Common\Collections\Collection
+     * @return Collection
      */
     public function getTransactions()
     {
         return $this->transactions;
+    }
+
+    /**
+     * Add livraison
+     *
+     * @param Livraison $livraison
+     *
+     * @return Boutique
+     */
+    public function addLivraison(Livraison $livraison)
+    {
+        $this->livraisons[] = $livraison;
+
+        return $this;
+    }
+
+    /**
+     * Remove livraison
+     *
+     * @param Livraison $livraison
+     */
+    public function removeLivraison(Livraison $livraison)
+    {
+        $this->livraisons->removeElement($livraison);
+    }
+
+    /**
+     * Get livraisons
+     *
+     * @return Collection
+     */
+    public function getLivraisons()
+    {
+        return $this->livraisons;
     }
 }

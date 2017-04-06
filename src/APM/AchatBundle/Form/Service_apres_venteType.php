@@ -18,7 +18,6 @@ class Service_apres_venteType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('codeSav')
             ->add('dateDue', DateTimeType::class, ['required' => false])
             ->add('descriptionPanne', TextareaType::class, ['required' => false])
             ->add('etat', ChoiceType::class, [
@@ -29,7 +28,7 @@ class Service_apres_venteType extends AbstractType
                     "Autre" => 3
                 )
             ])
-            ->add('client');
+        ;
     }
 
     /**

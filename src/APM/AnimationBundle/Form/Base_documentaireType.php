@@ -18,13 +18,12 @@ class Base_documentaireType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('code')
             ->add('description', TextareaType::class, ['required' => false])
             ->add('objet', TextType::class, ['required' => false])
             ->add('urlContenu', UrlType::class, [
                 'default_protocol' => "ftp://"
             ])
-            ->add('proprietaire');
+            ;
     }
 
     /**

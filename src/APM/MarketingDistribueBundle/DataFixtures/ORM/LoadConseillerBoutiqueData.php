@@ -10,6 +10,7 @@ namespace APM\CoreBundle\DataFixtures\ORM;
 
 
 use APM\MarketingDistribueBundle\Entity\Conseiller_boutique;
+use APM\MarketingDistribueBundle\Factory\TradeFactory;
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
@@ -23,8 +24,8 @@ class LoadConseillerBoutiqueData extends AbstractFixture implements OrderedFixtu
     public function load(ObjectManager $manager)
     {
 
-        $conseillerBtq = new Conseiller_boutique();
-        $conseillerBtq->setCode("CONSBTQ125Test");
+        /** @var Conseiller_boutique $conseillerBtq */
+        $conseillerBtq = TradeFactory::getTradeProvider("conseiller_boutique");;
         $conseillerBtq->setConseiller($this->getReference('conseiller'));
         $conseillerBtq->setBoutique($this->getReference('boutique'));
 

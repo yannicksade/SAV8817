@@ -18,9 +18,8 @@ class Groupe_relationnelType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('code')
-            ->add('description', TextareaType::class, ["required" => false])
             ->add('designation', TextType::class)
+            ->add('description', TextareaType::class, ["required" => false])
             ->add('type', ChoiceType::class, array(
                 'choices' => [
                     'CLIENT' => 0,
@@ -33,7 +32,7 @@ class Groupe_relationnelType extends AbstractType
                     'COLLABORATEUR' => 7,
                     'Autre' => 8
                 ]))
-            ->add('proprietaire');
+            ;
     }
 
     /**

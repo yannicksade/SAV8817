@@ -13,7 +13,7 @@ class BoutiqueControllerTest extends WebTestCase
         //run this client to a separate client
         $client->insulate();
         // Create a new entry in the database
-        $client->request('GET', '/apm_vente_boutique');
+        $client->request('GET', '/apm/vente_boutique');
         $crawler = $client->followRedirect();
         $this->assertEquals(200, $client->getResponse()->getStatusCode(), "Unexpected HTTP status code for GET /apm_vente_boutique");
 
@@ -44,7 +44,7 @@ class BoutiqueControllerTest extends WebTestCase
 
         // Delete the entity and redirect to the list
         $client->submit($crawler->selectButton('Delete')->form());
-        $this->assertTrue($client->getResponse()->isRedirect('/apm_vente_boutique/'), 'The response is redirect not to /apm_vente_boutique/');
+        $this->assertTrue($client->getResponse()->isRedirect('/apm/vente_boutique/'), 'The response is redirect not to /apm_vente_boutique/');
         $client->followRedirect();
 
         // Check the entity has been delete on the list

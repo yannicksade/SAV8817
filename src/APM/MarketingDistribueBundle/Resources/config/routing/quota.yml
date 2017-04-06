@@ -1,5 +1,5 @@
 apm_marketing_quota_index:
-    path:     /
+    path:     /{id}
     defaults: { _controller: "APMMarketingDistribueBundle:Quota:index" }
     methods:  GET
 

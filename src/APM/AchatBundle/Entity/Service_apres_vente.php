@@ -2,6 +2,7 @@
 
 namespace APM\AchatBundle\Entity;
 
+use APM\AchatBundle\Factory\TradeFactory;
 use Symfony\Component\Validator\Constraints as Assert;
 use APM\UserBundle\Entity\Utilisateur_avm;
 use APM\VenteBundle\Entity\Offre;
@@ -19,7 +20,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
  * @ORM\Entity(repositoryClass="APM\AchatBundle\Repository\Service_apres_venteRepository")
  * @UniqueEntity("codeSav")
  */
-class Service_apres_vente
+class Service_apres_vente extends TradeFactory
 {
     /**
      * @var string
@@ -69,20 +70,24 @@ class Service_apres_vente
     private $client;
 
     /**
+     * @var Offre
      *
-     * @ORM\OneToMany(targetEntity="APM\VenteBundle\Entity\Offre", mappedBy="Service_apres_vente")
-     * @ORM\JoinColumn(nullable=false)
-     *
+     * @ORM\ManyToOne(targetEntity="APM\VenteBundle\Entity\Offre", inversedBy="service_apres_ventes")
+     * @ORM\JoinColumns({
+     *   @ORM\JoinColumn(name="offre_id", referencedColumnName="id", nullable=false)
+     * })
      */
-    private $offres;
+    private $offre;
 
 
     /**
      * Constructor
+     * @param string $var
      */
-    public function __construct()
+    public function __construct($var)
     {
-        $this->offres = new ArrayCollection();
+        $this->codeSav = "SV" . $var;
+        $this->dateDue = new \DateTime();
     }
 
     /**
@@ -217,37 +222,28 @@ class Service_apres_vente
         return $this;
     }
 
+
     /**
-     * Add offre
+     * Set offre
      *
      * @param Offre $offre
      *
      * @return Service_apres_vente
      */
-    public function addOffre(Offre $offre)
+    public function setOffre(Offre $offre)
     {
-        $this->offres[] = $offre;
+        $this->offre = $offre;
 
         return $this;
     }
 
     /**
-     * Remove offre
+     * Get offre
      *
-     * @param Offre $offre
+     * @return \APM\VenteBundle\Entity\Offre
      */
-    public function removeOffre(Offre $offre)
+    public function getOffre()
     {
-        $this->offres->removeElement($offre);
-    }
-
-    /**
-     * Get offres
-     *
-     * @return Collection
-     */
-    public function getOffres()
-    {
-        return $this->offres;
+        return $this->offre;
     }
 }

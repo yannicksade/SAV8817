@@ -4,8 +4,11 @@ namespace APM\UserBundle\Entity;
 
 use APM\AchatBundle\Entity\Groupe_offre;
 use APM\AchatBundle\Entity\Service_apres_vente;
+use APM\AchatBundle\Entity\Specification_achat;
 use APM\AnimationBundle\Entity\Base_documentaire;
+use APM\CoreBundle\Trade\CodeGenerator;
 use APM\MarketingDistribueBundle\Entity\Conseiller;
+use APM\TransportBundle\Entity\Livraison;
 use APM\TransportBundle\Entity\Profile_transporteur;
 use APM\VenteBundle\Entity\Boutique;
 use APM\VenteBundle\Entity\Offre;
@@ -173,22 +176,6 @@ class Utilisateur_avm extends Utilisateur
      */
     private $recepteurCommunications;
 
-
-    /**
-     *@var Collection
-     * @ORM\OneToMany(targetEntity="APM\VenteBundle\Entity\Suggestion_produit", mappedBy="suggerant")
-     *
-     */
-    private $suggerantSuggestions;
-
-    /**
-     *@var Collection
-     * @ORM\OneToMany(targetEntity="APM\VenteBundle\Entity\Suggestion_produit", mappedBy="destinataire")
-     *
-     */
-    private $destinataireSuggestions;
-
-
     /**
      * @var Collection
      * @ORM\OneToMany(targetEntity="APM\VenteBundle\Entity\Rabais_offre", mappedBy="vendeur")
@@ -247,7 +234,22 @@ class Utilisateur_avm extends Utilisateur
      * @ORM\OneToMany(targetEntity="APM\VenteBundle\Entity\Boutique", mappedBy="gerant")
      * @ORM\joinColumn(nullable=false)
      */
-    private $boutiques; //Boutiques managées par un gerant
+    private $boutiquesGerant; //Boutiques managées par le gerant
+
+
+    /**
+     * @var Collection
+     * @ORM\OneToMany(targetEntity="APM\AchatBundle\Entity\Specification_achat", mappedBy="utilisateur")
+     */
+    private $specifications;
+
+
+    /**
+     * @var Collection
+     * @ORM\OneToMany(targetEntity="APM\TransportBundle\Entity\Livraison", mappedBy="utilisateur")
+     */
+    private $livraisons;
+
 
     /**
      * Constructor
@@ -258,6 +260,7 @@ class Utilisateur_avm extends Utilisateur
 
         $this->roles = array('ROLE_USERAVM');
         $this->enabled = true;
+        $this->code = "X" . CodeGenerator::getGenerator(6);
 
         $this->offres = new ArrayCollection();
 
@@ -270,19 +273,18 @@ class Utilisateur_avm extends Utilisateur
         $this->documents = new ArrayCollection();
         $this->rabais=new  ArrayCollection();
 
-        $this->destinataireSuggestions = new ArrayCollection();
-        $this->suggerantSuggestions = new ArrayCollection();
-
         $this->recepteurCommunications = new ArrayCollection();
         $this->emetteurCommunications = new  ArrayCollection();
 
         $this->transactions = new ArrayCollection();
         $this->commentaires=new  ArrayCollection();
 
-        $this->boutiques = new ArrayCollection();
+        $this->boutiquesGerant = new ArrayCollection();
         $this->boutiquesProprietaire = new  ArrayCollection();
         $this->utilisateurOffres = new ArrayCollection();
+        $this->specifications = new  ArrayCollection();
 
+        $this->livraisons = new ArrayCollection();
 
     }
 
@@ -666,40 +668,6 @@ class Utilisateur_avm extends Utilisateur
     public function getBoutiquesProprietaire()
     {
         return $this->boutiquesProprietaire;
-    }
-
-    /**
-     * Add boutique
-     *
-     * @param Boutique $boutique
-     *
-     * @return Utilisateur_avm
-     */
-    public function addBoutique(Boutique $boutique)
-    {
-        $this->boutiques[] = $boutique;
-
-        return $this;
-    }
-
-    /**
-     * Remove boutique
-     *
-     * @param Boutique $boutique
-     */
-    public function removeBoutique(Boutique $boutique)
-    {
-        $this->boutiques->removeElement($boutique);
-    }
-
-    /**
-     * Get boutiques
-     *
-     * @return Collection
-     */
-    public function getBoutiques()
-    {
-        return $this->boutiques;
     }
 
     /**
@@ -1092,74 +1060,6 @@ class Utilisateur_avm extends Utilisateur
     }
 
     /**
-     * Add suggerantSuggestion
-     *
-     * @param Suggestion_produit $suggerantSuggestion
-     *
-     * @return Utilisateur_avm
-     */
-    public function addSuggerantSuggestion(Suggestion_produit $suggerantSuggestion)
-    {
-        $this->suggerantSuggestions[] = $suggerantSuggestion;
-
-        return $this;
-    }
-
-    /**
-     * Remove suggerantSuggestion
-     *
-     * @param Suggestion_produit $suggerantSuggestion
-     */
-    public function removeSuggerantSuggestion(Suggestion_produit $suggerantSuggestion)
-    {
-        $this->suggerantSuggestions->removeElement($suggerantSuggestion);
-    }
-
-    /**
-     * Get suggerantSuggestions
-     *
-     * @return Collection
-     */
-    public function getSuggerantSuggestions()
-    {
-        return $this->suggerantSuggestions;
-    }
-
-    /**
-     * Add destinataireSuggestion
-     *
-     * @param Suggestion_produit $destinataireSuggestion
-     *
-     * @return Utilisateur_avm
-     */
-    public function addDestinataireSuggestion(Suggestion_produit $destinataireSuggestion)
-    {
-        $this->destinataireSuggestions[] = $destinataireSuggestion;
-
-        return $this;
-    }
-
-    /**
-     * Remove destinataireSuggestion
-     *
-     * @param Suggestion_produit $destinataireSuggestion
-     */
-    public function removeDestinataireSuggestion(Suggestion_produit $destinataireSuggestion)
-    {
-        $this->destinataireSuggestions->removeElement($destinataireSuggestion);
-    }
-
-    /**
-     * Get destinataireSuggestions
-     *
-     * @return Collection
-     */
-    public function getDestinataireSuggestions()
-    {
-        return $this->destinataireSuggestions;
-    }
-
-    /**
      * Add individuGroupe
      *
      * @param Individu_to_groupe $individuGroupe
@@ -1225,5 +1125,108 @@ class Utilisateur_avm extends Utilisateur
     public function getDocuments()
     {
         return $this->documents;
+    }
+
+
+    /**
+     * Add livraison
+     *
+     * @param Livraison $livraison
+     *
+     * @return Utilisateur_avm
+     */
+    public function addLivraison(Livraison $livraison)
+    {
+        $this->livraisons[] = $livraison;
+
+        return $this;
+    }
+
+    /**
+     * Remove livraison
+     *
+     * @param Livraison $livraison
+     */
+    public function removeLivraison(Livraison $livraison)
+    {
+        $this->livraisons->removeElement($livraison);
+    }
+
+    /**
+     * Get livraisons
+     *
+     * @return Collection
+     */
+    public function getLivraisons()
+    {
+        return $this->livraisons;
+    }
+
+    /**
+     * Add specification
+     *
+     * @param Specification_achat $specification
+     *
+     * @return Utilisateur_avm
+     */
+    public function addSpecification(Specification_achat $specification)
+    {
+        $this->specifications[] = $specification;
+
+        return $this;
+    }
+
+    /**
+     * Remove specification
+     *
+     * @param Specification_achat $specification
+     */
+    public function removeSpecification(Specification_achat $specification)
+    {
+        $this->specifications->removeElement($specification);
+    }
+
+    /**
+     * Get specifications
+     *
+     * @return Collection
+     */
+    public function getSpecifications()
+    {
+        return $this->specifications;
+    }
+
+    /**
+     * Add boutiquesGerant
+     *
+     * @param Boutique $boutiquesGerant
+     *
+     * @return Utilisateur_avm
+     */
+    public function addBoutiquesGerant(Boutique $boutiquesGerant)
+    {
+        $this->boutiquesGerant[] = $boutiquesGerant;
+
+        return $this;
+    }
+
+    /**
+     * Remove boutiquesGerant
+     *
+     * @param Boutique $boutiquesGerant
+     */
+    public function removeBoutiquesGerant(Boutique $boutiquesGerant)
+    {
+        $this->boutiquesGerant->removeElement($boutiquesGerant);
+    }
+
+    /**
+     * Get boutiquesGerant
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getBoutiquesGerant()
+    {
+        return $this->boutiquesGerant;
     }
 }

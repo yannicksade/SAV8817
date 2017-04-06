@@ -2,10 +2,9 @@
 
 namespace APM\VenteBundle\Entity;
 
-use APM\AchatBundle\Entity\Specification_achat;
 use APM\TransportBundle\Entity\Livraison;
 use APM\UserBundle\Entity\Utilisateur_avm;
-use APM\VenteBundle\TradeAbstraction\Trade;
+use APM\VenteBundle\Factory\TradeFactory;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -19,12 +18,12 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
  * @ORM\Entity(repositoryClass="APM\VenteBundle\Repository\TransactionRepository")
  * @UniqueEntity("code")
  */
-class Transaction extends Trade
+class Transaction extends TradeFactory
 {
     /**
      * @var \DateTime
      * @Assert\DateTime
-     * @ORM\Column(name="date", type="datetime", nullable=true)
+     * @ORM\Column(name="date", type="datetime", nullable=false)
      */
     private $date;
 
@@ -87,19 +86,10 @@ class Transaction extends Trade
      * @var Livraison
      * @ORM\ManyToOne(targetEntity="APM\TransportBundle\Entity\Livraison", inversedBy="operations")
      * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="livraison_id", referencedColumnName="id", nullable=true)
+     *   @ORM\JoinColumn(name="livraison_id", referencedColumnName="id", nullable=false)
      * })
      */
     private $livraison;
-
-    /**
-     * @var Specification_achat
-     * @ORM\ManyToOne(targetEntity="APM\AchatBundle\Entity\Specification_achat" , inversedBy="operations")
-     * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="ordre_id", referencedColumnName="id", nullable=true)
-     * })
-     */
-    private $ordre;
 
 
     /**
@@ -304,30 +294,6 @@ class Transaction extends Trade
     public function setLivraison(Livraison $livraison)
     {
         $this->livraison = $livraison;
-
-        return $this;
-    }
-
-    /**
-     * Get ordre
-     *
-     * @return Specification_achat
-     */
-    public function getOrdre()
-    {
-        return $this->ordre;
-    }
-
-    /**
-     * Set ordre
-     *
-     * @param Specification_achat $ordre
-     *
-     * @return Transaction
-     */
-    public function setOrdre(Specification_achat $ordre = null)
-    {
-        $this->ordre = $ordre;
 
         return $this;
     }

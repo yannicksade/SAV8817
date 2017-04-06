@@ -20,11 +20,13 @@ apm_core_main:
 apm_core_user-dashboard:
     resource: "@APMCoreBundle/Resources/config/routing/user-dashboard.yml"
     prefix:   /easy-trade/user/dashboard
+
+
 #----------- ajouter d'autre accessibilité aux droits des utilisateurs AVM ici ---------
 #------- ex: /easy-trade/user/...
 
 
-#-------------------------- pages staff ------------------------------------------------
+#-------------------------- pages du staff ------------------------------------------------
 apm_core_staff_analyste:
     resource: "@APMCoreBundle/Resources/config/staff/analyste.yml"
     prefix:   /easy-trade/staff/analyste
@@ -41,6 +43,10 @@ apm_core_staff_comptable:
     resource: "@APMCoreBundle/Resources/config/staff/comptable.yml"
     prefix:   /easy-trade/staff/comptable
 
+apm_core_staff_super-admin:
+    resource: "@APMCoreBundle/Resources/config/staff/super-admin.yml"
+    prefix:   /easy-trade/staff/superAdmin
+
 #--------------------------- pages du gerant ou du proprietaire de boutique ---------------
 apm_core_gerant-boutique:
     resource: "@APMCoreBundle/Resources/config/user/boutique.yml"
@@ -54,4 +60,11 @@ apm_core_transport:
     resource: "@APMCoreBundle/Resources/config/user/transport.yml"
     prefix:   /easy-trade/transport
 
-#---------------------------------------- ------------------------------------------------
+#---------------------------------------- gérer les Fonctions du systeme------------------------------------------------
+apm_core_fonction_offre:
+    resource: "@APMCoreBundle/Resources/config/fonctions/offre.yml"
+    prefix:   /easy-trade/user/offre
+
+apm_core_fonction_boutique:
+    resource: "@APMCoreBundle/Resources/config/fonctions/boutique.yml"
+    prefix:   /easy-trade/user/boutique

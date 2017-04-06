@@ -22,23 +22,11 @@ class ConseillerType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('code')
             ->add('dateEnregistrement', DateTimeType::class)
             ->add('description', TextareaType::class, ['required' => false])
             ->add('conseillerA2', CheckboxType::class, ['required' => false])
             ->add('matricule', TextType::class, ['required' => false])
             ->add('valeurQuota', NumberType::class, ['required' => false])
-            ->add('utilisateur')
-            ->add('reseau', EntityType::class, [
-                'class' => 'APMMarketingReseauBundle:Reseau_conseillers',
-                'choice_label' => 'designation',
-                'required' => false
-            ])
-//            ->add('conseillerBoutiques', EntityType::class, [
-//                'class'=>'APMMarketingDistribueBundle:Conseiller_boutique',
-//                'choice_label'=>'code',
-//                'required'=>false
-//            ])
 
             ->add('reset', ResetType::class)
         ;

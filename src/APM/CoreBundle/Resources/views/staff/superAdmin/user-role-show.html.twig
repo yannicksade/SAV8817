@@ -1,0 +1,33 @@
+{% extends "APMAdminBundle:_Main:layout.html.twig" %}
+
+{% block body %}
+    <table>
+        <thead>
+        Liste les roles utilisateurs
+        </thead>
+        <tbody>
+
+        <tr>
+            <th>Utilisateur</th>
+            <th>Role</th>
+        </tr>
+
+        {% for user in usersGranted %}
+            <tr>
+                <td>{{ user.username }}</td>
+
+                {% for i in user.roles %}
+                    <td> ; {{ i }} ;</td>
+                {% endfor %}
+                <td>
+                    <a href="{{ path('apm_core_super-admin_role-edit', { 'id': user.id }) }}">Modifier</a>
+                </td>
+            </tr>
+        {% endfor %}
+
+        <p>
+            <a href="{{ path('apm_core_super-admin_role-edit') }}">retour </a>
+        </p>
+        </tbody>
+    </table>
+{% endblock %}

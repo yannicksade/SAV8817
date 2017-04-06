@@ -2,6 +2,7 @@
 
 namespace APM\AnimationBundle\Entity;
 
+use APM\AnimationBundle\Factory\TradeFactory;
 use APM\UserBundle\Entity\Utilisateur_avm;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
@@ -14,7 +15,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @ORM\Entity(repositoryClass="APM\AnimationBundle\Repository\Base_documentaireRepository")
  * @UniqueEntity("code")
  */
-class Base_documentaire
+class Base_documentaire extends TradeFactory
 {
 
     /**
@@ -54,6 +55,13 @@ class Base_documentaire
     private $id;
 
     /**
+     * @var \DateTime
+     * @Assert\DateTime
+     * @ORM\Column(name="date", type="datetime", nullable=true)
+     */
+    private $date;
+
+    /**
      * @var Utilisateur_avm
      * @ORM\ManyToOne(targetEntity="APM\UserBundle\Entity\Utilisateur_avm", inversedBy="documents")
      * @ORM\JoinColumns({
@@ -61,6 +69,18 @@ class Base_documentaire
      * })
      */
     private $proprietaire;
+
+
+
+    /**
+     * Base_documentaire constructor.
+     * @param string $var
+     */
+    public function __construct($var)
+    {
+        $this->code = "BD" . $var;
+        $this->date = new \DateTime();
+    }
 
     /**
      * Get description
@@ -190,5 +210,29 @@ class Base_documentaire
         $this->code = $code;
 
         return $this;
+    }
+
+    /**
+     * Set date
+     *
+     * @param \DateTime $date
+     *
+     * @return Base_documentaire
+     */
+    public function setDate($date)
+    {
+        $this->date = $date;
+
+        return $this;
+    }
+
+    /**
+     * Get date
+     *
+     * @return \DateTime
+     */
+    public function getDate()
+    {
+        return $this->date;
     }
 }

@@ -2,6 +2,7 @@
 
 namespace APM\VenteBundle\Form;
 
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\MoneyType;
@@ -27,8 +28,16 @@ class Rabais_offreType extends AbstractType
             ])
             //->add('pourcentage', PercentType::class)
             ->add('quantiteMin', NumberType::class, ['required' => false])
-            ->add('vendeur')
-            ->add('beneficiaireRabais');
+            ->add('beneficiaireRabais', EntityType::class, [
+                'class' => 'APMUserBundle:Utilisateur_avm',
+                'choice_label' => 'username'
+            ])
+            ->add('offre', EntityType::class, [
+                'class' => 'APMVenteBundle:Offre',
+                'choice_label' => 'designation',
+                'required' => false
+            ])
+            ;
     }
 
     /**

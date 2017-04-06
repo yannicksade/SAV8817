@@ -1,6 +1,6 @@
 #------------------------- Objects Factory ---------------------------------
 apm_vente_categorie_index:
-    path:     /
+    path:     /{id}
     defaults: { _controller: "APMVenteBundle:Categorie:index" }
     methods:  GET
 

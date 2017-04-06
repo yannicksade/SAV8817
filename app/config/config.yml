@@ -104,7 +104,7 @@ fos_user:
                 sender_name: Easy Trade Team
             template:   '@FOSUser/Resetting/email.txt.twig'
 
-# Configure PUGXMultiuserBundle for utilisateur-avm and admin
+# Configuratio de PUGXMultiuserBundle pour  utilisateur-avm et admin
 pugx_multi_user:
   users:
     utilisateur_avm:
@@ -116,7 +116,7 @@ pugx_multi_user:
             type: APM\UserBundle\Form\Type\Utilisateur_avmType
             name: apm_utilisateur_avm_registration
             validation_groups:  [Registration, Default]
-          template: :Registration:utilisateur_avm.form.html.twig
+          template: FOSUserBundle:Registration:utilisateur_avm.form.html.twig
         profile:
           form:
             type: APM\UserBundle\Form\Type\ProfileUtilisateur_avmFormType
@@ -131,7 +131,7 @@ pugx_multi_user:
             type: APM\UserBundle\Form\Type\RegistrationAdminFormType
             name: apm_admin_registration
             validation_groups:  [Registration, Default]
-          template: :Registration:admin.form.html.twig
+          template: FOSUserBundle:Registration:admin.form.html.twig
         profile:
             form:
               type: APM\UserBundle\Form\Type\ProfileAdminFormType

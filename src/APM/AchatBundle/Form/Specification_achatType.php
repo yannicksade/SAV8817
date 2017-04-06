@@ -19,22 +19,15 @@ class Specification_achatType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('code')
             ->add('demandeRabais', CheckboxType::class, ['required' => false])
             ->add('livraison', CheckboxType::class, [
                 'label' => 'Livrable ?',
                 'required' => false
             ])
             ->add('avis', TextareaType::class, ['required' => false])
-            ->add('Operations', EntityType::class, [
-                'class' => 'APM\VenteBundle\Entity\Transaction',
-                'choice_label' => 'code',
-                'label' => 'Colis',
-                'multiple' => true,
-                'required' => false
-            ])
             ->add('dateLivraisonSouhaite', DateTimeType::class)
-            ->add('echantillon')
+            ->add('echantillon')->add('offre', EntityType::class, ["required" => true])
+
         ;
     }
     

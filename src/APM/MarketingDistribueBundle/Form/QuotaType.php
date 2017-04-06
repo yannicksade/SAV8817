@@ -19,7 +19,6 @@ class QuotaType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('code')
             ->add('description', TextareaType::class, ['required' => false])
             ->add('libelleQuota', TextType::class, ['required' => false])
             ->add('valeurQuota', MoneyType::class, [
@@ -32,12 +31,6 @@ class QuotaType extends AbstractType
                 'choice_label' => 'code',
                 'required' => true
             ])
-//            ->add('commissionnements', EntityType::class, [
-//                'class' => 'APMMarketingDistribueBundle:Commissionnement',
-//                'choice_label' => 'code',
-//                'multiple' => true,
-//                'required' => false
-//            ])
         ;
     }
     

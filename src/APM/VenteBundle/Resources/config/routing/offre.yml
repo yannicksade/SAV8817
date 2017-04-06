@@ -26,16 +26,3 @@ apm_vente_offre_delete:
 apm_vente_offre_deleteFromList:
     path:     /list/{id}/delete
     defaults: { _controller: "APMVenteBundle:Offre:deleteFromList" }
-
-#---------------------- Handle offre on Trade-------------------------------------------------
-#--------- accès exclusif----
-apm_vente_offre_restreindre:
-    path:     /{id}/admettre-utilisateur/{user_id}
-    defaults: { _controller: "APMVenteBundle:Trade:restreindreOffreAUtilisateur" }
-apm_vente_offre_exclure:
-    path:     /{id}/exclure-utilisateur/{user_id}
-    defaults: { _controller: "APMVenteBundle:Trade:exclureOffreAUtilisateur" }
-#--------- transferer offre----
-apm_vente_offre_transferer:
-    path:     /{id}/transferer-offre/{source_id}/{destinataire_id}/{ordre_id}/{livraison_id}
-    defaults: { _controller: "APMVenteBundle:Trade:transfererOffre" }

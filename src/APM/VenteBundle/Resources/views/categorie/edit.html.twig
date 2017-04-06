@@ -10,7 +10,7 @@
 
     <ul>
         <li>
-            <a href="{{ path('apm_vente_categorie_index') }}">Back to the list</a>
+            <a href="{{ path('apm_vente_categorie_index', {'id':boutique.id}) }}">Back to the list</a>
         </li>
         <li>
             {{ form_start(delete_form) }}

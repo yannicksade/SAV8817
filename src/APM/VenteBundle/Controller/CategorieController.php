@@ -2,9 +2,10 @@
 
 namespace APM\VenteBundle\Controller;
 
+use APM\VenteBundle\Entity\Boutique;
 use APM\VenteBundle\Entity\Categorie;
+use APM\VenteBundle\Factory\TradeFactory;
 use APM\VenteBundle\Form\CategorieType;
-use APM\VenteBundle\TradeAbstraction\Trade;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -16,16 +17,18 @@ class CategorieController extends Controller
 {
 
     /**
-     * Lists all Categorie entities.
-     *
+     * Liste les catégories par Boutique
+     * @param Boutique $boutique
+     * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function indexAction()
+    public function indexAction(Boutique $boutique)
     {
-        $em = $this->getEM();
-        $categories = $em->getRepository('APMVenteBundle:Categorie')->findAll();
+        $this->listAndShowSecurity($boutique);
+        $categories = $boutique->getCategories();
 
         return $this->render('APMVenteBundle:categorie:index.html.twig', array(
             'categories' => $categories,
+            'boutique' => $boutique
         ));
     }
 
@@ -37,17 +40,19 @@ class CategorieController extends Controller
     /**
      * Creates a new Categorie entity.
      * @param Request $request
+     * @param Boutique $boutique
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function newAction(Request $request)
+    public function newAction(Request $request, Boutique $boutique=null)
     {
+        $this->createSecurity($boutique);
         /** @var Categorie $categorie */
-        $categorie = Trade::getTradeProvider('categorie');
+        $categorie = TradeFactory::getTradeProvider('categorie');
         $form = $this->createForm(CategorieType::class, $categorie);
         $form->handleRequest($request);
-
         if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getEM();
+            $this->createSecurity($boutique, $form->get('categorieCourante')->getData());
+           $em= $this->getEM();
             $em->persist($categorie);
             $em->flush();
 
@@ -55,6 +60,7 @@ class CategorieController extends Controller
         }
         return $this->render('APMVenteBundle:categorie:new.html.twig', array(
             'form' => $form->createView(),
+            'boutique' => $boutique
         ));
     }
 
@@ -65,8 +71,8 @@ class CategorieController extends Controller
      */
     public function showAction(Categorie $categorie)
     {
+        $this->listAndShowSecurity();
         $deleteForm = $this->createDeleteForm($categorie);
-
         return $this->render('APMVenteBundle:categorie:show.html.twig', array(
             'categorie' => $categorie,
             'delete_form' => $deleteForm->createView(),
@@ -96,11 +102,13 @@ class CategorieController extends Controller
      */
     public function editAction(Request $request, Categorie $categorie)
     {
+        $this->editAndDeleteSecurity($categorie);
+
         $deleteForm = $this->createDeleteForm($categorie);
         $editForm = $this->createForm(CategorieType::class, $categorie);
         $editForm->handleRequest($request);
-
         if ($editForm->isSubmitted() && $editForm->isValid()) {
+            $this->editAndDeleteSecurity($categorie);
             $em = $this->getEM();
             $em->persist($categorie);
             $em->flush();
@@ -124,24 +132,101 @@ class CategorieController extends Controller
      */
     public function deleteAction(Request $request, Categorie $categorie)
     {
+        $this->editAndDeleteSecurity($categorie);
+
         $form = $this->createDeleteForm($categorie);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $this->editAndDeleteSecurity($categorie);
             $em = $this->getEM();
             $em->remove($categorie);
             $em->flush();
         }
 
-        return $this->redirectToRoute('apm_vente_categorie_index');
+        return $this->redirectToRoute('apm_vente_categorie_index', ['id' =>$categorie->getBoutique()->getId()]);
     }
 
-    public function deleteFromListAction(Categorie $object)
+    public function deleteFromListAction(Categorie $categorie)
     {
+        $this->editAndDeleteSecurity($categorie);
+
         $em = $this->getDoctrine()->getManager();
         $em->remove($object);
         $em->flush();
 
-        return $this->redirectToRoute('apm_vente_categorie_index');
+        return $this->redirectToRoute('apm_vente_categorie_index', ['id' =>$categorie->getBoutique()->getId()]);
+    }
+
+    /**
+     * @param Boutique $boutique
+     */
+    private function listAndShowSecurity($boutique = null){
+        //-----------------------------------security-------------------------------------------
+        // Unable to access the controller unless you have a USERAVM role
+        $this->denyAccessUnlessGranted(['ROLE_BOUTIQUE', 'ROLE_USERAVM'], null, 'Unable to access this page!');
+        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
+            throw $this->createAccessDeniedException();}
+            if($boutique ){
+                $user = $this->getUser();
+                $proprietaire = $boutique->getProprietaire();
+                $gerant = $boutique->getGerant();
+            if ($user !== $gerant && $user !== $proprietaire) {
+                throw $this->createAccessDeniedException();
+            }
+        }
+        //----------------------------------------------------------------------------------------
+    }
+
+    /**
+     * @param Boutique $boutique
+     * @param Categorie $categorieCourante
+     */
+    private function createSecurity($boutique = null, $categorieCourante=null){
+        //---------------------------------security-----------------------------------------------
+        // Unable to access the controller unless you have a USERAVM role
+        $this->denyAccessUnlessGranted('ROLE_BOUTIQUE', null, 'Unable to access this page!');
+
+        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY')) {
+            throw $this->createAccessDeniedException();
+        }
+        //Interdire tout utilisateur si ce n'est pas le gerant ou le proprietaire
+        if($boutique) {
+            $user = $this->getUser();
+            $gerant = $boutique->getGerant();
+            $proprietaire = $boutique->getProprietaire();
+            if ($user !== $gerant&&$user !==$proprietaire) {
+                throw $this->createAccessDeniedException();
+            }
+            if($categorieCourante){
+                $currentBoutique = $categorieCourante->getBoutique();
+                 if($currentBoutique !== $boutique) {
+                     throw $this->createAccessDeniedException();}
+            }
+        }
+        //----------------------------------------------------------------------------------------
+    }
+
+    /**
+     * @param Categorie $categorie
+     */
+    private function editAndDeleteSecurity($categorie){
+        //---------------------------------security-----------------------------------------------
+        // Unable to access the controller unless you have a USERAVM role
+        $this->denyAccessUnlessGranted('ROLE_BOUTIQUE', null, 'Unable to access this page!');
+
+        /* ensure that the user is logged in
+        *  and that the one is the owner
+         * Interdire tout utilisateur si ce n'est pas le gerant ou le proprietaire
+        */
+        $user = $this->getUser();
+        $boutique = $categorie->getBoutique();
+        $gerant = $boutique->getGerant();
+        $proprietaire = $boutique->getProprietaire();
+        if ((!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY')) || ( $gerant !== $user && $user !== $proprietaire) ) {
+            throw $this->createAccessDeniedException();
+        }
+        //----------------------------------------------------------------------------------------
+
     }
 }

@@ -37,8 +37,7 @@ class BoutiqueType extends AbstractType
                 ],
                 'required' => false
             ))
-            ->add('gerant')
-            ->add('proprietaire');
+            ->add('gerant');
     }
 
     /**

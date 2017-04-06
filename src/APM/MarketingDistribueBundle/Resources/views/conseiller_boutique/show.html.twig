@@ -5,12 +5,22 @@
 
     <table>
         <tbody>
+
         <tr>
-            <th>Code</th>
-            <td>{{ conseiller_boutique.code }}</td>
+            <th>User Name:</th>
+            <td>{{ conseiller_boutique.conseiller.utilisateur.username }}</td>
         </tr>
         <tr>
-            <th>Valeurs gagnés</th>
+            <th>Boutique:</th>
+            <td>{{ conseiller_boutique.boutique.designation }}</td>
+        </tr>
+        <tr>
+            <th>Conseiller:</th>
+            <td>{{ conseiller_boutique.conseiller.code }}</td>
+        </tr>
+
+        <tr>
+            <th>Valeurs:</th>
             <td>{{ conseiller_boutique.gainValeur }}</td>
         </tr>
         </tbody>

@@ -14,7 +14,7 @@ class MessageControllerTest extends WebTestCase
         //run this client to a separate client
         $client->insulate();
         // Create a new entry in the database
-        $client->request('GET', '/apm_user_message');
+        $client->request('GET', '/apm/user_message');
         $crawler = $client->followRedirect();
         $this->assertEquals(200, $client->getResponse()->getStatusCode(), "Unexpected HTTP status code for GET /apm_user_message");
 
@@ -44,7 +44,7 @@ class MessageControllerTest extends WebTestCase
 
         // Delete the entity and redirect to the list
         $client->submit($crawler->selectButton('Delete')->form());
-        $this->assertTrue($client->getResponse()->isRedirect('/apm_user_message/'), 'The response is redirect not to /apm_user_message/');
+        $this->assertTrue($client->getResponse()->isRedirect('/apm/user_message/'), 'The response is redirect not to /apm_user_message/');
         $client->followRedirect();
 
         // Check the entity has been delete on the list

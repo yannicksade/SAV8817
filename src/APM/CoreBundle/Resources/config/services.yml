@@ -1,0 +1,6 @@
+#services:
+#
+##---------- sécurise les créations et les modification d'objets ---------
+#    apm_core.objet_security:
+#        class: APM\CoreBundle\Security\SafeHandler
+#        arguments: ['@security.authorization_checker']

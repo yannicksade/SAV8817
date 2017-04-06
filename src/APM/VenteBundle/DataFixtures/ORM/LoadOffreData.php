@@ -9,8 +9,8 @@
 namespace APM\CoreBundle\DataFixtures\ORM;
 
 
+use APM\VenteBundle\Factory\TradeFactory;
 use APM\VenteBundle\Entity\Offre;
-use APM\VenteBundle\TradeAbstraction\Trade;
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
@@ -23,7 +23,7 @@ class LoadOffreData extends AbstractFixture implements OrderedFixtureInterface
     public function load(ObjectManager $manager)
     {
         /** @var Offre $offre */
-        $offre = Trade::getTradeProvider('offre');
+        $offre = TradeFactory::getTradeProvider('offre');
         $offre->setVendeur($this->getReference('user-avm'));
         $offre->setCategorie($this->getReference('categorie'));
         $offre->setDesignation("ARRACHIDE");

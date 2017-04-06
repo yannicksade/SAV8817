@@ -4,7 +4,6 @@ namespace APM\TransportBundle\Form;
 
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -18,10 +17,7 @@ class Profile_transporteurType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('code')
-            ->add('livreurBoutique', CheckboxType::class, ['required' => false])
             ->add('matricule', TextType::class)
-            ->add('utilisateur')
             ->add('transporteurZones', EntityType::class, [
                 'class' => 'APMTransportBundle:Zone_intervention',
                 'choice_label' => 'code',

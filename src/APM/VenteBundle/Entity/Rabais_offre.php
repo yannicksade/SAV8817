@@ -3,9 +3,7 @@
 namespace APM\VenteBundle\Entity;
 
 use APM\UserBundle\Entity\Utilisateur_avm;
-use APM\VenteBundle\TradeAbstraction\Trade;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
+use APM\VenteBundle\Factory\TradeFactory;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
@@ -17,7 +15,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
  * @ORM\Entity(repositoryClass="APM\VenteBundle\Repository\Rabais_offreRepository")
  * @UniqueEntity("code")
  */
-class Rabais_offre extends Trade
+class Rabais_offre extends TradeFactory
 {
     /**
      * @var string
@@ -84,11 +82,13 @@ class Rabais_offre extends Trade
     private $beneficiaireRabais;
 
     /**
-     * @var Collection
-     * @ORM\OneToMany(targetEntity="Transaction_produit", mappedBy="rabais")
+     * @var Offre
+     * @ORM\ManyToOne(targetEntity="APM\VenteBundle\Entity\Offre", inversedBy="rabais")
+     * @ORM\JoinColumns({
+     *   @ORM\JoinColumn(name="offre_id", referencedColumnName="id")
+     * })
      */
-    private $transactions;
-
+    private $offre;
 
     /**
      * Constructor
@@ -96,7 +96,6 @@ class Rabais_offre extends Trade
      */
     public function __construct($var)
     {
-        $this->transactions = new ArrayCollection();
         $this->code = "RB" . $var;
     }
 
@@ -220,41 +219,6 @@ class Rabais_offre extends Trade
         return $this;
     }
 
-
-    /**
-     * Add transaction
-     *
-     * @param Transaction_produit $transaction
-     *
-     * @return Rabais_offre
-     */
-    public function addTransaction(Transaction_produit $transaction)
-    {
-        $this->transactions[] = $transaction;
-
-        return $this;
-    }
-
-    /**
-     * Remove transaction
-     *
-     * @param Transaction_produit $transaction
-     */
-    public function removeTransaction(Transaction_produit $transaction)
-    {
-        $this->transactions->removeElement($transaction);
-    }
-
-    /**
-     * Get transactions
-     *
-     * @return Collection
-     */
-    public function getTransactions()
-    {
-        return $this->transactions;
-    }
-
     /**
      * Get id
      *
@@ -311,5 +275,29 @@ class Rabais_offre extends Trade
         $this->code = $code;
 
         return $this;
+    }
+
+    /**
+     * Set offre
+     *
+     * @param Offre $offre
+     *
+     * @return Rabais_offre
+     */
+    public function setOffre(Offre $offre = null)
+    {
+        $this->offre = $offre;
+
+        return $this;
+    }
+
+    /**
+     * Get offre
+     *
+     * @return Offre
+     */
+    public function getOffre()
+    {
+        return $this->offre;
     }
 }

@@ -1,32 +1,26 @@
 {% extends "APMAdminBundle:_Main:layout.html.twig" %}
 
 {% block body %}
-    <h1>Boutique list</h1>
-
+    <div>
     <table>
         <thead>
+        <tr>- Mes Boutique Propres -</tr>
+        ---------------------------------------------------------
         <tr>
             <th>Code</th>
-            <th>Nationalite</th>
             <th>Designation</th>
-            <th>Raison Sociale</th>
             <th>Statut Social</th>
-            <th>Proprietaire</th>
             <th>Actions</th>
         </tr>
         </thead>
         <tbody>
-        {% for boutique in boutiques %}
-            {% if boutique.publiable %}
+        {% for boutique in boutiquesProprietaire %}
             <tr>
                 <td>
                     <a href="{{ path('apm_vente_boutique_show', { 'id': boutique.id }) }}">{{ boutique.code }}</a>
                 </td>
-                <td>{{ boutique.nationalite }}</td>
                 <td>{{ boutique.designation }}</td>
-                <td>{{ boutique.raisonSociale }}</td>
                 <td>{{ boutique.statutSocial }}</td>
-                <td>{{ boutique.proprietaire }}</td>
                 <td>
                     <ul>
                         <li>
@@ -42,14 +36,51 @@
                     </ul>
                 </td>
             </tr>
-            {% endif %}
         {% endfor %}
         </tbody>
     </table>
 
     <ul>
         <li>
-            <a href="{{ path('apm_vente_boutique_new') }}">Create a new entry</a>
+            <a href="{{ path('apm_vente_boutique_new') }}">Créer une nouvelle boutique</a>
         </li>
     </ul>
+    </div>
+<div>
+    <table>
+        <thead>
+             <tr>- Boutiques Gérances -</tr>
+        ---------------------------------------------------------
+        <tr>
+            <th>Code</th>
+            <th>Nationalite</th>
+            <th>Designation</th>
+            <th>Raison Sociale</th>
+            <th>Statut Social</th>
+            <th>Proprietaire</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for boutique in boutiquesGerant %}
+            <tr>
+                <td>
+                    <a href="{{ path('apm_vente_boutique_show', { 'id': boutique.id }) }}">{{ boutique.code }}</a>
+                </td>
+                <td>{{ boutique.designation }}</td>
+                <td>{{ boutique.nationalite }}</td>
+                <td>{{ boutique.raisonSociale }}</td>
+                <td>{{ boutique.statutSocial }}</td>
+                <td>
+                    <ul>
+                        <li>
+                            <a href="{{ path('apm_vente_boutique_show', { 'id': boutique.id }) }}">show</a>
+                        </li>
+                    </ul>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
 {% endblock %}

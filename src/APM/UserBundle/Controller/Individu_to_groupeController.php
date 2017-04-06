@@ -2,7 +2,10 @@
 
 namespace APM\UserBundle\Controller;
 
+use APM\UserBundle\Entity\Groupe_relationnel;
 use APM\UserBundle\Entity\Individu_to_groupe;
+use APM\UserBundle\Entity\Utilisateur_avm;
+use APM\UserBundle\Factory\TradeFactory;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -13,14 +16,16 @@ use Symfony\Component\HttpFoundation\Request;
 class Individu_to_groupeController extends Controller
 {
     /**
-     * Lists all Individu_to_groupe entities.
+     * Liste tous les groupes auxquels l'utilisateur appartient
+     * AUCUNE ACCESS PREVUE POUR CETTE FONCTION;
      *
      */
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
-
-        $individu_to_groupes = $em->getRepository('APMUserBundle:Individu_to_groupe')->findAll();
+        $this->listeAndShowSecurity();
+        /** @var Utilisateur_avm $user */
+        $user = $this->getUser();
+        $individu_to_groupes = $user->getIndividuGroupes();
 
         return $this->render('APMUserBundle:individu_to_groupe:index.html.twig', array(
             'individu_to_groupes' => $individu_to_groupes,
@@ -28,16 +33,19 @@ class Individu_to_groupeController extends Controller
     }
 
     /**
-     * Creates a new Individu_to_groupe entity.
-     *
+     *  Affecter l'utilisateur à un groupe
+     * @param Request $request
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
     public function newAction(Request $request)
     {
-        $individu_to_groupe = new Individu_to_groupe();
+        $this->createSecurity();
+        /** @var Individu_to_groupe $individu_to_groupe */
+        $individu_to_groupe = TradeFactory::getTradeProvider("individu_to_groupe");
         $form = $this->createForm('APM\UserBundle\Form\Individu_to_groupeType', $individu_to_groupe);
         $form->handleRequest($request);
-
         if ($form->isSubmitted() && $form->isValid()) {
+            $this->createSecurity($form->getData()['groupeRelationnel']);
             $em = $this->getDoctrine()->getManager();
             $em->persist($individu_to_groupe);
             $em->flush();
@@ -53,10 +61,12 @@ class Individu_to_groupeController extends Controller
 
     /**
      * Finds and displays a Individu_to_groupe entity.
-     *
+     * @param Individu_to_groupe $individu_to_groupe
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function showAction(Individu_to_groupe $individu_to_groupe)
     {
+        $this->listeAndShowSecurity();
         $deleteForm = $this->createDeleteForm($individu_to_groupe);
 
         return $this->render('APMUserBundle:individu_to_groupe:show.html.twig', array(
@@ -82,15 +92,19 @@ class Individu_to_groupeController extends Controller
 
     /**
      * Displays a form to edit an existing Individu_to_groupe entity.
-     *
+     * @param Request $request
+     * @param Individu_to_groupe $individu_to_groupe
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
     public function editAction(Request $request, Individu_to_groupe $individu_to_groupe)
     {
+        $this->editAndDeleteSecurity($individu_to_groupe);
+
         $deleteForm = $this->createDeleteForm($individu_to_groupe);
         $editForm = $this->createForm('APM\UserBundle\Form\Individu_to_groupeType', $individu_to_groupe);
         $editForm->handleRequest($request);
-
         if ($editForm->isSubmitted() && $editForm->isValid()) {
+            $this->editAndDeleteSecurity($individu_to_groupe);
             $em = $this->getDoctrine()->getManager();
             $em->persist($individu_to_groupe);
             $em->flush();
@@ -107,14 +121,18 @@ class Individu_to_groupeController extends Controller
 
     /**
      * Deletes a Individu_to_groupe entity.
-     *
+     * @param Request $request
+     * @param Individu_to_groupe $individu_to_groupe
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse
      */
     public function deleteAction(Request $request, Individu_to_groupe $individu_to_groupe)
     {
+        $this->editAndDeleteSecurity($individu_to_groupe);
+
         $form = $this->createDeleteForm($individu_to_groupe);
         $form->handleRequest($request);
-
         if ($form->isSubmitted() && $form->isValid()) {
+            $this->editAndDeleteSecurity($individu_to_groupe);
             $em = $this->getDoctrine()->getManager();
             $em->remove($individu_to_groupe);
             $em->flush();
@@ -123,12 +141,56 @@ class Individu_to_groupeController extends Controller
         return $this->redirectToRoute('apm_user_individu-to-groupe_index');
     }
 
-    public function deleteFromListAction(Individu_to_groupe $object)
+    public function deleteFromListAction(Individu_to_groupe $individu_to_groupe)
     {
+        $this->editAndDeleteSecurity($individu_to_groupe);
+
         $em = $this->getDoctrine()->getManager();
-        $em->remove($object);
+        $em->remove($individu_to_groupe);
         $em->flush();
 
         return $this->redirectToRoute('apm_user_individu-to-groupe_index');
+    }
+
+    private function listeAndShowSecurity()
+    {
+        //---------------------------------security-----------------------------------------------
+        // Liste tous les groupes auxquels l'utilisateur appartient
+        $this->denyAccessUnlessGranted('ROLE_NO_ACCESS', null, 'Unable to access this page!');
+        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
+            throw $this->createAccessDeniedException();
+        }
+        //-----------------------------------------------------------------------------------------
+    }
+
+    /**
+     * @param Groupe_relationnel $groupe
+     */
+    private function createSecurity($groupe = null)
+    {
+        //---------------------------------security-----------------------------------------------
+        // Unable to access the controller unless you have a USERAVM role
+        $this->denyAccessUnlessGranted('ROLE_USERAVM', null, 'Unable to access this page!');
+
+        $user = $this->getUser();
+        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY') || $user !== $groupe->getProprietaire()) {
+            throw $this->createAccessDeniedException();
+        }
+        //----------------------------------------------------------------------------------------
+    }
+
+    /**
+     * @param Individu_to_groupe $individu_groupe
+     */
+    private function editAndDeleteSecurity($individu_groupe)
+    {
+        //---------------------------------security-----------------------------------------------
+        // Unable to access the controller unless you have a USERAVM role
+        $this->denyAccessUnlessGranted('ROLE_USERAVM', null, 'Unable to access this page!');
+        $user = $this->getUser();
+
+        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY') || $individu_groupe->getGroupeRelationnel()->getProprietaire() !== $user) {
+            throw $this->createAccessDeniedException();
+        }
     }
 }

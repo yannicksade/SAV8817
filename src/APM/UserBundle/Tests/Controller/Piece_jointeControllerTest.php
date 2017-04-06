@@ -14,7 +14,7 @@ class Piece_jointeControllerTest extends WebTestCase
         //run this client to a separate client
         $client->insulate();
         // Create a new entry in the database
-        $client->request('GET', '/apm_user_piece-jointe');
+        $client->request('GET', '/apm/user_piece-jointe');
         $crawler = $client->followRedirect();
         $this->assertEquals(200, $client->getResponse()->getStatusCode(), "Unexpected HTTP status code for GET /apm_user_piece-jointe");
 
@@ -44,7 +44,7 @@ class Piece_jointeControllerTest extends WebTestCase
 
         // Delete the entity and redirect to the list
         $client->submit($crawler->selectButton('Delete')->form());
-        $this->assertTrue($client->getResponse()->isRedirect('/apm_user_piece-jointe/'), 'The response is redirect not to /apm_user_piece-jointe/');
+        $this->assertTrue($client->getResponse()->isRedirect('/apm/user_piece-jointe/'), 'The response is redirect not to /apm_user_piece-jointe/');
         $client->followRedirect();
 
         // Check the entity has been delete on the list

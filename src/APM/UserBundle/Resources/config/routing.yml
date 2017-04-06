@@ -10,24 +10,20 @@ apm_admin_registration:
 #Gestion des ressources utilisateurs
 apm_user_communication:
     resource: "@APMUserBundle/Resources/config/routing/communication.yml"
-    prefix:   /apm_user_communication
+    prefix:   /user_communication
 
 apm_user_commentaire:
     resource: "@APMUserBundle/Resources/config/routing/commentaire.yml"
-    prefix:   /apm_user_commentaire
+    prefix:   /user_commentaire
 
 apm_user_groupe-relationnel:
     resource: "@APMUserBundle/Resources/config/routing/groupe_relationnel.yml"
-    prefix:   /apm_user_groupe-relationnel
+    prefix:   /user_groupe-relationnel
 
 apm_user_individu-to-groupe:
     resource: "@APMUserBundle/Resources/config/routing/individu_to_groupe.yml"
-    prefix:   /apm_user_individu-to-groupe
-
-apm_user_message:
-    resource: "@APMUserBundle/Resources/config/routing/message.yml"
-    prefix:   /apm_user_message
+    prefix:   /user_individu-to-groupe
 
 apm_user_piece-jointe:
     resource: "@APMUserBundle/Resources/config/routing/piece_jointe.yml"
-    prefix:   /apm_user_piece-jointe
+    prefix:   /user_piece-jointe

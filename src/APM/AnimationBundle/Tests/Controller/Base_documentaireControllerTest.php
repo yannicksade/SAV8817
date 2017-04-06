@@ -13,7 +13,7 @@ class Base_documentaireControllerTest extends WebTestCase
         $client = static::createClient();
 
         // Create a new entry in the database
-        $client->request('GET', '/apm_animation_base_documentaire');
+        $client->request('GET', '/apm/animation_base_documentaire');
         $crawler = $client->followRedirect();
         $this->assertEquals(200, $client->getResponse()->getStatusCode(), "Unexpected HTTP status code for GET /apm_animation_base_documentaire/");
 
@@ -44,7 +44,7 @@ class Base_documentaireControllerTest extends WebTestCase
 
         // Delete the entity and redirect to the list
         $client->submit($crawler->selectButton('Delete')->form());
-        $this->assertTrue($client->getResponse()->isRedirect('/apm_animation_base_documentaire/'), 'The response is redirect not to /apm_animation_base_documentaire_index');
+        $this->assertTrue($client->getResponse()->isRedirect('/apm/animation_base_documentaire/'), 'The response is redirect not to /apm_animation_base_documentaire_index');
         $client->followRedirect();
 
         // Check the entity has been delete on the list

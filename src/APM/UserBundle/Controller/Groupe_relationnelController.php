@@ -3,6 +3,8 @@
 namespace APM\UserBundle\Controller;
 
 use APM\UserBundle\Entity\Groupe_relationnel;
+use APM\UserBundle\Entity\Utilisateur_avm;
+use APM\UserBundle\Factory\TradeFactory;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -13,31 +15,35 @@ use Symfony\Component\HttpFoundation\Request;
 class Groupe_relationnelController extends Controller
 {
     /**
-     * Lists all Groupe_relationnel entities.
+     * Liste tous les groupe relationnel crée par l'utilisateur
      *
      */
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
-
-        $groupe_relationnels = $em->getRepository('APMUserBundle:Groupe_relationnel')->findAll();
-
+        $this->listAndShowSecurity();
+        /** @var Utilisateur_avm $user */
+        $user = $this->getUser();
+        $groupes = $user->getGroupesProprietaire();
         return $this->render('APMUserBundle:groupe_relationnel:index.html.twig', array(
-            'groupe_relationnels' => $groupe_relationnels,
+            'groupe_relationnels' => $groupes
         ));
     }
 
     /**
      * Creates a new Groupe_relationnel entity.
-     *
+     * @param Request $request
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
     public function newAction(Request $request)
     {
-        $groupe_relationnel = new Groupe_relationnel();
+        $this->createSecurity();
+        /** @var Groupe_relationnel $groupe_relationnel */
+        $groupe_relationnel = TradeFactory::getTradeProvider("groupe_relationnel");
         $form = $this->createForm('APM\UserBundle\Form\Groupe_relationnelType', $groupe_relationnel);
         $form->handleRequest($request);
-
         if ($form->isSubmitted() && $form->isValid()) {
+            $this->createSecurity();
+            $groupe_relationnel->setProprietaire($this->getUser());
             $em = $this->getDoctrine()->getManager();
             $em->persist($groupe_relationnel);
             $em->flush();
@@ -53,10 +59,12 @@ class Groupe_relationnelController extends Controller
 
     /**
      * Finds and displays a Groupe_relationnel entity.
-     *
+     * @param Groupe_relationnel $groupe_relationnel
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function showAction(Groupe_relationnel $groupe_relationnel)
     {
+        $this->listAndShowSecurity();
         $deleteForm = $this->createDeleteForm($groupe_relationnel);
 
         return $this->render('APMUserBundle:groupe_relationnel:show.html.twig', array(
@@ -82,15 +90,19 @@ class Groupe_relationnelController extends Controller
 
     /**
      * Displays a form to edit an existing Groupe_relationnel entity.
-     *
+     * @param Request $request
+     * @param Groupe_relationnel $groupe_relationnel
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
     public function editAction(Request $request, Groupe_relationnel $groupe_relationnel)
     {
+        $this->editAndDeleteSecurity($groupe_relationnel);
         $deleteForm = $this->createDeleteForm($groupe_relationnel);
         $editForm = $this->createForm('APM\UserBundle\Form\Groupe_relationnelType', $groupe_relationnel);
         $editForm->handleRequest($request);
 
         if ($editForm->isSubmitted() && $editForm->isValid()) {
+            $this->editAndDeleteSecurity($groupe_relationnel);
             $em = $this->getDoctrine()->getManager();
             $em->persist($groupe_relationnel);
             $em->flush();
@@ -107,14 +119,18 @@ class Groupe_relationnelController extends Controller
 
     /**
      * Deletes a Groupe_relationnel entity.
-     *
+     * @param Request $request
+     * @param Groupe_relationnel $groupe_relationnel
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse
      */
     public function deleteAction(Request $request, Groupe_relationnel $groupe_relationnel)
     {
+        $this->editAndDeleteSecurity($groupe_relationnel);
         $form = $this->createDeleteForm($groupe_relationnel);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $this->editAndDeleteSecurity($groupe_relationnel);
             $em = $this->getDoctrine()->getManager();
             $em->remove($groupe_relationnel);
             $em->flush();
@@ -123,12 +139,56 @@ class Groupe_relationnelController extends Controller
         return $this->redirectToRoute('apm_user_groupe-relationnel_index');
     }
 
-    public function deleteFromListAction(Groupe_relationnel $object)
+    public function deleteFromListAction(Groupe_relationnel $groupe_relationnel)
     {
+        $this->editAndDeleteSecurity($groupe_relationnel);
         $em = $this->getDoctrine()->getManager();
-        $em->remove($object);
+        $em->remove($groupe_relationnel);
         $em->flush();
 
         return $this->redirectToRoute('apm_user_groupe-relationnel_index');
     }
+
+    private function listAndShowSecurity(){
+        //-----------------------------------security-------------------------------------------
+        // Unable to access the controller unless you have a USERAVM role
+        $this->denyAccessUnlessGranted('ROLE_USERAVM', null, 'Unable to access this page!');
+        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_REMEMBERED'))  {
+            throw $this->createAccessDeniedException();
+        }
+        //----------------------------------------------------------------------------------------
+    }
+
+    private function createSecurity(){
+        //---------------------------------security-----------------------------------------------
+        // Unable to access the controller unless you have a USERAVM role
+        $this->denyAccessUnlessGranted('ROLE_USERAVM', null, 'Unable to access this page!');
+        /* ensure that the user is logged in
+        */
+        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY')) {
+            throw $this->createAccessDeniedException();
+        }
+        //----------------------------------------------------------------------------------------
+    }
+
+    /**
+     * @param Groupe_relationnel $groupe
+     * @internal param Commentaire $commentaire
+     */
+    private function editAndDeleteSecurity($groupe){
+        //---------------------------------security-----------------------------------------------
+        // Unable to access the controller unless you have a USERAVM role
+        $this->denyAccessUnlessGranted('ROLE_USERAVM', null, 'Unable to access this page!');
+
+        /* ensure that the user is logged in
+        *  and that the one is the owner
+        */
+        $user = $this->getUser();
+        if ((!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY')) || ($groupe->getProprietaire() !== $user)) {
+            throw $this->createAccessDeniedException();
+        }
+        //----------------------------------------------------------------------------------------
+
+    }
+
 }

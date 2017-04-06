@@ -7,6 +7,7 @@
  */
 namespace APM\MarketingDistribueBundle\Entity;
 
+use APM\MarketingDistribueBundle\Factory\TradeFactory;
 use APM\VenteBundle\Entity\Boutique;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -21,14 +22,8 @@ use Doctrine\ORM\Mapping as ORM;
  * @ORM\Entity(repositoryClass="APM\MarketingDistribueBundle\Repository\Conseiller_boutiqueRepository")
  * @UniqueEntity("code", message="Ce code est déjà pris.")
  */
-class Conseiller_boutique
+class Conseiller_boutique extends TradeFactory
 {
-    /**
-     * @var string
-     * @ORM\Column(name="code", type="string", length=255, nullable=false)
-     */
-    private $code;
-
     /**
      * Id
      * @var integer
@@ -39,11 +34,23 @@ class Conseiller_boutique
     private $id;
 
     /**
+     * @var string
+     * @ORM\Column(name="code", type="string")
+     */
+    private $code;
+
+    /**
      * @var integer
      * @Assert\Range(min=0)
      * @ORM\Column(name="gainValeur", type="integer", nullable=true)
      */
     private $gainValeur;
+
+    /**
+     * @var \DateTime
+     * @ORM\Column(name="date", type="datetime")
+     */
+    private $date;
 
     /**
      * @var Conseiller
@@ -77,31 +84,8 @@ class Conseiller_boutique
     public function __construct()
     {
         $this->commissionnements = new ArrayCollection();
-        $this->commissions = new ArrayCollection();
-    }
+        $this->date = new \DateTime();
 
-    /**
-     * Get code
-     *
-     * @return string
-     */
-    public function getCode()
-    {
-        return $this->code;
-    }
-
-    /**
-     * Set code
-     *
-     * @param string $code
-     *
-     * @return Conseiller_boutique
-     */
-    public function setCode($code)
-    {
-        $this->code = $code;
-
-        return $this;
     }
 
     /**
@@ -197,40 +181,6 @@ class Conseiller_boutique
     }
 
     /**
-     * Add commission
-     *
-     * @param Quota $commission
-     *
-     * @return Conseiller_boutique
-     */
-    public function addCommission(Quota $commission)
-    {
-        $this->commissions[] = $commission;
-
-        return $this;
-    }
-
-    /**
-     * Remove commission
-     *
-     * @param Quota $commission
-     */
-    public function removeCommission(Quota $commission)
-    {
-        $this->commissions->removeElement($commission);
-    }
-
-    /**
-     * Get commissions
-     *
-     * @return \Doctrine\Common\Collections\Collection
-     */
-    public function getCommissions()
-    {
-        return $this->commissions;
-    }
-
-    /**
      * Get gainValeur
      *
      * @return integer
@@ -252,5 +202,37 @@ class Conseiller_boutique
         $this->gainValeur = $gainValeur;
 
         return $this;
+    }
+
+    /**
+     * @return \DateTime
+     */
+    public function getDate()
+    {
+        return $this->date;
+    }
+
+    /**
+     * @param \DateTime $date
+     */
+    public function setDate(\DateTime $date)
+    {
+        $this->date = $date;
+    }
+
+    /**
+     * @return string
+     */
+    public function getCode()
+    {
+        return $this->code;
+    }
+
+    /**
+     * @param string $code
+     */
+    public function setCode(string $code)
+    {
+        $this->code = $code;
     }
 }

@@ -23,6 +23,7 @@ security:
         ROLE_BOUTIQUE:      ROLE_USERAVM
         ROLE_TRANSPORTEUR:  ROLE_USERAVM
         ROLE_CONSEILLER:    ROLE_USERAVM
+        ROLE_CONSEILLER_A2: ROLE_CONSEILLER
     #-------------------------------------------
     providers:
         fos_userbundle:
@@ -52,10 +53,10 @@ security:
     access_control:
 
     #     pages accessibles aux utilisateurs anonymes
-        - { path: ^/login, role: IS_AUTHENTICATED_ANONYMOUSLY }
-        - { path: ^/logout, role: IS_AUTHENTICATED_REMEMBERED }
-        - { path: ^/change-password, role: IS_AUTHENTICATED_REMEMBERED }
-        - { path: ^/profile, role: IS_AUTHENTICATED_REMEMBERED }
+        - { path: ^/login, role: IS_AUTHENTICATED_ANONYMOUSLY } # This is for All users logged in or anonymous
+        - { path: ^/logout, role: IS_AUTHENTICATED_REMEMBERED }  # This is for users logged in even with a remembered me cokie
+        - { path: ^/change-password, role: IS_AUTHENTICATED_FULLY } # This is strictly for users who have successfully logged in and not via remembered me cookie
+        - { path: ^/profile, role: IS_AUTHENTICATED_FULLY }
         - { path: ^/register/utilisateur-avm, role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/resetting, role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/easy-trade/costumer, role: IS_AUTHENTICATED_ANONYMOUSLY}
@@ -83,7 +84,13 @@ security:
         - { path: ^/apm/gestionnaire, role: ROLE_ADMIN} #gestion du business
           #   pages accessibles au super admin
 #        - { path: ^/register-admin, role: ROLE_SUPER_ADMIN }
-        - { path: ^/apm, role: ROLE_SUPER_ADMIN }
+
+        - { path: ^/apm, role: ROLE_USERAVM }
+        #Preventing from any access
+        - { path: /apm, role: ROLE_SUPER_ADMIN } # Everything that is below or above this path belong to the super user
+
+        - { path: /easy-trade, role: ROLE_SUPER_ADMIN}
+       # - { path: ^/, role: ROLE_SUPER_ADMIN} # Everything that has not been included in any careful path belong to the super user
 
 
 

@@ -14,7 +14,7 @@ class LivraisonControllerTest extends WebTestCase
         //run this client to a separate client
         $client->insulate();
         // Create a new entry in the database
-        $client->request('GET', '/apm_transport_livraison');
+        $client->request('GET', '/apm/transport_livraison');
         $crawler = $client->followRedirect();
         $this->assertEquals(200, $client->getResponse()->getStatusCode(), "Unexpected HTTP status code for GET /apm_transport_livraison");
 
@@ -44,7 +44,7 @@ class LivraisonControllerTest extends WebTestCase
 
         // Delete the entity and redirect to the list
         $client->submit($crawler->selectButton('Delete')->form());
-        $this->assertTrue($client->getResponse()->isRedirect('/apm_transport_livraison/'), 'The response is redirect not to /apm_transport_livraison/');
+        $this->assertTrue($client->getResponse()->isRedirect('/apm/transport_livraison/'), 'The response is redirect not to /apm_transport_livraison/');
         $client->followRedirect();
 
         // Check the entity has been delete on the list

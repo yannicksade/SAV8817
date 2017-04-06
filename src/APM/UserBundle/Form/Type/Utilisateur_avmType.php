@@ -16,7 +16,6 @@ class Utilisateur_avmType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('code')
             ->add('dateEnregistrement', DateTimeType::class)
             ->add('acheteur', CheckboxType::class, ['required' => true])
             ->add('conseillerA1', CheckboxType::class, ['required' => true])

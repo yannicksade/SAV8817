@@ -9,8 +9,8 @@
 namespace APM\CoreBundle\DataFixtures\ORM;
 
 
+use APM\VenteBundle\Factory\TradeFactory;
 use APM\VenteBundle\Entity\Transaction;
-use APM\VenteBundle\TradeAbstraction\Trade;
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
@@ -23,7 +23,7 @@ class LoadTransactionData extends AbstractFixture implements OrderedFixtureInter
     public function load(ObjectManager $manager)
     {
         /** @var Transaction $transaction */
-        $transaction = Trade::getTradeProvider('transaction');
+        $transaction = TradeFactory::getTradeProvider('transaction');
         $transaction->setAuteur($this->getReference('user-avm'));
 
         $manager->persist($transaction);

@@ -4,6 +4,7 @@
 */
 namespace APM\UserBundle\Entity;
 
+use APM\CoreBundle\Trade\CodeGenerator;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -23,5 +24,7 @@ class Admin extends Utilisateur
     public function __construct() {
         parent::__construct();
         $this->lastLogin = new \DateTime;
+        $this->enabled = false;
+        $this->code = "XX" . CodeGenerator::getGenerator(4);
     }
 }

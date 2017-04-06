@@ -26,13 +26,15 @@
 
     <ul>
         <li>
-            <a href="{{ path('apm_marketing_commissionnement_index') }}">Back to the list</a>
+            <a href="{{ path('apm_marketing_commissionnement_index', {'id':  commissionnement.conseillerBoutique.id}) }}">Back
+                to the list</a>
         </li>
         <li>
             <a href="{{ path('apm_marketing_commissionnement_edit', { 'id': commissionnement.id }) }}">Edit</a>
         </li>
         <li>
-            <a href="{{ path('apm_marketing_commissionnement_new') }}">Add a new one</a>
+            <a href="{{ path('apm_marketing_commissionnement_new', {'id':  commissionnement.conseillerBoutique.id}) }}">Add
+                a new one</a>
         </li>
 
         <li>

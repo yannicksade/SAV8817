@@ -14,7 +14,13 @@
         {% for conseiller_boutique in conseiller_boutiques %}
             <tr>
                 <td>
-                    <a href="{{ path('apm_marketing_conseiller_boutique_show', { 'id': conseiller_boutique.id }) }}">{{ conseiller_boutique.code }}</a>
+                    {{ conseiller_boutique.boutique.designation }} |
+                </td>
+                <td>
+                    {{ conseiller_boutique.conseiller.code }} |
+                </td>
+                <td>
+                    {{ conseiller_boutique.conseiller.utilisateur.username }} |
                 </td>
                 <td>
                     <ul>

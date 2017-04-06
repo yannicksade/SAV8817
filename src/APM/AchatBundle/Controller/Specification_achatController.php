@@ -3,6 +3,8 @@
 namespace APM\AchatBundle\Controller;
 
 use APM\AchatBundle\Entity\Specification_achat;
+use APM\AchatBundle\Factory\TradeFactory;
+use APM\UserBundle\Entity\Utilisateur_avm;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -13,31 +15,37 @@ use Symfony\Component\HttpFoundation\Request;
 class Specification_achatController extends Controller
 {
     /**
-     * Lists all Specification_achat entities.
-     *
+     * Liste les Specification faites par le client
+     * @return \Symfony\Component\HttpFoundation\Response
+     * @internal param Utilisateur $utilisateur
      */
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
-
-        $specification_achats = $em->getRepository('APMAchatBundle:Specification_achat')->findAll();
+        $this->listAndShowSecurity();
+        /** @var Utilisateur_avm $user */
+        $user = $this->getUser();
+        $specification_achats = $user->getSpecifications();
 
         return $this->render('APMAchatBundle:specification_achat:index.html.twig', array(
             'specification_achats' => $specification_achats,
         ));
     }
 
+
     /**
-     * Creates a new Specification_achat entity.
-     *
+     * @param Request $request
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
     public function newAction(Request $request)
     {
-        $specification_achat = new Specification_achat();
+        $this->createSecurity();
+        /** @var Specification_achat $specification_achat */
+        $specification_achat = TradeFactory::getTradeProvider("specification_achat");
         $form = $this->createForm('APM\AchatBundle\Form\Specification_achatType', $specification_achat);
         $form->handleRequest($request);
-
         if ($form->isSubmitted() && $form->isValid()) {
+            $this->createSecurity();
+            $specification_achat->setUtilisateur($this->getUser());
             $em = $this->getDoctrine()->getManager();
             $em->persist($specification_achat);
             $em->flush();
@@ -52,11 +60,15 @@ class Specification_achatController extends Controller
     }
 
     /**
-     * Finds and displays a Specification_achat entity.
+     * Voir une specification faite
      *
+     * Finds and displays a Specification_achat entity.
+     * @param Specification_achat $specification_achat
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function showAction(Specification_achat $specification_achat)
     {
+        $this->listAndShowSecurity();
         $deleteForm = $this->createDeleteForm($specification_achat);
 
         return $this->render('APMAchatBundle:specification_achat:show.html.twig', array(
@@ -82,15 +94,19 @@ class Specification_achatController extends Controller
 
     /**
      * Displays a form to edit an existing Specification_achat entity.
-     *
+     * @param Request $request
+     * @param Specification_achat $specification_achat
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
     public function editAction(Request $request, Specification_achat $specification_achat)
     {
+        $this->editAndDeleteSecurity($specification_achat);
         $deleteForm = $this->createDeleteForm($specification_achat);
         $editForm = $this->createForm('APM\AchatBundle\Form\Specification_achatType', $specification_achat);
         $editForm->handleRequest($request);
 
         if ($editForm->isSubmitted() && $editForm->isValid()) {
+            $this->editAndDeleteSecurity($specification_achat);
             $em = $this->getDoctrine()->getManager();
             $em->persist($specification_achat);
             $em->flush();
@@ -107,14 +123,19 @@ class Specification_achatController extends Controller
 
     /**
      * Deletes a Specification_achat entity.
-     *
+     * @param Request $request
+     * @param Specification_achat $specification_achat
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse
      */
     public function deleteAction(Request $request, Specification_achat $specification_achat)
     {
+        $this->editAndDeleteSecurity($specification_achat);
+
         $form = $this->createDeleteForm($specification_achat);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $this->editAndDeleteSecurity($specification_achat);
             $em = $this->getDoctrine()->getManager();
             $em->remove($specification_achat);
             $em->flush();
@@ -123,12 +144,57 @@ class Specification_achatController extends Controller
         return $this->redirectToRoute('apm_achat_specification_achat_index');
     }
 
-    public function deleteFromListAction(Specification_achat $object)
+    /**
+     * @param Specification_achat $specification_achat
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse
+     */
+    public function deleteFromListAction(Specification_achat $specification_achat)
     {
+         $this->editAndDeleteSecurity($specification_achat);
         $em = $this->getDoctrine()->getManager();
-        $em->remove($object);
+        $em->remove($specification_achat);
         $em->flush();
 
         return $this->redirectToRoute('apm_achat_specification_achat_index');
+    }
+
+    private function listAndShowSecurity(){
+        //---------------------------------security-----------------------------------------------
+        // Unable to access the controller unless you have a USERAVM role
+        $this->denyAccessUnlessGranted('ROLE_USERAVM', null, 'Unable to access this page!');
+        /* ensure that the user is logged in
+        */
+        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY')) {
+            throw $this->createAccessDeniedException();
+        }
+        //----------------------------------------------------------------------------------------
+    }
+    private function createSecurity(){
+        //---------------------------------security-----------------------------------------------
+        // Unable to access the controller unless you have a USERAVM role
+        $this->denyAccessUnlessGranted('ROLE_USERAVM', null, 'Unable to access this page!');
+
+        /* ensure that the user is logged in */
+        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY')) {
+            throw $this->createAccessDeniedException();
+        }
+        //----------------------------------------------------------------------------------------
+    }
+
+    /**
+     * @param Specification_achat $specification_achat
+     */
+    private function editAndDeleteSecurity($specification_achat){
+        //---------------------------------security-----------------------------------------------
+        // Unable to access the controller unless you have a USERAVM role
+        $this->denyAccessUnlessGranted('ROLE_USERAVM', null, 'Unable to access this page!');
+
+        /* ensure that the user is logged in  # granted even through remembering cookies
+        */
+        $user = $this->getUser();
+        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_REMEMBERED') || $user !== $specification_achat->getUtilisateur()) {
+            throw $this->createAccessDeniedException();
+        }
+        //----------------------------------------------------------------------------------------
     }
 }

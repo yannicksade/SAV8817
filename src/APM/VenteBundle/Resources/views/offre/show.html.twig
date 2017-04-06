@@ -6,6 +6,24 @@
     <table>
         <tbody>
         <tr>
+            <th>Boutique</th>
+            <td>{% if offre.boutique %}<a href="{{ path('apm_vente_boutique_show', { 'id': offre.boutique.id }) }}"><strong>{{ offre.boutique.designation }}</strong></a>{% else %}<i>Free lance</i>{% endif %}</td>
+        </tr>
+        <tr>
+            <th>Vendeur</th>
+            <td>{% if offre.vendeur.prenom %} {{ offre.vendeur.prenom }}{% else %}{{ offre.vendeur.username }} {% endif %}</td>
+        </tr>
+
+        <tr>
+            <th>Catégorie</th>
+            <td>{% if offre.categorie.categorieCourante %}{{ offre.categorie.categorieCourante.designation }}{% endif %}</td>
+
+            <th>Catégorie parent</th>
+            <td>{% if offre.categorie %}{{ offre.categorie.designation }}{% endif %}</td>
+
+        </tr>
+
+        <tr>
             <th>Garantie</th>
             <td>{% if offre.garantie %}Yes{% else %}No{% endif %}</td>
         </tr>
@@ -13,10 +31,7 @@
             <th>Code</th>
             <td>{{ offre.code }}</td>
         </tr>
-        <tr>
-            <th>Catégorie</th>
-            <td>{% if offre.categorie %}{{ offre.categorie.designation }}{% endif %}</td>
-        </tr>
+
         <tr>
             <th>Datecreation</th>
             <td>{% if offre.dateCreation %}{{ offre.dateCreation|date('Y-m-d H:i:s') }}{% endif %}</td>
@@ -33,10 +48,7 @@
             <th>Designation</th>
             <td>{{ offre.designation }}</td>
         </tr>
-        <tr>
-            <th>Boutique</th>
-            <td>{% if offre.boutique %}{{ offre.boutique.designation }}{% endif %}</td>
-        </tr>
+
         <tr>
             <th>Retourne</th>
             <td>{% if offre.retourne %}Yes{% else %}No{% endif %}</td>
@@ -75,10 +87,6 @@
             <td>{{ offre.reference }}</td>
         </tr>
         <tr>
-            <th>Remiseproduit</th>
-            <td>{{ offre.remiseProduit }}</td>
-        </tr>
-        <tr>
             <th>Typeoffre</th>
             <td>{{ offre.typeOffre }}</td>
         </tr>
@@ -86,20 +94,27 @@
             <th>Valide</th>
             <td>{% if offre.valide %}Yes{% else %}No{% endif %}</td>
         </tr>
+            <tr>
+                <th>Remiseproduit</th>
+                {% for remise in offre.remises %}
+                    <td>
+                         <a href="{{ path('apm_vente_remise_show', { 'id': remise.id }) }}"> {{ remise.code }}</a>
+                    </td>
+                {% endfor %}
+            </tr>
         </tbody>
     </table>
 
     <ul>
         <li>
-            <a href="{{ path('apm_vente_offre_index') }}">Back to the list</a>
+            <a href="{{ path('apm_vente_remise_new', {'id': offre.id}) }}">Créer une remise</a>
         </li>
         <li>
-            <a href="{{ path('apm_vente_offre_edit', { 'id': offre.id }) }}">Edit</a>
+            <a href="{{ path('apm_vente_offre_index')}}">Retour à la liste</a>
         </li>
         <li>
-            <a href="{{ path('apm_vente_offre_new') }}">Add a new one</a>
+            <a href="{{ path('apm_vente_offre_edit', { 'id': offre.id }) }}">Modifier</a>
         </li>
-
         <li>
             {{ form_start(delete_form) }}
             <input type="submit" value="Delete">

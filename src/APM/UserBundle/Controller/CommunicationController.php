@@ -3,6 +3,8 @@
 namespace APM\UserBundle\Controller;
 
 use APM\UserBundle\Entity\Communication;
+use APM\UserBundle\Entity\Utilisateur_avm;
+use APM\UserBundle\Factory\TradeFactory;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -13,31 +15,36 @@ use Symfony\Component\HttpFoundation\Request;
 class CommunicationController extends Controller
 {
     /**
-     * Lists all Communication entities.
+     * Lister les communication reçues et envoyées
      *
      */
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
-
-        $listCommunications = $em->getRepository('APMUserBundle:Communication')->findAll();
-
+        $this->listAndShowSecurity();
+        /** @var Utilisateur_avm $user */
+        $user = $this->getUser();
+        $communicationsSent = $user->getEmetteurCommunications();
+        $communicationsReceived = $user->getRecepteurCommunications();
         return $this->render('APMUserBundle:communication:index.html.twig', array(
-            'communications' => $listCommunications
+            'communications' => [$communicationsSent, $communicationsReceived]
         ));
     }
 
     /**
-     * Creates a new Communication entity.
-     *
+     * L'Emetteur Crée et soumet un model de communication
+     * @param Request $request
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
     public function newAction(Request $request)
     {
-        $communication = new Communication();
+        $this->createSecurity();
+        /** @var Communication $communication */
+        $communication = TradeFactory::getTradeProvider("communication");
         $form = $this->createForm('APM\UserBundle\Form\CommunicationType', $communication);
         $form->handleRequest($request);
-
         if ($form->isSubmitted() && $form->isValid()) {
+            $this->createSecurity();
+            $communication->setEmetteur($this->getUser());
             $em = $this->getDoctrine()->getManager();
             $em->persist($communication);
             $em->flush();
@@ -53,10 +60,12 @@ class CommunicationController extends Controller
 
     /**
      * Finds and displays a Communication entity.
-     *
+     * @param Communication $communication
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function showAction(Communication $communication)
     {
+        $this->listAndShowSecurity();
         $deleteForm = $this->createDeleteForm($communication);
 
         return $this->render('APMUserBundle:communication:show.html.twig', array(
@@ -82,15 +91,19 @@ class CommunicationController extends Controller
 
     /**
      * Displays a form to edit an existing Communication entity.
-     *
+     * @param Request $request
+     * @param Communication $communication
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
     public function editAction(Request $request, Communication $communication)
     {
+        $this->editAndDeleteSecurity($communication);
         $deleteForm = $this->createDeleteForm($communication);
         $editForm = $this->createForm('APM\UserBundle\Form\CommunicationType', $communication);
         $editForm->handleRequest($request);
 
         if ($editForm->isSubmitted() && $editForm->isValid()) {
+            $this->editAndDeleteSecurity($communication);
             $em = $this->getDoctrine()->getManager();
             $em->persist($communication);
             $em->flush();
@@ -107,14 +120,18 @@ class CommunicationController extends Controller
 
     /**
      * Deletes a Communication entity.
-     *
+     * @param Request $request
+     * @param Communication $communication
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse
      */
     public function deleteAction(Request $request, Communication $communication)
     {
+        $this->editAndDeleteSecurity($communication);
         $form = $this->createDeleteForm($communication);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $this->editAndDeleteSecurity($communication);
             $em = $this->getDoctrine()->getManager();
             $em->remove($communication);
             $em->flush();
@@ -123,12 +140,55 @@ class CommunicationController extends Controller
         return $this->redirectToRoute('apm_user_communication_index');
     }
 
-    public function deleteFromListAction(Communication $object)
+    public function deleteFromListAction(Communication $communication)
     {
+        $this->editAndDeleteSecurity($communication);
         $em = $this->getDoctrine()->getManager();
-        $em->remove($object);
+        $em->remove($communication);
         $em->flush();
 
         return $this->redirectToRoute('apm_user_communication_index');
     }
+
+    private function listAndShowSecurity(){
+        //-----------------------------------security-------------------------------------------
+        // Unable to access the controller unless you have a USERAVM role
+        $this->denyAccessUnlessGranted('ROLE_USERAVM', null, 'Unable to access this page!');
+        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_REMEMBERED'))  {
+            throw $this->createAccessDeniedException();
+        }
+        //----------------------------------------------------------------------------------------
+    }
+
+    private function createSecurity(){
+        //---------------------------------security-----------------------------------------------
+        // Unable to access the controller unless you have a USERAVM role
+        $this->denyAccessUnlessGranted('ROLE_USERAVM', null, 'Unable to access this page!');
+
+        /* ensure that the user is logged in */
+        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY')) {
+            throw $this->createAccessDeniedException();
+        }
+        //----------------------------------------------------------------------------------------
+    }
+
+    /**
+     * @param Communication $communication
+     */
+    private function editAndDeleteSecurity($communication){
+        //---------------------------------security-----------------------------------------------
+        // Unable to access the controller unless you have a USERAVM role
+        $this->denyAccessUnlessGranted('ROLE_USERAVM', null, 'Unable to access this page!');
+
+        /* ensure that the user is logged in
+        *  and that the one is the owner
+        */
+        $user = $this->getUser();
+        if ((!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY')) || ($communication->getEmetteur() !== $user)) {
+            throw $this->createAccessDeniedException();
+        }
+        //----------------------------------------------------------------------------------------
+
+    }
+
 }

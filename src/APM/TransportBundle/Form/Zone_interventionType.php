@@ -2,6 +2,7 @@
 
 namespace APM\TransportBundle\Form;
 
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CountryType;
 use Symfony\Component\Form\Extension\Core\Type\LocaleType;
@@ -20,7 +21,6 @@ class Zone_interventionType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('code')
             ->add('zoneTime', TimezoneType::class, [
                 'placeholder' => 'choisir une zone time'
             ])
@@ -36,6 +36,11 @@ class Zone_interventionType extends AbstractType
             ->add('pays', CountryType::class, [
                     'placeholder' => 'choisir un pays']
             )
+            ->add('livreur_boutique', EntityType::class,[
+                'class' =>'APMTransportBundle:Livreur_boutique',
+                'choice_label' =>'reference',
+                'required' =>false
+            ])
         ;
     }
 

@@ -32,7 +32,7 @@ class AdminController extends Controller {
         ]);
     }
 
-    public function getEM()
+    private function getEM()
     {
         return $this->getDoctrine()->getManager();
     }

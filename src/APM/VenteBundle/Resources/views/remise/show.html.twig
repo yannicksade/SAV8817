@@ -6,7 +6,7 @@
         <tbody>
         <tr>
             <th>Code</th>
-            <td>{{ remise.code }}</td>
+            <td>{{remise.code }}</td>
         </tr>
         <tr>
             <th>Dateexpiration</th>
@@ -37,13 +37,13 @@
 
     <ul>
         <li>
-            <a href="{{ path('apm_vente_remise_index') }}">Back to the list</a>
+            <a href="{{ path('apm_vente_remise_index', {'id': remise.offre.id}) }}">Back to the list</a>
         </li>
         <li>
             <a href="{{ path('apm_vente_remise_edit', { 'id': remise.id }) }}">Edit</a>
         </li>
         <li>
-            <a href="{{ path('apm_vente_remise_new') }}">Add a new</a>
+            <a href="{{ path('apm_vente_remise_new', {'id': remise.offre.id}) }}">Add a new</a>
         </li>
 
         <li>

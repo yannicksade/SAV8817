@@ -2,7 +2,7 @@
 
 namespace APM\VenteBundle\Entity;
 
-use APM\VenteBundle\TradeAbstraction\Trade;
+use APM\VenteBundle\Factory\TradeFactory;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
@@ -14,7 +14,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
  * @ORM\Entity(repositoryClass="APM\VenteBundle\Repository\RemiseRepository")
  * @UniqueEntity("code")
  */
-class Remise extends Trade
+class Remise extends TradeFactory
 {
     /**
      * @var string

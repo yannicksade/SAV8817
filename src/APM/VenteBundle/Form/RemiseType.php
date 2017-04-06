@@ -28,11 +28,7 @@ class RemiseType extends AbstractType
             ->add('valeur', MoneyType::class, [
                 'grouping' => true,
                 'required' => false])
-            ->add('offre', EntityType::class, [
-                'class' => 'APMVenteBundle:Offre',
-                'choice_label' => 'designation',
-                'required' => true
-            ]);
+            ;
     }
 
     /**

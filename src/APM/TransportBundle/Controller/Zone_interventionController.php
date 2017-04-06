@@ -2,7 +2,12 @@
 
 namespace APM\TransportBundle\Controller;
 
+
+use APM\TransportBundle\Entity\Livreur_boutique;
+use APM\TransportBundle\Entity\Profile_transporteur;
 use APM\TransportBundle\Entity\Zone_intervention;
+use APM\TransportBundle\Factory\TradeFactory;
+use APM\UserBundle\Entity\Utilisateur_avm;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -13,31 +18,46 @@ use Symfony\Component\HttpFoundation\Request;
 class Zone_interventionController extends Controller
 {
     /**
-     * Lists all Zone_intervention entities.
-     *
+     * acceder les zones d'intervention créée par le transporteur
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
-
-        $zone_interventions = $em->getRepository('APMTransportBundle:Zone_intervention')->findAll();
-
+        $this->listeAndShowSecurity();
+        /** @var Utilisateur_avm $user */
+        $user = $this->getUser();
+        $zone_interventions = $user->getTransporteur()->getZones();
         return $this->render('APMTransportBundle:zone_intervention:index.html.twig', array(
             'zone_interventions' => $zone_interventions,
         ));
     }
 
-    /**
-     * Creates a new Zone_intervention entity.
-     *
-     */
+    private function listeAndShowSecurity()
+    {
+        //---------------------------------security-----------------------------------------------
+        // Unable to access the controller unless you have a USERAVM role
+        $this->denyAccessUnlessGranted( 'ROLE_TRANSPORTEUR', null, 'Unable to access this page!');
+        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
+            throw $this->createAccessDeniedException();
+        }
+        //----------------------------------------------------------------------------------------
+    }
+
     public function newAction(Request $request)
     {
-        $zone_intervention = new Zone_intervention();
+        $this->createSecurity();
+
+        /** @var Zone_intervention $zone_intervention */
+        $zone_intervention = TradeFactory::getTradeProvider("zone_intervention");
         $form = $this->createForm('APM\TransportBundle\Form\Zone_interventionType', $zone_intervention);
         $form->handleRequest($request);
-
         if ($form->isSubmitted() && $form->isValid()) {
+            $this->createSecurity();
+            /** @var Livreur_boutique $livreur_boutique */
+            $livreur_boutique = $form->getData()['livreur_boutique'];
+            /** @var Profile_transporteur $transporteur */
+            $transporteur = $this->getUser()->getTransporteur()|| $livreur_boutique->getTransporteur();
+            $zone_intervention->setTransporteur($transporteur);
             $em = $this->getDoctrine()->getManager();
             $em->persist($zone_intervention);
             $em->flush();
@@ -51,12 +71,25 @@ class Zone_interventionController extends Controller
         ));
     }
 
+    private function createSecurity()
+    {
+        //---------------------------------security-----------------------------------------------
+        $this->denyAccessUnlessGranted(['ROLE_TRANSPORTEUR', 'ROLE_BOUTIQUE'], null, 'Unable to access this page!');
+        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY') ) {
+            throw $this->createAccessDeniedException();
+        }
+        //----------------------------------------------------------------------------------------
+    }
+
     /**
      * Finds and displays a Zone_intervention entity.
-     *
+     * @param Zone_intervention $zone_intervention
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function showAction(Zone_intervention $zone_intervention)
     {
+        $this->listeAndShowSecurity();
+
         $deleteForm = $this->createDeleteForm($zone_intervention);
 
         return $this->render('APMTransportBundle:zone_intervention:show.html.twig', array(
@@ -82,15 +115,20 @@ class Zone_interventionController extends Controller
 
     /**
      * Displays a form to edit an existing Zone_intervention entity.
-     *
+     * @param Request $request
+     * @param Zone_intervention $zone_intervention
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
     public function editAction(Request $request, Zone_intervention $zone_intervention)
     {
+        $this->editAndDeleteSecurity($zone_intervention);
+
         $deleteForm = $this->createDeleteForm($zone_intervention);
         $editForm = $this->createForm('APM\TransportBundle\Form\Zone_interventionType', $zone_intervention);
         $editForm->handleRequest($request);
 
         if ($editForm->isSubmitted() && $editForm->isValid()) {
+            $this->editAndDeleteSecurity($zone_intervention);
             $em = $this->getDoctrine()->getManager();
             $em->persist($zone_intervention);
             $em->flush();
@@ -106,15 +144,36 @@ class Zone_interventionController extends Controller
     }
 
     /**
+     * @param Zone_intervention $zone_intervention
+     */
+    private function editAndDeleteSecurity($zone_intervention)
+    {
+        //---------------------------------security-----------------------------------------------
+        // Unable to access the controller unless they have the required role
+        $this->denyAccessUnlessGranted(['ROLE_TRANSPORTEUR','ROLE_BOUTIQUE'], null, 'Unable to access this page!');
+        /** @var Utilisateur_avm $user */
+       $user = $this->getUser();
+        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY') || $user !== $zone_intervention->getTransporteur()->getUtilisateur()){
+            throw $this->createAccessDeniedException();
+        }
+        //----------------------------------------------------------------------------------------
+    }
+
+    /**
      * Deletes a Zone_intervention entity.
-     *
+     * @param Request $request
+     * @param Zone_intervention $zone_intervention
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse
      */
     public function deleteAction(Request $request, Zone_intervention $zone_intervention)
     {
+        $this->editAndDeleteSecurity($zone_intervention);
+
         $form = $this->createDeleteForm($zone_intervention);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $this->editAndDeleteSecurity($zone_intervention);
             $em = $this->getDoctrine()->getManager();
             $em->remove($zone_intervention);
             $em->flush();
@@ -123,10 +182,12 @@ class Zone_interventionController extends Controller
         return $this->redirectToRoute('apm_zone_intervention_index');
     }
 
-    public function deleteFromListAction(Zone_intervention $object)
+    public function deleteFromListAction(Zone_intervention $zone_intervention)
     {
+        $this->editAndDeleteSecurity($zone_intervention);
+
         $em = $this->getDoctrine()->getManager();
-        $em->remove($object);
+        $em->remove($zone_intervention);
         $em->flush();
 
         return $this->redirectToRoute('apm_zone_intervention_index');

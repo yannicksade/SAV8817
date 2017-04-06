@@ -3,7 +3,9 @@
 namespace APM\TransportBundle\Entity;
 
 
+use APM\TransportBundle\Factory\TradeFactory;
 use APM\VenteBundle\Entity\Boutique;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -13,7 +15,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @ORM\Table(name="livreur_boutique")
  * @ORM\Entity(repositoryClass="APM\TransportBundle\Repository\Livreur_boutiqueRepository")
  */
-class Livreur_boutique
+class Livreur_boutique extends TradeFactory
 {
 
 
@@ -34,7 +36,7 @@ class Livreur_boutique
     /**
      * @var Profile_transporteur
      *
-     * @ORM\OneToOne(targetEntity="APM\TransportBundle\Entity\Profile_transporteur", cascade={"persist","remove"})
+     * @ORM\OneToOne(targetEntity="APM\TransportBundle\Entity\Profile_transporteur", inversedBy="livreurBoutique", cascade={"persist","remove"})
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="transporteur_id", referencedColumnName="id", nullable=false)
      * })
@@ -42,14 +44,17 @@ class Livreur_boutique
     private $transporteur;
 
     /**
-     * @var Boutique
+     * @var Collection
      *
-     * @ORM\ManyToOne(targetEntity="APM\VenteBundle\Entity\Boutique", inversedBy="livreurs")
-     * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="boutique_id", referencedColumnName="id", nullable=false)
-     * })
+     * @ORM\ManyToMany(targetEntity="APM\VenteBundle\Entity\Boutique", inversedBy="livreurs")
+     *
      */
-    private $boutique;
+    private $boutiques;
+
+    public function __construct()
+    {
+        $this->boutiques = new ArrayCollection();
+    }
 
     /**
      * Get Transporteur
@@ -71,31 +76,6 @@ class Livreur_boutique
     public function setTransporteur($transporteur)
     {
         $this->transporteur = $transporteur;
-
-        return $this;
-    }
-
-
-    /**
-     * Get boutique
-     *
-     * @return Boutique
-     */
-    public function getBoutique()
-    {
-        return $this->boutique;
-    }
-
-    /**
-     * Set boutique
-     *
-     * @param Boutique $boutique
-     *
-     * @return Livreur_boutique
-     */
-    public function setBoutique(Boutique $boutique)
-    {
-        $this->boutique = $boutique;
 
         return $this;
     }
@@ -146,5 +126,39 @@ class Livreur_boutique
         $this->reference = $reference;
 
         return $this;
+    }
+
+    /**
+     * Add boutique
+     *
+     * @param Boutique $boutique
+     *
+     * @return Livreur_boutique
+     */
+    public function addBoutique(Boutique $boutique)
+    {
+        $this->boutiques[] = $boutique;
+
+        return $this;
+    }
+
+    /**
+     * Remove boutique
+     *
+     * @param Boutique $boutique
+     */
+    public function removeBoutique(Boutique $boutique)
+    {
+        $this->boutiques->removeElement($boutique);
+    }
+
+    /**
+     * Get boutiques
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getBoutiques()
+    {
+        return $this->boutiques;
     }
 }

@@ -2,6 +2,7 @@
 
 namespace APM\MarketingDistribueBundle\Entity;
 
+use APM\MarketingDistribueBundle\Factory\TradeFactory;
 use APM\VenteBundle\Entity\Boutique;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -16,7 +17,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @ORM\Entity(repositoryClass="APM\MarketingDistribueBundle\Repository\QuotaRepository")
  * @UniqueEntity("code")
  */
-class Quota
+class Quota extends TradeFactory
 {
     /**
      * @var string
@@ -24,6 +25,12 @@ class Quota
      * @ORM\Column(name="code", type="string", length=255, nullable=false)
      */
     private $code;
+
+    /**
+     * @var \DateTime
+     * @ORM\column(type="datetime")
+     */
+    private $date;
 
     /**
      * @var string
@@ -75,10 +82,13 @@ class Quota
 
     /**
      * Constructor
+     * @param string $var
      */
-    public function __construct()
+    public function __construct($var)
     {
         $this->commissionnements = new ArrayCollection();
+        $this->code = "QA" . $var;
+        $this->date = new \DateTime();
     }
 
     /**
@@ -244,5 +254,21 @@ class Quota
     public function getCommissionnements()
     {
         return $this->commissionnements;
+    }
+
+    /**
+     * @return \DateTime
+     */
+    public function getDate()
+    {
+        return $this->date;
+    }
+
+    /**
+     * @param \DateTime $date
+     */
+    public function setDate(\DateTime $date)
+    {
+        $this->date = $date;
     }
 }

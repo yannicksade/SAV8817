@@ -2,6 +2,9 @@
 
 namespace APM\TransportBundle\Entity;
 
+use APM\TransportBundle\Factory\TradeFactory;
+use APM\UserBundle\Entity\Utilisateur_avm;
+use APM\VenteBundle\Entity\Boutique;
 use APM\VenteBundle\Entity\Transaction;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -17,7 +20,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
  * @ORM\Entity(repositoryClass="APM\TransportBundle\Repository\LivraisonRepository")
  * @UniqueEntity("code")
  */
-class Livraison
+class Livraison extends TradeFactory
 {
     /**
      * @var string
@@ -73,24 +76,45 @@ class Livraison
      *
      * @ORM\ManyToOne(targetEntity="APM\TransportBundle\Entity\Profile_transporteur", inversedBy="livraisons")
      * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="livreur_boutique_id", referencedColumnName="id", nullable=false)
+     *   @ORM\JoinColumn(name="livreur_boutique_id", referencedColumnName="id")
      * })
      */
     private $livreur;
 
     /**
+     * @var Utilisateur_avm
+     *
+     * @ORM\ManyToOne(targetEntity="APM\UserBundle\Entity\Utilisateur_avm", inversedBy="livraisons")
+     * @ORM\JoinColumns({
+     *   @ORM\JoinColumn(name="utilisateur_id", referencedColumnName="id", nullable=false)
+     * })
+     */
+    private $utilisateur;
+
+    /**
+     * @var Boutique
+     *
+     * @ORM\ManyToOne(targetEntity="APM\VenteBundle\Entity\Boutique", inversedBy="livraisons")
+     * @ORM\JoinColumns({
+     *   @ORM\JoinColumn(name="boutique_id", referencedColumnName="id")
+     * })
+     */
+    private $boutique;
+
+    /**
      * @var Collection
      * @ORM\OneToMany(targetEntity="APM\VenteBundle\Entity\Transaction", mappedBy="livraison")
-     * @ORM\JoinColumn(nullable=true)
      */
     private $operations;
 
     /**
      * Constructor
+     * @param string $var
      */
-    public function __construct()
+    public function __construct($var)
     {
         $this->operations = new ArrayCollection();
+        $this->code = "LV" . $var;
     }
 
     /**
@@ -313,5 +337,53 @@ class Livraison
         $this->code = $code;
 
         return $this;
+    }
+
+    /**
+     * Get utilisateur
+     *
+     * @return Utilisateur_avm
+     */
+    public function getUtilisateur()
+    {
+        return $this->utilisateur;
+    }
+
+    /**
+     * Set utilisateur
+     *
+     * @param Utilisateur_avm $utilisateur
+     *
+     * @return Livraison
+     */
+    public function setUtilisateur(Utilisateur_avm $utilisateur)
+    {
+        $this->utilisateur = $utilisateur;
+
+        return $this;
+    }
+
+    /**
+     * Set boutique
+     *
+     * @param Boutique $boutique
+     *
+     * @return Livraison
+     */
+    public function setBoutique(Boutique $boutique = null)
+    {
+        $this->boutique = $boutique;
+
+        return $this;
+    }
+
+    /**
+     * Get boutique
+     *
+     * @return \APM\VenteBundle\Entity\Boutique
+     */
+    public function getBoutique()
+    {
+        return $this->boutique;
     }
 }

@@ -1,16 +1,15 @@
 {% extends "APMAdminBundle:_Main:layout.html.twig" %}
 
 {% block body %}
-    <h1>Offre creation</h1>
 
+    <h2> Créer une Offre </h2>
     {{ form_start(form) }}
     {{ form_widget(form) }}
     <input type="submit" value="Create"/>
     {{ form_end(form) }}
-
     <ul>
         <li>
-            <a href="{{ path('apm_vente_offre_index') }}">Back to the list</a>
+            <a href="{{ path('apm_vente_offre_index') }}">Abandonner !</a>
         </li>
     </ul>
 {% endblock %}

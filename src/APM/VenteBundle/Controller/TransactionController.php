@@ -2,8 +2,9 @@
 
 namespace APM\VenteBundle\Controller;
 
+use APM\UserBundle\Entity\Utilisateur_avm;
 use APM\VenteBundle\Entity\Transaction;
-use APM\VenteBundle\TradeAbstraction\Trade;
+use APM\VenteBundle\Factory\TradeFactory;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -15,14 +16,15 @@ class TransactionController extends Controller
 {
 
     /**
-     * Lists all Transaction entities.
+     * Liste les transactions d'un individu
      *
      */
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
-
-        $transactions = $em->getRepository('APMVenteBundle:Transaction')->findAll();
+        $this->listAndShowSecurity();
+        /** @var Utilisateur_avm $user */
+        $user = $this->getUser();
+        $transactions = $user->getTransactions();
 
         return $this->render('APMVenteBundle:transaction:index.html.twig', array(
             'transactions' => $transactions,
@@ -36,12 +38,15 @@ class TransactionController extends Controller
      */
     public function newAction(Request $request)
     {
+        $this->createSecurity();
+
         /** @var Transaction $transaction */
-        $transaction = Trade::getTradeProvider('transaction');
+        $transaction = TradeFactory::getTradeProvider('transaction');
         $form = $this->createForm('APM\VenteBundle\Form\TransactionType', $transaction);
         $form->handleRequest($request);
-
         if ($form->isSubmitted() && $form->isValid()) {
+            $this->createSecurity();
+            $transaction->setAuteur($this->getUser());
             $em = $this->getDoctrine()->getManager();
             $em->persist($transaction);
             $em->flush();
@@ -62,8 +67,9 @@ class TransactionController extends Controller
      */
     public function showAction(Transaction $transaction)
     {
-        $deleteForm = $this->createDeleteForm($transaction);
+        $this->listAndShowSecurity();
 
+        $deleteForm = $this->createDeleteForm($transaction);
         return $this->render('APMVenteBundle:transaction:show.html.twig', array(
             'transaction' => $transaction,
             'delete_form' => $deleteForm->createView(),
@@ -93,11 +99,13 @@ class TransactionController extends Controller
      */
     public function editAction(Request $request, Transaction $transaction)
     {
+        $this->editAndDeleteSecurity();
         $deleteForm = $this->createDeleteForm($transaction);
         $editForm = $this->createForm('APM\VenteBundle\Form\TransactionType', $transaction);
         $editForm->handleRequest($request);
 
         if ($editForm->isSubmitted() && $editForm->isValid()) {
+            $this->editAndDeleteSecurity();
             $em = $this->getDoctrine()->getManager();
             $em->persist($transaction);
             $em->flush();
@@ -120,10 +128,12 @@ class TransactionController extends Controller
      */
     public function deleteAction(Request $request, Transaction $transaction)
     {
+        $this->editAndDeleteSecurity();
         $form = $this->createDeleteForm($transaction);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $this->editAndDeleteSecurity();
             $em = $this->getDoctrine()->getManager();
             $em->remove($transaction);
             $em->flush();
@@ -134,10 +144,45 @@ class TransactionController extends Controller
 
     public function deleteFromListAction(Transaction $object)
     {
+        $this->editAndDeleteSecurity();
         $em = $this->getDoctrine()->getManager();
         $em->remove($object);
         $em->flush();
 
         return $this->redirectToRoute('apm_vente_transaction_index');
+    }
+
+    private function listAndShowSecurity(){
+        //-----------------------------------security-------------------------------------------
+        // Unable to access the controller unless you have a USERAVM role
+        $this->denyAccessUnlessGranted('ROLE_USERAVM', null, 'Unable to access this page!');
+
+        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
+            throw $this->createAccessDeniedException();
+        }
+        //----------------------------------------------------------------------------------------
+    }
+
+    private function createSecurity(){
+        //---------------------------------security-----------------------------------------------
+        // Unable to access the controller unless you have a USERAVM role
+        $this->denyAccessUnlessGranted('ROLE_USERAVM', null, 'Unable to access this page!');
+
+        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY')) {
+            throw $this->createAccessDeniedException();
+        }
+        //----------------------------------------------------------------------------------------
+    }
+
+
+    private function editAndDeleteSecurity(){
+        //---------------------------------security-----------------------------------------------
+        // Unable to access the controller unless you have a USERAVM role
+        $this->denyAccessUnlessGranted('ROLE_SUPER_ADMIN', null, 'Unable to access this page!');
+
+        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY')) {
+            throw $this->createAccessDeniedException();
+        }
+        //----------------------------------------------------------------------------------------
     }
 }

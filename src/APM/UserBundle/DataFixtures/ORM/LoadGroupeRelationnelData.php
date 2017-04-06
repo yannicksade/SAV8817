@@ -10,6 +10,7 @@ namespace APM\CoreBundle\DataFixtures\ORM;
 
 
 use APM\UserBundle\Entity\Groupe_relationnel;
+use APM\UserBundle\Factory\TradeFactory;
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
@@ -22,7 +23,8 @@ class LoadGroupeRelationnelData extends AbstractFixture implements OrderedFixtur
     public function load(ObjectManager $manager)
     {
 
-        $relationnel = new Groupe_relationnel();
+        /** @var Groupe_relationnel $relationnel */
+        $relationnel = TradeFactory::getTradeProvider("groupe_relationnel");
         $relationnel->setDesignation("GroupeTest1");
         $relationnel->setCode("GRP125T");
         $relationnel->setProprietaire($this->getReference('user-avm'));

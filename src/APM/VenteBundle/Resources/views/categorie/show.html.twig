@@ -40,13 +40,13 @@
 
     <ul>
         <li>
-            <a href="{{ path('apm_vente_categorie_index') }}">Back to the list</a>
+            <a href="{{ path('apm_vente_categorie_index', {'id': categorie.boutique.id}) }}">Back to the list</a>
         </li>
         <li>
             <a href="{{ path('apm_vente_categorie_edit', { 'id': categorie.id }) }}">Edit</a>
         </li>
         <li>
-            <a href="{{ path('apm_vente_categorie_new') }}">Add a new one</a>
+            <a href="{{ path('apm_vente_categorie_new', {'id': categorie.boutique.id}) }}">Add a new one</a>
         </li>
         {% if delete_form %}
         <li>

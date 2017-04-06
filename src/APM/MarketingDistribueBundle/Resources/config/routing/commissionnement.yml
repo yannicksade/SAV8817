@@ -1,5 +1,5 @@
 apm_marketing_commissionnement_index:
-    path:     /
+    path:     /{id}
     defaults: { _controller: "APMMarketingDistribueBundle:Commissionnement:index" }
     methods:  GET
 
@@ -9,7 +9,7 @@ apm_marketing_commissionnement_show:
     methods:  GET
 
 apm_marketing_commissionnement_new:
-    path:     /new
+    path:     /new/{id}
     defaults: { _controller: "APMMarketingDistribueBundle:Commissionnement:new" }
     methods:  [GET, POST]
 

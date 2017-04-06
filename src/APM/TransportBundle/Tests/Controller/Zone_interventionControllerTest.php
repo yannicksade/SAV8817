@@ -13,7 +13,7 @@ class Zone_interventionControllerTest extends WebTestCase
         //run this client to a separate client
         $client->insulate();
         // Create a new entry in the database
-        $client->request('GET', '/apm_transport_zone_intervention');
+        $client->request('GET', '/apm/transport_zone_intervention');
         $crawler = $client->followRedirect();
         $this->assertEquals(200, $client->getResponse()->getStatusCode(), "Unexpected HTTP status code for GET /apm_transport_zone_intervention");
 
@@ -44,7 +44,7 @@ class Zone_interventionControllerTest extends WebTestCase
 
         // Delete the entity and redirect to the list
         $client->submit($crawler->selectButton('Delete')->form());
-        $this->assertTrue($client->getResponse()->isRedirect('/apm_transport_zone_intervention/'), 'The response is redirect not to/apm_transport_zone_intervention/');
+        $this->assertTrue($client->getResponse()->isRedirect('/apm/transport_zone_intervention/'), 'The response is redirect not to/apm_transport_zone_intervention/');
         $client->followRedirect();
 
         // Check the entity has been delete on the list

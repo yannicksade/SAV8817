@@ -1,23 +1,14 @@
 {% extends "APMAdminBundle:_Main:layout.html.twig" %}
 
 {% block body %}
-    <h1>Offre list</h1>
-
+    {#<h1>Offre de la boutique -  <a href="{{ path('apm_vente_boutique_show', { 'id': boutique.id }) }}">{{ boutique.designation }}</a></h1>#}
     <table>
         <thead>
         <tr>
             <th>Code</th>
-            <th>Designation</th>
-            <th>Date d'expiration</th>
-            <th>Description</th>
-            <th>Garantie</th>
-            <th>Retourne</th>
-            <th>Etat</th>
-            <th>Prixunitaire</th>
-            <th>Quantite</th>
-            <th>Evaluation</th>
-            <th>Reference</th>
-            <th>Valide</th>
+            <th>Désignation</th>
+            <th>Quantité</th>
+            <th>Prix Unitaire</th>
             <th>Actions</th>
         </tr>
         </thead>
@@ -26,16 +17,8 @@
             <tr>
                 <td><a href="{{ path('apm_vente_offre_show', { 'id': offre.id }) }}">{{ offre.code }}</a></td>
                 <td>{{ offre.designation }}</td>
-                <td>{% if offre.dateExpiration %}{{ offre.dateExpiration|date('Y-m-d H:i:s') }}{% endif %}</td>
-                <td>{{ offre.description }}</td>
-                <td>{{ offre.garantie }}</td>
-                <td>{% if offre.retourne %}Yes{% else %}No{% endif %}</td>
-                <td>{{ offre.etat }}</td>
-                <td>{{ offre.prixUnitaire }}</td>
                 <td>{{ offre.quantite }}</td>
-                <td>{{ offre.evaluation }}</td>
-                <td>{{ offre.reference }}</td>
-                <td>{% if offre.valide %}Yes{% else %}No{% endif %}</td>
+                <td>{{ offre.prixUnitaire }}</td>
                 <td>
                     <ul>
                         <li>
@@ -56,8 +39,18 @@
     </table>
 
     <ul>
+        {% if boutique != null %}
+             <li>
+                <a href="{{ path('apm_vente_offre_new', {'id': boutique.id}) }}">Créer une nouvelle offre</a>
+             </li>
+        {% endif %}
+        {% if boutique == null %}
+            <li>
+                <a href="{{ path('apm_vente_offre_new') }}">Créer une nouvelle offre</a>
+            </li>
+        {% endif %}
         <li>
-            <a href="{{ path('apm_vente_offre_new') }}">Create a new entry</a>
+            <a href="{{ path('apm_vente_categorie_new')}}">Créer une catégorie</a>
         </li>
     </ul>
 {% endblock %}

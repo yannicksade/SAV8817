@@ -42,12 +42,11 @@ class CategorieType extends AbstractType
                 'choice_label' => 'designation',
                 'required' => false
             ])
-            //'disabled'=>true
-            //'expanded'=>true,
-            //'placeholder'=>'aucun'
-            //'em'=>'default'
-            //'choices'=>$groups->getCategorieCourante()
-
+           ->add('boutique', EntityType::class, [
+               'class' => 'APMVenteBundle:Boutique',
+               'choice_label' => 'designation',
+                'required' =>false
+           ])
         ;
 //        $builder->get('categorieCourante')->addModelTransformer(
 //        new ObjectToStringTransformer());

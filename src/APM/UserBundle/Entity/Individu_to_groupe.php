@@ -2,8 +2,8 @@
 
 namespace APM\UserBundle\Entity;
 
+use APM\UserBundle\Factory\TradeFactory;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
@@ -11,16 +11,9 @@ use Symfony\Component\Validator\Constraints as Assert;
  *
  * @ORM\Table(name="individu_to_groupe")
  * @ORM\Entity(repositoryClass="APM\UserBundle\Repository\Individu_to_groupeRepository")
- * @UniqueEntity("code")
  */
-class Individu_to_groupe
+class Individu_to_groupe extends TradeFactory
 {
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="code", type="string", length=255, nullable=false)
-     */
-    private $code;
 
     /**
      * @var integer
@@ -142,27 +135,4 @@ class Individu_to_groupe
         return $this;
     }
 
-    /**
-     * Get code
-     *
-     * @return string
-     */
-    public function getCode()
-    {
-        return $this->code;
-    }
-
-    /**
-     * Set code
-     *
-     * @param string $code
-     *
-     * @return Individu_to_groupe
-     */
-    public function setCode($code)
-    {
-        $this->code = $code;
-
-        return $this;
-    }
 }

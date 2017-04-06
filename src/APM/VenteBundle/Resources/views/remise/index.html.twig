@@ -1,7 +1,7 @@
 {% extends "APMAdminBundle:_Main:layout.html.twig" %}
 
 {% block body %}
-    <h1>Remise list</h1>
+    <h1>Remise De sur l'offre {{ offre.designation }}</h1>
 
     <table>
         <thead>
@@ -47,7 +47,10 @@
 
     <ul>
         <li>
-            <a href="{{ path('apm_vente_remise_new') }}">Create a new entry</a>
+            <a href="{{ path('apm_vente_remise_index', {'id': offre.id}) }}">Create a new entry</a>
+        </li>
+        <li>
+            <a href="{{ path('apm_vente_boutique_show', {'id': offre.id}) }}">Retour à la boutique</a>
         </li>
     </ul>
 {% endblock %}

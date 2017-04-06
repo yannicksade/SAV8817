@@ -1,6 +1,6 @@
 apm_vente_boutique:
     resource: "@APMVenteBundle/Resources/config/routing/boutique.yml"
-    prefix:   /apm_vente_boutique
+    prefix:   /vente_boutique
 
 apm_vente_homepage:
     path:     /vente
@@ -8,28 +8,24 @@ apm_vente_homepage:
 
 apm_vente_categorie:
     resource: "@APMVenteBundle/Resources/config/routing/categorie.yml"
-    prefix:   /apm_vente_categorie
+    prefix:   /vente_categorie
 
 apm_vente_offre:
     resource: "@APMVenteBundle/Resources/config/routing/offre.yml"
-    prefix:   /apm_vente_offre
+    prefix:   /vente_offre
 
 apm_vente_rabais_offre:
     resource: "@APMVenteBundle/Resources/config/routing/rabais_offre.yml"
-    prefix:   /apm_vente_rabais_offre
+    prefix:   /vente_rabais_offre
 
 apm_vente_remise:
     resource: "@APMVenteBundle/Resources/config/routing/remise.yml"
-    prefix:   /apm_vente_remise
-
-apm_vente_suggestion_offre:
-    resource: "@APMVenteBundle/Resources/config/routing/suggestion_produit.yml"
-    prefix:   /apm_vente_suggestion_offre
+    prefix:   /vente_remise
 
 apm_vente_transaction_produit:
     resource: "@APMVenteBundle/Resources/config/routing/transaction_produit.yml"
-    prefix:   /apm_vente_transaction_produit
+    prefix:   /vente_transaction_produit
 
 apm_vente_transaction:
     resource: "@APMVenteBundle/Resources/config/routing/transaction.yml"
-    prefix:   /apm_vente_transaction
+    prefix:   /vente_transaction

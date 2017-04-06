@@ -2,9 +2,9 @@
 
 namespace APM\MarketingDistribueBundle\Entity;
 
+use APM\MarketingDistribueBundle\Factory\TradeFactory;
 use APM\MarketingReseauBundle\Entity\Reseau_conseillers;
 use APM\UserBundle\Entity\Utilisateur_avm;
-use APM\VenteBundle\Entity\Boutique;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -19,22 +19,21 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
  * @UniqueEntity("code", message="Ce code est déjà pris.")
  * @UniqueEntity("matricule", message="ce matricule existe déjà.")
  */
-class Conseiller
+class Conseiller extends TradeFactory
 {
+    public static $MAX_INSTANCE_RESEAU = 2;
     /**
      * @var string
      *
      * @ORM\Column(name="code", type="string", length=255, nullable=false)
      */
     private $code;
-
     /**
      * @var \DateTime
      * @Assert\DateTime
      * @ORM\Column(name="dateEnregistrement", type="datetime", nullable=true)
      */
     private $dateEnregistrement;
-
     /**
      * @var string
      * @Assert\Length(min=2, max=254)
@@ -94,6 +93,12 @@ class Conseiller
     private $reseau;
 
     /**
+     * @var Reseau_conseillers
+     * @ORM\OneToMany(targetEntity="APM\MarketingReseauBundle\Entity\Reseau_conseillers", mappedBy="conseillerProprietaire")
+     */
+    private $reseauxProprietaire;
+
+    /**
      * @var Collection
      * @ORM\OneToMany(targetEntity="APM\MarketingDistribueBundle\Entity\Conseiller_boutique", mappedBy="conseiller", cascade={"persist","remove"})
      */
@@ -101,11 +106,13 @@ class Conseiller
 
     /**
      * Constructor
+     * @param string $var
      */
-    public function __construct()
+    public function __construct($var)
     {
         $this->conseillerBoutiques = new ArrayCollection();
-        $this->boutiques = new ArrayCollection();
+        $this->reseauxProprietaire = new ArrayCollection();
+        $this->code = "AD" . $var;
     }
 
     /**
@@ -355,37 +362,38 @@ class Conseiller
         return $this->conseillerBoutiques;
     }
 
+
     /**
-     * Add boutique
+     * Add reseauxProprietaire
      *
-     * @param Boutique $boutique
+     * @param Reseau_conseillers $reseauxProprietaire
      *
      * @return Conseiller
      */
-    public function addBoutique(Boutique $boutique)
+    public function addReseauxProprietaire(Reseau_conseillers $reseauxProprietaire)
     {
-        $this->boutiques[] = $boutique;
+        $this->reseauxProprietaire[] = $reseauxProprietaire;
 
         return $this;
     }
 
     /**
-     * Remove boutique
+     * Remove reseauxProprietaire
      *
-     * @param Boutique $boutique
+     * @param Reseau_conseillers $reseauxProprietaire
      */
-    public function removeBoutique(Boutique $boutique)
+    public function removeReseauxProprietaire(Reseau_conseillers $reseauxProprietaire)
     {
-        $this->boutiques->removeElement($boutique);
+        $this->reseauxProprietaire->removeElement($reseauxProprietaire);
     }
 
     /**
-     * Get boutiques
+     * Get reseauxProprietaire
      *
      * @return Collection
      */
-    public function getBoutiques()
+    public function getReseauxProprietaire()
     {
-        return $this->boutiques;
+        return $this->reseauxProprietaire;
     }
 }

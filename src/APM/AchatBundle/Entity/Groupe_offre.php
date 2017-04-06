@@ -2,6 +2,7 @@
 
 namespace APM\AchatBundle\Entity;
 
+use APM\AchatBundle\Factory\TradeFactory;
 use Symfony\Component\Validator\Constraints as Assert;
 use APM\UserBundle\Entity\Utilisateur_avm;
 use APM\VenteBundle\Entity\Offre;
@@ -17,7 +18,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
  * @ORM\Entity(repositoryClass="APM\AchatBundle\Repository\Groupe_offreRepository")
  * @UniqueEntity("code")
  */
-class Groupe_offre
+class Groupe_offre extends TradeFactory
 {
 
     /**
@@ -91,11 +92,13 @@ class Groupe_offre
 
     /**
      * Constructor
+     * @param string $var
      */
-    public function __construct()
+    public function __construct($var)
     {
         $this->offres = new ArrayCollection();
         $this->dateDeVigueur = new \DateTime;
+        $this->code = "GO" . $var;
     }
 
     /**

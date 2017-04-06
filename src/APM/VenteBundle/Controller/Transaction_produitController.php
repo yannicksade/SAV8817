@@ -2,8 +2,10 @@
 
 namespace APM\VenteBundle\Controller;
 
+use APM\VenteBundle\Entity\Offre;
+use APM\VenteBundle\Entity\Transaction;
 use APM\VenteBundle\Entity\Transaction_produit;
-use APM\VenteBundle\TradeAbstraction\Trade;
+use APM\VenteBundle\Factory\TradeFactory;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -16,32 +18,34 @@ class Transaction_produitController extends Controller
 
     /**
      * Lists all Transaction_produit entities.
-     *
+     * @param Offre $offre
+     * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function indexAction()
+    public function indexAction(Offre $offre)
     {
-        $em = $this->getDoctrine()->getManager();
-
-        $transaction_produits = $em->getRepository('APMVenteBundle:Transaction_produit')->findAll();
-
+        $this->listAndShowSecurity($offre);
+        $transaction_produits = $offre->getProduitTransactions();
         return $this->render('APMVenteBundle:transaction_produit:index.html.twig', array(
             'transaction_produits' => $transaction_produits,
         ));
     }
 
-    /**
-     * Creates a new Transaction_produit entity.
-     * @param Request $request
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
-     */
+
     public function newAction(Request $request)
     {
+        $this->createSecurity();
         /** @var Transaction_produit $transaction_produit */
-        $transaction_produit = Trade::getTradeProvider('transaction_produit');
+        $transaction_produit = TradeFactory::getTradeProvider('transaction_produit');
+        /** @var Transaction $transaction */
+        $transaction = TradeFactory::getTradeProvider('transaction');
         $form = $this->createForm('APM\VenteBundle\Form\Transaction_produitType', $transaction_produit);
+        $form2 =$this->createForm('APM\VenteBundle\Form\TransactionType', $transaction);
         $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid() && $form2->isSubmitted() && $form2->isValid()) {
+            $this->createSecurity($form->getData()['offre']);
+            $transaction->setAuteur($this->getUser());
+            $transaction_produit->setTransaction($transaction);
             $em = $this->getDoctrine()->getManager();
             $em->persist($transaction_produit);
             $em->flush();
@@ -52,6 +56,7 @@ class Transaction_produitController extends Controller
         return $this->render('APMVenteBundle:transaction_produit:new.html.twig', array(
             'transaction_produit' => $transaction_produit,
             'form' => $form->createView(),
+            'form2' => $form2->createView(),
         ));
     }
 
@@ -62,6 +67,7 @@ class Transaction_produitController extends Controller
      */
     public function showAction(Transaction_produit $transaction_produit)
     {
+        $this->listAndShowSecurity($transaction_produit->getProduit());
         $deleteForm = $this->createDeleteForm($transaction_produit);
 
         return $this->render('APMVenteBundle:transaction_produit:show.html.twig', array(
@@ -93,11 +99,14 @@ class Transaction_produitController extends Controller
      */
     public function editAction(Request $request, Transaction_produit $transaction_produit)
     {
+        $this->editAndDeleteSecurity();
+
         $deleteForm = $this->createDeleteForm($transaction_produit);
         $editForm = $this->createForm('APM\VenteBundle\Form\Transaction_produitType', $transaction_produit);
         $editForm->handleRequest($request);
 
         if ($editForm->isSubmitted() && $editForm->isValid()) {
+            $this->editAndDeleteSecurity();
             $em = $this->getDoctrine()->getManager();
             $em->persist($transaction_produit);
             $em->flush();
@@ -120,10 +129,12 @@ class Transaction_produitController extends Controller
      */
     public function deleteAction(Request $request, Transaction_produit $transaction_produit)
     {
+        $this->editAndDeleteSecurity();
         $form = $this->createDeleteForm($transaction_produit);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $this->editAndDeleteSecurity();
             $em = $this->getDoctrine()->getManager();
             $em->remove($transaction_produit);
             $em->flush();
@@ -132,12 +143,57 @@ class Transaction_produitController extends Controller
         return $this->redirectToRoute('apm_vente_transaction_produit_index');
     }
 
-    public function deleteFromListAction(Transaction_produit $object)
+    public function deleteFromListAction(Transaction_produit $transaction_produit)
     {
+        $this->editAndDeleteSecurity();
         $em = $this->getDoctrine()->getManager();
-        $em->remove($object);
+        $em->remove($transaction_produit);
         $em->flush();
 
         return $this->redirectToRoute('apm_vente_transaction_produit_index');
+    }
+
+    /**
+     * @param Offre $offre
+     */
+    private function listAndShowSecurity($offre){
+        //-----------------------------------security-------------------------------------------
+        // Unable to access the controller unless you have a USERAVM role
+        $this->denyAccessUnlessGranted('ROLE_USERAVM', null, 'Unable to access this page!');
+
+            $user = $this->getUser();
+            $vendeur = $offre->getVendeur();
+            if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_REMEMBERED') || $user !== $vendeur) {
+                throw $this->createAccessDeniedException();
+            }
+        //----------------------------------------------------------------------------------------
+    }
+
+    /**
+     * @param Offre $offre
+     */
+    private function createSecurity($offre =null){
+        //---------------------------------security-----------------------------------------------
+        // Unable to access the controller unless you have a USERAVM role
+        $this->denyAccessUnlessGranted('ROLE_USERAVM', null, 'Unable to access this page!');
+        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY')){
+            throw $this->createAccessDeniedException();}
+        $user = $this->getUser();
+        $vendeur = $offre->getVendeur();
+        if(null !==$offre && $user !== $vendeur) {
+            throw $this->createAccessDeniedException();
+        }
+        //----------------------------------------------------------------------------------------
+    }
+
+    private function editAndDeleteSecurity(){
+        //---------------------------------security-----------------------------------------------
+        // Unable to access the controller unless you have a USERAVM role
+        $this->denyAccessUnlessGranted('ROLE_SUPER_ADMIN', null, 'Unable to access this page!');
+
+        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY')) {
+            throw $this->createAccessDeniedException();
+        }
+        //----------------------------------------------------------------------------------------
     }
 }

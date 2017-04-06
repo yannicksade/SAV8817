@@ -2,6 +2,7 @@
 
 namespace APM\UserBundle\Entity;
 
+use APM\UserBundle\Factory\TradeFactory;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -15,7 +16,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @ORM\Entity(repositoryClass="APM\UserBundle\Repository\Groupe_relationnelRepository")
  * @UniqueEntity("code")
  */
-class Groupe_relationnel
+class Groupe_relationnel extends TradeFactory
 {
     /**
      * @var string
@@ -76,10 +77,12 @@ class Groupe_relationnel
 
     /**
      * Constructor
+     * @param string $var
      */
-    public function __construct()
+    public function __construct($var)
     {
         $this->groupeIndividus = new ArrayCollection();
+        $this->code = "GR" . $var;
     }
 
     /**

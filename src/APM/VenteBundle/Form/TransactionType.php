@@ -5,13 +5,11 @@ namespace APM\VenteBundle\Form;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
-use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\MoneyType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints as Assert;
-use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 class TransactionType extends AbstractType
 {
@@ -22,7 +20,6 @@ class TransactionType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('date', DateTimeType::class)
             ->add('destinataireNonAvm', TextType::class, ['required' => false])
             ->add('montant', MoneyType::class, [
                 'required' => false,
@@ -49,14 +46,8 @@ class TransactionType extends AbstractType
                     'ANNULEE' => 5
                 )
             ])
-            ->add('auteur')
             ->add('livraison', EntityType::class, [
                 'class' => 'APMTransportBundle:Livraison',
-                'choice_label' => 'code',
-                'required' => true
-            ])
-            ->add('ordre', EntityType::class, [
-                'class' => 'APMAchatBundle:Specification_achat',
                 'choice_label' => 'code',
                 'required' => false
             ]);

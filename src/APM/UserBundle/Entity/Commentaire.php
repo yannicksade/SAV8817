@@ -2,6 +2,7 @@
 
 namespace APM\UserBundle\Entity;
 
+use APM\UserBundle\Factory\TradeFactory;
 use APM\VenteBundle\Entity\Offre;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
@@ -14,7 +15,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @ORM\Entity(repositoryClass="APM\UserBundle\Repository\CommentaireRepository")
  * @UniqueEntity("code")
  */
-class Commentaire
+class Commentaire extends TradeFactory
 {
     /**
      * @var string
@@ -73,6 +74,15 @@ class Commentaire
      * })
      */
     private $offre;
+
+    /**
+     * Commentaire constructor.
+     * @param string $var
+     */
+    public function __construct($var)
+    {
+        $this->code = "DL" . $var;
+    }
 
     /**
      * Get contenu

@@ -2,7 +2,6 @@
 
 namespace APM\UserBundle\Form;
 
-use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -42,13 +41,9 @@ class CommunicationType extends AbstractType
                     'APPEL_OFFRE' => 5
                 )))
             ->add('valide', CheckboxType::class, ['required' => false])
-            ->add('emetteur')
-            ->add('recepteur')
-            //->add('message', MessageType::class)//imbrication du message chez l'utilisateur
-            ->add('message', EntityType::class, [
-                'class' => 'APM\UserBundle\Entity\Message',
-                'choice_label' => 'code'
-            ]);
+            ->add('recepteur', ['multiple'=>true])
+
+            ;
     }
 
     /**

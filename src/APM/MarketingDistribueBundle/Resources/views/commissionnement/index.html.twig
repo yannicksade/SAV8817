@@ -9,7 +9,7 @@
             <th>Code</th>
             <th>Crédit dépensé</th>
             <th>Libellé</th>
-            <th>Quantité</th>
+            <th>Conseiller</th>
             <th>Actions</th>
         </tr>
         </thead>
@@ -21,7 +21,7 @@
                 </td>
                 <td>{{ commissionnement.creditDepense }}</td>
                 <td>{{ commissionnement.libelle }}</td>
-                <td>{{ commissionnement.quantite }}</td>
+                <td>{{ commissionnement.conseillerBoutique.conseiller.utilisateur }}</td>
                 <td>
                     <ul>
                         <li>
@@ -42,7 +42,8 @@
 
     <ul>
         <li>
-            <a href="{{ path('apm_marketing_commissionnement_new') }}">Create a new entry</a>
+            <a href="{{ path('apm_marketing_commissionnement_new', {'id':  commissionnements|first().conseillerBoutique.id}) }}">Create
+                a new entry</a>
         </li>
     </ul>
 {% endblock %}

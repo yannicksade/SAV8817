@@ -2,9 +2,9 @@
 
 namespace APM\AchatBundle\Entity;
 
-use APM\VenteBundle\Entity\Transaction;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
+use APM\AchatBundle\Factory\TradeFactory;
+use APM\UserBundle\Entity\Utilisateur_avm;
+use APM\VenteBundle\Entity\Offre;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -16,7 +16,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @ORM\Entity(repositoryClass="APM\AchatBundle\Repository\Specification_achatRepository")
  * @UniqueEntity("code")
  */
-class Specification_achat
+class Specification_achat extends TradeFactory
 {
     /**
      *
@@ -70,21 +70,36 @@ class Specification_achat
 
     /**
      *
-     * @var Collection
-     * @ORM\OneToMany(targetEntity="APM\VenteBundle\Entity\Transaction", mappedBy="ordre")
+     * @var Offre
+     * @ORM\ManyToOne(targetEntity="APM\VenteBundle\Entity\Offre", inversedBy="specifications")
+     * @ORM\JoinColumns({
+     *   @ORM\JoinColumn(name="offre_id", referencedColumnName="id", nullable=false)
+     * })
      */
-    private $operations;
+    private $offre;
+
+
+    /**
+     *
+     * @var Utilisateur_avm
+     * @ORM\ManyToOne(targetEntity="APM\UserBundle\Entity\Utilisateur_avm", inversedBy="specifications")
+     * @ORM\JoinColumns({
+     *   @ORM\JoinColumn(name="utilisateur_id", referencedColumnName="id", nullable=false)
+     * })
+     */
+    private $utilisateur;
 
 
     /**
      * Constructor
+     * @param string $var
      */
-    public function __construct()
+    public function __construct($var)
     {
-        $this->operations = new ArrayCollection();
         $this->demandeRabais = false;
         $this->livraison = false;
         $this->echantillon = false;
+        $this->code = "OA" . $var;
 
     }
 
@@ -273,36 +288,50 @@ class Specification_achat
     }
 
     /**
-     * Add operation
+     * Get offre
      *
-     * @param Transaction $operation
+     * @return Offre
+     */
+    public function getOffre()
+    {
+        return $this->offre;
+    }
+
+    /**
+     * Set offre
+     *
+     * @param Offre $offre
      *
      * @return Specification_achat
      */
-    public function addOperation(Transaction $operation)
+    public function setOffre(Offre $offre = null)
     {
-        $this->operations[] = $operation;
+        $this->offre = $offre;
 
         return $this;
     }
 
     /**
-     * Remove operation
+     * Get utilisateur
      *
-     * @param Transaction $operation
+     * @return Utilisateur_avm
      */
-    public function removeOperation(Transaction $operation)
+    public function getUtilisateur()
     {
-        $this->operations->removeElement($operation);
+        return $this->utilisateur;
     }
 
     /**
-     * Get operations
+     * Set utilisateur
      *
-     * @return \Doctrine\Common\Collections\Collection
+     * @param Utilisateur_avm $utilisateur
+     *
+     * @return Specification_achat
      */
-    public function getOperations()
+    public function setUtilisateur(Utilisateur_avm $utilisateur = null)
     {
-        return $this->operations;
+        $this->utilisateur = $utilisateur;
+
+        return $this;
     }
 }

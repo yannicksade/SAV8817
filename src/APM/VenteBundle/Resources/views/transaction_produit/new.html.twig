@@ -5,9 +5,10 @@
 
     {{ form_start(form) }}
     {{ form_widget(form) }}
-    <input type="submit" value="Create"/>
+    {{ form_start(form2) }}
+        <input type="submit" value="Create"/>
     {{ form_end(form) }}
-
+    {{ form_end(form2) }}
     <ul>
         <li>
             <a href="{{ path('apm_vente_transaction_produit_index') }}">Back to the list</a>

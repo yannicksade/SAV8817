@@ -6,12 +6,17 @@
     <table>
         <tbody>
         <tr>
-            <th>Code</th>
-            <td>{{ boutique.code }}</td>
+            <th>Designation</th>
+            <td><strong>{{ boutique.designation }}</strong></td>
         </tr>
         <tr>
-            <th>Nom</th>
-            <td>{{ boutique.designation }}</td>
+            <th>Propriétaire</th>
+            <td>{{ boutique.proprietaire }}</td>
+        </tr>
+
+        <tr>
+            <th>Code</th>
+            <td>{{ boutique.code }}</td>
         </tr>
         <tr>
             <th>Description</th>
@@ -31,20 +36,30 @@
             <td>{{ boutique.statutSocial }}</td>
         </tr>
         <tr>
-            <th>Offres</th>
-            {% for offre in boutique.offres %}
-                <td>  {{ offre.designation }}</td>
-            {% endfor %}
+            <th>Gérant</th>
+            <td>{% if boutique.gerant %}
+                    {% if boutique.gerant.nom %}{{ boutique.gerant.nom }}{% endif %}
+                    {% if boutique.gerant.prenom %} {{ boutique.gerant.prenom }}{% endif %}
+                    pseudo :{{ boutique.gerant.username }}
+                {% endif %}</td>
         </tr>
         <tr>
-            <th>Categories</th>
+            <th>Categories des offres</th>
             {% for categorie in boutique.categories %}
-                <td>  {{ categorie.designation }}</td>
+                <td>
+                    <a href="{{ path('apm_vente_categorie_show', { 'id': categorie.id }) }}">{{ categorie.designation }}</a>|
+                </td>
             {% endfor %}
         </tr>
         <tr>
-            <th>Propriétaire</th>
-            <td>{{ boutique.proprietaire }}</td>
+            <th>Offres hors categorie</th>
+            {% for offre in boutique.offres %}
+                 {% if offre.categorie == null %}
+                     <td>
+                         <a href="{{ path('apm_vente_offre_show', { 'id': offre.id }) }}">{{ offre.designation }}</a>|
+                     </td>
+                 {% endif %}
+            {% endfor %}
         </tr>
 
         </tbody>
@@ -52,13 +67,10 @@
 
     <ul>
         <li>
-            <a href="{{ path('apm_vente_boutique_index') }}">Back to the list</a>
+            <a href="{{ path('apm_vente_boutique_index') }}"> Retour à la boutique</a>
         </li>
         <li>
-            <a href="{{ path('apm_vente_boutique_edit', { 'id': boutique.id }) }}">Edit</a>
-        </li>
-        <li>
-            <a href="{{ path('apm_vente_boutique_new') }}">Add a new one</a>
+            <a href="{{ path('apm_vente_boutique_edit', { 'id': boutique.id }) }}">Modifier</a>
         </li>
 
         {% if delete_form %}

@@ -3,6 +3,12 @@
 namespace APM\UserBundle\Entity;
 
 
+use APM\AnimationBundle\Entity\Base_documentaire;
+use APM\UserBundle\Entity\Piece_jointe;
+use APM\UserBundle\Factory\TradeFactory;
+use APM\VenteBundle\Entity\Offre;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -12,7 +18,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @ORM\Table(name="communication")
  * @ORM\Entity(repositoryClass="APM\UserBundle\Repository\CommunicationRepository")
  */
-class Communication
+class Communication extends TradeFactory
 {
     /**
      * @ORM\Id
@@ -30,11 +36,32 @@ class Communication
 
     /**
      * @var string
+     * @Assert\Length(min=0)
+     * @ORM\Column(name="contenu", type="text", nullable=true)
+     */
+    private $contenu;
+
+    /**
+     * @var \DateTime
+     * @Assert\DateTime
+     * @ORM\Column(name="dateEmission", type="datetime", nullable=false)
+     */
+    private $date;
+
+
+    /**
+     * @var string
      * @Assert\NotBlank
      * @Assert\Length(min=2, max=254)
      * @ORM\Column(name="reference", type="string", length=255, nullable=true)
      */
     private $reference;
+
+    /**
+     * @var Collection
+     * @ORM\ManyToMany(targetEntity="APM\VenteBundle\Entity\Offre", inversedBy="communications")
+     */
+    private $offres;
 
 
     /**
@@ -84,15 +111,17 @@ class Communication
     private $recepteur;
 
     /**
-     * Communication
-     *
-     * @ORM\OneToOne(targetEntity="APM\UserBundle\Entity\Message", cascade={"persist","remove"})
-     * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="message_id", referencedColumnName="id", nullable=false)
-     * })
+     * @var
+     * @ORM\ManyToMany(targetEntity="APM\AnimationBundle\Entity\Base_documentaire")
      */
-    private $message;
+    private $documents;
 
+
+    public function __construct()
+    {
+        $this->offres= new ArrayCollection();
+        $this->documents = new ArrayCollection();
+    }
 
     /**
      * Get dateDeVigueur
@@ -282,30 +311,6 @@ class Communication
         return $this->id;
     }
 
-    /**
-     * Get communication
-     *
-     * @return Message
-     */
-    public function getMessage()
-    {
-        return $this->message;
-    }
-
-
-    /**
-     * Set communication
-     *
-     * @param Message $communication
-     *
-     * @return Communication
-     */
-    public function setMessage(Message $communication)
-    {
-        $this->message = $communication;
-
-        return $this;
-    }
 
     /**
      * Get reference
@@ -329,5 +334,122 @@ class Communication
         $this->reference = $reference;
 
         return $this;
+    }
+
+    /**
+     * Set contenu
+     *
+     * @param string $contenu
+     *
+     * @return Communication
+     */
+    public function setContenu($contenu)
+    {
+        $this->contenu = $contenu;
+
+        return $this;
+    }
+
+    /**
+     * Get contenu
+     *
+     * @return string
+     */
+    public function getContenu()
+    {
+        return $this->contenu;
+    }
+
+    /**
+     * Set date
+     *
+     * @param \DateTime $date
+     *
+     * @return Communication
+     */
+    public function setDate($date)
+    {
+        $this->date = $date;
+
+        return $this;
+    }
+
+    /**
+     * Get date
+     *
+     * @return \DateTime
+     */
+    public function getDate()
+    {
+        return $this->date;
+    }
+
+
+    /**
+     * Add offre
+     *
+     * @param Offre $offre
+     *
+     * @return Communication
+     */
+    public function addOffre(Offre $offre)
+    {
+        $this->offres[] = $offre;
+
+        return $this;
+    }
+
+    /**
+     * Remove offre
+     *
+     * @param Offre $offre
+     */
+    public function removeOffre(Offre $offre)
+    {
+        $this->offres->removeElement($offre);
+    }
+
+    /**
+     * Get offres
+     *
+     * @return Collection
+     */
+    public function getOffres()
+    {
+        return $this->offres;
+    }
+
+    /**
+     * Add document
+     *
+     * @param Base_documentaire $document
+     *
+     * @return Communication
+     */
+    public function addDocument(Base_documentaire $document)
+    {
+        $this->documents[] = $document;
+
+        return $this;
+    }
+
+    /**
+     * Remove document
+     *
+     * @param Base_documentaire $document
+     */
+    public function removeDocument(Base_documentaire $document)
+    {
+        $this->documents->removeElement($document);
+    }
+
+    /**
+     * Get documents
+     *
+     * @return Collection
+     */
+    public function getDocuments()
+    {
+        return $this->documents;
     }
 }

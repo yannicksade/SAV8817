@@ -2,8 +2,9 @@
 
 namespace APM\TransportBundle\Entity;
 
+
+use APM\TransportBundle\Factory\TradeFactory;
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -15,7 +16,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @ORM\Entity(repositoryClass="APM\TransportBundle\Repository\Zone_interventionRepository")
  * @UniqueEntity("code")
  */
-class Zone_intervention
+class Zone_intervention extends TradeFactory
 {
     /**
      * @var string
@@ -75,27 +76,31 @@ class Zone_intervention
      */
     private $id;
 
+
+    /**
+     * @var Profile_transporteur
+     *
+     * @ORM\ManyToOne(targetEntity="APM\TransportBundle\Entity\Profile_transporteur", inversedBy="zones")
+     * @ORM\JoinColumns({
+     *   @ORM\JoinColumn(name="transporteurProprietaire_id", referencedColumnName="id", nullable=false)
+     * })
+     */
+    private $transporteur;
+
     /**
      * @var Collection
-     *
-     * @ORM\ManyToMany(targetEntity="APM\TransportBundle\Entity\Profile_transporteur", inversedBy="transporteurZones")
-     * @ORM\JoinTable(name="transporteur_Zone_intervention",
-     *   joinColumns={
-     *     @ORM\JoinColumn(name="zoneIntervention_id", referencedColumnName="id")
-     *   },
-     *   inverseJoinColumns={
-     *     @ORM\JoinColumn(name="transporteur_id", referencedColumnName="id", nullable=true)
-     *   }
-     * )
+     * @ORM\OneToMany(targetEntity="APM\TransportBundle\Entity\Transporteur_zoneintervention", mappedBy="zoneIntervention")
      */
-    private $zoneTransporteurs;
+    private $zone_transporteurs;
 
     /**
      * Constructor
+     * @param string $var
      */
-    public function __construct()
+    public function __construct($var)
     {
-        $this->zoneTransporteurs = new ArrayCollection();
+        $this->code = "ZO" . $var;
+        $this->zone_transporteurs =new  ArrayCollection();
     }
 
     /**
@@ -181,40 +186,6 @@ class Zone_intervention
         return $this->id;
     }
 
-
-    /**
-     * Add transporteur
-     *
-     * @param Profile_transporteur $transporteur
-     *
-     * @return Zone_intervention
-     */
-    public function addZoneTransporteur(Profile_transporteur $transporteur)
-    {
-        $this->zoneTransporteurs[] = $transporteur;
-
-        return $this;
-    }
-
-    /**
-     * Remove transporteur
-     *
-     * @param Profile_transporteur $transporteur
-     */
-    public function removeZoneTransporteur(Profile_transporteur $transporteur)
-    {
-        $this->zoneTransporteurs->removeElement($transporteur);
-    }
-
-    /**
-     * Get transporteurs
-     *
-     * @return Collection
-     */
-    public function getZoneTransporteurs()
-    {
-        return $this->zoneTransporteurs;
-    }
 
     /**
      * Get designation
@@ -310,5 +281,63 @@ class Zone_intervention
         $this->adresse = $adresse;
 
         return $this;
+    }
+
+    /**
+     * Get transporteur
+     *
+     * @return Profile_transporteur
+     */
+    public function getTransporteur()
+    {
+        return $this->transporteur;
+    }
+
+    /**
+     * Set transporteur
+     *
+     * @param Profile_transporteur $transporteur
+     *
+     * @return Zone_intervention
+     */
+    public function setTransporteur(Profile_transporteur $transporteur)
+    {
+        $this->transporteur = $transporteur;
+
+        return $this;
+    }
+
+    /**
+     * Add zoneTransporteur
+     *
+     * @param Transporteur_zoneintervention $zoneTransporteur
+     *
+     * @return Zone_intervention
+     */
+    public function addZoneTransporteur(Transporteur_zoneintervention $zoneTransporteur)
+    {
+        $this->zone_transporteurs[] = $zoneTransporteur;
+
+        return $this;
+    }
+
+    /**
+     * Remove zoneTransporteur
+     *
+     * @param Transporteur_zoneintervention $zoneTransporteur
+     */
+    public function removeZoneTransporteur(Transporteur_zoneintervention $zoneTransporteur)
+    {
+        $this->zone_transporteurs->removeElement($zoneTransporteur);
+    }
+
+    /**
+     * Get zoneTransporteurs
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getZoneTransporteurs()
+    {
+        return $this->zone_transporteurs;
     }
 }

@@ -18,7 +18,6 @@ class Reseau_conseillersType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('code')
             ->add('designation', TextType::class, ['required' => true])
             ->add('description', TextareaType::class, ['required' => false])
             ->add('advisors', EntityType::class, [

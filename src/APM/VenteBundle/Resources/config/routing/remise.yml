@@ -1,5 +1,5 @@
 apm_vente_remise_index:
-    path:     /
+    path:     /{id}
     defaults: { _controller: "APMVenteBundle:Remise:index" }
     methods:  GET
 
@@ -9,7 +9,7 @@ apm_vente_remise_show:
     methods:  GET
 
 apm_vente_remise_new:
-    path:     /new
+    path:     /new/{id}
     defaults: { _controller: "APMVenteBundle:Remise:new" }
     methods:  [GET, POST]
 

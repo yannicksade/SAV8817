@@ -10,6 +10,7 @@ namespace APM\CoreBundle\DataFixtures\ORM;
 
 
 use APM\MarketingDistribueBundle\Entity\Conseiller;
+use APM\MarketingDistribueBundle\Factory\TradeFactory;
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
@@ -22,7 +23,8 @@ class LoadConseillerData extends AbstractFixture implements OrderedFixtureInterf
     public function load(ObjectManager $manager)
     {
 
-        $conseiller = new Conseiller();
+        /** @var Conseiller $conseiller */
+        $conseiller = TradeFactory::getTradeProvider("conseiller");
         $conseiller->setMatricule("MATAD125T");
         $conseiller->setCode("CONS125Test");
         $conseiller->setUtilisateur($this->getReference('user-avm'));

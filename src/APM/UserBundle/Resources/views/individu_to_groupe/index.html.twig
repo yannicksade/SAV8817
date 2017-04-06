@@ -6,7 +6,6 @@
     <table>
         <thead>
         <tr>
-            <th>Code</th>
             <th>Utilisateur</th>
             <th>Actions</th>
         </tr>
@@ -14,9 +13,6 @@
         <tbody>
         {% for individu_to_groupe in individu_to_groupes %}
             <tr>
-                <td>
-                    <a href="{{ path('apm_user_individu-to-groupe_show', { 'id': individu_to_groupe.id }) }}">{{ individu_to_groupe.code }}</a>
-                </td>
                 <td>{{ individu_to_groupe.individu }}</td>
                 <td>
                     <ul>

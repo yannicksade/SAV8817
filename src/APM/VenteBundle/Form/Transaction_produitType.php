@@ -17,16 +17,12 @@ class Transaction_produitType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder
+        $builder->add('reference')
             ->add('quantite', NumberType::class, ['required' => false])
             ->add('produit', EntityType::class, [
                 'class' => 'APMVenteBundle:Offre',
                 'choice_label' => 'designation',
-                'required' => true
-            ])
-            ->add('transaction', EntityType::class, [
-                'class' => 'APMVenteBundle:Transaction',
-                'choice_label' => 'code',
+                'multiple' => true,
                 'required' => true
             ])
             ->add('rabais', EntityType::class, [
@@ -34,6 +30,8 @@ class Transaction_produitType extends AbstractType
                 'choice_label' => 'code',
                 'required' => false
             ])
+
+            ->add('transaction', TransactionType::class)
         ;
     }
 

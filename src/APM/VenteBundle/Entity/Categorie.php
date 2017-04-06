@@ -2,7 +2,7 @@
 
 namespace APM\VenteBundle\Entity;
 
-use APM\VenteBundle\TradeAbstraction\Trade;
+use APM\VenteBundle\Factory\TradeFactory;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -16,7 +16,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
  * @ORM\Entity(repositoryClass="APM\VenteBundle\Repository\CategorieRepository")
  * @UniqueEntity("code")
  */
-class Categorie extends Trade
+class Categorie extends TradeFactory
 {
 
     /**

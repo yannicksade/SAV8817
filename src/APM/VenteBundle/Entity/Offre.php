@@ -3,9 +3,11 @@
 namespace APM\VenteBundle\Entity;
 
 use APM\AchatBundle\Entity\Service_apres_vente;
+use APM\AchatBundle\Entity\Specification_achat;
 use APM\UserBundle\Entity\Commentaire;
+use APM\UserBundle\Entity\Communication;
 use APM\UserBundle\Entity\Utilisateur_avm;
-use APM\VenteBundle\TradeAbstraction\Trade;
+use APM\VenteBundle\Factory\TradeFactory;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -19,7 +21,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
  * @ORM\Entity(repositoryClass="APM\VenteBundle\Repository\OffreRepository")
  * @UniqueEntity("code", message="impossible de creer l'offre, veuillez ressayer plus tard! ")
  */
-class Offre extends Trade
+class Offre extends TradeFactory
 {
 
     /**
@@ -203,20 +205,10 @@ class Offre extends Trade
      *
      * @ORM\ManyToOne(targetEntity="APM\VenteBundle\Entity\Categorie", inversedBy="offres")
      * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="categorie_id", referencedColumnName="id", nullable=true)
+     *   @ORM\JoinColumn(name="categorie_id", referencedColumnName="id", nullable=false)
      * })
      */
     private $categorie;
-
-    /**
-     * @var Suggestion_produit
-     *
-     * @ORM\ManyToOne(targetEntity="APM\VenteBundle\Entity\Suggestion_produit", inversedBy="produits")
-     * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="suggestion_id", referencedColumnName="id")
-     * })
-     */
-    private $suggestion;
 
     /**
      * @var Boutique
@@ -238,15 +230,13 @@ class Offre extends Trade
      */
     private $vendeur;
 
+
     /**
-     * @var Service_apres_vente
+     * @var Collection
+     * @ORM\OneToMany(targetEntity="APM\AchatBundle\Entity\Service_apres_vente", mappedBy="offres")
      *
-     * @ORM\ManyToOne(targetEntity="APM\AchatBundle\Entity\Service_apres_vente", inversedBy="offres")
-     * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="Service_apres_vente_id", referencedColumnName="id", nullable=true)
-     * })
      */
-    private $Service_apres_vente;
+    private $service_apres_ventes;
 
 
     /**
@@ -259,6 +249,13 @@ class Offre extends Trade
      */
     private $remises;
 
+
+    /**
+     * @var Specification_achat
+     * @ORM\OneToMany(targetEntity="APM\AchatBundle\Entity\Specification_achat" , mappedBy="offre", cascade={"remove"})
+     */
+    private $specifications;
+
     /**
      * @var Collection
      * @ORM\oneToMany(targetEntity="APM\VenteBundle\Entity\Transaction_produit", mappedBy="produit")
@@ -266,15 +263,32 @@ class Offre extends Trade
     private $produitTransactions;
 
     /**
+     * @var Collection
+     * @ORM\ManyToMany(targetEntity="APM\UserBundle\Entity\Communication", mappedBy="offres")
+     */
+    private $communications;
+
+
+    /**
+     * @var Collection
+     * @ORM\OneToMany(targetEntity="APM\VenteBundle\Entity\Rabais_offre", mappedBy="offre")
+     */
+    private $rabais;
+
+
+    /**
      * Constructor
      * @param string $var
      */
     public function __construct($var)
     {
-
+        $this->service_apres_ventes = new ArrayCollection();
         $this->commentaires = new ArrayCollection();
         $this->remises = new ArrayCollection();
         $this->code = "OF" . $var;
+        $this->specifications = new ArrayCollection();
+        $this->communications = new ArrayCollection();
+        $this->rabais = new ArrayCollection();
     }
 
     /**
@@ -797,29 +811,6 @@ class Offre extends Trade
         return $this;
     }
 
-    /**
-     * Get suggestion
-     *
-     * @return Suggestion_produit
-     */
-    public function getSuggestion()
-    {
-        return $this->suggestion;
-    }
-
-    /**
-     * Set suggestion
-     *
-     * @param Suggestion_produit $suggestion
-     *
-     * @return Offre
-     */
-    public function setSuggestion(Suggestion_produit $suggestion = null)
-    {
-        $this->suggestion = $suggestion;
-
-        return $this;
-    }
 
     /**
      * Get boutique
@@ -865,54 +856,6 @@ class Offre extends Trade
     public function setVendeur(Utilisateur_avm $vendeur = null)
     {
         $this->vendeur = $vendeur;
-
-        return $this;
-    }
-
-    /**
-     * Get Service_apres_vente
-     *
-     * @return Service_apres_vente
-     */
-    public function getService_apres_vente()
-    {
-        return $this->Service_apres_vente;
-    }
-
-    /**
-     * Get serviceApresVente
-     *
-     * @return Service_apres_vente
-     */
-    public function getServiceApresVente()
-    {
-        return $this->Service_apres_vente;
-    }
-
-    /**
-     * Set Service_apres_vente
-     *
-     * @param Service_apres_vente $Service_apres_vente
-     *
-     * @return Offre
-     */
-    public function setService_apres_vente(Service_apres_vente $Service_apres_vente = null)
-    {
-        $this->Service_apres_vente = $Service_apres_vente;
-
-        return $this;
-    }
-
-    /**
-     * Set serviceApresVente
-     *
-     * @param Service_apres_vente $serviceApresVente
-     *
-     * @return Offre
-     */
-    public function setServiceApresVente(Service_apres_vente $serviceApresVente = null)
-    {
-        $this->Service_apres_vente = $serviceApresVente;
 
         return $this;
     }
@@ -1138,5 +1081,143 @@ class Offre extends Trade
     public function getProduitTransactions()
     {
         return $this->produitTransactions;
+    }
+
+
+    /**
+     * Add specification
+     *
+     * @param Specification_achat $specification
+     *
+     * @return Offre
+     */
+    public function addSpecification(Specification_achat $specification)
+    {
+        $this->specifications[] = $specification;
+
+        return $this;
+    }
+
+    /**
+     * Remove specification
+     *
+     * @param Specification_achat $specification
+     */
+    public function removeSpecification(Specification_achat $specification)
+    {
+        $this->specifications->removeElement($specification);
+    }
+
+    /**
+     * Get specifications
+     *
+     * @return Collection
+     */
+    public function getSpecifications()
+    {
+        return $this->specifications;
+    }
+
+
+    /**
+     * Add communication
+     *
+     * @param Communication $communication
+     *
+     * @return Offre
+     */
+    public function addCommunication(Communication $communication)
+    {
+        $this->communications[] = $communication;
+
+        return $this;
+    }
+
+    /**
+     * Remove communication
+     *
+     * @param Communication $communication
+     */
+    public function removeCommunication(Communication $communication)
+    {
+        $this->communications->removeElement($communication);
+    }
+
+    /**
+     * Get communications
+     *
+     * @return Collection
+     */
+    public function getCommunications()
+    {
+        return $this->communications;
+    }
+
+    /**
+     * Add rabai
+     *
+     * @param Rabais_offre $rabai
+     *
+     * @return Offre
+     */
+    public function addRabai(Rabais_offre $rabai)
+    {
+        $this->rabais[] = $rabai;
+
+        return $this;
+    }
+
+    /**
+     * Remove rabai
+     *
+     * @param Rabais_offre $rabai
+     */
+    public function removeRabai(Rabais_offre $rabai)
+    {
+        $this->rabais->removeElement($rabai);
+    }
+
+    /**
+     * Get rabais
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getRabais()
+    {
+        return $this->rabais;
+    }
+
+    /**
+     * Add serviceApresVente
+     *
+     * @param Service_apres_vente $serviceApresVente
+     *
+     * @return Offre
+     */
+    public function addServiceApresVente(Service_apres_vente $serviceApresVente)
+    {
+        $this->service_apres_ventes[] = $serviceApresVente;
+
+        return $this;
+    }
+
+    /**
+     * Remove serviceApresVente
+     *
+     * @param Service_apres_vente $serviceApresVente
+     */
+    public function removeServiceApresVente(Service_apres_vente $serviceApresVente)
+    {
+        $this->service_apres_ventes->removeElement($serviceApresVente);
+    }
+
+    /**
+     * Get serviceApresVentes
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getServiceApresVentes()
+    {
+        return $this->service_apres_ventes;
     }
 }

@@ -8,8 +8,8 @@
 
 namespace APM\CoreBundle\DataFixtures\ORM;
 
+use APM\VenteBundle\Factory\TradeFactory;
 use APM\VenteBundle\Entity\Categorie;
-use APM\VenteBundle\TradeAbstraction\Trade;
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
@@ -20,7 +20,7 @@ class LoadCategorieData extends AbstractFixture implements OrderedFixtureInterfa
     public function load(ObjectManager $manager)
     {
         /** @var Categorie $categorie */
-        $categorie = Trade::getTradeProvider('categorie');
+        $categorie = TradeFactory::getTradeProvider('categorie');
         $categorie->setDesignation("BASE CATEGORY");
         $categorie->setBoutique($this->getReference('boutique'));
         $manager->persist($categorie);

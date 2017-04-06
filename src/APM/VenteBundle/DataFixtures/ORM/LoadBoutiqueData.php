@@ -10,7 +10,7 @@ namespace APM\CoreBundle\DataFixtures\ORM;
 
 
 use APM\VenteBundle\Entity\Boutique;
-use APM\VenteBundle\TradeAbstraction\Trade;
+use APM\VenteBundle\Factory\TradeFactory;
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
@@ -23,7 +23,7 @@ class LoadBoutiqueData extends AbstractFixture implements OrderedFixtureInterfac
     public function load(ObjectManager $manager)
     {
         /** @var Boutique $btq */
-        $btq = Trade::getTradeProvider('boutique');
+        $btq = TradeFactory::getTradeProvider('boutique');
         $btq->setDesignation("Ma Boutique");
         $btq->setProprietaire($this->getReference('user-avm'));
         $manager->persist($btq);

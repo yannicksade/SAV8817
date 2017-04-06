@@ -13,7 +13,7 @@ use Doctrine\ORM\EntityRepository;
 class Groupe_offreRepository extends EntityRepository
 {
 
-    public function getGroupesOffresAvecCreateurs()
+    public function getGroupesOffresByOwner($user)
     {
         $qb = $this->createQueryBuilder('g')
             ->leftJoin('g.createur', 'c')

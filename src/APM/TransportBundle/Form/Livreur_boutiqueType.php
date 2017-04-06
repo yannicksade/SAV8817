@@ -19,11 +19,6 @@ class Livreur_boutiqueType extends AbstractType
     {
         $builder
             ->add('reference', TextType::class)
-            //->add('transporteur', Profile_transporteurType::class)//enregistrer un livreur avec son profile transporteur
-            ->add('transporteur', EntityType::class, [
-                'class' => 'APM\TransportBundle\Entity\Profile_transporteur',
-                'choice_label' => 'code'
-            ])
             ->add('boutique', EntityType::class, [
                 'class' => 'APMVenteBundle:Boutique',
                 'choice_label' => 'code'

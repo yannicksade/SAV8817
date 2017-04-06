@@ -1,6 +1,6 @@
 apm_transport_livraison:
     resource: "@APMTransportBundle/Resources/config/routing/livraison.yml"
-    prefix:   /apm_transport_livraison
+    prefix:   /transport_livraison
 
 apm_transport_homepage:
     path:     /transport
@@ -8,12 +8,12 @@ apm_transport_homepage:
 
 apm_transport_livreur_boutique:
     resource: "@APMTransportBundle/Resources/config/routing/livreur_boutique.yml"
-    prefix:   /apm_transport_livreur_boutique
+    prefix:   /transport_livreur_boutique
 
 apm_transport_transporteur:
     resource: "@APMTransportBundle/Resources/config/routing/profile_transporteur.yml"
-    prefix:   /apm_transport_transporteur
+    prefix:   /transport_transporteur
 
 apm_transport_zone_intervention:
     resource: "@APMTransportBundle/Resources/config/routing/zone_intervention.yml"
-    prefix:   /apm_transport_zone_intervention
+    prefix:   /transport_zone_intervention

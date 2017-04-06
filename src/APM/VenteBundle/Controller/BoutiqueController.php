@@ -1,8 +1,9 @@
 <?php
 namespace APM\VenteBundle\Controller;
 
+use APM\UserBundle\Entity\Utilisateur_avm;
 use APM\VenteBundle\Entity\Boutique;
-use APM\VenteBundle\TradeAbstraction\Trade;
+use APM\VenteBundle\Factory\TradeFactory;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -14,17 +15,19 @@ class BoutiqueController extends Controller
 {
 
     /**
-     * Lists all Boutique entities.
+     * Liste les boutiques de l'utilisateur
      *
      */
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
-
-        $boutiques = $em->getRepository('APMVenteBundle:Boutique')->findAll();
-
+        $this->listAndShowSecurity();
+        /** @var Utilisateur_avm $user */
+        $user = $this->getUser();
+        $boutiques = $user->getBoutiquesProprietaire();
+        $boutiquesGerant = $user->getBoutiquesGerant();
         return $this->render('APMVenteBundle:boutique:index.html.twig', array(
-            'boutiques' => $boutiques,
+            'boutiquesProprietaire' => $boutiques,
+            'boutiquesGerant' => $boutiquesGerant,
         ));
     }
 
@@ -35,12 +38,14 @@ class BoutiqueController extends Controller
      */
     public function newAction(Request $request)
     {
+        $this->createSecurity();
         /** @var Boutique $boutique */
-        $boutique = Trade::getTradeProvider('boutique');
+        $boutique = TradeFactory::getTradeProvider('boutique');
         $form = $this->createForm('APM\VenteBundle\Form\BoutiqueType', $boutique);
         $form->handleRequest($request);
-
         if ($form->isSubmitted() && $form->isValid()) {
+            $this->createSecurity();
+            $boutique->setProprietaire($this->getUser());
             $em = $this->getEM();
             $em->persist($boutique);
             $em->flush();
@@ -65,6 +70,7 @@ class BoutiqueController extends Controller
      */
     public function showAction(Boutique $boutique)
     {
+        $this->listAndShowSecurity();
         $deleteForm = $this->createDeleteForm($boutique);
 
         return $this->render('APMVenteBundle:boutique:show.html.twig', array(
@@ -96,11 +102,13 @@ class BoutiqueController extends Controller
      */
     public function editAction(Request $request, Boutique $boutique)
     {
+        $this->editAndDeleteSecurity($boutique);
         $deleteForm = $this->createDeleteForm($boutique);
         $editForm = $this->createForm('APM\VenteBundle\Form\BoutiqueType', $boutique);
         $editForm->handleRequest($request);
 
         if ($editForm->isSubmitted() && $editForm->isValid()) {
+            $this->editAndDeleteSecurity($boutique);
             $em = $this->getEM();
             $em->persist($boutique);
             $em->flush();
@@ -123,10 +131,12 @@ class BoutiqueController extends Controller
      */
     public function deleteAction(Request $request, Boutique $boutique)
     {
+        $this->editAndDeleteSecurity($boutique);
         $form = $this->createDeleteForm($boutique);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $this->editAndDeleteSecurity($boutique);
             $em = $this->getEM();
             $em->remove($boutique);
             $em->flush();
@@ -135,12 +145,53 @@ class BoutiqueController extends Controller
         return $this->redirectToRoute('apm_vente_boutique_index');
     }
 
-    public function deleteFromListAction(Boutique $object)
+    public function deleteFromListAction(Boutique $boutique)
     {
+        $this->editAndDeleteSecurity($boutique);
         $em = $this->getDoctrine()->getManager();
-        $em->remove($object);
+        $em->remove($boutique);
         $em->flush();
 
         return $this->redirectToRoute('apm_vente_boutique_index');
+    }
+
+
+    private function listAndShowSecurity(){
+        //-----------------------------------security-------------------------------------------
+        $this->denyAccessUnlessGranted('ROLE_BOUTIQUE', null, 'Unable to access this page!');
+        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_REMEMBERED'))  {
+            throw $this->createAccessDeniedException();
+        }
+        //----------------------------------------------------------------------------------------
+    }
+
+    private function createSecurity(){
+        //---------------------------------security-----------------------------------------------
+        $this->denyAccessUnlessGranted('ROLE_BOUTIQUE', null, 'Unable to access this page!');
+        /* ensure that the user is logged in
+        */
+        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY')) {
+            throw $this->createAccessDeniedException();
+        }
+        //----------------------------------------------------------------------------------------
+    }
+
+    /**
+     * @param Boutique $boutique
+     */
+    private function editAndDeleteSecurity($boutique){
+        //---------------------------------security-----------------------------------------------
+        // Unable to access the controller unless you have a USERAVM role
+        $this->denyAccessUnlessGranted('ROLE_BOUTIQUE', null, 'Unable to access this page!');
+
+        /* ensure that the user is logged in  # granted even through remembering cookies
+        *  and that the one is the owner
+        */
+        $user = $this->getUser();
+        if ((!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY')) || ($boutique->getProprietaire() !== $user)) {
+            throw $this->createAccessDeniedException();
+        }
+        //----------------------------------------------------------------------------------------
+
     }
 }

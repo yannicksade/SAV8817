@@ -23,7 +23,6 @@ class Groupe_offreType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('code')
             ->add('dateDeVigueur', DateTimeType::class, [
                 'input' => 'datetime',
                 //'by_reference'=>true
@@ -48,7 +47,6 @@ class Groupe_offreType extends AbstractType
             ])
             ->add('recurrent', CheckboxType::class, ['required' => false])
             ->add('designation', TextType::class, ['required' => true])
-            ->add('createur')
             ->add('offres', EntityType::class, array(
                     'class' => 'APMVenteBundle:Offre',
                     'choice_label' => 'designation',

@@ -13,7 +13,7 @@ class CategorieControllerTest extends WebTestCase
         //run this client to a separate client
         $client->insulate();
         // Create a new entry in the database
-        $client->request('GET', '/apm_vente_categorie');
+        $client->request('GET', '/apm/vente_categorie');
         $crawler = $client->followRedirect();
         $this->assertEquals(200, $client->getResponse()->getStatusCode(), "Unexpected HTTP status code for GET /apm_vente_categorie");
 
@@ -43,7 +43,7 @@ class CategorieControllerTest extends WebTestCase
 
         // Delete the entity and redirect to the list
         $client->submit($crawler->selectButton('Delete')->form());
-        $this->assertTrue($client->getResponse()->isRedirect('/apm_vente_categorie/'), 'The response is redirect not to /apm_vente_categorie/');
+        $this->assertTrue($client->getResponse()->isRedirect('/apm/vente_categorie/'), 'The response is redirect not to /apm_vente_categorie/');
         $client->followRedirect();
 
         // Check the entity has been delete on the list

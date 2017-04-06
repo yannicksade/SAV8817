@@ -2,7 +2,7 @@
 
 namespace APM\VenteBundle\Entity;
 
-use APM\VenteBundle\TradeAbstraction\Trade;
+use APM\VenteBundle\Factory\TradeFactory;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -14,7 +14,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @ORM\Entity(repositoryClass="APM\VenteBundle\Repository\Transaction_produitRepository")
  *
  */
-class Transaction_produit extends Trade
+class Transaction_produit extends TradeFactory
 {
 
     /**
@@ -27,8 +27,7 @@ class Transaction_produit extends Trade
 
     /**
      * @var string
-     * @Assert\NotBlank
-     * @ORM\Column(name="reference", type="string", length=255, nullable=false)
+     * @ORM\Column(name="reference", type="string", length=255, nullable=true)
      */
     private $reference;
     /**
@@ -60,21 +59,11 @@ class Transaction_produit extends Trade
     private $transaction;
 
     /**
-     * @var Rabais_offre
-     * @ORM\ManyToOne(targetEntity="APM\VenteBundle\Entity\Rabais_offre", inversedBy="transactions")
-     * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="rabais_id", referencedColumnName="id")
-     * })
-     */
-    private $rabais;
-
-    /**
      * Transaction_produit constructor.
-     * @param string $var
+     *
      */
-    function __construct($var)
+    function __construct()
     {
-        $this->reference = "TP" . $var;
     }
 
     /**
@@ -156,30 +145,6 @@ class Transaction_produit extends Trade
     public function setTransaction(Transaction $transaction = null)
     {
         $this->transaction = $transaction;
-
-        return $this;
-    }
-
-    /**
-     * Get rabais
-     *
-     * @return Rabais_offre
-     */
-    public function getRabais()
-    {
-        return $this->rabais;
-    }
-
-    /**
-     * Set rabais
-     *
-     * @param Rabais_offre $rabais
-     *
-     * @return Transaction_produit
-     */
-    public function setRabais(Rabais_offre $rabais = null)
-    {
-        $this->rabais = $rabais;
 
         return $this;
     }

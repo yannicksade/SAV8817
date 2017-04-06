@@ -19,15 +19,13 @@ class CommentaireType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('code')
             ->add('contenu', TextareaType::class, ['required' => false])
-            ->add('date', DateTimeType::class)
             ->add('evaluation', NumberType::class, ['required' => false])
             ->add('offre', EntityType::class, [
                 'class' => 'APMVenteBundle:Offre',
                 'choice_label' => 'code'
             ])
-            ->add('utilisateur');
+        ;
     }
 
     /**

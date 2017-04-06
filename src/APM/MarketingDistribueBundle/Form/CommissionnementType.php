@@ -19,7 +19,6 @@ class CommissionnementType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('code')
             ->add('creditDepense', NumberType::class, ['required' => false])
             ->add('dateCreation', DateTimeType::class)
             ->add('libelle')

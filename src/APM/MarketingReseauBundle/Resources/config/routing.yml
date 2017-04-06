@@ -4,4 +4,4 @@ apm_marketing_reseau_homepage:
 
 apm_marketing_reseau_conseillers:
     resource: "@APMMarketingReseauBundle/Resources/config/routing/reseau_conseillers.yml"
-    prefix:   /apm_marketing_reseau_conseillers
+    prefix:   /marketing_reseau_conseillers

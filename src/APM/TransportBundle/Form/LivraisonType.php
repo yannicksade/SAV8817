@@ -20,7 +20,6 @@ class LivraisonType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('code')
             ->add('dateEtHeureLivraison', DateTimeType::class)
             ->add('description', TextareaType::class, ['required' => false])
             ->add('etatLivraison', ChoiceType::class, array(
@@ -46,14 +45,14 @@ class LivraisonType extends AbstractType
             ->add('operations', EntityType::class, [
                 'class' => 'APMVenteBundle:Transaction',
                 'choice_label' => 'code',
-                //'required' => false,
+                'required' => true,
                 'multiple' => true
             ])
             ->add('valide', CheckboxType::class, ['required' => false])
             ->add('livreur', EntityType::class, [
                 'class' => 'APMTransportBundle:Profile_transporteur',
                 'choice_label' => 'code',
-                'required' => true
+                'required' =>true
             ])
         ;
     }

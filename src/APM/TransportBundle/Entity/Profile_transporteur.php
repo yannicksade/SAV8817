@@ -2,6 +2,7 @@
 
 namespace APM\TransportBundle\Entity;
 
+use APM\TransportBundle\Factory\TradeFactory;
 use APM\UserBundle\Entity\Utilisateur_avm;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -12,12 +13,12 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
  * Profile_transporteur
  *
  * @ORM\Table(name="profile_transporteur")
- * @ORM\Entity(repositoryClass="APM\TransportBundle\Repository\TranspoteurRepository")
+ * @ORM\Entity(repositoryClass="APM\TransportBundle\Repository\TransporteurRepository")
  * @UniqueEntity("code", message="Ce code est déjà pris.")
  * @UniqueEntity("matricule", message="Ce matricule existe déja.")
  *
  */
-class Profile_transporteur
+class Profile_transporteur extends TradeFactory
 {
     /**
      * @var string
@@ -27,19 +28,20 @@ class Profile_transporteur
     private $code;
 
     /**
-     * @var boolean
-     * @Assert\Choice({0,1})
-     * @ORM\Column(name="estLivreur_boutique", type="boolean", nullable=true)
-     */
-    private $livreurBoutique;
-
-    /**
      * @var string
      * @Assert\NotBlank
      * @Assert\Length(min=2, max=55)
      * @ORM\Column(name="matricule", type="string", length=255, nullable=false)
      */
     private $matricule;
+
+    /**
+     * @var string
+     * @Assert\NotBlank
+     * @Assert\Length(min=2, max=255)
+     * @ORM\Column(name="designation", type="string", length=255, nullable=false)
+     */
+    private $designation;
 
     /**
      * Id
@@ -61,12 +63,12 @@ class Profile_transporteur
      */
     private $utilisateur;
 
+
     /**
      * @var Collection
-     *
-     * @ORM\ManyToMany(targetEntity="APM\TransportBundle\Entity\Zone_intervention", mappedBy="zoneTransporteurs")
+     * @ORM\OneToMany(targetEntity="APM\TransportBundle\Entity\Zone_intervention", mappedBy="transporteur")
      */
-    private $transporteurZones;
+    private $zones;
 
     /**
      * @var Collection
@@ -74,12 +76,33 @@ class Profile_transporteur
      */
     private $livraisons;
 
+
+    /**
+     * @var Collection
+     * @ORM\OneToMany(targetEntity="APM\TransportBundle\Entity\Transporteur_zoneintervention", mappedBy="transporteur")
+     */
+    private $transporteur_zones;
+
+    /**
+     * @var Livreur_boutique
+     *
+     * @ORM\OneToOne(targetEntity="APM\TransportBundle\Entity\Livreur_boutique", mappedBy="transporteur")
+     * @ORM\JoinColumns({
+     *   @ORM\JoinColumn(name="livreurBoutique_id", referencedColumnName="id", nullable=true)
+     * })
+     */
+    private $livreurBoutique;
+
+
     /**
      * Constructor
+     * @param string $var
      */
-    public function __construct()
+    public function __construct($var)
     {
-        $this->transporteurZones = new ArrayCollection();
+        $this->transporteur_zones = new ArrayCollection();
+        $this->zones = new ArrayCollection();
+        $this->code = "XP" . $var;
     }
 
     /**
@@ -102,41 +125,6 @@ class Profile_transporteur
     public function setCode($code)
     {
         $this->code = $code;
-
-        return $this;
-    }
-
-
-    /**
-     * Get estLivreurBoutique
-     *
-     * @return boolean
-     */
-    public function isLivreurBoutique()
-    {
-        return $this->livreurBoutique;
-    }
-
-    /**
-     * Get livreurBoutique
-     *
-     * @return boolean
-     */
-    public function getLivreurBoutique()
-    {
-        return $this->livreurBoutique;
-    }
-
-    /**
-     * Set estLivreurBoutique
-     *
-     * @param boolean $estLivreurBoutique
-     *
-     * @return Profile_transporteur
-     */
-    public function setLivreurBoutique($estLivreurBoutique)
-    {
-        $this->livreurBoutique = $estLivreurBoutique;
 
         return $this;
     }
@@ -200,40 +188,6 @@ class Profile_transporteur
     }
 
     /**
-     * Add zone
-     *
-     * @param Zone_intervention $zone
-     *
-     * @return Profile_transporteur
-     */
-    public function addTransporteurZone(Zone_intervention $zone)
-    {
-        $this->transporteurZones[] = $zone;
-
-        return $this;
-    }
-
-    /**
-     * Remove zone
-     *
-     * @param Zone_intervention $zone
-     */
-    public function removeTransporteurZone(Zone_intervention $zone)
-    {
-        $this->transporteurZones->removeElement($zone);
-    }
-
-    /**
-     * Get TransporteurZones
-     *
-     * @return Collection
-     */
-    public function getTransporteurZones()
-    {
-        return $this->transporteurZones;
-    }
-
-    /**
      * Add livraison
      *
      * @param Livraison $livraison
@@ -265,5 +219,114 @@ class Profile_transporteur
     public function getLivraisons()
     {
         return $this->livraisons;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDesignation()
+    {
+        return $this->designation;
+    }
+
+    /**
+     * @param string $designation
+     */
+    public function setDesignation(string $designation)
+    {
+        $this->designation = $designation;
+    }
+
+
+    /**
+     * Add zone
+     *
+     * @param Zone_intervention $zone
+     *
+     * @return Profile_transporteur
+     */
+    public function addZone(Zone_intervention $zone)
+    {
+        $this->zones[] = $zone;
+
+        return $this;
+    }
+
+    /**
+     * Remove zone
+     *
+     * @param Zone_intervention $zone
+     */
+    public function removeZone(Zone_intervention $zone)
+    {
+        $this->zones->removeElement($zone);
+    }
+
+    /**
+     * Get zones
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getZones()
+    {
+        return $this->zones;
+    }
+
+    /**
+     * Add transporteurZone
+     *
+     * @param Transporteur_zoneintervention $transporteurZone
+     *
+     * @return Profile_transporteur
+     */
+    public function addTransporteurZone(Transporteur_zoneintervention $transporteurZone)
+    {
+        $this->transporteur_zones[] = $transporteurZone;
+
+        return $this;
+    }
+
+    /**
+     * Remove transporteurZone
+     *
+     * @param Transporteur_zoneintervention $transporteurZone
+     */
+    public function removeTransporteurZone(Transporteur_zoneintervention $transporteurZone)
+    {
+        $this->transporteur_zones->removeElement($transporteurZone);
+    }
+
+    /**
+     * Get transporteurZones
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getTransporteurZones()
+    {
+        return $this->transporteur_zones;
+    }
+
+    /**
+     * Set livreurBoutique
+     *
+     * @param Livreur_boutique $livreurBoutique
+     *
+     * @return Profile_transporteur
+     */
+    public function setLivreurBoutique(Livreur_boutique $livreurBoutique = null)
+    {
+        $this->livreurBoutique = $livreurBoutique;
+
+        return $this;
+    }
+
+    /**
+     * Get livreurBoutique
+     *
+     * @return Livreur_boutique
+     */
+    public function getLivreurBoutique()
+    {
+        return $this->livreurBoutique;
     }
 }

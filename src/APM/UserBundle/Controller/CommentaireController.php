@@ -3,6 +3,8 @@
 namespace APM\UserBundle\Controller;
 
 use APM\UserBundle\Entity\Commentaire;
+use APM\UserBundle\Entity\Utilisateur_avm;
+use APM\UserBundle\Factory\TradeFactory;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -18,10 +20,10 @@ class CommentaireController extends Controller
      */
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
-
-        $commentaires = $em->getRepository('APMUserBundle:Commentaire')->findAll();
-
+        $this->listAndShowSecurity();
+        /** @var Utilisateur_avm $user */
+        $user = $this->getUser();
+        $commentaires = $user->getCommentaires();
         return $this->render('APMUserBundle:commentaire:index.html.twig', array(
             'commentaires' => $commentaires,
         ));
@@ -29,15 +31,19 @@ class CommentaireController extends Controller
 
     /**
      * Creates a new Commentaire entity.
-     *
+     * @param Request $request
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
     public function newAction(Request $request)
     {
-        $commentaire = new Commentaire();
+        $this->createSecurity();
+        /** @var Commentaire $commentaire */
+        $commentaire = TradeFactory::getTradeProvider("commentaire");
         $form = $this->createForm('APM\UserBundle\Form\CommentaireType', $commentaire);
         $form->handleRequest($request);
-
         if ($form->isSubmitted() && $form->isValid()) {
+            $this->createSecurity();
+            $commentaire->setUtilisateur($this->getUser());
             $em = $this->getDoctrine()->getManager();
             $em->persist($commentaire);
             $em->flush();
@@ -53,10 +59,12 @@ class CommentaireController extends Controller
 
     /**
      * Finds and displays a Commentaire entity.
-     *
+     * @param Commentaire $commentaire
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function showAction(Commentaire $commentaire)
     {
+        $this->listAndShowSecurity();
         $deleteForm = $this->createDeleteForm($commentaire);
 
         return $this->render('APMUserBundle:commentaire:show.html.twig', array(
@@ -82,15 +90,20 @@ class CommentaireController extends Controller
 
     /**
      * Displays a form to edit an existing Commentaire entity.
-     *
+     * @param Request $request
+     * @param Commentaire $commentaire
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
     public function editAction(Request $request, Commentaire $commentaire)
     {
+        $this->editAndDeleteSecurity($commentaire);
+
         $deleteForm = $this->createDeleteForm($commentaire);
         $editForm = $this->createForm('APM\UserBundle\Form\CommentaireType', $commentaire);
         $editForm->handleRequest($request);
 
         if ($editForm->isSubmitted() && $editForm->isValid()) {
+            $this->editAndDeleteSecurity($commentaire);
             $em = $this->getDoctrine()->getManager();
             $em->persist($commentaire);
             $em->flush();
@@ -107,14 +120,18 @@ class CommentaireController extends Controller
 
     /**
      * Deletes a Commentaire entity.
-     *
+     * @param Request $request
+     * @param Commentaire $commentaire
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse
      */
     public function deleteAction(Request $request, Commentaire $commentaire)
     {
+        $this->editAndDeleteSecurity($commentaire);
         $form = $this->createDeleteForm($commentaire);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $this->editAndDeleteSecurity($commentaire);
             $em = $this->getDoctrine()->getManager();
             $em->remove($commentaire);
             $em->flush();
@@ -124,10 +141,52 @@ class CommentaireController extends Controller
 
     public function deleteFromListAction(Commentaire $object)
     {
+        $this->editAndDeleteSecurity($commentaire);
         $em = $this->getDoctrine()->getManager();
         $em->remove($object);
         $em->flush();
 
         return $this->redirectToRoute('apm_user_commentaire_index');
     }
+
+
+    private function listAndShowSecurity(){
+        //-----------------------------------security-------------------------------------------
+        // Unable to access the controller unless you have a USERAVM role
+        $this->denyAccessUnlessGranted('ROLE_USERAVM', null, 'Unable to access this page!');
+        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_REMEMBERED'))  {
+            throw $this->createAccessDeniedException();
+        }
+        //----------------------------------------------------------------------------------------
+    }
+
+
+    private function createSecurity(){
+        //---------------------------------security-----------------------------------------------
+        // Unable to access the controller unless you have a USERAVM role
+        $this->denyAccessUnlessGranted('ROLE_USERAVM', null, 'Unable to access this page!');
+        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY')) {
+            throw $this->createAccessDeniedException();
+        }
+        //----------------------------------------------------------------------------------------
+    }
+
+    /**
+     * @param Commentaire $commentaire
+     */
+    private function editAndDeleteSecurity($commentaire){
+        //---------------------------------security-----------------------------------------------
+        // Unable to access the controller unless you have a USERAVM role
+        $this->denyAccessUnlessGranted('ROLE_USERAVM', null, 'Unable to access this page!');
+        /* ensure that the user is logged in
+        *  and that the one is the owner
+        */
+        $user = $this->getUser();
+        if ((!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY')) || ($commentaire->getUtilisateur() !== $user)) {
+            throw $this->createAccessDeniedException();
+        }
+        //----------------------------------------------------------------------------------------
+
+    }
+
 }

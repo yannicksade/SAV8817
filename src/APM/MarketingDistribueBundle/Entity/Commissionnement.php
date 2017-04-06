@@ -2,6 +2,7 @@
 
 namespace APM\MarketingDistribueBundle\Entity;
 
+use APM\MarketingDistribueBundle\Factory\TradeFactory;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -14,7 +15,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @ORM\Entity(repositoryClass="APM\MarketingDistribueBundle\Repository\CommissionnementRepository")
  * @UniqueEntity("code")
  */
-class Commissionnement
+class Commissionnement extends TradeFactory
 {
     /**
      *
@@ -89,9 +90,14 @@ class Commissionnement
      */
     private $commission;
 
-    public function __construct()
+    /**
+     * Commissionnement constructor.
+     * @param string $var
+     */
+    public function __construct($var)
     {
         $this->dateCreation = new \DateTime();
+        $this->code = "CS" . $var;
 
     }
 

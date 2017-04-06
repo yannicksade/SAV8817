@@ -19,6 +19,7 @@ class LoadEntityData implements FixtureInterface
 {
 
     /**
+     * Tous les dataFixtures créée dans le projet sont chargés ici
      * @param ObjectManager|EntityManagerInterface $manager
      */
     public function load(ObjectManager $manager)

@@ -26,7 +26,8 @@
 
     <ul>
         <li>
-            <a href="{{ path('apm_marketing_quota_index') }}">Back to the list</a>
+            <a href="{{ path('apm_marketing_quota_index', {'id': quotum.boutiqueProprietaire.id}) }}">Back to the
+                list</a>
         </li>
         <li>
             <a href="{{ path('apm_marketing_quota_edit', { 'id': quotum.id }) }}">Edit</a>

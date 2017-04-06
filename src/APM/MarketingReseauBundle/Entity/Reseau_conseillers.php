@@ -3,6 +3,7 @@
 namespace APM\MarketingReseauBundle\Entity;
 
 use APM\MarketingDistribueBundle\Entity\Conseiller;
+use APM\MarketingReseauBundle\Factory\TradeFactory;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -16,15 +17,19 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @ORM\Entity(repositoryClass="APM\MarketingReseauBundle\Repository\Reseau_conseillersRepository")
  * @UniqueEntity("code")
  */
-class Reseau_conseillers
+class Reseau_conseillers extends TradeFactory
 {
+    /**
+     * @var integer
+     * @ORM\Column(name="nombreInstance", type="integer")
+     */
+    public static $nombreInstanceReseau = 0;
     /**
      * @var string
      *
      * @ORM\Column(name="code", type="string", length=255, nullable=false)
      */
     private $code;
-
     /**
      * @var string
      *
@@ -57,12 +62,37 @@ class Reseau_conseillers
      */
     private $advisors;
 
+
+    /**
+     * @var Conseiller
+     *
+     * @ORM\ManyToOne(targetEntity="APM\MarketingDistribueBundle\Entity\Conseiller" , inversedBy="reseauxProprietaire")
+     * @ORM\JoinColumns({
+     *   @ORM\JoinColumn(name="conseillerProprietaire_id", referencedColumnName="id", nullable=false)
+     * })
+     */
+    private $conseillerProprietaire;
+
+
+    /**
+     * @var Reseau_conseillers
+     *
+     * @ORM\ManyToOne(targetEntity="APM\MarketingReseauBundle\Entity\Reseau_conseillers")
+     * @ORM\JoinColumns({
+     *   @ORM\JoinColumn(name="sousReseau_id", referencedColumnName="id", nullable=true)
+     * })
+     */
+    private $sousReseau;
+
     /**
      * Constructor
+     * @param string $var
      */
-    public function __construct()
+    public function __construct($var)
     {
         $this->advisors = new ArrayCollection();
+        $this->code = "RX" . $var;
+        static::$nombreInstanceReseau += 1;
     }
 
     /**
@@ -181,4 +211,53 @@ class Reseau_conseillers
 
         return $this;
     }
+
+    /**
+     * Get sousReseau
+     *
+     * @return Reseau_conseillers
+     */
+    public function getSousReseau()
+    {
+        return $this->sousReseau;
+    }
+
+    /**
+     * Set sousReseau
+     *
+     * @param Reseau_conseillers $sousReseau
+     *
+     * @return Reseau_conseillers
+     */
+    public function setSousReseau(Reseau_conseillers $sousReseau = null)
+    {
+        $this->sousReseau = $sousReseau;
+
+        return $this;
+    }
+
+    /**
+     * Get conseillerProprietaire
+     *
+     * @return Conseiller
+     */
+    public function getConseillerProprietaire()
+    {
+        return $this->conseillerProprietaire;
+    }
+
+    /**
+     * Set conseillerProprietaire
+     *
+     * @param Conseiller $conseillerProprietaire
+     *
+     * @return Reseau_conseillers
+     */
+    public function setConseillerProprietaire(Conseiller $conseillerProprietaire)
+    {
+        $this->conseillerProprietaire = $conseillerProprietaire;
+
+        return $this;
+    }
+
 }

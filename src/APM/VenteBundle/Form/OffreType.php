@@ -2,10 +2,12 @@
 
 namespace APM\VenteBundle\Form;
 
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\MoneyType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\PercentType;
@@ -24,13 +26,19 @@ class OffreType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
+            ->add('categorie', EntityType::class,
+                [
+                    'class' =>'APMVenteBundle:Categorie',
+                    'choice_label' => 'designation',
+                    'required' =>true
+                ])
+            ->add('boutique', HiddenType::class)
             ->add('garantie', CheckboxType::class, ['required' => false])
             ->add('dataSheet', UrlType::class, [
                 'default_protocol' => 'ftp',
                 'required' => false
             ])
             ->add('credit', NumberType::class, ['required' => false])
-            ->add('dateCreation', DateTimeType::class)
             ->add('dateExpiration', DateTimeType::class, ['required' => false])
             ->add('description', TextareaType::class, ['required' => false])
             ->add('disponibleEnStock', CheckboxType::class, array(
@@ -81,8 +89,7 @@ class OffreType extends AbstractType
                     'ARTICLE' => 0,
                     'PRODUIT' => 1,
                     'SERVICE' => 2
-                ]
-            ])
+                ]])
         ;
     }
 
