@@ -119,7 +119,7 @@ var Custom = function () {
                         //------------------------------- fill the form ---------------------
                         var parent = item.parentNode.parentNode, etatElement;
                         formElement_2.querySelector('input[type="reset"]').click(); //reinitialize the form
-                        if (parent.id === "stack1") {//from the modal data 2
+                        if (parent.id === "stack") {//from the modal data 2
                             formElement_2.querySelector('#id_x').value = document.querySelector('#id_y').innerText;
                             formElement_2.querySelector('#code_x').value = document.querySelector('#code_y').innerText;
                             formElement_2.querySelector('#offre_x').value = document.querySelector('#offre_y').innerText;
@@ -177,7 +177,7 @@ var Custom = function () {
                         var parent = item.parentNode.parentNode, offreElement;
                         var a;
                         formElement_1.querySelector('input[type="reset"]').click(); //reinitialize the form
-                        if (parent.id === "stack1") {//from model data 1
+                        if (parent.id === "stack") {//from model data 1
                             formElement_1.querySelector('.id_x').value = modalId.innerText;
                             formElement_1.querySelector('.code_x').value = document.querySelector('#code_y').innerText;
                             formElement_1.querySelector('#boutique_x').value = document.querySelector('#boutique_y').innerText;
