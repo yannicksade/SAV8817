@@ -3,12 +3,10 @@
 namespace APM\AchatBundle\Form;
 
 
-use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
-use Symfony\Component\Form\Extension\Core\Type\ResetType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -23,16 +21,17 @@ class Groupe_offreType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('dateDeVigueur', DateTimeType::class, [
-                'input' => 'datetime',
-                //'by_reference'=>true
-                'widget' => 'choice',
-                'format' => 'dd-MM-yyyy HH:mm',
-//                'date_format'=>'dd-MM-yyyy HH:mm',
-//                'date_widget'=>'',
-//                'time_widget'=>'',
-                'invalid_message' => 'cette date n\'est pas valide',
+            ->add('code')
+            ->add('dateDeVigueur', TextType::class, [
+                'required' => false,
+                /*'html5' => false,
+                'widget' => 'single_text',*/
+                //'format' => "dd MM yyyy - HH:ii",
+                //'attr'=>['class' =>'bs-datetime'],
+                //'label'=>'date alerte',
+                //'label_attr' =>['class' =>'control-label']
             ])
+
             ->add('description', TextareaType::class, ['required' => false])
             ->add('propriete', ChoiceType::class, [
                 'choices' => array(
@@ -40,21 +39,20 @@ class Groupe_offreType extends AbstractType
                     'A SUIVRE' => 1,
                     'A CONTACTER VENDEUR' => 2,
                     'STOCK PREVISIONNEL' => 3,
-                    'A RE-VENDRE' => 3,
-                    'Autres' => 4,
+                    'A RE-VENDRE' => 4,
+                    'Autres' => 5,
                 ),
                 'required' => true
             ])
             ->add('recurrent', CheckboxType::class, ['required' => false])
-            ->add('designation', TextType::class, ['required' => true])
-            ->add('offres', EntityType::class, array(
+            ->add('designation', TextType::class, ['required' => true])/*->add('offres', EntityType::class, array(
                     'class' => 'APMVenteBundle:Offre',
                     'choice_label' => 'designation',
                     'required' => false,
                     'multiple' => true
                 )
-            )
-            ->add('reset', ResetType::class);
+            )*/
+        ;
     }
 
     /**

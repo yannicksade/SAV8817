@@ -11,12 +11,14 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 /**
  * Communication
  *
  * @ORM\Table(name="communication")
  * @ORM\Entity(repositoryClass="APM\UserBundle\Repository\CommunicationRepository")
+ * @UniqueEntity("code")
  */
 class Communication extends TradeFactory
 {
@@ -26,6 +28,12 @@ class Communication extends TradeFactory
      * @ORM\Column(type="integer")
      */
     protected $id;
+
+    /**
+     * @var string
+     * @ORM\Column(name="code", type="string", nullable=false)
+     */
+    private $code;
 
     /**
      * @var \DateTime
@@ -51,7 +59,6 @@ class Communication extends TradeFactory
 
     /**
      * @var string
-     * @Assert\NotBlank
      * @Assert\Length(min=2, max=254)
      * @ORM\Column(name="reference", type="string", length=255, nullable=true)
      */
@@ -117,10 +124,25 @@ class Communication extends TradeFactory
     private $documents;
 
 
-    public function __construct()
+    /**
+     * @var string
+     * @Assert\NotBlank
+     * @Assert\Length(min=2, max=254)
+     * @ORM\Column(name="objet", type="string", length=255, nullable=true)
+     */
+    private $objet;
+
+
+    /**
+     * Communication constructor.
+     * @param string $var
+     */
+    public function __construct($var)
     {
+        $this->date = new \DateTime();
         $this->offres= new ArrayCollection();
         $this->documents = new ArrayCollection();
+        $this->code = 'CO' . $var;
     }
 
     /**
@@ -337,6 +359,16 @@ class Communication extends TradeFactory
     }
 
     /**
+     * Get contenu
+     *
+     * @return string
+     */
+    public function getContenu()
+    {
+        return $this->contenu;
+    }
+
+    /**
      * Set contenu
      *
      * @param string $contenu
@@ -351,13 +383,13 @@ class Communication extends TradeFactory
     }
 
     /**
-     * Get contenu
+     * Get date
      *
-     * @return string
+     * @return \DateTime
      */
-    public function getContenu()
+    public function getDate()
     {
-        return $this->contenu;
+        return $this->date;
     }
 
     /**
@@ -373,17 +405,6 @@ class Communication extends TradeFactory
 
         return $this;
     }
-
-    /**
-     * Get date
-     *
-     * @return \DateTime
-     */
-    public function getDate()
-    {
-        return $this->date;
-    }
-
 
     /**
      * Add offre
@@ -451,5 +472,58 @@ class Communication extends TradeFactory
     public function getDocuments()
     {
         return $this->documents;
+    }
+
+    public function __toString()
+    {
+        return $this->code;
+    }
+
+    /**
+     * Get code
+     *
+     * @return string
+     */
+    public function getCode()
+    {
+        return $this->code;
+    }
+
+    /**
+     * Set code
+     *
+     * @param string $code
+     *
+     * @return Communication
+     */
+    public function setCode($code)
+    {
+        $this->code = $code;
+
+        return $this;
+    }
+
+    /**
+     * Get objet
+     *
+     * @return string
+     */
+    public function getObjet()
+    {
+        return $this->objet;
+    }
+
+    /**
+     * Set objet
+     *
+     * @param string $objet
+     *
+     * @return Communication
+     */
+    public function setObjet($objet)
+    {
+        $this->objet = $objet;
+
+        return $this;
     }
 }

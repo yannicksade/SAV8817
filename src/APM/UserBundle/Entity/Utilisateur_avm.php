@@ -37,39 +37,25 @@ class Utilisateur_avm extends Utilisateur
 
 
     /**
-     * @var \DateTime
-     * @Assert\DateTime
-     * @ORM\Column(name="dateEnregistrement", type="datetime", nullable=true)
-     */
-    private $dateEnregistrement;
-
-    /**
      * @var boolean
      * @Assert\Choice({0,1})
      * @ORM\Column(name="estAcheteur", type="boolean", nullable=true)
      */
-    private $acheteur;
+    private $isAcheteur;
 
     /**
      * @var boolean
      * @Assert\Choice({0,1})
      * @ORM\Column(name="estConseillerA1", type="boolean", nullable=true)
      */
-    private $conseillerA1;
-
-    /**
-     * @var boolean
-     * @Assert\Choice({0,1})
-     * @ORM\Column(name="estConseillerA2", type="boolean", nullable=true)
-     */
-    private $conseillerA2;
+    private $isConseillerA1;
 
     /**
      * @var boolean
      * @Assert\Choice({0,1})
      * @ORM\Column(name="estGerantBoutique", type="boolean", nullable=true)
      */
-    private $gerantBoutique;
+    private $isGerantBoutique;
 
 
     /**
@@ -77,35 +63,14 @@ class Utilisateur_avm extends Utilisateur
      * @Assert\Choice({0,1})
      * @ORM\Column(name="estTransporteur", type="boolean", nullable=true)
      */
-    private $transporteurLivreur;
+    private $isTransporteurLivreur;
 
     /**
      * @var boolean
      * @Assert\Choice({0,1})
      * @ORM\Column(name="estVendeur", type="boolean", nullable=true)
      */
-    private $vendeur;
-
-    /**
-     * @var integer
-     * @Assert\Choice({0,1,2,3})
-     * @ORM\Column(name="etatCompte", type="integer", nullable=true)
-     */
-    private $etatDuCompte;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="latitudeX", type="decimal", nullable=true)
-     */
-    private $latitudeX;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="longitudeY", type="decimal", nullable=true)
-     */
-    private $longitudeY;
+    private $isVendeur;
 
     /**
      * @var integer
@@ -113,13 +78,6 @@ class Utilisateur_avm extends Utilisateur
      * @ORM\Column(name="pointsDeFidelite", type="integer", nullable=true)
      */
     private $pointsDeFidelite;
-
-    /**
-     * @var string
-     * @Assert\Url()
-     * @ORM\Column(name="urlImageProfile", type="string", length=255, nullable=true)
-     */
-    private $urlImageProfile;
 
     /**
      * @var Collection
@@ -160,7 +118,7 @@ class Utilisateur_avm extends Utilisateur
      * @var Collection
      * @ORM\OneToMany(targetEntity="APM\VenteBundle\Entity\Transaction", mappedBy="auteur")
      */
-    private $transactions;
+    private $transactionsEffectues;
 
     /**
      * @var Collection
@@ -179,9 +137,14 @@ class Utilisateur_avm extends Utilisateur
     /**
      * @var Collection
      * @ORM\OneToMany(targetEntity="APM\VenteBundle\Entity\Rabais_offre", mappedBy="vendeur")
-     * @ORM\JoinColumn(nullable=true)
      */
-    private $rabais;
+    private $rabaisAccordes;
+
+    /**
+     * @var Collection
+     * @ORM\OneToMany(targetEntity="APM\VenteBundle\Entity\Rabais_offre", mappedBy="beneficiaireRabais")
+     */
+    private $rabaisRecus;
 
 
     /**
@@ -223,16 +186,13 @@ class Utilisateur_avm extends Utilisateur
     private $transporteur;
 
     /**
-     * @ORM\OneToOne(targetEntity="APM\MarketingDistribueBundle\Entity\Conseiller", mappedBy="utilisateur")
-     * @ORM\JoinColumn(nullable=true)
-     *
+     * @ORM\OneToOne(targetEntity="APM\MarketingDistribueBundle\Entity\Conseiller", mappedBy="utilisateur", cascade={"persist","remove"})
      */
     private $profileConseiller;
 
     /**
      * @var Collection
      * @ORM\OneToMany(targetEntity="APM\VenteBundle\Entity\Boutique", mappedBy="gerant")
-     * @ORM\joinColumn(nullable=false)
      */
     private $boutiquesGerant; //Boutiques managées par le gerant
 
@@ -242,6 +202,12 @@ class Utilisateur_avm extends Utilisateur
      * @ORM\OneToMany(targetEntity="APM\AchatBundle\Entity\Specification_achat", mappedBy="utilisateur")
      */
     private $specifications;
+
+    /**
+     * @var Collection
+     * @ORM\OneToMany(targetEntity="APM\VenteBundle\Entity\Transaction", mappedBy="beneficiaire")
+     */
+    private $transactionsRecues;
 
 
     /**
@@ -257,7 +223,7 @@ class Utilisateur_avm extends Utilisateur
     public function __construct()
     {
         parent::__construct();
-
+        $this->dateEnregistrement = new \DateTime();
         $this->roles = array('ROLE_USERAVM');
         $this->enabled = true;
         $this->code = "X" . CodeGenerator::getGenerator(6);
@@ -271,12 +237,13 @@ class Utilisateur_avm extends Utilisateur
         $this->groupesProprietaire=new  ArrayCollection();
 
         $this->documents = new ArrayCollection();
-        $this->rabais=new  ArrayCollection();
-
+        $this->rabaisRecus = new  ArrayCollection();
+        $this->rabaisAccordes = new  ArrayCollection();
         $this->recepteurCommunications = new ArrayCollection();
         $this->emetteurCommunications = new  ArrayCollection();
 
-        $this->transactions = new ArrayCollection();
+        $this->transactionsEffectues = new ArrayCollection();
+        $this->transactionsRecues = new ArrayCollection();
         $this->commentaires=new  ArrayCollection();
 
         $this->boutiquesGerant = new ArrayCollection();
@@ -285,31 +252,9 @@ class Utilisateur_avm extends Utilisateur
         $this->specifications = new  ArrayCollection();
 
         $this->livraisons = new ArrayCollection();
+        $this->transactionsRecues = new ArrayCollection();
+        $this->transactionsEffectues = new ArrayCollection();
 
-    }
-
-    /**
-     * Get dateEnregistrement
-     *
-     * @return \DateTime
-     */
-    public function getDateEnregistrement()
-    {
-        return $this->dateEnregistrement;
-    }
-
-    /**
-     * Set dateEnregistrement
-     *
-     * @param \DateTime $dateEnregistrement
-     *
-     * @return Utilisateur_avm
-     */
-    public function setDateEnregistrement($dateEnregistrement)
-    {
-        $this->dateEnregistrement = $dateEnregistrement;
-
-        return $this;
     }
 
     /**
@@ -319,7 +264,7 @@ class Utilisateur_avm extends Utilisateur
      */
     public function isAcheteur()
     {
-        return $this->acheteur;
+        return $this->isAcheteur;
     }
 
     /**
@@ -327,9 +272,9 @@ class Utilisateur_avm extends Utilisateur
      *
      * @return boolean
      */
-    public function getAcheteur()
+    public function getIsAcheteur()
     {
-        return $this->acheteur;
+        return $this->isAcheteur;
     }
 
     /**
@@ -339,80 +284,13 @@ class Utilisateur_avm extends Utilisateur
      *
      * @return Utilisateur_avm
      */
-    public function setAcheteur($estAcheteur)
+    public function setIsAcheteur($estAcheteur)
     {
-        $this->acheteur = $estAcheteur;
+        $this->isAcheteur = $estAcheteur;
 
         return $this;
     }
 
-    /**
-     * Get estConseillerA1
-     *
-     * @return boolean
-     */
-    public function isConseillerA1()
-    {
-        return $this->conseillerA1;
-    }
-
-    /**
-     * Get conseillerA1
-     *
-     * @return boolean
-     */
-    public function getConseillerA1()
-    {
-        return $this->conseillerA1;
-    }
-
-    /**
-     * Set estConseillerA1
-     *
-     * @param boolean $estConseillerA1
-     *
-     * @return Utilisateur_avm
-     */
-    public function setConseillerA1($estConseillerA1)
-    {
-        $this->conseillerA1 = $estConseillerA1;
-
-        return $this;
-    }
-
-    /**
-     * Get estConseillerA2
-     *
-     * @return boolean
-     */
-    public function isConseillerA2()
-    {
-        return $this->conseillerA2;
-    }
-
-    /**
-     * Get conseillerA2
-     *
-     * @return boolean
-     */
-    public function getConseillerA2()
-    {
-        return $this->conseillerA2;
-    }
-
-    /**
-     * Set estConseillerA2
-     *
-     * @param boolean $estConseillerA2
-     *
-     * @return Utilisateur_avm
-     */
-    public function setConseillerA2($estConseillerA2)
-    {
-        $this->conseillerA2 = $estConseillerA2;
-
-        return $this;
-    }
 
     /**
      * Get estGerantBoutique
@@ -421,7 +299,7 @@ class Utilisateur_avm extends Utilisateur
      */
     public function isGerantBoutique()
     {
-        return $this->gerantBoutique;
+        return $this->isGerantBoutique;
     }
 
     /**
@@ -429,9 +307,9 @@ class Utilisateur_avm extends Utilisateur
      *
      * @return boolean
      */
-    public function getGerantBoutique()
+    public function getIsGerantBoutique()
     {
-        return $this->gerantBoutique;
+        return $this->isGerantBoutique;
     }
 
     /**
@@ -441,9 +319,9 @@ class Utilisateur_avm extends Utilisateur
      *
      * @return Utilisateur_avm
      */
-    public function setGerantBoutique($estGerantBoutique)
+    public function setIsGerantBoutique($estGerantBoutique)
     {
-        $this->gerantBoutique = $estGerantBoutique;
+        $this->isGerantBoutique = $estGerantBoutique;
 
         return $this;
     }
@@ -455,7 +333,7 @@ class Utilisateur_avm extends Utilisateur
      */
     public function isTransporteurLivreur()
     {
-        return $this->transporteurLivreur;
+        return $this->isTransporteurLivreur;
     }
 
     /**
@@ -463,9 +341,9 @@ class Utilisateur_avm extends Utilisateur
      *
      * @return boolean
      */
-    public function getTransporteurLivreur()
+    public function getIsTransporteurLivreur()
     {
-        return $this->transporteurLivreur;
+        return $this->isTransporteurLivreur;
     }
 
     /**
@@ -475,9 +353,9 @@ class Utilisateur_avm extends Utilisateur
      *
      * @return Utilisateur_avm
      */
-    public function setTransporteurLivreur($estTransporteur)
+    public function setIsTransporteurLivreur($estTransporteur)
     {
-        $this->transporteurLivreur = $estTransporteur;
+        $this->isTransporteurLivreur = $estTransporteur;
 
         return $this;
     }
@@ -489,7 +367,7 @@ class Utilisateur_avm extends Utilisateur
      */
     public function isVendeur()
     {
-        return $this->vendeur;
+        return $this->isVendeur;
     }
 
     /**
@@ -497,9 +375,9 @@ class Utilisateur_avm extends Utilisateur
      *
      * @return boolean
      */
-    public function getVendeur()
+    public function getIsVendeur()
     {
-        return $this->vendeur;
+        return $this->isVendeur;
     }
 
     /**
@@ -509,45 +387,11 @@ class Utilisateur_avm extends Utilisateur
      *
      * @return Utilisateur_avm
      */
-    public function setVendeur($estVendeur)
+    public function setIsVendeur($estVendeur)
     {
-        $this->vendeur = $estVendeur;
+        $this->isVendeur = $estVendeur;
 
         return $this;
-    }
-
-    /**
-     * Get etatDuCompte
-     *
-     * @return string
-     */
-    public function getEtatDuCompte()
-    {
-        return $this->etatDuCompte;
-    }
-
-    /**
-     * Set etatDuCompte
-     *
-     * @param string $etatDuCompte
-     *
-     * @return Utilisateur_avm
-     */
-    public function setEtatDuCompte($etatDuCompte)
-    {
-        $this->etatDuCompte = $etatDuCompte;
-
-        return $this;
-    }
-
-    /**
-     * Get latitudeX
-     *
-     * @return string
-     */
-    public function getLatitudeX()
-    {
-        return $this->latitudeX;
     }
 
     /**
@@ -560,30 +404,6 @@ class Utilisateur_avm extends Utilisateur
     public function setLatitudeX($latitudeX)
     {
         $this->latitudeX = $latitudeX;
-
-        return $this;
-    }
-
-    /**
-     * Get longitudeY
-     *
-     * @return string
-     */
-    public function getLongitudeY()
-    {
-        return $this->longitudeY;
-    }
-
-    /**
-     * Set longitudeY
-     *
-     * @param string $longitudeY
-     *
-     * @return Utilisateur_avm
-     */
-    public function setLongitudeY($longitudeY)
-    {
-        $this->longitudeY = $longitudeY;
 
         return $this;
     }
@@ -612,29 +432,6 @@ class Utilisateur_avm extends Utilisateur
         return $this;
     }
 
-    /**
-     * Get urlImageProfile
-     *
-     * @return string
-     */
-    public function getUrlImageProfile()
-    {
-        return $this->urlImageProfile;
-    }
-
-    /**
-     * Set urlImageProfile
-     *
-     * @param string $urlImageProfile
-     *
-     * @return Utilisateur_avm
-     */
-    public function setUrlImageProfile($urlImageProfile)
-    {
-        $this->urlImageProfile = $urlImageProfile;
-
-        return $this;
-    }
 
     /**
      * Add boutiquesProprietaire
@@ -736,75 +533,6 @@ class Utilisateur_avm extends Utilisateur
     public function getCommentaires()
     {
         return $this->commentaires;
-    }
-
-    /**
-     * Add transaction
-     *
-     * @param Transaction $transaction
-     *
-     * @return Utilisateur_avm
-     */
-    public function addTransaction(Transaction $transaction)
-    {
-        $this->transactions[] = $transaction;
-
-        return $this;
-    }
-
-    /**
-     * Remove transaction
-     *
-     * @param Transaction $transaction
-     */
-    public function removeTransaction(Transaction $transaction)
-    {
-        $this->transactions->removeElement($transaction);
-    }
-
-    /**
-     * Get transactions
-     *
-     * @return Collection
-     */
-    public function getTransactions()
-    {
-        return $this->transactions;
-    }
-
-
-    /**
-     * Add rabai
-     *
-     * @param Rabais_offre $rabai
-     *
-     * @return Utilisateur_avm
-     */
-    public function addRabai(Rabais_offre $rabai)
-    {
-        $this->rabais[] = $rabai;
-
-        return $this;
-    }
-
-    /**
-     * Remove rabai
-     *
-     * @param Rabais_offre $rabai
-     */
-    public function removeRabai(Rabais_offre $rabai)
-    {
-        $this->rabais->removeElement($rabai);
-    }
-
-    /**
-     * Get rabais
-     *
-     * @return Collection
-     */
-    public function getRabais()
-    {
-        return $this->rabais;
     }
 
 
@@ -1223,10 +951,179 @@ class Utilisateur_avm extends Utilisateur
     /**
      * Get boutiquesGerant
      *
-     * @return \Doctrine\Common\Collections\Collection
+     * @return Collection
      */
     public function getBoutiquesGerant()
     {
         return $this->boutiquesGerant;
     }
+
+    public function __toString()
+    {
+        return parent::__toString();
+    }
+
+    /**
+     * Add rabais Accorde
+     *
+     *
+     * @param Rabais_offre $rabaisAccorde
+     * @return Utilisateur_avm
+     */
+    public function addRabaisAccorde(Rabais_offre $rabaisAccorde)
+    {
+        $this->rabaisAccordes[] = $rabaisAccorde;
+
+        return $this;
+    }
+
+    /**
+     * Remove rabaisAccorde
+     *
+     * @param Rabais_offre $rabaisAccorde
+     */
+    public function removeRabaisAccorde(Rabais_offre $rabaisAccorde)
+    {
+        $this->rabaisAccordes->removeElement($rabaisAccorde);
+    }
+
+    /**
+     * Get rabaisAccordes
+     *
+     * @return Collection
+     */
+    public function getRabaisAccordes()
+    {
+        return $this->rabaisAccordes;
+    }
+
+    /**
+     * Add rabaisRecus
+     *
+     * @param Rabais_offre $rabaisRecus
+     *
+     * @return Utilisateur_avm
+     */
+    public function addRabaisRecus(Rabais_offre $rabaisRecus)
+    {
+        $this->rabaisRecus[] = $rabaisRecus;
+
+        return $this;
+    }
+
+    /**
+     * Remove rabaisRecus
+     *
+     * @param Rabais_offre $rabaisRecus
+     */
+    public function removeRabaisRecus(Rabais_offre $rabaisRecus)
+    {
+        $this->rabaisRecus->removeElement($rabaisRecus);
+    }
+
+    /**
+     * Get rabaisRecus
+     *
+     * @return Collection
+     */
+    public function getRabaisRecus()
+    {
+        return $this->rabaisRecus;
+    }
+
+
+    /**
+     * Add transactionsEffectue
+     *
+     * @param Transaction $transactionsEffectue
+     *
+     * @return Utilisateur_avm
+     */
+    public function addTransactionsEffectue(Transaction $transactionsEffectue)
+    {
+        $this->transactionsEffectues[] = $transactionsEffectue;
+
+        return $this;
+    }
+
+    /**
+     * Remove transactionsEffectue
+     *
+     * @param Transaction $transactionsEffectue
+     */
+    public function removeTransactionsEffectue(Transaction $transactionsEffectue)
+    {
+        $this->transactionsEffectues->removeElement($transactionsEffectue);
+    }
+
+    /**
+     * Get transactionsEffectues
+     *
+     * @return Collection
+     */
+    public function getTransactionsEffectues()
+    {
+        return $this->transactionsEffectues;
+    }
+
+    /**
+     * Add transactionsRecue
+     *
+     * @param Transaction $transactionsRecue
+     *
+     * @return Utilisateur_avm
+     */
+    public function addTransactionsRecue(Transaction $transactionsRecue)
+    {
+        $this->transactionsRecues[] = $transactionsRecue;
+
+        return $this;
+    }
+
+    /**
+     * Remove transactionsRecue
+     *
+     * @param Transaction $transactionsRecue
+     */
+    public function removeTransactionsRecue(Transaction $transactionsRecue)
+    {
+        $this->transactionsRecues->removeElement($transactionsRecue);
+    }
+
+    /**
+     * Get transactionsRecues
+     *
+     * @return Collection
+     */
+    public function getTransactionsRecues()
+    {
+        return $this->transactionsRecues;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isConseillerA1()
+    {
+        return $this->isConseillerA1;
+    }
+
+    /**
+     * Get isConseillerA1
+     *
+     * @return boolean
+     */
+    public function getIsConseillerA1()
+    {
+        return $this->isConseillerA1;
+    }
+
+    /**
+     * @param boolean $isConseillerA1
+     */
+    public function setIsConseillerA1(bool $isConseillerA1)
+    {
+        $this->isConseillerA1 = $isConseillerA1;
+    }
+
 }

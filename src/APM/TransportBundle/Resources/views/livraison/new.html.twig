@@ -9,8 +9,18 @@
     {{ form_end(form) }}
 
     <ul>
+        {% if livraison.boutique %}
+            <li>
+                <a href="{{ path('apm_transport_livraison_boutique_index', {'id':livraison.boutique.id}) }}">Retour aux
+                    livraisons de la boutique</a>
+            </li>
+        {% else %}
+            <li>
+                <a href="{{ path('apm_transport_livraison_index') }}">Retour aux livraisons de l'utilisateur</a>
+            </li>
+        {% endif %}
         <li>
-            <a href="{{ path('apm_transport_livraison_index') }}">Back to the list</a>
+            <a href="{{ path('apm_vente_transaction_index') }}">Retour aux transactions de l'utilisateur</a>
         </li>
     </ul>
 {% endblock %}

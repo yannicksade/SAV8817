@@ -1,13 +1,11 @@
 
 {% block fos_user_content %}
     {% trans_default_domain 'FOSUserBundle' %}
-    <h1>Administrateur</h1>
-    <form action="{{ path('apm_admin_registration') }}" method="POST">
+    <h1>Création d'un compte Staff AVM</h1>
         {{ form_start(form) }}
         {{ form_widget(form) }}
         <div>
             <input type="submit" value="{{ 'registration.submit'|trans }}" />
         </div>
         {{ form_end(form) }}
-    </form>
 {% endblock fos_user_content %}

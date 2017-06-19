@@ -1,29 +1,35 @@
-apm_marketing_reseau_conseillers_index:
+apm_marketing_reseau_conseiller_index:
+    path:     /conseiller/{id}
+    defaults: { _controller: "APMMarketingReseauBundle:Reseau_conseillers:index" }
+    methods:  GET
+
+apm_marketing_reseau_index:
     path:     /
     defaults: { _controller: "APMMarketingReseauBundle:Reseau_conseillers:index" }
     methods:  GET
 
-apm_marketing_reseau_conseillers_show:
+apm_marketing_reseau_show:
     path:     /{id}/show
     defaults: { _controller: "APMMarketingReseauBundle:Reseau_conseillers:show" }
     methods:  GET
 
-apm_marketing_reseau_conseillers_new:
+apm_marketing_reseau_new:
     path:     /new
     defaults: { _controller: "APMMarketingReseauBundle:Reseau_conseillers:new" }
-    methods:  [GET, POST]
 
-apm_marketing_reseau_conseillers_edit:
-    path:     /{id}/edit
-    defaults: { _controller: "APMMarketingReseauBundle:Reseau_conseillers:edit" }
-    methods:  [GET, POST]
+apm_marketing_reseau_left_add:
+    path:     /left-add/{id}
+    defaults: { _controller: "APMMarketingReseauBundle:Reseau_conseillers:addLeftMember" }
 
-apm_marketing_reseau_conseillers_delete:
-    path:     /{id}/delete
-    defaults: { _controller: "APMMarketingReseauBundle:Reseau_conseillers:delete" }
-    methods:  DELETE
+apm_marketing_reseau_right_add:
+    path:     /right-add/{id}
+    defaults: { _controller: "APMMarketingReseauBundle:Reseau_conseillers:addRightMember" }
 
-apm_marketing_reseau_conseillers_deleteFromList:
-    path:     /list/{id}/delete
-    defaults: { _controller: "APMMarketingReseauBundle:Reseau_conseillers:deleteFromList" }
 
+apm_marketing_reseau_left_promote:
+    path:     /left-promote/{id}
+    defaults: { _controller: "APMMarketingReseauBundle:Reseau_conseillers:promoteLeftMember" }
+
+apm_marketing_reseau_right_promote:
+    path:     /right-promote/{id}
+    defaults: { _controller: "APMMarketingReseauBundle:Reseau_conseillers:promoteRightMember" }

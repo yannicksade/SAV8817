@@ -1,40 +1,68 @@
 {% extends "APMAdminBundle:_Main:layout.html.twig" %}
 
 {% block body %}
-    <h1>Livreur_boutique list</h1>
+    <h1>Livreurs de la boutique {{ boutique }}</h1>
 
     <table>
         <thead>
         <tr>
             <th>Code</th>
-            <th>Matricule</th>
             <th>Reférence</th>
+            <th>Matricule</th>
         </tr>
         </thead>
         <tbody>
-        {% for livreur_boutique in livreur_boutiques %}
+        <p>------------------------------ Livreurs boutique ------------------------------------------------------</p>
+        {% for livreur_boutique in livreurs_boutiques %}
             <tr>
                 <td>
-                    <a href="{{ path('apm_transport_livreur_boutique_show', { 'id': livreur_boutique.id }) }}">{% if livreur_boutique.transporteur==null %} {% else %}{{ livreur_boutique.transporteur.code }}{% endif %}</a>
+                    <a href="{{ path('apm_transport_livreur_boutique_show', { 'id': livreur_boutique.id }) }}">{{ livreur_boutique.transporteur.code }}</a>
                 </td>
-                <td>
-                    {% if livreur_boutique.transporteur==null %} {% else %}{{ livreur_boutique.transporteur.matricule }}{% endif %}
-                </td>
-                <td>
-                    {{ livreur_boutique.reference }}
-                </td>
+                <td>{{ livreur_boutique.reference }}</td>
+                <td>{{ livreur_boutique.transporteur.matricule }}</td>
                 <td>
                     <ul>
                         <li>
-                            <a href="{{ path('apm_transport_livreur_boutique_show', { 'id': livreur_boutique.id }) }}">show</a>
+                            <a href="{{ path('apm_transport_livreur_boutique_show', { 'id': livreur_boutique.id }) }}">détail</a>
                         </li>
+                        {% if app.user == livreur_boutique.boutiqueProprietaire.gerant or app.user == livreur_boutique.boutiqueProprietaire.proprietaire %}
+                            <li>
+                                <a href="{{ path('apm_transport_livreur_boutique_edit', { 'id': livreur_boutique.id }) }}">modifier</a>
+                            </li>
+                            <li>
+                                <a href="{{ path('apm_transport_livreur_boutique_deleteFromList', { 'id': livreur_boutique.id }) }}">supprimer</a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    <table>
+        <thead>
+        <tr>
+            <th>Code</th>
+            <th>Reférence</th>
+            <th>Matricule</th>
+            <th>Boutique Propriétaire</th>
+        </tr>
+        </thead>
+        <tbody>
+        <p>------------------------------ Livreurs Empruntés ------------------------------------------------------</p>
+        {% for livreur_boutique in livreurs_Empruntes %}
+            <tr>
+                <td>
+                    <a href="{{ path('apm_transport_livreur_boutique_show', { 'id': livreur_boutique.id }) }}">{{ livreur_boutique.transporteur.code }}</a>
+                </td>
+                <td>{{ livreur_boutique.reference }}</td>
+                <td>{{ livreur_boutique.transporteur.matricule }}</td>
+                <td>{{ livreur_boutique.boutiqueProprietaire }}</td>
+                <td>
+                    <ul>
                         <li>
-                            <a href="{{ path('apm_transport_livreur_boutique_edit', { 'id': livreur_boutique.id }) }}">edit</a>
+                            <a href="{{ path('apm_transport_livreur_boutique_show', { 'id': livreur_boutique.id }) }}">détail</a>
                         </li>
-                        <li>
-                            <a href="{{ path('apm_transport_livreur_boutique_deleteFromList', { 'id': livreur_boutique.id }) }}">delete</a>
-                        </li>
-
                     </ul>
                 </td>
             </tr>
@@ -43,8 +71,11 @@
     </table>
 
     <ul>
-        <li>
-            <a href="{{ path('apm_transport_livreur_boutique_new') }}">Create a new entry</a>
+        {% if app.user == boutique.gerant or app.user == boutique.proprietaire %}
+            <li>
+                <a href="{{ path('apm_transport_livreur_boutique_new', {'id': boutique.id}) }}">Créer un nouveau livreur
+                    pour cette boutique</a>
         </li>
+        {% endif %}
     </ul>
 {% endblock %}

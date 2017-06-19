@@ -1,45 +1,68 @@
-{% extends "APMAdminBundle:_Main:layout.html.twig" %}
+{#{% extends "APMAdminBundle:_Main:layout.html.twig" %}#}
 
 {% block body %}
-    <h1>Reseau_conseillers list</h1>
+    {% if conseiller %}
+        <h1>Reseau des conseillers</h1>
+        <p>
+            Grand Master: <strong>{{ conseiller.masterConseiller }}</strong><br/>
+            {% if conseiller.masterConseiller %}Code: {{ conseiller.masterConseiller.code }}{% endif %}
+        </p>
 
-    <table>
-        <thead>
-        <tr>
-            <th>Code</th>
-            <th>Description</th>
-            <th>Actions</th>
-        </tr>
-        </thead>
-        <tbody>
-        {% for reseau_conseiller in reseau_conseillers %}
+        <table>
+            <thead>
+            <tr>
+                <th>Maître</th>
+                <th>Fils de Gauche</th>
+                <th>Fils de Droite</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+
             <tr>
                 <td>
-                    <a href="{{ path('apm_marketing_reseau_conseillers_show', { 'id': reseau_conseiller.id }) }}">{{ reseau_conseiller.code }}</a>
+                    <a href="{{ path('apm_marketing_conseiller_show', { 'id': conseiller.id }) }}">{{ conseiller }}</a>
                 </td>
-                <td>{{ reseau_conseiller.description }}</td>
+                <td> {% if conseiller.conseillerGauche %}<a
+                            href="{{ path('apm_marketing_reseau_conseiller_index', {'id':conseiller.conseillerGauche.id}) }}">{{ conseiller.conseillerGauche }}{% else %} - {% endif %}</a>
+                </td>
+                <td> {% if conseiller.conseillerDroite %}<a
+                            href="{{ path('apm_marketing_reseau_conseiller_index', {'id':conseiller.conseillerDroite.id}) }}">{{ conseiller.conseillerDroite }}{% else %} - {% endif %}</a>
+                </td>
                 <td>
-                    <ul>
-                        <li>
-                            <a href="{{ path('apm_marketing_reseau_conseillers_show', { 'id': reseau_conseiller.id }) }}">show</a>
-                        </li>
-                        <li>
-                            <a href="{{ path('apm_marketing_reseau_conseillers_edit', { 'id': reseau_conseiller.id }) }}">edit</a>
-                        </li>
-                        <li>
-                            <a href="{{ path('apm_marketing_reseau_conseillers_deleteFromList', { 'id': reseau_conseiller.id }) }}">delete</a>
-                        </li>
-
-                    </ul>
+                    <a href="{{ path('apm_marketing_reseau_show', { 'id': conseiller.id }) }}">afficher</a>
                 </td>
             </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+            </tbody>
+        </table>
 
-    <ul>
-        <li>
-            <a href="{{ path('apm_marketing_reseau_conseillers_new') }}">Create a new entry</a>
-        </li>
-    </ul>
+        <ul>
+            {# {% if app.user.profileConseiller and app.user.profileConseiller.isConseillerA2 %}#}
+            <li>
+                <a href="{{ path('apm_marketing_reseau_new') }}">Créer votre réseau propre</a>
+            </li>
+            <li>
+                <a href="{{ path('apm_marketing_reseau_index') }}">Retour à mon réseau</a>
+            </li>
+            {#{% endif %}#}
+
+            <li>
+                <a href="{{ path('apm_marketing_reseau_left_promote', {'id':conseiller.id}) }}">Promotion de gauche</a>
+            </li>
+            <li>
+                <a href="{{ path('apm_marketing_reseau_right_promote', {'id':conseiller.id}) }}">Promotion de droite</a>
+            </li>
+
+            {% if conseiller.masterConseiller %}
+                <li>
+                    <a href="{{ path('apm_marketing_reseau_conseiller_index',{'id':conseiller.masterConseiller.id}) }}">remonter
+                        le réseau du master</a>
+                </li>
+
+            {% endif %}
+
+        </ul>
+    {% else %}
+        <p><b>Vous n'êtes pas conseiller!</b></p>
+    {% endif %}
 {% endblock %}

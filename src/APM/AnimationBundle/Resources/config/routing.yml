@@ -1,6 +1,6 @@
 apm_animation_base_documentaire:
     resource: "@APMAnimationBundle/Resources/config/routing/base_documentaire.yml"
-    prefix:   /animation_base_documentaire
+    prefix:   /animation/base-documentaire
 
 apm_animation_homepage:
     path:     /animation

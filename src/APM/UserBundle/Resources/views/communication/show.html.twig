@@ -6,9 +6,30 @@
     <table>
         <tbody>
         <tr>
-            <th>Code</th>
-            {% if communication.message==null %}{% else %}{{ communication.message.code }}{% endif %}
+            <th>Date d'émission</th>
+            <td>{{ communication.date|date('Y-m-d H:i:s') }}</td>
+        <tr>
+        <tr>
+            <th>Emetteur</th>
+            <td>{{ communication.emetteur }}</td>
         </tr>
+        <tr>
+            <th>Destinataire</th>
+            <td>{{ communication.recepteur }}</td>
+        </tr>
+        <tr>
+            <th>Objet</th>
+            <td>{{ communication.objet }}</td>
+        </tr>
+        <tr>
+            <th>Code</th>
+            <td>{{ communication.code }}</td>
+        </tr>
+        <tr>
+            <th>Reférence</th>
+            <td>{{ communication.reference }}</td>
+        </tr>
+
         <tr>
             <th>Datedevigueur</th>
             <td>{% if communication.dateDeVigueur %}{{ communication.dateDeVigueur|date('Y-m-d H:i:s') }}{% endif %}</td>
@@ -18,25 +39,29 @@
             <td>{{ communication.dateFin|date('Y-m-d H:i:s') }}</td>
         </tr>
         <tr>
-            <th>Reférence</th>
-            <td>{{ communication.reference }}</td>
+            <th>Contenu</th>
+            <td>{{ communication.contenu }}</td>
         </tr>
         <tr>
             <th>Valide</th>
             <td>{% if communication.valide %}Yes{% else %}No{% endif %}</td>
+        </tr>
+        <tr>
+            <th>Type</th>
+            <td>{{ communication.type }}</td>
         </tr>
         </tbody>
     </table>
 
     <ul>
         <li>
-            <a href="{{ path('apm_user_communication_index') }}">Back to the list</a>
+            <a href="{{ path('apm_user_communication_index') }}">Retour à la liste</a>
         </li>
         <li>
-            <a href="{{ path('apm_user_communication_edit', { 'id': communication.id }) }}">Edit</a>
+            <a href="{{ path('apm_user_communication_edit', { 'id': communication.id }) }}">modifier</a>
         </li>
         <li>
-            <a href="{{ path('apm_user_communication_new') }}">Add a new one</a>
+            <a href="{{ path('apm_user_communication_new') }}">Créer une nouvelle communication</a>
         </li>
 
         <li>

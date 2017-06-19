@@ -1,7 +1,7 @@
-{% extends "APMAdminBundle:_Main:layout.html.twig" %}
+{% extends ":base/dashboard:layout.html.twig" %}
 
+{% block content_body %}
 
-{% block body %}
     <h1>Boutique edit</h1>
 
     {{ form_start(edit_form) }}
@@ -17,6 +17,14 @@
             {{ form_start(delete_form) }}
             <input type="submit" value="Delete">
             {{ form_end(delete_form) }}
+            {# render a field row, but display a label with text "foo" #}
+            {#{{ form_row(form.name, {'label': 'foo'}) }}#}
+            {#{{ form_row(form.submit, { 'label': 'Submit me' }) }}#}
+            {# render the start tag and change the submission method #}
+            {#{{ form_start(form, {'method': 'GET'}) }}#}
+            {#{{ form_rest(form) }}#}
+            {# render a widget, but add a "foo" class to it #}
+            {#{{ form_widget(form.name, { 'attr': {'class': 'foo'} }) }}#}
         </li>
     </ul>
-{% endblock %}
+{% endblock content_body %}

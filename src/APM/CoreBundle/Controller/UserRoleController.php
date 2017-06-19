@@ -20,8 +20,8 @@ class UserRoleController extends Controller
     {
         $form = $this->createForm(UsersRolePromptType::class);
         $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
-            $data = $form->getData(); //est ce que cet utilisateur est valid conme object
+        if ($form->isSubmitted()) {
+            $data = $form->getData();
             $role = $data['role'];
             $utilisateurs = $data['utilisateurs'];
             $isAddRole = $data['ajouterRole'];

@@ -28,7 +28,7 @@ class AdminController extends Controller {
 
         return $this->render('APMAdminBundle:Administrateur:index.html.twig', [
             'form' => $form->createView(),
-            'admins' => $allAdmins
+            'admins' => $allAdmins,
         ]);
     }
 

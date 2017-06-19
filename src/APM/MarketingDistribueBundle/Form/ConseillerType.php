@@ -22,12 +22,8 @@ class ConseillerType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('dateEnregistrement', DateTimeType::class)
-            ->add('description', TextareaType::class, ['required' => false])
-            ->add('conseillerA2', CheckboxType::class, ['required' => false])
             ->add('matricule', TextType::class, ['required' => false])
-            ->add('valeurQuota', NumberType::class, ['required' => false])
-
+            ->add('description', TextareaType::class, ['required' => false])
             ->add('reset', ResetType::class)
         ;
     }

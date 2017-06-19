@@ -364,6 +364,16 @@ class Livraison extends TradeFactory
     }
 
     /**
+     * Get boutique
+     *
+     * @return \APM\VenteBundle\Entity\Boutique
+     */
+    public function getBoutique()
+    {
+        return $this->boutique;
+    }
+
+    /**
      * Set boutique
      *
      * @param Boutique $boutique
@@ -377,13 +387,8 @@ class Livraison extends TradeFactory
         return $this;
     }
 
-    /**
-     * Get boutique
-     *
-     * @return \APM\VenteBundle\Entity\Boutique
-     */
-    public function getBoutique()
+    public function __toString()
     {
-        return $this->boutique;
+        return $this->code;
     }
 }

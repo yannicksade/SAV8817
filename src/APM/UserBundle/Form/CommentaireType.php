@@ -21,10 +21,6 @@ class CommentaireType extends AbstractType
         $builder
             ->add('contenu', TextareaType::class, ['required' => false])
             ->add('evaluation', NumberType::class, ['required' => false])
-            ->add('offre', EntityType::class, [
-                'class' => 'APMVenteBundle:Offre',
-                'choice_label' => 'code'
-            ])
         ;
     }
 

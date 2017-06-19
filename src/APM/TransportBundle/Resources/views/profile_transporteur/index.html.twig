@@ -1,13 +1,14 @@
 {% extends "APMAdminBundle:_Main:layout.html.twig" %}
 
 {% block body %}
-    <h1>Liste des transporteurs</h1>
-
+    <h1>Liste des transporteurs </h1>
+    {% if zone %}Zone de couverture: <strong>{{ zone }}-{{ zone.adresse }}-{{ zone.zoneTime }}
+        -{{ zone.pays }}</strong>{% endif %}
     <table>
         <thead>
         <tr>
             <th>Code</th>
-            <th>Livreur Boutique</th>
+            <th>Livreur Boutique?</th>
             <th>Matricule</th>
             <th>Actions</th>
         </tr>
@@ -16,22 +17,23 @@
         {% for profile_transporteur in profile_transporteurs %}
             <tr>
                 <td>
-                    <a href="{{ path('apm_transport_transporteur_show', { 'id': profile_transporteur.id }) }}">{{ profile_transporteur.code }}</a>
+                    {% if profile_transporteur.livreurBoutique %}
+                        <a href="{{ path('apm_transport_livreur_boutique_show', { 'id': profile_transporteur.livreurBoutique.id }) }}">{{ profile_transporteur.code }}</a>
+                    {% else %}
+                        <a href="{{ path('apm_transport_transporteur_show', { 'id': profile_transporteur.id }) }}">{{ profile_transporteur.code }}</a>
+                    {% endif %}
                 </td>
                 <td>{% if profile_transporteur.livreurBoutique %}Yes{% else %}No{% endif %}</td>
                 <td>{{ profile_transporteur.matricule }}</td>
                 <td>
                     <ul>
                         <li>
-                            <a href="{{ path('apm_transport_transporteur_show', { 'id': profile_transporteur.id }) }}">show</a>
+                            {% if profile_transporteur.livreurBoutique %}
+                                <a href="{{ path('apm_transport_livreur_boutique_show', { 'id': profile_transporteur.livreurBoutique.id }) }}">afficher</a>
+                            {% else %}
+                                <a href="{{ path('apm_transport_transporteur_show', { 'id': profile_transporteur.id }) }}">afficher</a>
+                            {% endif %}
                         </li>
-                        <li>
-                            <a href="{{ path('apm_transport_transporteur_edit', { 'id': profile_transporteur.id }) }}">edit</a>
-                        </li>
-                        <li>
-                            <a href="{{ path('apm_transport_transporteur_deleteFromList', { 'id': profile_transporteur.id }) }}">delete</a>
-                        </li>
-
                     </ul>
                 </td>
             </tr>
@@ -41,7 +43,10 @@
 
     <ul>
         <li>
-            <a href="{{ path('apm_transport_transporteur_new') }}">Create a new entry</a>
+            <a href="{{ path('apm_transport_transporteur_new') }}">Créer un profile transporteur</a>
+        </li>
+        <li>
+            <a href="{{ path('apm_zone_intervention_index') }}">Liste les zones d'interventions</a>
         </li>
     </ul>
 {% endblock %}

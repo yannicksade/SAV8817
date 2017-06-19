@@ -6,6 +6,9 @@ use APM\MarketingDistribueBundle\Entity\Commissionnement;
 use APM\MarketingDistribueBundle\Entity\Conseiller_boutique;
 use APM\MarketingDistribueBundle\Entity\Quota;
 use APM\MarketingDistribueBundle\Factory\TradeFactory;
+use APM\UserBundle\Entity\Admin;
+use APM\UserBundle\Entity\Utilisateur_avm;
+use APM\VenteBundle\Entity\Boutique;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -16,38 +19,101 @@ use Symfony\Component\HttpFoundation\Request;
 class CommissionnementController extends Controller
 {
     /**
-     * Liste
-     * @param Conseiller_boutique $conseiller_boutique
+     * Liste les commissionnements d'un conseiller
+     * @param Boutique $boutique
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function indexAction(Conseiller_boutique $conseiller_boutique)
+    public function indexAction(Boutique $boutique = null)
     {
-        $this->listAndShowSecurity($conseiller_boutique);
-        $commissionnements =$conseiller_boutique->getCommissionnements();
+        $boutiques_commissionnements = null;
+        if ($boutique) {
+            $this->listAndShowSecurity(null, $boutique);
+            $boutiqueConseillers = $boutique->getBoutiqueConseillers();
+            if ($boutiqueConseillers) {
+                /** @var Conseiller_boutique $boutiqueConseiller */
+                foreach ($boutiqueConseillers as $boutiqueConseiller) {
+                    $boutiques_commissionnements [] = array(
+                        'boutique' => $boutiqueConseiller->getBoutique(),
+                        'commissionnements' => $boutiqueConseiller->getCommissionnements(),
+                        'conseiller' => $boutiqueConseiller->getConseiller(),
+                    );
+                }
+            }
+
+        } else {
+            $this->listAndShowSecurity();
+            /** @var Utilisateur_avm $user */
+            $user = $this->getUser();
+            $conseiller = $user->getProfileConseiller();
+            if ($conseiller) {
+                $conseiller_boutiques = $conseiller->getConseillerBoutiques();
+                if ($conseiller_boutiques) {
+                    /** @var Conseiller_boutique $conseiller_boutique */
+                    foreach ($conseiller_boutiques as $conseiller_boutique) {
+                        $boutiques_commissionnements [] = array(
+                            'boutique' => $conseiller_boutique->getBoutique(),
+                            'commissionnements' => $conseiller_boutique->getCommissionnements(),
+                            'conseiller' => $conseiller_boutique->getConseiller(),
+                        );
+                    }
+                }
+            }
+        }
 
         return $this->render('APMMarketingDistribueBundle:commissionnement:index.html.twig', array(
-            'commissionnements' => $commissionnements,
+            'boutiques_commissionnements' => $boutiques_commissionnements,
         ));
     }
 
     /**
-     * Créer un commissionnement pour consiller-boutique
+     * @param Commissionnement |null $commissionnement
+     * @param Boutique $boutique
+     */
+    private function listAndShowSecurity($commissionnement = null, $boutique = null)
+    {
+        //---------------------------------security-----------------------------------------------
+        $this->denyAccessUnlessGranted(['ROLE_CONSEILLER', 'ROLE_BOUTIQUE'], null, 'Unable to access this page!');
+        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY')) {
+            throw $this->createAccessDeniedException();
+        }
+        $gerant = null;
+        $proprietaire = null;
+        /** @var Utilisateur_avm $user */
+        $user = $this->getUser();
+        $conseiller = $user->getProfileConseiller();
+        if ($conseiller) $conseiller = $conseiller->getUtilisateur();
+        if ($commissionnement) {
+            $boutique = $commissionnement->getCommission()->getBoutiqueProprietaire();
+            $conseiller = $commissionnement->getConseillerBoutique()->getConseiller()->getUtilisateur();
+            $gerant = null;
+            $proprietaire = null;
+        }
+        if ($boutique) {
+            $gerant = $boutique->getGerant();
+            $proprietaire = $boutique->getProprietaire();
+            $conseiller = null;
+        }
+        if ($user !== $conseiller && $user !== $gerant && $user !== $proprietaire) {
+            throw $this->createAccessDeniedException();
+        }
+    }
+
+    /**
+     * Une boutique créé des commissionnements pour des conseiller de la boutique
      * @param Request $request
+     * @param Boutique $boutique
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function newAction(Request $request)
+    public function newAction(Request $request, Boutique $boutique)
     {
-        //s'assurer en amont que les conditions requises au conseiller sont remplies pour créer un commissionnement
-        // pour appeler une fonction callback pour cette vérification
-
-        $this->createSecurity();
+        $this->createSecurity($boutique);
         /** @var Commissionnement $commissionnement */
         $commissionnement = TradeFactory::getTradeProvider("commissionnement");
         $form = $this->createForm('APM\MarketingDistribueBundle\Form\CommissionnementType', $commissionnement);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            $data = $form->getData();
-            $this->createSecurity($data('conseiller_boutique'), $data('quota'));
+            $quota = $form->get('commission')->getData();
+            $this->createSecurity($boutique, $quota);
             $em = $this->getDoctrine()->getManager();
             $em->persist($commissionnement);
             $em->flush();
@@ -58,7 +124,32 @@ class CommissionnementController extends Controller
         return $this->render('APMMarketingDistribueBundle:commissionnement:new.html.twig', array(
             'commissionnement' => $commissionnement,
             'form' => $form->createView(),
+            'boutique' => $boutique,
         ));
+    }
+
+    /**
+     * @param Boutique $boutique
+     * @param Quota $quota
+     */
+    private function createSecurity($boutique, $quota = null)
+    {
+        //---------------------------------security-----------------------------------------------
+        // Unable to access the controller unless you have the required role
+        $this->denyAccessUnlessGranted('ROLE_BOUTIQUE', null, 'Unable to access this page!');
+        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY')) {
+            throw $this->createAccessDeniedException();
+        }
+        /* ensure that the user is logged in
+        *  and that the one is the owner
+        */
+        //la boutique pour laquelle le conseiller beneficie les commissionnements doit être la même qui offre le Quota
+        $user = $this->getUser();
+        $proprietaire = $boutique->getProprietaire();
+        $gerant = $boutique->getGerant();
+        if (null !== $quota && $quota->getBoutiqueProprietaire() !== $boutique || $user !== $gerant && $user !== $proprietaire)
+            throw $this->createAccessDeniedException();
+        //----------------------------------------------------------------------------------------
     }
 
     /**
@@ -69,7 +160,7 @@ class CommissionnementController extends Controller
     public function showAction(Commissionnement $commissionnement)
     {
 
-        $this->listAndShowSecurity($commissionnement->getConseillerBoutique());
+        $this->listAndShowSecurity($commissionnement);
 
         $deleteForm = $this->createDeleteForm($commissionnement);
 
@@ -102,13 +193,13 @@ class CommissionnementController extends Controller
      */
     public function editAction(Request $request, Commissionnement $commissionnement)
     {
-        $this->editAndDeleteSecurity($commissionnement);
+        $this->editSecurity();
         $deleteForm = $this->createDeleteForm($commissionnement);
         $editForm = $this->createForm('APM\MarketingDistribueBundle\Form\CommissionnementType', $commissionnement);
         $editForm->handleRequest($request);
 
         if ($editForm->isSubmitted() && $editForm->isValid()) {
-            $this->editAndDeleteSecurity($commissionnement);
+            $this->editSecurity();
             $em = $this->getDoctrine()->getManager();
             $em->persist($commissionnement);
             $em->flush();
@@ -123,6 +214,16 @@ class CommissionnementController extends Controller
         ));
     }
 
+    private function editSecurity()
+    {
+        //---------------------------------security-----------------------------------------------
+        $this->denyAccessUnlessGranted('ROLE_SUPER_ADMIN', null, 'Unable to access this page!');
+        $user = $this->getUser();
+        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY')
+            || !($user instanceof Admin)
+        ) throw $this->createAccessDeniedException();
+    }
+
     /**
      * Supprimer à partir d'un formulaire
      * @param Request $request
@@ -131,86 +232,47 @@ class CommissionnementController extends Controller
      */
     public function deleteAction(Request $request, Commissionnement $commissionnement)
     {
-        $this->editAndDeleteSecurity($commissionnement);
+        $this->deleteSecurity($commissionnement);
         $form = $this->createDeleteForm($commissionnement);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $this->editAndDeleteSecurity($commissionnement);
+            $this->deleteSecurity($commissionnement);
             $em = $this->getDoctrine()->getManager();
             $em->remove($commissionnement);
             $em->flush();
         }
 
-        return $this->redirectToRoute('apm_marketing_commissionnement_index', $commissionnement->getConseillerBoutique()->getId());
+        return $this->redirectToRoute('apm_marketing_commissionnement_index');
+    }
+    //-------------------------------------------------------
+
+    /**
+     * Le conseiller peut supprimer ses commissionnement
+     * @param Commissionnement $commissionnement
+     */
+    private function deleteSecurity($commissionnement)
+    {
+        //---------------------------------security-----------------------------------------------
+        $this->denyAccessUnlessGranted('ROLE_CONSEILLER', null, 'Unable to access this page!');
+        $user = $this->getUser();
+        if ((!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY'))
+            || ($commissionnement->getConseillerBoutique()->getConseiller()->getUtilisateur() !== $user)
+        ) {
+            throw $this->createAccessDeniedException();
+        }
+        //----------------------------------------------------------------------------------------
     }
 
     public function deleteFromListAction(Commissionnement $commissionnement)
     {
-        $this->editAndDeleteSecurity($commissionnement);
+        $this->deleteSecurity($commissionnement);
         $em = $this->getDoctrine()->getManager();
         $em->remove($commissionnement);
         $em->flush();
 
         return $this->redirectToRoute('apm_marketing_commissionnement_index');
     }
-
-    /**
-     * @param Commissionnement $commissionnement
-     */
-    private function editAndDeleteSecurity($commissionnement){
-        //---------------------------------security-----------------------------------------------
-        // Unable to access the controller unless you have a USERAVM role
-        $this->denyAccessUnlessGranted('ROLE_NO_ACCESS', null, 'Unable to access this page!');
-        /* ensure that the user is logged in  # granted even through remembering cookies
-        *  and that the one is the owner
-        */
-        $user = $this->getUser();
-        if ((!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY')) || ($commissionnement->getConseillerBoutique()->getConseiller()->getUtilisateur() !== $user)) {
-            throw $this->createAccessDeniedException();
-        }
-        //----------------------------------------------------------------------------------------
-    }
-
-    /**
-     * @param Conseiller_boutique $conseiller_boutique
-     * @param Quota $quota
-     */
-    private function createSecurity($conseiller_boutique = null, $quota = null){
-        //---------------------------------security-----------------------------------------------
-        // Unable to access the controller unless you have the required role
-        $this->denyAccessUnlessGranted('ROLE_CONSEILLER', null, 'Unable to access this page!');
-        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY')) {
-            throw $this->createAccessDeniedException();
-        }
-        /* ensure that the user is logged in
-        *  and that the one is the owner
-         * Test d'identité!
-        */
-        //la boutique pourlaquelle le conseiller beneficie des commissionnement doit être la même qui offre le Quota
-        $user = $this->getUser();
-        if($conseiller_boutique && $quota) {
-            if ($conseiller_boutique->getConseiller()->getUtilisateur() !== $user || $quota->getBoutiqueProprietaire() !== $conseiller_boutique->getBoutique()) {
-                throw $this->createAccessDeniedException();
-            }
-        }
-        //----------------------------------------------------------------------------------------
-    }
-
-    /**
-     * @param Conseiller_boutique $conseiller_boutique
-     */
-    private function listAndShowSecurity($conseiller_boutique){
-        //---------------------------------security-----------------------------------------------
-        // Unable to access the controller unless you have a USERAVM role
-        $this->denyAccessUnlessGranted('ROLE_CONSEILLER', null, 'Unable to access this page!');
-        /* ensure that the user is logged in  # granted even through remembering cookies
-        *  and that the one is the owner
-        */
-        $user = $this->getUser();
-            if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_REMEMBERED') || $conseiller_boutique->getConseiller()->getUtilisateur() !== $user) {
-                throw $this->createAccessDeniedException();
-            }
-        //----------------------------------------------------------------------------------------
-    }
+    //----------------------------------------------------------------------------------------
 }
+

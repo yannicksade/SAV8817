@@ -1,0 +1,40 @@
+{% extends ":base/dashboard:layout.html.twig" %}
+{%- block title -%} E-TRADE | Image Produit {% endblock %}
+{% block custom_stylesheets %}
+    {% stylesheets "dashboard/assets/global/plugins/jcrop/css/jquery.Jcrop.min.css"
+    "dashboard/assets/pages/css/image-crop.min.css" filter='cssrewrite' %}
+    <link href="{{ asset_url }}" rel="stylesheet" type="text/css"/>
+    {% endstylesheets %}
+{% endblock custom_stylesheets %}
+
+{% block content_body %}
+    <h1>Positionnement de l'image</h1>
+    <div class="row">
+        <div class="responsive-1024">
+            <img src="{{ asset(vich_uploader_asset(offre, 'imageFile')) }}" alt="{{ offre.designation }}" id="demo3"/>
+        </div>
+        <div class="responsive-1024">
+            <div id="preview-pane">
+                <div class="preview-container">
+                    <img src="{{ asset(vich_uploader_asset(offre, 'imageFile')) }}"
+                         alt="{{ offre.designation }}"
+                         class="jcrop-preview"/>
+                </div>
+            </div>
+        </div>
+        {{ form_start(crop_form) }}
+        <input type="hidden" id="crop_x" name="x"/>
+        <input type="hidden" id="crop_y" name="y"/>
+        <input type="hidden" id="crop_w" name="w"/>
+        <input type="hidden" id="crop_h" name="h"/>
+        <input type="submit" value="Crop Image" class="btn btn-large green"/>
+        {{ form_end(crop_form) }}
+    </div>
+{% endblock content_body %}
+
+{% block javascripts %}
+    {% javascripts 'dashboard/assets/global/plugins/jcrop/js/jquery.Jcrop.js'
+    'dashboard/assets/pages/scripts/form-image-crop.js' %}
+    <script src="{{ asset_url }}" type="text/javascript"></script>
+    {% endjavascripts %}
+{% endblock javascripts %}

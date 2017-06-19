@@ -20,15 +20,16 @@ class CommissionnementType extends AbstractType
     {
         $builder
             ->add('creditDepense', NumberType::class, ['required' => false])
-            ->add('dateCreation', DateTimeType::class)
             ->add('libelle')
             ->add('description')
             ->add('quantite', NumberType::class)
+            //il ne doit s'agit que des conseillers de la boutique
             ->add('conseillerBoutique', EntityType::class, [
                 'class' => 'APMMarketingDistribueBundle:Conseiller_boutique',
-                'choice_label' => 'code',
+                'choice_label' => 'conseiller',
                 'required' => true
             ])
+            //il ne doit s'agit que des quotas créés par la boutique en question
             ->add('commission', EntityType::class, [
                 'class' => 'APMMarketingDistribueBundle:Quota',
                 'choice_label' => 'code',

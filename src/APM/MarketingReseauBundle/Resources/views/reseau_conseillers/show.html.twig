@@ -1,40 +1,44 @@
-{% extends "APMAdminBundle:_Main:layout.html.twig" %}
+{#{% extends "APMAdminBundle:_Main:layout.html.twig" %}#}
 {% block body %}
-    <h1>Reseau_conseillers</h1>
+    <h1>Maître conseiller : <a
+                href="{{ path('apm_marketing_conseiller_show',{'id':conseiller.id}) }}">{{ conseiller }}</a></h1>
 
     <table>
         <tbody>
         <tr>
             <th>Code</th>
-            <td>{{ reseau_conseiller.code }}</td>
+            <td>{{ conseiller.code }}</td>
         </tr>
         <tr>
-            <th>Description</th>
-            <td>{{ reseau_conseiller.description }}</td>
+            <th>Conseiller de droite :</th>
+            <td>{{ conseiller.conseillerDroite }}</td>
         </tr>
         <tr>
-            <th>Nom</th>
-            <td>{{ reseau_conseiller.designation }}</td>
+            <th>Conseiller de gauche :</th>
+            <td>{{ conseiller.conseillerGauche }}</td>
         </tr>
 
         </tbody>
     </table>
 
-    <ul>
-        <li>
-            <a href="{{ path('apm_marketing_reseau_conseillers_index') }}">Back to the list</a>
-        </li>
-        <li>
-            <a href="{{ path('apm_marketing_reseau_conseillers_edit', { 'id': reseau_conseiller.id }) }}">Edit</a>
-        </li>
-        <li>
-            <a href="{{ path('apm_marketing_reseau_conseillers_new') }}">Add a new one</a>
-        </li>
+    {#{% if app.user.profileConseiller.isConseillerA2 %}#}
+    <li>
+        <a href="{{ path('apm_marketing_reseau_left_add', { 'id': conseiller.id }) }}">Ajouter/Modifier membre de
+            gauche</a>
+    </li>
+    <li>
+        <a href="{{ path('apm_marketing_reseau_right_add', { 'id': conseiller.id }) }}">Ajouter/Modifier membre de
+            droite</a>
+    </li>
+    <li>
+        <a href="{{ path('apm_marketing_reseau_left_promote', {'id':conseiller.id}) }}">Promotion de gauche</a>
+    </li>
+    <li>
+        <a href="{{ path('apm_marketing_reseau_right_promote', {'id':conseiller.id}) }}">Promotion de droite</a>
+    </li>
+    <li>
+        <a href="{{ path('apm_marketing_reseau_index') }}">Retour à reseau courant</a>
+    </li>
+    {#{% endif %}#}
 
-        <li>
-            {{ form_start(delete_form) }}
-            <input type="submit" value="Delete">
-            {{ form_end(delete_form) }}
-        </li>
-    </ul>
 {% endblock %}

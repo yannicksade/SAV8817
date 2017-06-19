@@ -312,4 +312,9 @@ class Remise extends TradeFactory
 
         return $this;
     }
+
+    public function __toString()
+    {
+        return $this->code;
+    }
 }

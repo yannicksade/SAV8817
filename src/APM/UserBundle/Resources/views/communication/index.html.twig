@@ -1,7 +1,7 @@
 {% extends "APMAdminBundle:_Main:layout.html.twig" %}
 
 {% block body %}
-    <h1>Communication list</h1>
+    <h1>Liste des Communications</h1>
 
     <table>
         <thead>
@@ -9,31 +9,74 @@
             <th>Code</th>
             <th>Date de Vigueur</th>
             <th>Reférence</th>
-            <th>Type</th>
             <th>Valide</th>
+            <th>Destinataire</th>
             <th>Actions</th>
         </tr>
         </thead>
         <tbody>
-        {% for communication in communications %}
+        <p>-----------------------------------Envoyée(s)----------------------------------------------------------</p>
+        {% for communication in communicationsSent %}
             <tr>
                 <td>
-                    <a href="{{ path('apm_user_communication_show', { 'id': communication.id }) }}">{% if communication.message==null %}{% else %}{{ communication.message.code }}{% endif %}</a>
+                    <a href="{{ path('apm_user_communication_show', { 'id': communication.id }) }}">{{ communication.code }}</a>
                 </td>
                 <td>{{ communication.dateDeVigueur|date('d-m-Y H:i:s') }}</td>
                 <td>{{ communication.reference }}</td>
-                <td>{{ communication.type }}</td>
                 <td>{% if communication.valide %}Yes{% else %}No{% endif %}</td>
+                <td>{{ communication.recepteur }}</td>
                 <td>
                     <ul>
                         <li>
-                            <a href="{{ path('apm_user_communication_show', { 'id': communication.id }) }}">show</a>
+                            <a href="{{ path('apm_user_communication_show', { 'id': communication.id }) }}">afficher</a>
                         </li>
                         <li>
-                            <a href="{{ path('apm_user_communication_edit', { 'id': communication.id }) }}">edit</a>
+                            <a href="{{ path('apm_user_communication_edit', { 'id': communication.id }) }}">modifier</a>
                         </li>
                         <li>
-                            <a href="{{ path('apm_user_communication_deleteFromList', { 'id': communication.id }) }}">delete</a>
+                            <a href="{{ path('apm_user_communication_deleteFromList', { 'id': communication.id }) }}">supprimer</a>
+                        </li>
+
+                    </ul>
+                </td>
+            </tr>
+        {% endfor %}
+        <p><a href="{{ path('apm_user_communication_new') }}">Créer une nouvelle communication</a></p>
+        </tbody>
+    </table>
+
+    <table>
+        <thead>
+        <tr>
+            <th>Code</th>
+            <th>Date de Vigueur</th>
+            <th>Reférence</th>
+            <th>Valide</th>
+            <th>Emetteur</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <p>-----------------------------------Reçue(s)----------------------------------------------------------</p>
+        {% for communication in communicationsReceived %}
+            <tr>
+                <td>
+                    <a href="{{ path('apm_user_communication_show', { 'id': communication.id }) }}">{{ communication.code }}</a>
+                </td>
+                <td>{{ communication.dateDeVigueur|date('d-m-Y H:i:s') }}</td>
+                <td>{{ communication.reference }}</td>
+                <td>{% if communication.valide %}Yes{% else %}No{% endif %}</td>
+                <td>{{ communication.emetteur }}</td>
+                <td>
+                    <ul>
+                        <li>
+                            <a href="{{ path('apm_user_communication_show', { 'id': communication.id }) }}">afficher</a>
+                        </li>
+                        <li>
+                            <a href="{{ path('apm_user_communication_edit', { 'id': communication.id }) }}">modifier</a>
+                        </li>
+                        <li>
+                            <a href="{{ path('apm_user_communication_deleteFromList', { 'id': communication.id }) }}">supprimer</a>
                         </li>
 
                     </ul>
@@ -42,10 +85,4 @@
         {% endfor %}
         </tbody>
     </table>
-
-    <ul>
-        <li>
-            <a href="{{ path('apm_user_communication_new') }}">Create a new entry</a>
-        </li>
-    </ul>
 {% endblock %}

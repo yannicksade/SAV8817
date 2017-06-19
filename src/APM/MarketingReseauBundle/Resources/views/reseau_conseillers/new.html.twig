@@ -1,6 +1,7 @@
-{% extends "APMAdminBundle:_Main:layout.html.twig" %}
+{#{% extends "APMAdminBundle:_Main:layout.html.twig" %}#}
+
 {% block body %}
-    <h1>Reseau_conseillers creation</h1>
+    <h1>Ajout d'un memebre au réseau: {{ conseiller }}</h1>
 
     {{ form_start(form) }}
     {{ form_widget(form) }}
@@ -9,7 +10,7 @@
 
     <ul>
         <li>
-            <a href="{{ path('apm_marketing_reseau_conseillers_index') }}">Back to the list</a>
+            <a href="{{ path('apm_marketing_reseau_conseiller_index',{'id':conseiller.id}) }}">Retour à la liste</a>
         </li>
     </ul>
 {% endblock %}

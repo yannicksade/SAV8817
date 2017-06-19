@@ -1,7 +1,7 @@
 {% extends "APMAdminBundle:_Main:layout.html.twig" %}
 
 {% block body %}
-    <h1>Livraison list</h1>
+    <h1>Liste des Livraisons enregistrées</h1>
 
     <table>
         <thead>
@@ -46,8 +46,18 @@
     </table>
 
     <ul>
+        {% if boutique %}
+            <li>
+                <a href="{{ path('apm_transport_livraison_new', {'id': boutique.id}) }}">Créer une livraison
+                    boutique</a>
+            </li>
+        {% else %}
+            <li>
+                <a href="{{ path('apm_transport_livraison_new') }}">Créer une livraison</a>
+            </li>
+        {% endif %}
         <li>
-            <a href="{{ path('apm_transport_livraison_new') }}">Create a new entry</a>
+            <a href="{{ path('apm_vente_transaction_index') }}">Liste mes transactions </a>
         </li>
     </ul>
 {% endblock %}

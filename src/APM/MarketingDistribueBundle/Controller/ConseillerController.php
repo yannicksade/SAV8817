@@ -15,18 +15,27 @@ use Symfony\Component\HttpFoundation\Request;
 class ConseillerController extends Controller
 {
     /**
-     *
+     * Liste tous les conseillers
      * @return \Symfony\Component\HttpFoundation\Response
      */
     public function indexAction()
     {
-        /** @var Utilisateur_avm $user */
-        $user = $this->getUser();
-        $this->listAndShowSecurity($user->getProfileConseiller());
-        $profile_conseiller= $user->getProfileConseiller();
+        $this->listAndShowSecurity();
+        $em = $this->getDoctrine()->getManager();
+        $conseillers = $em->getRepository('APMMarketingDistribueBundle:conseiller')->findAll();
         return $this->render('APMMarketingDistribueBundle:conseiller:index.html.twig', array(
-            'conseillers' => $profile_conseiller,
+            'conseillers' => $conseillers,
         ));
+    }
+
+    private function listAndShowSecurity()
+    {
+        //-----------------------------------security-------------------------------------------
+        $this->denyAccessUnlessGranted('ROLE_USERAVM', null, 'Unable to access this page!');
+        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY')) {
+            throw $this->createAccessDeniedException();
+        }
+        //----------------------------------------------------------------------------------------
     }
 
     /**
@@ -43,7 +52,9 @@ class ConseillerController extends Controller
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             $this->createSecurity();
-            $conseiller->setUtilisateur($this->getUser());
+            /** @var Utilisateur_avm $user */
+            $user = $this->getUser();
+            $conseiller->setUtilisateur($user);
             $em = $this->getDoctrine()->getManager();
             $em->persist($conseiller);
             $em->flush();
@@ -57,6 +68,19 @@ class ConseillerController extends Controller
         ));
     }
 
+    private function createSecurity()
+    {
+        //---------------------------------security-----------------------------------------------
+        // Unable to access the controller unless you have a CONSEILLER role
+        $this->denyAccessUnlessGranted('ROLE_CONSEILLER', null, 'Unable to access this page!');
+        /** @var Utilisateur_avm $user */
+        $user = $this->getUser();
+        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY') || !$user->isConseillerA1()) {
+            throw $this->createAccessDeniedException();
+        }
+        //----------------------------------------------------------------------------------------
+    }
+
     /**
      * Finds and displays a Conseiller entity.
      * @param Conseiller $conseiller
@@ -64,7 +88,7 @@ class ConseillerController extends Controller
      */
     public function showAction(Conseiller $conseiller)
     {
-        $this->listAndShowSecurity($conseiller);
+        $this->listAndShowSecurity();
 
         $deleteForm = $this->createDeleteForm($conseiller);
 
@@ -119,6 +143,23 @@ class ConseillerController extends Controller
     }
 
     /**
+     * @param Conseiller $conseiller
+     */
+    private function editAndDeleteSecurity($conseiller)
+    {
+        //---------------------------------security-----------------------------------------------
+        // Unable to access the controller unless you have a CONSEILLER role
+        $this->denyAccessUnlessGranted('ROLE_CONSEILLER', null, 'Unable to access this page!');
+        $user = $this->getUser();
+        if ((!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY')) ||
+            ($conseiller->getUtilisateur() !== $user)
+        ) {
+            throw $this->createAccessDeniedException();
+        }
+        //----------------------------------------------------------------------------------------
+    }
+
+    /**
      * Deletes a Conseiller entity.
      * @param Request $request
      * @param Conseiller $conseiller
@@ -148,51 +189,5 @@ class ConseillerController extends Controller
         $em->flush();
 
         return $this->redirectToRoute('apm_marketing_conseiller_index');
-    }
-
-    /**
-     * @param Conseiller $conseiller
-     */
-    private function listAndShowSecurity($conseiller){
-        //-----------------------------------security-------------------------------------------
-        // Unable to access the controller unless you have a CONSEILLER role
-        $this->denyAccessUnlessGranted('ROLE_CONSEILLER', null, 'Unable to access this page!');
-        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
-            throw $this->createAccessDeniedException();
-        }
-        if($conseiller !== null){
-            if($this->getUser() !== $conseiller->getUtilisateur()){
-                throw $this->createAccessDeniedException();
-            }
-        }
-    }
-    private function createSecurity(){
-        //---------------------------------security-----------------------------------------------
-        // Unable to access the controller unless you have a CONSEILLER role
-        $this->denyAccessUnlessGranted('ROLE_CONSEILLER', null, 'Unable to access this page!');
-        /* ensure that the user is logged in  # and granted even to create a network */
-        /** @var Utilisateur_avm $user */
-        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY')) {
-            throw $this->createAccessDeniedException();
-        }
-        //----------------------------------------------------------------------------------------
-    }
-
-    /**
-     * @param Conseiller $conseiller
-     */
-    private function editAndDeleteSecurity($conseiller){
-        //---------------------------------security-----------------------------------------------
-        // Unable to access the controller unless you have a CONSEILLER role
-        $this->denyAccessUnlessGranted('ROLE_CONSEILLER', null, 'Unable to access this page!');
-
-        /* ensure that the user is logged in  # granted even through remembering cookies
-        *  and that the one is the owner
-        */
-        $user = $this->getUser();
-        if ((!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY')) || ($conseiller->getUtilisateur() !== $user)) {
-            throw $this->createAccessDeniedException();
-        }
-        //----------------------------------------------------------------------------------------
     }
 }

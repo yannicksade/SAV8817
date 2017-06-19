@@ -6,39 +6,70 @@
     <table>
         <tbody>
         <tr>
-            <th>Code</th>
+            <th>Code:</th>
             <td>{{ zone_intervention.code }}</td>
         </tr>
         <tr>
-            <th>Description</th>
-            <td>{{ zone_intervention.designation }}</td>
+            <th>Transporteur principal:</th>
+            <td><strong>
+                    {% if zone_intervention.transporteur.livreurBoutique %}
+                        <a href="{{ path('apm_transport_livreur_boutique_show', { 'id': zone_intervention.transporteur.livreurBoutique.id }) }}">{{ zone_intervention.transporteur }}</a>
+                    {% else %}
+                        <a href="{{ path('apm_transport_transporteur_show', { 'id': zone_intervention.transporteur.id }) }}">{{ zone_intervention.transporteur }}</a>
+                    {% endif %}
+                </strong></td>
         </tr>
         <tr>
-            <th>Langue</th>
+            <th>Designation:</th>
+            <td>{{ zone_intervention.designation }}</td>
+        </tr>
+
+        <tr>
+            <th>Adresse:</th>
+            <td>{{ zone_intervention.adresse }}</td>
+        </tr>
+        <tr>
+            <th>Temps zone:</th>
+            <td>{{ zone_intervention.zoneTime }}</td>
+        </tr>
+        <tr>
+            <th>Langage:</th>
             <td>{{ zone_intervention.language }}</td>
         </tr>
         <tr>
-            <th>Nom</th>
-            <td>{{ zone_intervention.description }}</td>
-        </tr>
-        <tr>
-            <th>Pays</th>
+            <th>Pays:</th>
             <td>{{ zone_intervention.pays }}</td>
         </tr>
+        <tr>
+            <th>Description:</th>
+            <td>{{ zone_intervention.description }}</td>
+        </tr>
+
         </tbody>
     </table>
 
     <ul>
         <li>
-            <a href="{{ path('apm_zone_intervention_index') }}">Back to the list</a>
+            <a href="{{ path('apm_transport_transporteur_zone-intervention_index', {'id': zone_intervention.id}) }}">Liste
+                tous les transporteurs de cette zone</a>
         </li>
         <li>
-            <a href="{{ path('apm_zone_intervention_edit', { 'id': zone_intervention.id }) }}">Edit</a>
+            <a href="{{ path('apm_zone_intervention_index') }}">Liste toutes des zones</a>
         </li>
-        <li>
-            <a href="{{ path('apm_zone_intervention_new') }}">Add a new one</a>
+        {% if app.user.transporteur %}
+            <li>
+                <a href="{{ path('apm_zone_transporteur-zone_intervention_index', {'id':app.user.transporteur.id}) }}">Retour
+                    à la liste mes zones</a>
+            </li>
+        {% endif %}
+        {% if app.user == zone_intervention.transporteur.utilisateur %}
+            <li>
+                <a href="{{ path('apm_zone_intervention_edit', { 'id': zone_intervention.id }) }}">modifier</a>
         </li>
-
+            <li>
+                <a href="{{ path('apm_zone_intervention_new') }}">Supprimer</a>
+            </li>
+        {% endif %}
         <li>
             {{ form_start(delete_form) }}
             <input type="submit" value="Delete">

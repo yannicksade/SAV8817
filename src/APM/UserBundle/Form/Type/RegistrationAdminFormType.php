@@ -5,13 +5,22 @@ namespace APM\UserBundle\Form\Type;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class RegistrationAdminFormType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
+            /* ->add('type', ChoiceType::class, [
+                 'required' => false,
+                 'choices' => [
+                     'Utilisateur AVM' => 'utilisateur_avm',
+                     'Staff' => 'admin',
+                 ]
+             ])*/
             ->add('enabled', CheckboxType::class, ['required' => false])
             ->add('roles', ChoiceType::class, array(
                     'choices' => [
@@ -28,9 +37,7 @@ class RegistrationAdminFormType extends AbstractType
                     ],
                     'required' => true,
                     'multiple' => true,
-
                 )
-
             );
     }
 

@@ -5,6 +5,7 @@
 namespace APM\UserBundle\Entity;
 
 use APM\CoreBundle\Trade\CodeGenerator;
+use Symfony\Component\Validator\Constraints as Assert;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -23,8 +24,15 @@ class Admin extends Utilisateur
 
     public function __construct() {
         parent::__construct();
+        $this->dateEnregistrement = new \DateTime();
         $this->lastLogin = new \DateTime;
         $this->enabled = false;
         $this->code = "XX" . CodeGenerator::getGenerator(4);
     }
+
+    public function __toString()
+    {
+        return parent::__toString();
+    }
+
 }

@@ -1,26 +1,25 @@
 {% extends "APMAdminBundle:_Main:layout.html.twig" %}
 
 {% block body %}
-    <h1>Individu_to_groupe</h1>
+    <h1>Individu - Groupe</h1>
 
-    <table>
-        <tbody>
-        <tr>
-            <th>Propriete</th>
-            <td>{{ individu_to_groupe.propriete }}</td>
-        </tr>
-        </tbody>
-    </table>
-
+    Groupe:
+    {{ individu_to_groupe.groupeRelationnel }}</br>
+    Personne:
+    {{ individu_to_groupe.individu }}</br>
+    Propriete:
+    {{ individu_to_groupe.propriete }}<br>
+    Description:
+    {{ individu_to_groupe.description }}
     <ul>
         <li>
-            <a href="{{ path('apm_user_individu-to-groupe_index') }}">Back to the list</a>
+            <a href="{{ path('apm_user_individu-to-groupe_index') }}">Retour à la liste</a>
         </li>
         <li>
-            <a href="{{ path('apm_user_individu-to-groupe_edit', { 'id': individu_to_groupe.id }) }}">Edit</a>
+            <a href="{{ path('apm_user_individu-to-groupe_edit', { 'id': individu_to_groupe.id }) }}">Modifier</a>
         </li>
         <li>
-            <a href="{{ path('apm_user_individu-to-groupe_new') }}">Add a new one</a>
+            <a href="{{ path('apm_user_individu-to-groupe_new') }}">Jouter une nouvelle personne</a>
         </li>
 
         <li>

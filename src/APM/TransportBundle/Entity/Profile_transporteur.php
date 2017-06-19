@@ -30,18 +30,10 @@ class Profile_transporteur extends TradeFactory
     /**
      * @var string
      * @Assert\NotBlank
-     * @Assert\Length(min=2, max=55)
+     * @Assert\Length(min=2, max=205)
      * @ORM\Column(name="matricule", type="string", length=255, nullable=false)
      */
     private $matricule;
-
-    /**
-     * @var string
-     * @Assert\NotBlank
-     * @Assert\Length(min=2, max=255)
-     * @ORM\Column(name="designation", type="string", length=255, nullable=false)
-     */
-    private $designation;
 
     /**
      * Id
@@ -87,9 +79,6 @@ class Profile_transporteur extends TradeFactory
      * @var Livreur_boutique
      *
      * @ORM\OneToOne(targetEntity="APM\TransportBundle\Entity\Livreur_boutique", mappedBy="transporteur")
-     * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="livreurBoutique_id", referencedColumnName="id", nullable=true)
-     * })
      */
     private $livreurBoutique;
 
@@ -221,22 +210,6 @@ class Profile_transporteur extends TradeFactory
         return $this->livraisons;
     }
 
-    /**
-     * @return string
-     */
-    public function getDesignation()
-    {
-        return $this->designation;
-    }
-
-    /**
-     * @param string $designation
-     */
-    public function setDesignation(string $designation)
-    {
-        $this->designation = $designation;
-    }
-
 
     /**
      * Add zone
@@ -307,6 +280,16 @@ class Profile_transporteur extends TradeFactory
     }
 
     /**
+     * Get livreurBoutique
+     *
+     * @return Livreur_boutique
+     */
+    public function getLivreurBoutique()
+    {
+        return $this->livreurBoutique;
+    }
+
+    /**
      * Set livreurBoutique
      *
      * @param Livreur_boutique $livreurBoutique
@@ -320,13 +303,8 @@ class Profile_transporteur extends TradeFactory
         return $this;
     }
 
-    /**
-     * Get livreurBoutique
-     *
-     * @return Livreur_boutique
-     */
-    public function getLivreurBoutique()
+    public function __toString()
     {
-        return $this->livreurBoutique;
+        return $this->matricule;
     }
 }

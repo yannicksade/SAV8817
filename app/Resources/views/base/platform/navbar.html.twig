@@ -1,0 +1,205 @@
+<html>
+<nav class="container navbar navbar-default img-rounded" role="navigation">
+    {# Responsive nav bar#}
+    <div class="nav-header nav-justified" style="width: auto">
+        <button type="button" style="padding-right: auto" class="navbar-toggle img-responsive" data-toggle="collapse"
+                data-target="#bsresponsif">
+            <span class="sr-only">Toggle navigation</span>
+        </button>
+        <span class="navbar-brand"><a href="#"><small>Trade</small></a></span>
+    </div>
+
+    <div class="collapse navbar-collapse" id="bsresponsif">
+        <div class="row">
+            <div class="col-lg-2">
+                <div class="row">
+                    <a href="#">
+                        {% image "admin/assets/img/logoHTmodif.png" %}
+                        <img src="{{ asset_url }}" alt="E-T logo" class="img-responsive"/>
+                        {% endimage %}
+                    </a>
+                </div>
+                <div class="row">
+                    <p>
+                        {% block sidebar %}
+                            {% include ":base/main:sidebar.html.twig" %}
+                        {% endblock %}
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="row responsive-utilities-test">
+                    <form class="navbar-form" role="search" style="position: relative" action="#">
+
+                        <label for="pays"></label><br/>
+                        <select name="pays" id="pays">
+                            <option value="All" selected>Tous les pays</option>
+                            <optgroup label="Afrique">
+                                <option value="Cameroun">Camaroun</option>
+                                <option value="Nigeria">Nigéria</option>
+                                <option value="Civ">Côte d'ivoire</option>
+                            </optgroup>
+                            <optgroup label="Europe">
+                                <option value="France">France</option>
+                                <option value="Italie">Italie</option>
+                                <option value="Espagne">Espagne</option>
+                                <option value="UK">Royaume uni</option>
+                            </optgroup>
+                            <optgroup label="Amerique">
+                                <option value="Canada">Canada</option>
+                                <option value="Usa">Etat Unies</option>
+                            </optgroup>
+                            <optgroup label="Asie">
+                                <option value="Chine">Chine</option>
+                                <option value="Japon">Japon</option>
+                            </optgroup>
+                        </select><br/>
+
+                        <div class="form-group input-group">
+                            <div class="input-group-btn">
+                                <button style="border-radius: 0 0" class="btn btn-default embed-responsive-item"
+                                        tabindex="-1">
+                                    <small>search</small>
+                                </button>
+                            </div>
+
+                            <div class="input-group-btn">
+                                <button style="border-radius: 0 0"
+                                        class="btn btn-default dropdown-toggle embed-responsive-item"
+                                        data-toggle="dropdown" tabindex="-1">
+                                    <span class="caret"></span>
+                                    <span class="sr-only">toggle</span>
+                                </button>
+                                <ul class="dropdown-menu">
+                                    <li><a href="#"> categorie</a></li>
+                                    <li><a href="#"> categorie</a></li>
+                                    <li><a href="#"> categorie</a></li>
+                                    <li><a href="#"> categorie</a></li>
+                                    <li class="divider"></li>
+                                    <li><a href="#"> categorie</a></li>
+                                    <li><a href="#"> categorie</a></li>
+                                    <li><a href="#"> categorie</a></li>
+                                    <li><a href="#"> categorie</a></li>
+                                </ul>
+                            </div>
+                            <input type="text" class="form-control" placeholder="browsing..."/>
+                            <span class="input-group-btn"><button type="submit"
+                                                                  class="btn btn-default">Go!</button> </span>
+                        </div>
+                    </form>
+                </div>
+                <div class="row">
+                    <ul class="nav nav-tabs">
+                        <li class="active"><a href="#">HOME</a></li>
+                        <li class="dropdown text-center"><a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                                Onglet<br/><span class="caret"></span></a>
+                            <ul class="dropdown-menu">
+                                <li><a href="#">sous-menu</a></li>
+                                <li><a href="#">sous-menu</a></li>
+                                <li><a href="#">sous-menu</a></li>
+                                <li class="divider"></li>
+                                <li><a href="#">sous-menu</a></li>
+                                <li><a href="#">sous-menu</a></li>
+                                <li><a href="#">sous-menu</a></li>
+                            </ul>
+                        </li>
+                        <li class="dropdown text-center"><a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                                Onglet<br/><span class="caret"></span></a>
+                            <ul class="dropdown-menu">
+                                <li><a href="#">sous-menu</a></li>
+                                <li><a href="#">sous-menu</a></li>
+                                <li><a href="#">sous-menu</a></li>
+                                <li class="divider"></li>
+                                <li><a href="#">sous-menu</a></li>
+                                <li><a href="#">sous-menu</a></li>
+                                <li><a href="#">sous-menu</a></li>
+                            </ul>
+                        </li>
+                        <li class="dropdown text-center"><a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                                Onglet<br/><span class="caret"></span></a>
+                            <ul class="dropdown-menu">
+                                <li><a href="#">sous-menu</a></li>
+                                <li><a href="#">sous-menu</a></li>
+                                <li><a href="#">sous-menu</a></li>
+                                <li class="divider"></li>
+                                <li><a href="#">sous-menu</a></li>
+                                <li><a href="#">sous-menu</a></li>
+                                <li><a href="#">sous-menu</a></li>
+                            </ul>
+                        </li>
+                        <li class="dropdown text-center"><a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                                Onglet<br/><span class="caret"></span></a>
+                            <ul class="dropdown-menu">
+                                <li><a href="#">sous-menu</a></li>
+                                <li><a href="#">sous-menu</a></li>
+                                <li><a href="#">sous-menu</a></li>
+                                <li class="divider"></li>
+                                <li><a href="#">sous-menu</a></li>
+                                <li><a href="#">sous-menu</a></li>
+                                <li><a href="#">sous-menu</a></li>
+                            </ul>
+                        </li>
+                        <li class="dropdown text-center"><a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                                Onglet<br/><span class="caret"></span></a>
+                            <ul class="dropdown-menu">
+                                <li><a href="#">sous-menu</a></li>
+                                <li><a href="#">sous-menu</a></li>
+                                <li><a href="#">sous-menu</a></li>
+                                <li class="divider"></li>
+                                <li><a href="#">sous-menu</a></li>
+                                <li><a href="#">sous-menu</a></li>
+                                <li><a href="#">sous-menu</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div> {# --end middle clumn#}
+            <div class="col-lg-4 navbar-right">
+                {# gestion de la connexion des utilisateur et l'utilisateur anonyme#}
+                <div class="row">
+                    <div>
+                        <strong>Hello</strong>
+                        {% if app.user is not defined %}
+                        {% elseif app.user == null %},
+                            <strong>non connecté</strong> {#Utilisateur anonyme#}
+                            <p>
+                                <em>
+                                    <a href="{{ path('fos_user_security_login') }}">{{ 'layout.login'|trans({}, 'FOSUserBundle') }}</a>
+                                    |
+                                    <a href="{{ path('apm_utilisateur_avm_registration') }}">enregistrez-vous</a>
+                                </em>
+                            </p>
+                        {% elseif app.user.prenom != null %} {{ app.user.prenom }}!
+                            <p>
+                                <em><a href="{{ path('apm_core_user-dashboard_show', {'id':app.user.id }) }}">dashboard</a></em>
+                                |
+                                <em><a href="{{ path('fos_user_security_logout') }}">déconnexion</a></em>
+                            </p>
+                        {% elseif app.user.nom != null %} Mr/Ms {{ app.user.nom }},
+                            <p>
+                                <em><a href="{{ path('apm_core_user-dashboard_show', {'id':app.user.id }) }}">dashboard</a></em>
+                                |
+                                <em><a href="{{ path('fos_user_security_logout') }}">déconnexion</a> </em>
+                            </p>
+                        {% elseif app.user.username != null %} utilisateur {{ app.user.username }}
+                            <p>
+                                <em><a href="{{ path('apm_core_user-dashboard_show', {'id':app.user.id }) }}">dashboard</a></em>
+                                |
+                                <em><a href="{{ path('fos_user_security_logout') }}">déconnexion</a> </em>
+                            </p>
+
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="row">
+                    <p>
+                        <strong>Panier</strong> |
+                        <strong>Notification</strong>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+</html>

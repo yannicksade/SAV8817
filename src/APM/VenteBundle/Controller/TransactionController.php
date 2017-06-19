@@ -3,6 +3,7 @@
 namespace APM\VenteBundle\Controller;
 
 use APM\UserBundle\Entity\Utilisateur_avm;
+use APM\VenteBundle\Entity\Boutique;
 use APM\VenteBundle\Entity\Transaction;
 use APM\VenteBundle\Factory\TradeFactory;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -16,36 +17,83 @@ class TransactionController extends Controller
 {
 
     /**
-     * Liste les transactions d'un individu
-     *
+     * Liste les transactions d'un individu; effectuées et recues
+     * @param Boutique $boutique
+     * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function indexAction()
+    public function indexAction(Boutique $boutique = null)
     {
-        $this->listAndShowSecurity();
-        /** @var Utilisateur_avm $user */
-        $user = $this->getUser();
-        $transactions = $user->getTransactions();
+        $this->listAndShowSecurity($boutique);
+        if ($boutique) {
+            $transactionsEffectues = $boutique->getTransactions();
+            $transactionsRecues = $boutique->getTransactionsRecues();
+        } else {
+            /** @var Utilisateur_avm $user */
+            $user = $this->getUser();
+            $transactionsEffectues = $user->getTransactionsEffectues();
+            $transactionsRecues = $user->getTransactionsRecues();
+        }
 
         return $this->render('APMVenteBundle:transaction:index.html.twig', array(
-            'transactions' => $transactions,
+            'transactionsEffectues' => $transactionsEffectues,
+            'transactionsRecues' => $transactionsRecues,
+            'boutique' => $boutique,
         ));
+    }
+
+    /**
+     * @param Boutique $boutique
+     * @param Transaction $transaction
+     */
+    private function listAndShowSecurity($boutique, $transaction = null)
+    {
+        //-----------------------------------security-------------------------------------------
+
+        $this->denyAccessUnlessGranted('ROLE_USERAVM', null, 'Unable to access this page!');
+        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
+            throw $this->createAccessDeniedException();
+        }
+        $gerant = null;
+        $proprietaire = null;
+        $auteur = null;
+        $beneficiaire = null;
+        $vendeur = null;
+        $user = $this->getUser();
+        if ($boutique) {//autoriser un ayant droit à consulter de droit ses transactions
+            $gerant = $boutique->getGerant();
+            $proprietaire = $boutique->getProprietaire();
+            $beneficiaire = $transaction->getBeneficiaire();
+        } else {
+            if ($transaction) {//s'il ne s'agit pas de la boutique, il peut s'agit de l'auteur ou du bénéficiaire qui veut avoir des informations
+                $auteur = $transaction->getAuteur();
+                $beneficiaire = $transaction->getBeneficiaire();
+            } else {
+                $vendeur = $user; //autoriser l'utilisateur AVM si l'objet ne porte pas sur ressource dédiée: boutique
+            }
+        }
+        if ($user !== $gerant && $user !== $proprietaire && $user !== $auteur && $user !== $beneficiaire && !$vendeur) {
+            throw $this->createAccessDeniedException();
+        }
+        //----------------------------------------------------------------------------------------
     }
 
     /**
      * Creates a new Transaction entity.
      * @param Request $request
+     * @param Boutique $boutique
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function newAction(Request $request)
+    public function newAction(Request $request, Boutique $boutique = null)
     {
-        $this->createSecurity();
+        $this->createSecurity($boutique);
 
         /** @var Transaction $transaction */
         $transaction = TradeFactory::getTradeProvider('transaction');
+        $transaction->setBoutique($boutique);
         $form = $this->createForm('APM\VenteBundle\Form\TransactionType', $transaction);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            $this->createSecurity();
+            $this->createSecurity($boutique);
             $transaction->setAuteur($this->getUser());
             $em = $this->getDoctrine()->getManager();
             $em->persist($transaction);
@@ -61,13 +109,37 @@ class TransactionController extends Controller
     }
 
     /**
+     * @param Boutique $boutique
+     */
+    private function createSecurity($boutique)
+    {
+        //---------------------------------security-----------------------------------------------
+        // Unable to access the controller unless you have a USERAVM role
+        $this->denyAccessUnlessGranted('ROLE_USERAVM', null, 'Unable to access this page!');
+
+        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY')) {
+            throw $this->createAccessDeniedException();
+        }
+        if ($boutique) {
+            $user = $this->getUser();
+            $gerant = $boutique->getGerant();
+            $proprietaire = $boutique->getProprietaire();
+            if ($user !== $gerant && $user !== $proprietaire) {
+                throw $this->createAccessDeniedException();
+            }
+        }
+
+        //----------------------------------------------------------------------------------------
+    }
+
+    /**
      * Finds and displays a Transaction entity.
      * @param Transaction $transaction
      * @return \Symfony\Component\HttpFoundation\Response
      */
     public function showAction(Transaction $transaction)
     {
-        $this->listAndShowSecurity();
+        $this->listAndShowSecurity($transaction->getBoutique(), $transaction);
 
         $deleteForm = $this->createDeleteForm($transaction);
         return $this->render('APMVenteBundle:transaction:show.html.twig', array(
@@ -99,13 +171,13 @@ class TransactionController extends Controller
      */
     public function editAction(Request $request, Transaction $transaction)
     {
-        $this->editAndDeleteSecurity();
+        $this->editAndDeleteSecurity($transaction);
         $deleteForm = $this->createDeleteForm($transaction);
         $editForm = $this->createForm('APM\VenteBundle\Form\TransactionType', $transaction);
         $editForm->handleRequest($request);
 
         if ($editForm->isSubmitted() && $editForm->isValid()) {
-            $this->editAndDeleteSecurity();
+            $this->editAndDeleteSecurity($transaction);
             $em = $this->getDoctrine()->getManager();
             $em->persist($transaction);
             $em->flush();
@@ -121,6 +193,38 @@ class TransactionController extends Controller
     }
 
     /**
+     * @param Transaction $transaction
+     */
+    private function editAndDeleteSecurity($transaction)
+    {
+        //---------------------------------security-----------------------------------------------
+        // Unable to access the controller unless you have a USERAVM role
+        $this->denyAccessUnlessGranted('ROLE_USERAVM', null, 'Unable to access this page!');
+
+        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY')) {
+            throw $this->createAccessDeniedException();
+        }
+        $gerant = null;
+        $proprietaire = null;
+        $auteur = null;
+        $beneficiaire = null;
+        $user = $this->getUser();
+        $boutique = $transaction->getBoutique();
+        if ($boutique) {
+            $gerant = $boutique->getGerant();
+            $proprietaire = $boutique->getProprietaire();
+        } elseif ($transaction) {//s'il ne s'agit pas de la boutique, il peut s'agit de l'auteur ou du bénéficiaire qui veut modifier des informations
+            $auteur = $transaction->getAuteur();
+            $beneficiaire = $transaction->getBeneficiaire();
+        }
+        if ($user !== $gerant && $user !== $proprietaire && $user !== $auteur && $user !== $beneficiaire) {
+            throw $this->createAccessDeniedException();
+        }
+
+        //----------------------------------------------------------------------------------------
+    }
+
+    /**
      * Deletes a Transaction entity.
      * @param Request $request
      * @param Transaction $transaction
@@ -128,12 +232,12 @@ class TransactionController extends Controller
      */
     public function deleteAction(Request $request, Transaction $transaction)
     {
-        $this->editAndDeleteSecurity();
+        $this->editAndDeleteSecurity($transaction);
         $form = $this->createDeleteForm($transaction);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $this->editAndDeleteSecurity();
+            $this->editAndDeleteSecurity($transaction);
             $em = $this->getDoctrine()->getManager();
             $em->remove($transaction);
             $em->flush();
@@ -142,47 +246,13 @@ class TransactionController extends Controller
         return $this->redirectToRoute('apm_vente_transaction_index');
     }
 
-    public function deleteFromListAction(Transaction $object)
+    public function deleteFromListAction(Transaction $transaction)
     {
-        $this->editAndDeleteSecurity();
+        $this->editAndDeleteSecurity($transaction);
         $em = $this->getDoctrine()->getManager();
-        $em->remove($object);
+        $em->remove($transaction);
         $em->flush();
 
         return $this->redirectToRoute('apm_vente_transaction_index');
-    }
-
-    private function listAndShowSecurity(){
-        //-----------------------------------security-------------------------------------------
-        // Unable to access the controller unless you have a USERAVM role
-        $this->denyAccessUnlessGranted('ROLE_USERAVM', null, 'Unable to access this page!');
-
-        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
-            throw $this->createAccessDeniedException();
-        }
-        //----------------------------------------------------------------------------------------
-    }
-
-    private function createSecurity(){
-        //---------------------------------security-----------------------------------------------
-        // Unable to access the controller unless you have a USERAVM role
-        $this->denyAccessUnlessGranted('ROLE_USERAVM', null, 'Unable to access this page!');
-
-        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY')) {
-            throw $this->createAccessDeniedException();
-        }
-        //----------------------------------------------------------------------------------------
-    }
-
-
-    private function editAndDeleteSecurity(){
-        //---------------------------------security-----------------------------------------------
-        // Unable to access the controller unless you have a USERAVM role
-        $this->denyAccessUnlessGranted('ROLE_SUPER_ADMIN', null, 'Unable to access this page!');
-
-        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY')) {
-            throw $this->createAccessDeniedException();
-        }
-        //----------------------------------------------------------------------------------------
     }
 }

@@ -1,13 +1,22 @@
-{% extends "APMAdminBundle:_Main:layout.html.twig" %}
+{% extends ":base/dashboard:layout.html.twig" %}
 
-{% block body %}
-    {#<h1>Offre de la boutique -  <a href="{{ path('apm_vente_boutique_show', { 'id': boutique.id }) }}">{{ boutique.designation }}</a></h1>#}
+{% block content_body %}
+    {{ form_start(filter) }}
+    {{ form_widget(filter) }}
+    <input type="submit" value="Go"/>
+    {{ form_end(filter) }}
+    <p>----------------------------------------------------------------</p>
+
+    <h1> Mes Offres {% if boutique -%} - <a
+            href="{{ path('apm_vente_boutique_show', { 'id': boutique.id }) }}">{{ boutique }}
+            {% if categorie %}- <a
+                href="{{ path('apm_vente_categorie_show', { 'id': categorie.id }) }}">{{ categorie }}</a>{% endif %}
+            </a>{% endif %}</h1>
     <table>
         <thead>
         <tr>
             <th>Code</th>
             <th>Désignation</th>
-            <th>Quantité</th>
             <th>Prix Unitaire</th>
             <th>Actions</th>
         </tr>
@@ -17,20 +26,24 @@
             <tr>
                 <td><a href="{{ path('apm_vente_offre_show', { 'id': offre.id }) }}">{{ offre.code }}</a></td>
                 <td>{{ offre.designation }}</td>
-                <td>{{ offre.quantite }}</td>
                 <td>{{ offre.prixUnitaire }}</td>
                 <td>
                     <ul>
-                        <li>
-                            <a href="{{ path('apm_vente_offre_show', { 'id': offre.id }) }}">show</a>
-                        </li>
-                        <li>
-                            <a href="{{ path('apm_vente_offre_edit', { 'id': offre.id }) }}">edit</a>
-                        </li>
-                        <li>
-                            <a href="{{ path('apm_vente_offre_deleteFromList', { 'id': offre.id }) }}">delete</a>
-                        </li>
 
+                        <li>
+                            <a href="{{ path('apm_vente_offre_show', { 'id': offre.id }) }}">afficher</a> |
+                        </li>
+                        {#
+                                                {% if app.user == offre.vendeur or offre.boutique !=null and offre.boutique.gerant == app.user or offre.boutique !=null and offre.boutique.proprietaire ==app.user %}
+                        #}
+                        <li>
+                            <a href="{{ path('apm_vente_offre_edit', { 'id': offre.id }) }}">modifier</a> |
+                        </li>
+                        <li>
+                            <a href="{{ path('apm_vente_offre_deleteFromList', { 'id': offre.id }) }}">supprimer</a>
+                            |
+                        </li>
+                        {#  {% endif %}#}
                     </ul>
                 </td>
             </tr>
@@ -39,18 +52,28 @@
     </table>
 
     <ul>
-        {% if boutique != null %}
-             <li>
-                <a href="{{ path('apm_vente_offre_new', {'id': boutique.id}) }}">Créer une nouvelle offre</a>
-             </li>
-        {% endif %}
-        {% if boutique == null %}
+
+        {% if app.user == vendeur or boutique !=null and boutique.gerant == app.user or boutique !=null and boutique.proprietaire ==app.user %}
             <li>
                 <a href="{{ path('apm_vente_offre_new') }}">Créer une nouvelle offre</a>
             </li>
+            {% if boutique %}
+            <li>
+                <a href="{{ path('apm_vente_categorie_new', {'id': boutique.id}) }}"> Créer une nouvelle catégorie
+                    dans
+                    la boutique </a>
+            </li>
+                <li>
+                    <a href="{{ path('apm_vente_boutique_show', {'id': boutique.id}) }}"> Afficher la boutique</a>
+                </li>
+            {% else %}
+                <li>
+                    <a href="{{ path('apm_vente_boutique_index') }}"> Liste les boutiques</a>
+            </li>
+            {% endif %}
         {% endif %}
         <li>
-            <a href="{{ path('apm_vente_categorie_new')}}">Créer une catégorie</a>
+            <a href="{{ path('apm_core_user-dashboard_index') }}"> Retour à l'accueil</a>
         </li>
     </ul>
-{% endblock %}
+{% endblock content_body %}

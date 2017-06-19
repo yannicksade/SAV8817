@@ -4,6 +4,7 @@ namespace APM\VenteBundle\Entity;
 
 use APM\TransportBundle\Entity\Livraison;
 use APM\UserBundle\Entity\Utilisateur_avm;
+use APM\VenteBundle\Entity\Boutique;
 use APM\VenteBundle\Factory\TradeFactory;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -56,6 +57,13 @@ class Transaction extends TradeFactory
     private $nature;
 
     /**
+     * @var boolean
+     * @ORM\Column(name="is_shipped", type="boolean", nullable=true)
+     *
+     */
+    private $shipped;
+
+    /**
      * @var integer
      * @Assert\Choice({0,1,2,3,4,5})
      * @ORM\Column(name="statut", type="integer", nullable=true)
@@ -75,7 +83,7 @@ class Transaction extends TradeFactory
 
     /**
      * @var Utilisateur_avm
-     * @ORM\ManyToOne(targetEntity="APM\UserBundle\Entity\Utilisateur_avm", inversedBy="transactions")
+     * @ORM\ManyToOne(targetEntity="APM\UserBundle\Entity\Utilisateur_avm", inversedBy="transactionsEffectues")
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="auteur_id", referencedColumnName="id", nullable=false)
      * })
@@ -83,10 +91,28 @@ class Transaction extends TradeFactory
     private $auteur;
 
     /**
+     * @var Utilisateur_avm
+     * @ORM\ManyToOne(targetEntity="APM\UserBundle\Entity\Utilisateur_avm", inversedBy="transactionsRecues")
+     * @ORM\JoinColumns({
+     *   @ORM\JoinColumn(name="beneficiaire_id", referencedColumnName="id", nullable=false)
+     * })
+     */
+    private $beneficiaire;
+
+    /**
+     * @var Boutique
+     * @ORM\ManyToOne(targetEntity="APM\VenteBundle\Entity\Boutique", inversedBy="transactionsRecues")
+     * @ORM\JoinColumns({
+     *   @ORM\JoinColumn(name="boutiqueBeneficiaire_id", referencedColumnName="id")
+     * })
+     */
+    private $boutiqueBeneficiaire;
+
+    /**
      * @var Livraison
      * @ORM\ManyToOne(targetEntity="APM\TransportBundle\Entity\Livraison", inversedBy="operations")
      * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="livraison_id", referencedColumnName="id", nullable=false)
+     *   @ORM\JoinColumn(name="livraison_id", referencedColumnName="id")
      * })
      */
     private $livraison;
@@ -378,5 +404,74 @@ class Transaction extends TradeFactory
         $this->boutique = $boutique;
 
         return $this;
+    }
+
+    public function __toString()
+    {
+        return $this->code;
+    }
+
+    /**
+     * Get beneficiaire
+     *
+     * @return Utilisateur_avm
+     */
+    public function getBeneficiaire()
+    {
+        return $this->beneficiaire;
+    }
+
+    /**
+     * Set beneficiaire
+     *
+     * @param Utilisateur_avm $beneficiaire
+     *
+     * @return Transaction
+     */
+    public function setBeneficiaire(Utilisateur_avm $beneficiaire)
+    {
+        $this->beneficiaire = $beneficiaire;
+
+        return $this;
+    }
+
+    /**
+     * Get boutiqueBeneficiaire
+     *
+     * @return Boutique
+     */
+    public function getBoutiqueBeneficiaire()
+    {
+        return $this->boutiqueBeneficiaire;
+    }
+
+    /**
+     * Set boutiqueBeneficiaire
+     *
+     * @param Boutique $boutiqueBeneficiaire
+     *
+     * @return Transaction
+     */
+    public function setBoutiqueBeneficiaire(Boutique $boutiqueBeneficiaire = null)
+    {
+        $this->boutiqueBeneficiaire = $boutiqueBeneficiaire;
+
+        return $this;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isShipped()
+    {
+        return $this->shipped;
+    }
+
+    /**
+     * @param boolean $shipped
+     */
+    public function setShipped(bool $shipped)
+    {
+        $this->shipped = $shipped;
     }
 }

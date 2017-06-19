@@ -11,7 +11,6 @@ use APM\MarketingDistribueBundle\Factory\TradeFactory;
 use APM\VenteBundle\Entity\Boutique;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -20,7 +19,6 @@ use Doctrine\ORM\Mapping as ORM;
  *
  * @ORM\Table(name="conseiller_boutique")
  * @ORM\Entity(repositoryClass="APM\MarketingDistribueBundle\Repository\Conseiller_boutiqueRepository")
- * @UniqueEntity("code", message="Ce code est déjà pris.")
  */
 class Conseiller_boutique extends TradeFactory
 {
@@ -33,11 +31,6 @@ class Conseiller_boutique extends TradeFactory
      */
     private $id;
 
-    /**
-     * @var string
-     * @ORM\Column(name="code", type="string")
-     */
-    private $code;
 
     /**
      * @var integer
@@ -220,19 +213,4 @@ class Conseiller_boutique extends TradeFactory
         $this->date = $date;
     }
 
-    /**
-     * @return string
-     */
-    public function getCode()
-    {
-        return $this->code;
-    }
-
-    /**
-     * @param string $code
-     */
-    public function setCode(string $code)
-    {
-        $this->code = $code;
-    }
 }

@@ -2,23 +2,22 @@
 
 namespace APM\UserBundle\Controller;
 
-use FOS\UserBundle\Controller\RegistrationController as BaseController;
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 
-class RegistrationAdminController extends BaseController
+class RegistrationAdminController extends Controller
 {
     public function registerAction(Request $request)
-    {
-        $this->securitySecurity();
+    { //accessible uniquement au super-administrateur
+        $this->security();
         $class = 'APM\UserBundle\Entity\Admin';
         return $this
                     ->get('pugx_multi_user.registration_manager')
             ->register($class);
 
-
     }
 
-    private function securitySecurity()
+    private function security()
     {
         //---------------------------------security-----------------------------------------------
         // Access reserve au super admin
@@ -38,13 +37,15 @@ class RegistrationAdminController extends BaseController
 //$em->updateUser($admin, true);
 
     /**
+     *  Recupération de l'entity manager pour la discrimination
      * @param string $class
      * @return object
      */
-//private function getManager($class){
-//        $discriminator = $this->get('pugx_user.manager.user_discriminator');
-//        $discriminator->setClass($class);
-//       return $this->get('pugx_user_manager');
-//
-//    }
+    /*private function getManager($class){
+            $discriminator = $this->get('pugx_user.manager.user_discriminator');
+            $discriminator->setClass($class);
+           return $this->get('pugx_user_manager');
+
+        }*/
+
 }

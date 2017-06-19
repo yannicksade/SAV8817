@@ -46,6 +46,9 @@ class TransactionType extends AbstractType
                     'ANNULEE' => 5
                 )
             ])
+            ->add('beneficiaire', EntityType::class, [
+                'class' => 'APMUserBundle:Utilisateur_avm'
+            ])
             ->add('livraison', EntityType::class, [
                 'class' => 'APMTransportBundle:Livraison',
                 'choice_label' => 'code',

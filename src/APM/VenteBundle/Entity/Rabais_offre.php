@@ -2,6 +2,7 @@
 
 namespace APM\VenteBundle\Entity;
 
+use APM\UserBundle\Entity\Groupe_relationnel;
 use APM\UserBundle\Entity\Utilisateur_avm;
 use APM\VenteBundle\Factory\TradeFactory;
 use Doctrine\ORM\Mapping as ORM;
@@ -64,7 +65,7 @@ class Rabais_offre extends TradeFactory
     /**
      * @var Utilisateur_avm
      *
-     * @ORM\ManyToOne(targetEntity="APM\UserBundle\Entity\Utilisateur_avm", inversedBy="rabais")
+     * @ORM\ManyToOne(targetEntity="APM\UserBundle\Entity\Utilisateur_avm", inversedBy="rabaisAccordes")
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="vendeur_id", referencedColumnName="id", nullable=false)
      * })
@@ -74,7 +75,7 @@ class Rabais_offre extends TradeFactory
     /**
      * @var Utilisateur_avm
      *
-     * @ORM\ManyToOne(targetEntity="APM\UserBundle\Entity\Utilisateur_avm")
+     * @ORM\ManyToOne(targetEntity="APM\UserBundle\Entity\Utilisateur_avm", inversedBy="rabaisRecus")
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="beneficiaire_id", referencedColumnName="id", nullable=false)
      * })
@@ -85,10 +86,21 @@ class Rabais_offre extends TradeFactory
      * @var Offre
      * @ORM\ManyToOne(targetEntity="APM\VenteBundle\Entity\Offre", inversedBy="rabais")
      * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="offre_id", referencedColumnName="id")
+     *   @ORM\JoinColumn(name="offre_id", referencedColumnName="id", nullable = false)
      * })
      */
     private $offre;
+
+
+    /**
+     * @var Groupe_relationnel
+     * @ORM\ManyToOne(targetEntity="APM\UserBundle\Entity\Groupe_relationnel", inversedBy="rabais")
+     * @ORM\JoinColumns({
+     *   @ORM\JoinColumn(name="groupe_id", referencedColumnName="id")
+     * })
+     */
+    private $groupe;
+
 
     /**
      * Constructor
@@ -278,6 +290,16 @@ class Rabais_offre extends TradeFactory
     }
 
     /**
+     * Get offre
+     *
+     * @return Offre
+     */
+    public function getOffre()
+    {
+        return $this->offre;
+    }
+
+    /**
      * Set offre
      *
      * @param Offre $offre
@@ -291,13 +313,32 @@ class Rabais_offre extends TradeFactory
         return $this;
     }
 
-    /**
-     * Get offre
-     *
-     * @return Offre
-     */
-    public function getOffre()
+    public function __toString()
     {
-        return $this->offre;
+        return $this->code;
+    }
+
+    /**
+     * Get groupe
+     *
+     * @return \APM\UserBundle\Entity\Groupe_relationnel
+     */
+    public function getGroupe()
+    {
+        return $this->groupe;
+    }
+
+    /**
+     * Set groupe
+     *
+     * @param \APM\UserBundle\Entity\Groupe_relationnel $groupe
+     *
+     * @return Rabais_offre
+     */
+    public function setGroupe(\APM\UserBundle\Entity\Groupe_relationnel $groupe = null)
+    {
+        $this->groupe = $groupe;
+
+        return $this;
     }
 }

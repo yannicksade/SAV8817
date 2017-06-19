@@ -15,15 +15,10 @@ class Conseiller_boutiqueType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('conseiller', EntityType::class, array(
-                'class' => 'APMMarketingDistribueBundle:Conseiller',
-                'choice_label' => 'code',
-                'required' => true
-            ))
             ->add('boutique', EntityType::class, array(
                 'class' => 'APMVenteBundle:Boutique',
                 'choice_label' => 'code',
-                'required' => true
+                'required' => false
             ));
     }
 

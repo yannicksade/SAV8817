@@ -1,6 +1,6 @@
-{% extends "APMAdminBundle:_Main:layout.html.twig" %}
+{% extends ":base/dashboard:layout.html.twig" %}
 
-{% block body %}
+{% block content_body %}
     <h1>Groupe_relationnel list</h1>
 
     <table>
@@ -9,7 +9,7 @@
             <th>Code</th>
             <th>Nom</th>
             <th>Type</th>
-            <th>Id</th>
+            <th>Conversational Group?</th>
             <th>Actions</th>
         </tr>
         </thead>
@@ -19,22 +19,19 @@
                 <td>
                     <a href="{{ path('apm_user_groupe-relationnel_show', { 'id': groupe_relationnel.id }) }}">{{ groupe_relationnel.code }}</a>
                 </td>
-                <td>{{ groupe_relationnel.designation }}</td>
+                <td> {{ groupe_relationnel }}</td>
                 <td>{{ groupe_relationnel.type }}</td>
-                <td>{{ groupe_relationnel.id }}</td>
+                <td>{% if groupe_relationnel.conversationalGroup %} oui {% else %} non {% endif %} </td>
                 <td>
                     <ul>
                         <li>
-                            <a href="{{ path('apm_user_groupe-relationnel_show', { 'id': groupe_relationnel.id }) }}">show</a>
+                            <a href="{{ path('apm_user_groupe-relationnel_show', { 'id': groupe_relationnel.id }) }}">Detail</a>
                         </li>
                         <li>
-                            <a href="{{ path('apm_user_groupe-relationnel_edit', { 'id': groupe_relationnel.id }) }}">edit</a>
+                            <a href="{{ path('apm_user_groupe-relationnel_edit', { 'id': groupe_relationnel.id }) }}">Modifier</a>
                         </li>
                         <li>
-                            <a href="{{ path('apm_user_groupe-relationnel_edit', { 'id': groupe_relationnel.id }) }}">edit</a>
-                        </li>
-                        <li>
-                            <a href="{{ path('apm_user_groupe-relationnel_deleteFromList', { 'id': groupe_relationnel.id }) }}">delete</a>
+                            <a href="{{ path('apm_user_groupe-relationnel_deleteFromList', { 'id': groupe_relationnel.id }) }}">Supprimer</a>
                         </li>
 
                     </ul>
@@ -45,8 +42,12 @@
     </table>
 
     <ul>
+
         <li>
-            <a href="{{ path('apm_user_groupe-relationnel_new') }}">Create a new entry</a>
+            <a href="{{ path('apm_user_groupe-relationnel_new') }}">Créer un nouveau groupe</a>
+        </li>
+        <li>
+            <a href="{{ path('apm_user_individu-to-groupe_new') }}">Créer une relation</a>
         </li>
     </ul>
-{% endblock %}
+{% endblock content_body %}

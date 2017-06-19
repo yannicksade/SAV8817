@@ -5,6 +5,10 @@
     <table>
         <tbody>
         <tr>
+            <th>Offre</th>
+            <td><strong>{{ remise.offre }}</strong></td>
+        </tr>
+        <tr>
             <th>Code</th>
             <td>{{remise.code }}</td>
         </tr>
@@ -28,22 +32,18 @@
             <th>Valeur</th>
             <td>{{ remise.valeur }}</td>
         </tr>
-        <tr>
-            <th>Id</th>
-            <td>{{ remise.id }}</td>
-        </tr>
         </tbody>
     </table>
 
     <ul>
         <li>
-            <a href="{{ path('apm_vente_remise_index', {'id': remise.offre.id}) }}">Back to the list</a>
+            <a href="{{ path('apm_vente_remise_offre_index', {'id': remise.offre.id}) }}">Back to the list</a>
         </li>
         <li>
             <a href="{{ path('apm_vente_remise_edit', { 'id': remise.id }) }}">Edit</a>
         </li>
         <li>
-            <a href="{{ path('apm_vente_remise_new', {'id': remise.offre.id}) }}">Add a new</a>
+            <a href="{{ path('apm_vente_remise_offre_new', {'id': remise.offre.id}) }}">Add a new</a>
         </li>
 
         <li>

@@ -1,6 +1,7 @@
-{% extends "APMAdminBundle:_Main:layout.html.twig" %}
+{% extends ":base/dashboard:layout.html.twig" %}
 
-{% block body %}
+{% block content_body %}
+
     <h1>Groupe_relationnel</h1>
 
     <table>
@@ -10,29 +11,52 @@
             <td>{{ groupe_relationnel.description }}</td>
         </tr>
         <tr>
-            <th>Nom</th>
+            <th>Désignation</th>
             <td>{{ groupe_relationnel.designation }}</td>
+        </tr>
+        <tr>
+            <th>Proprietaire</th>
+            <td>{{ groupe_relationnel.proprietaire }}</td>
         </tr>
         <tr>
             <th>Type</th>
             <td>{{ groupe_relationnel.type }}</td>
         </tr>
         <tr>
+            <th>Groupe de discussion?</th>
+            <td>{% if groupe_relationnel.conversationalGroup %} oui {% else %} non {% endif %} </td>
+        </tr>
+        <tr>
             <th>Code</th>
             <td>{{ groupe_relationnel.code }}</td>
+        </tr>
+        <tr>
+            <th>Image</th>
+            <td><img src="{{ asset(url_image ~ groupe_relationnel.image) }}"/></td>
         </tr>
         </tbody>
     </table>
 
     <ul>
         <li>
-            <a href="{{ path('apm_user_groupe-relationnel_index') }}">Back to the list</a>
+            <a href="{{ path('apm_user_groupe-relationnel_index') }}">Retour à la liste des groupes</a>
         </li>
         <li>
-            <a href="{{ path('apm_user_groupe-relationnel_edit', { 'id': groupe_relationnel.id }) }}">Edit</a>
+            <a href="{{ path('apm_user_individu-to-groupe_index') }}">Retour à la liste des groupes relationnels</a>
         </li>
         <li>
-            <a href="{{ path('apm_user_groupe-relationnel_new') }}">Add a new one</a>
+            <a href="{{ path('apm_user_groupe-relationnel_edit', { 'id': groupe_relationnel.id }) }}">Modifier</a>
+        </li>
+        <li>
+            <a href="{{ path('apm_user_groupe-relationnel_new') }}">Créer un nouveau groupe</a>
+        </li>
+        <li>
+            <a href="{{ path('apm_user_individu_to_groupe_liste-user_index', {'id':groupe_relationnel.id}) }}">Liste les
+                utilisateurs du groupe</a>
+        </li>
+        <li>
+            <a href="{{ path('apm_user_groupe_individu_new', {'id':groupe_relationnel.id}) }}">Affecter une personne au
+                groupe</a>
         </li>
         <li>
             {{ form_start(delete_form) }}
@@ -40,4 +64,4 @@
             {{ form_end(delete_form) }}
         </li>
     </ul>
-{% endblock %}
+{% endblock content_body %}

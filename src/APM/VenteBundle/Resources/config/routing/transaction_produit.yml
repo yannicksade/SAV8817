@@ -1,6 +1,21 @@
-apm_vente_transaction_produit_index:
+apm_vente_transaction_produit_user_index:
     path:     /
     defaults: { _controller: "APMVenteBundle:Transaction_produit:index" }
+    methods:  GET
+
+apm_vente_transaction_produit_offre_index:
+    path:     /offre/{offre_id}
+    defaults: { _controller: "APMVenteBundle:Transaction_produit:index" }
+    methods:  GET
+
+apm_vente_transaction_produit_boutique_index:
+    path:     /boutique/{id}
+    defaults: { _controller: "APMVenteBundle:Transaction_produit:index" }
+    methods:  GET
+
+apm_vente_transaction_produit_liste_index:
+    path:     /liste/offres-transaction/{id}
+    defaults: { _controller: "APMVenteBundle:Transaction_produit:listeOffres" }
     methods:  GET
 
 apm_vente_transaction_produit_show:
@@ -9,7 +24,12 @@ apm_vente_transaction_produit_show:
     methods:  GET
 
 apm_vente_transaction_produit_new:
-    path:     /new
+    path:     /transaction-produit/new/{id}
+    defaults: { _controller: "APMVenteBundle:Transaction_produit:new" }
+    methods:  [GET, POST]
+
+apm_vente_transaction_produit_accueil_new:
+    path:     /transaction-offre/new
     defaults: { _controller: "APMVenteBundle:Transaction_produit:new" }
     methods:  [GET, POST]
 

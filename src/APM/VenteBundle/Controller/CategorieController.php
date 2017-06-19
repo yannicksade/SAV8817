@@ -32,22 +32,40 @@ class CategorieController extends Controller
         ));
     }
 
-    private function getEM()
+    /**
+     * @param Boutique $boutique
+     */
+    private function listAndShowSecurity($boutique = null)
     {
-        return $this->get('doctrine.orm.entity_manager');
+        //-----------------------------------security-------------------------------------------
+        // Unable to access the controller unless you have a USERAVM role
+        $this->denyAccessUnlessGranted(['ROLE_BOUTIQUE', 'ROLE_USERAVM'], null, 'Unable to access this page!');
+        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
+            throw $this->createAccessDeniedException();
+        }
+        if ($boutique) {
+            $user = $this->getUser();
+            $proprietaire = $boutique->getProprietaire();
+            $gerant = $boutique->getGerant();
+            if ($user !== $gerant && $user !== $proprietaire) {
+                throw $this->createAccessDeniedException();
+            }
+        }
+        //----------------------------------------------------------------------------------------
     }
 
     /**
-     * Creates a new Categorie entity.
+     * Creates les catégories sont créées uniquement dans les boutiques
      * @param Request $request
      * @param Boutique $boutique
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function newAction(Request $request, Boutique $boutique=null)
+    public function newAction(Request $request, Boutique $boutique = null)
     {
         $this->createSecurity($boutique);
         /** @var Categorie $categorie */
         $categorie = TradeFactory::getTradeProvider('categorie');
+        $categorie->setBoutique($boutique);
         $form = $this->createForm(CategorieType::class, $categorie);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
@@ -62,6 +80,42 @@ class CategorieController extends Controller
             'form' => $form->createView(),
             'boutique' => $boutique
         ));
+    }
+
+    /**
+     * @param Boutique $boutique
+     * @param Categorie $categorieCourante
+     */
+    private function createSecurity($boutique = null, $categorieCourante = null)
+    {
+        //---------------------------------security-----------------------------------------------
+        // Unable to access the controller unless you have a USERAVM role
+        $this->denyAccessUnlessGranted('ROLE_BOUTIQUE', null, 'Unable to access this page!');
+
+        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY')) {
+            throw $this->createAccessDeniedException();
+        }
+        //Interdire tout utilisateur si ce n'est pas le gerant ou le proprietaire
+        if ($boutique) {
+            $user = $this->getUser();
+            $gerant = $boutique->getGerant();
+            $proprietaire = $boutique->getProprietaire();
+            if ($user !== $gerant && $user !== $proprietaire) {
+                throw $this->createAccessDeniedException();
+            }
+            if ($categorieCourante) {
+                $currentBoutique = $categorieCourante->getBoutique();
+                if ($currentBoutique !== $boutique) {
+                    throw $this->createAccessDeniedException();
+                }
+            }
+        }
+        //----------------------------------------------------------------------------------------
+    }
+
+    private function getEM()
+    {
+        return $this->get('doctrine.orm.entity_manager');
     }
 
     /**
@@ -125,6 +179,30 @@ class CategorieController extends Controller
     }
 
     /**
+     * @param Categorie $categorie
+     */
+    private function editAndDeleteSecurity($categorie)
+    {
+        //---------------------------------security-----------------------------------------------
+        // Unable to access the controller unless you have a USERAVM role
+        $this->denyAccessUnlessGranted('ROLE_BOUTIQUE', null, 'Unable to access this page!');
+
+        /* ensure that the user is logged in
+        *  and that the one is the owner
+         * Interdire tout utilisateur si ce n'est pas le gerant ou le proprietaire
+        */
+        $user = $this->getUser();
+        $boutique = $categorie->getBoutique();
+        $gerant = $boutique->getGerant();
+        $proprietaire = $boutique->getProprietaire();
+        if ((!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY')) || ($gerant !== $user && $user !== $proprietaire)) {
+            throw $this->createAccessDeniedException();
+        }
+        //----------------------------------------------------------------------------------------
+
+    }
+
+    /**
      * Deletes a Categorie entity.
      * @param Request $request
      * @param Categorie $categorie
@@ -156,77 +234,5 @@ class CategorieController extends Controller
         $em->flush();
 
         return $this->redirectToRoute('apm_vente_categorie_index', ['id' =>$categorie->getBoutique()->getId()]);
-    }
-
-    /**
-     * @param Boutique $boutique
-     */
-    private function listAndShowSecurity($boutique = null){
-        //-----------------------------------security-------------------------------------------
-        // Unable to access the controller unless you have a USERAVM role
-        $this->denyAccessUnlessGranted(['ROLE_BOUTIQUE', 'ROLE_USERAVM'], null, 'Unable to access this page!');
-        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
-            throw $this->createAccessDeniedException();}
-            if($boutique ){
-                $user = $this->getUser();
-                $proprietaire = $boutique->getProprietaire();
-                $gerant = $boutique->getGerant();
-            if ($user !== $gerant && $user !== $proprietaire) {
-                throw $this->createAccessDeniedException();
-            }
-        }
-        //----------------------------------------------------------------------------------------
-    }
-
-    /**
-     * @param Boutique $boutique
-     * @param Categorie $categorieCourante
-     */
-    private function createSecurity($boutique = null, $categorieCourante=null){
-        //---------------------------------security-----------------------------------------------
-        // Unable to access the controller unless you have a USERAVM role
-        $this->denyAccessUnlessGranted('ROLE_BOUTIQUE', null, 'Unable to access this page!');
-
-        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY')) {
-            throw $this->createAccessDeniedException();
-        }
-        //Interdire tout utilisateur si ce n'est pas le gerant ou le proprietaire
-        if($boutique) {
-            $user = $this->getUser();
-            $gerant = $boutique->getGerant();
-            $proprietaire = $boutique->getProprietaire();
-            if ($user !== $gerant&&$user !==$proprietaire) {
-                throw $this->createAccessDeniedException();
-            }
-            if($categorieCourante){
-                $currentBoutique = $categorieCourante->getBoutique();
-                 if($currentBoutique !== $boutique) {
-                     throw $this->createAccessDeniedException();}
-            }
-        }
-        //----------------------------------------------------------------------------------------
-    }
-
-    /**
-     * @param Categorie $categorie
-     */
-    private function editAndDeleteSecurity($categorie){
-        //---------------------------------security-----------------------------------------------
-        // Unable to access the controller unless you have a USERAVM role
-        $this->denyAccessUnlessGranted('ROLE_BOUTIQUE', null, 'Unable to access this page!');
-
-        /* ensure that the user is logged in
-        *  and that the one is the owner
-         * Interdire tout utilisateur si ce n'est pas le gerant ou le proprietaire
-        */
-        $user = $this->getUser();
-        $boutique = $categorie->getBoutique();
-        $gerant = $boutique->getGerant();
-        $proprietaire = $boutique->getProprietaire();
-        if ((!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY')) || ( $gerant !== $user && $user !== $proprietaire) ) {
-            throw $this->createAccessDeniedException();
-        }
-        //----------------------------------------------------------------------------------------
-
     }
 }

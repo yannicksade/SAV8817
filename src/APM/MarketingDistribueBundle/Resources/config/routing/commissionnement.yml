@@ -1,5 +1,16 @@
 apm_marketing_commissionnement_index:
-    path:     /{id}
+    path:     /
+    defaults: { _controller: "APMMarketingDistribueBundle:Commissionnement:index" }
+    methods:  GET
+
+apm_marketing_commissionnement_boutique_index:
+    path:     /boutique/{id}
+    defaults: { _controller: "APMMarketingDistribueBundle:Commissionnement:index" }
+    methods:  GET
+
+
+apm_marketing_commissionnement_conseiller-boutique_index:
+    path:     /conseiller-boutique/{id}
     defaults: { _controller: "APMMarketingDistribueBundle:Commissionnement:index" }
     methods:  GET
 

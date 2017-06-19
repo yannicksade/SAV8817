@@ -3,13 +3,18 @@ apm_achat_specification_achat_index:
     defaults: { _controller: "APMAchatBundle:Specification_achat:index" }
     methods:  GET
 
+apm_achat_specification_achat_offre_index:
+    path:     /offre/{id}
+    defaults: { _controller: "APMAchatBundle:Specification_achat:index" }
+    methods:  GET
+
 apm_achat_specification_achat_show:
     path:     /{id}/show
     defaults: { _controller: "APMAchatBundle:Specification_achat:show" }
     methods:  GET
 
 apm_achat_specification_achat_new:
-    path:     /new
+    path:     /new/{id}
     defaults: { _controller: "APMAchatBundle:Specification_achat:new" }
     methods:  [GET, POST]
 

@@ -1,7 +1,7 @@
-{% extends "APMAdminBundle:_Main:layout.html.twig" %}
+{% extends ":base/dashboard:layout.html.twig" %}
 
-{% block body %}
-    <h1>Boutique creation</h1>
+{% block content_body %}
+    <h1> Boutique creation</h1>
 
     {{ form_start(form) }}
     {{ form_widget(form) }}
@@ -13,4 +13,4 @@
             <a href="{{ path('apm_vente_boutique_index') }}">Back to the list</a>
         </li>
     </ul>
-{% endblock %}
+{% endblock content_body %}

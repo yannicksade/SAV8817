@@ -8,6 +8,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Vich\UploaderBundle\Form\Type\VichImageType;
 
 class Groupe_relationnelType extends AbstractType
 {
@@ -18,6 +19,7 @@ class Groupe_relationnelType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
+            ->add('conversationalGroup')
             ->add('designation', TextType::class)
             ->add('description', TextareaType::class, ["required" => false])
             ->add('type', ChoiceType::class, array(
@@ -32,6 +34,11 @@ class Groupe_relationnelType extends AbstractType
                     'COLLABORATEUR' => 7,
                     'Autre' => 8
                 ]))
+            ->add('imageFile', VichImageType::class, [
+                'required' => false,
+                'allow_delete' => true,
+
+            ])
             ;
     }
 

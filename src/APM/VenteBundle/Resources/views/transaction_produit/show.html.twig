@@ -1,7 +1,7 @@
 {% extends "APMAdminBundle:_Main:layout.html.twig" %}
 
 {% block body %}
-    <h1>Transaction_produit</h1>
+    <h1>Transaction Produit</h1>
 
     <table>
         <tbody>
@@ -9,28 +9,60 @@
             <th>Code</th>
             <td>{{ transaction_produit.transaction.code }}</td>
         </tr>
+        {% if transaction_produit.transaction.boutique %}
+            <tr>
+                <th>Boutique</th>
+                <td>
+                    <a href="{{ path('apm_vente_boutique_show', {'id':transaction_produit.transaction.boutique.id}) }}"> {{ transaction_produit.transaction.boutique }}</a>
+                </td>
+            </tr>
+        {% endif %}
         <tr>
             <th>Reférence</th>
             <td>{{ transaction_produit.reference }}</td>
         </tr>
+
         <tr>
             <th>Quantite</th>
             <td>{{ transaction_produit.quantite }}</td>
         </tr>
+
         </tbody>
     </table>
 
     <ul>
         <li>
-            <a href="{{ path('apm_vente_transaction_produit_index') }}">Back to the list</a>
+            <a href="{{ path('apm_vente_transaction_produit_liste_index',{'id': transaction_produit.transaction.id}) }}">afficher
+                les offres de cette transaction</a>
         </li>
-        <li>
-            <a href="{{ path('apm_vente_transaction_produit_edit', { 'id': transaction_produit.id }) }}">Edit</a>
-        </li>
-        <li>
-            <a href="{{ path('apm_vente_transaction_produit_new') }}">Add a new one</a>
-        </li>
+        {% if transaction_produit.transaction.auteur == app.user %}
+            {% if transaction_produit.transaction.boutique %}
+                <li>
+                    <a href="{{ path('apm_transport_livraison_operation_boutique',{'id':transaction_produit.transaction.boutique.id, 'transaction_id': transaction_produit.transaction.id }) }}">Livrer
+                        cette transaction boutique</a>
+                </li>
+            {% else %}
+                <li>
+                    <a href="{{ path('apm_transport_livraison_operation',{'transaction_id': transaction_produit.transaction.id }) }}">Livrer
+                        cette transaction</a>
+                </li>
+            {% endif %}
 
+            {#<li>
+                <a href="{{ path('apm_vente_transaction_produit_offre_index',{'id': transaction_produit.produit.id}) }}">Retour à la liste des transactions sur </a>
+            </li>#}
+            <li>
+                <a href="{{ path('apm_vente_transaction_produit_edit', { 'id': transaction_produit.id }) }}">modifier</a>
+            </li>
+            <li>
+                <a href="{{ path('apm_vente_transaction_produit_new',{'id': transaction_produit.produit.id}) }}">Créer
+                    une nouvelle transaction du produit</a>
+            </li>
+        {% endif %}
+        <li>
+            <a href="{{ path('apm_vente_transaction_produit_user_index') }}">Retour à la liste de mes transactions
+                produits</a>
+        </li>
         <li>
             {{ form_start(delete_form) }}
             <input type="submit" value="Delete">

@@ -1,52 +1,59 @@
 {% extends "APMAdminBundle:_Main:layout.html.twig" %}
 
 {% block body %}
-    <h1>Categorie</h1>
+    <h1>{{ categorie }} - <a href="{{ path('apm_vente_boutique_index') }}"> {{- categorie.boutique }}</a></h1>
 
     <table>
         <tbody>
         <tr>
-            <th>Description</th>
-            <td>{{ categorie.description }}</td>
+            <th>Code:</th>
+            <td>{{ categorie.code }}</td>
         </tr>
         <tr>
-            <th>Designation</th>
+            <th>Designation:</th>
             <td>{{ categorie.designation }}</td>
         </tr>
         <tr>
-            <th>Livrable</th>
-            <td>{% if categorie.livrable %}Yes{% else %}No{% endif %}</td>
+            <th>Categorie parent:</th>
+            <td>{% if categorie.categorieCourante %}<a
+                    href="{{ path('apm_vente_categorie_show', {'id': categorie.categorieCourante.id}) }}">{{ categorie.categorieCourante.designation }}</a>{% endif %}
+            </td>
         </tr>
         <tr>
-            <th>Code</th>
-            <td>{{ categorie.code }}</td>
+            <th>Description:</th>
+            <td>{{ categorie.description }}</td>
         </tr>
+        <tr>
+            <th>Produit Livrable ?:</th>
+            <td>{% if categorie.livrable %}Yes{% else %}No{% endif %}</td>
+        </tr>
+
         <tr>
             <th>Image</th>
             <td>{{ categorie.image }}</td>
         </tr>
-        <tr>
-            <th>Offres</th>
+        {#<tr>
+            <th>Offres de la catégorie</th>
             {% for offre in categorie.offres %}
-                <td>{{ offre.designation }}</td>
+                <td> <a href="{{ path('apm_vente_offre_show', {'id': offre.id}) }}">{{ offre.designation }}</a>,</td>
             {% endfor %}
-        </tr>
-        <tr>
-            <th>Categorie parent</th>
-            <td> {% if categorie.categorieCourante==null %} - {% else %} {{ categorie.categorieCourante.designation }}{% endif %}</td>
-        </tr>
+        </tr>#}
         </tbody>
     </table>
 
     <ul>
         <li>
-            <a href="{{ path('apm_vente_categorie_index', {'id': categorie.boutique.id}) }}">Back to the list</a>
+            <a href="{{ path('apm_vente_offre_boutique-categorie_index', {'id': categorie.boutique.id, 'categorie_id': categorie.id}) }}">Liste
+                les offres de cette catégorie</a>
         </li>
         <li>
-            <a href="{{ path('apm_vente_categorie_edit', { 'id': categorie.id }) }}">Edit</a>
+            <a href="{{ path('apm_vente_categorie_index', {'id': categorie.boutique.id}) }}">Retour à la liste</a>
         </li>
         <li>
-            <a href="{{ path('apm_vente_categorie_new', {'id': categorie.boutique.id}) }}">Add a new one</a>
+            <a href="{{ path('apm_vente_categorie_edit', { 'id': categorie.id }) }}">Modifier</a>
+        </li>
+        <li>
+            <a href="{{ path('apm_vente_categorie_new', {'id': categorie.boutique.id}) }}">Créer une nouvelle</a>
         </li>
         {% if delete_form %}
         <li>

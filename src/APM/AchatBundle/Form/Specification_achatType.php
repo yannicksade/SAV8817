@@ -24,10 +24,9 @@ class Specification_achatType extends AbstractType
                 'label' => 'Livrable ?',
                 'required' => false
             ])
-            ->add('avis', TextareaType::class, ['required' => false])
             ->add('dateLivraisonSouhaite', DateTimeType::class)
-            ->add('echantillon')->add('offre', EntityType::class, ["required" => true])
-
+            ->add('avis', TextareaType::class, ['required' => false])
+            ->add('echantillon')
         ;
     }
     

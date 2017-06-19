@@ -3,13 +3,14 @@
 namespace APM\MarketingDistribueBundle\Entity;
 
 use APM\MarketingDistribueBundle\Factory\TradeFactory;
-use APM\MarketingReseauBundle\Entity\Reseau_conseillers;
+
 use APM\UserBundle\Entity\Utilisateur_avm;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+
 
 /**
  * Conseiller
@@ -21,7 +22,6 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
  */
 class Conseiller extends TradeFactory
 {
-    public static $MAX_INSTANCE_RESEAU = 2;
     /**
      * @var string
      *
@@ -34,6 +34,13 @@ class Conseiller extends TradeFactory
      * @ORM\Column(name="dateEnregistrement", type="datetime", nullable=true)
      */
     private $dateEnregistrement;
+
+    /**
+     * @var \DateTime
+     * @Assert\DateTime
+     * @ORM\Column(name="dateCreationReseau", type="datetime", nullable=true)
+     */
+    private $dateCreationReseau;
     /**
      * @var string
      * @Assert\Length(min=2, max=254)
@@ -46,15 +53,20 @@ class Conseiller extends TradeFactory
      * @Assert\Choice({0,1})
      * @ORM\Column(name="estConseillerA2", type="boolean", nullable=true)
      */
-    private $conseillerA2;
+    private $isConseillerA2;
+
+    /**
+     * @var integer
+     * @ORM\Column(name="nombreInstance", type="integer", nullable=true)
+     */
+    private $nombreInstanceReseau;
 
     /**
      * @var string
-     * @Assert\NotBlank
      * @Assert\Length(min=2, max=100)
      * @ORM\Column(name="matricule", type="string", length=255, nullable=true)
      */
-    private $matricule;
+    private $matricule; // à utiliser dans le réseau de conseiller pour distinguer les membres plus facilement
 
     /**
      * @var integer
@@ -76,27 +88,9 @@ class Conseiller extends TradeFactory
      * @var Utilisateur_avm
      *
      * @ORM\OneToOne(targetEntity="APM\UserBundle\Entity\Utilisateur_avm", inversedBy="profileConseiller")
-     * @ORM\JoinColumn(name="utilisateur_id", referencedColumnName="id", nullable=false)
-     *
+     * @ORM\JoinColumn(name="utilisateur_id", referencedColumnName="id" , nullable=true)
      */
     private $utilisateur;
-
-
-    /**
-     * @var Reseau_conseillers
-     *
-     * @ORM\ManyToOne(targetEntity="APM\MarketingReseauBundle\Entity\Reseau_conseillers", inversedBy="advisors")
-     * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="reseau_id", referencedColumnName="id")
-     * })
-     */
-    private $reseau;
-
-    /**
-     * @var Reseau_conseillers
-     * @ORM\OneToMany(targetEntity="APM\MarketingReseauBundle\Entity\Reseau_conseillers", mappedBy="conseillerProprietaire")
-     */
-    private $reseauxProprietaire;
 
     /**
      * @var Collection
@@ -105,14 +99,38 @@ class Conseiller extends TradeFactory
     private $conseillerBoutiques;
 
     /**
+     * @var Conseiller
+     *
+     * @ORM\ManyToOne(targetEntity="APM\MarketingDistribueBundle\Entity\Conseiller")
+     */
+    private $masterConseiller;
+
+
+    /**
+     * @var Conseiller
+     *
+     * @ORM\OneToOne(targetEntity="APM\MarketingDistribueBundle\Entity\Conseiller")
+     */
+    private $conseillerDroite;
+
+    /**
+     * @var Conseiller
+     *
+     * @ORM\OneToOne(targetEntity="APM\MarketingDistribueBundle\Entity\Conseiller")
+     */
+    private $conseillerGauche;
+
+
+    /**
      * Constructor
      * @param string $var
      */
     public function __construct($var)
     {
         $this->conseillerBoutiques = new ArrayCollection();
-        $this->reseauxProprietaire = new ArrayCollection();
         $this->code = "AD" . $var;
+        $this->nombreInstanceReseau = 0;
+        $this->dateEnregistrement = new \DateTime();
     }
 
     /**
@@ -194,7 +212,31 @@ class Conseiller extends TradeFactory
      */
     public function isConseillerA2()
     {
-        return $this->conseillerA2;
+        return $this->isConseillerA2;
+    }
+
+    /**
+     * Get isConseillerA2
+     *
+     * @return boolean
+     */
+    public function getIsConseillerA2()
+    {
+        return $this->isConseillerA2;
+    }
+
+    /**
+     * Set isConseillerA2
+     *
+     * @param boolean $isConseillerA2
+     *
+     * @return Conseiller
+     */
+    public function setIsConseillerA2($isConseillerA2)
+    {
+        $this->isConseillerA2 = $isConseillerA2;
+
+        return $this;
     }
 
     /**
@@ -204,7 +246,7 @@ class Conseiller extends TradeFactory
      */
     public function getConseillerA2()
     {
-        return $this->conseillerA2;
+        return $this->isConseillerA2;
     }
 
     /**
@@ -216,7 +258,7 @@ class Conseiller extends TradeFactory
      */
     public function setConseillerA2($estConseillerA2)
     {
-        $this->conseillerA2 = $estConseillerA2;
+        $this->isConseillerA2 = $estConseillerA2;
 
         return $this;
     }
@@ -304,31 +346,6 @@ class Conseiller extends TradeFactory
     }
 
     /**
-     * Get reseau
-     *
-     * @return Reseau_conseillers
-     */
-    public function getReseau()
-    {
-        return $this->reseau;
-    }
-
-    /**
-     * Set reseau
-     *
-     * @param Reseau_conseillers $reseau
-     *
-     * @return Conseiller
-     */
-    public function setReseau(Reseau_conseillers $reseau)
-    {
-        $this->reseau = $reseau;
-
-        return $this;
-    }
-
-
-    /**
      * Add conseillerBoutique
      *
      * @param Conseiller_boutique $conseillerBoutique
@@ -362,38 +379,118 @@ class Conseiller extends TradeFactory
         return $this->conseillerBoutiques;
     }
 
+    /**
+     * @return int
+     */
+    public function getNombreInstanceReseau()
+    {
+        return $this->nombreInstanceReseau;
+    }
 
     /**
-     * Add reseauxProprietaire
-     *
-     * @param Reseau_conseillers $reseauxProprietaire
+     * @param int $nombreInstanceReseau
+     */
+    public function setNombreInstanceReseau(int $nombreInstanceReseau)
+    {
+        $this->nombreInstanceReseau = $nombreInstanceReseau;
+    }
+
+    /**
+     * Get masterConseiller
      *
      * @return Conseiller
      */
-    public function addReseauxProprietaire(Reseau_conseillers $reseauxProprietaire)
+    public function getMasterConseiller()
     {
-        $this->reseauxProprietaire[] = $reseauxProprietaire;
+        return $this->masterConseiller;
+    }
+
+    /**
+     * Set masterConseiller
+     *
+     * @param Conseiller $masterConseiller
+     *
+     * @return Conseiller
+     */
+    public function setMasterConseiller(Conseiller $masterConseiller = null)
+    {
+        $this->masterConseiller = $masterConseiller;
 
         return $this;
     }
 
     /**
-     * Remove reseauxProprietaire
+     * Get conseillerDroite
      *
-     * @param Reseau_conseillers $reseauxProprietaire
+     * @return Conseiller
      */
-    public function removeReseauxProprietaire(Reseau_conseillers $reseauxProprietaire)
+    public function getConseillerDroite()
     {
-        $this->reseauxProprietaire->removeElement($reseauxProprietaire);
+        return $this->conseillerDroite;
     }
 
     /**
-     * Get reseauxProprietaire
+     * Set conseillerDroite
      *
-     * @return Collection
+     * @param Conseiller $conseillerDroite
+     *
+     * @return Conseiller
      */
-    public function getReseauxProprietaire()
+    public function setConseillerDroite(Conseiller $conseillerDroite = null)
     {
-        return $this->reseauxProprietaire;
+        $this->conseillerDroite = $conseillerDroite;
+
+        return $this;
     }
+
+    /**
+     * Get conseillerGauche
+     *
+     * @return Conseiller
+     */
+    public function getConseillerGauche()
+    {
+        return $this->conseillerGauche;
+    }
+
+    /**
+     * Set conseillerGauche
+     *
+     * @param Conseiller $conseillerGauche
+     *
+     * @return Conseiller
+     */
+    public function setConseillerGauche(Conseiller $conseillerGauche = null)
+    {
+        $this->conseillerGauche = $conseillerGauche;
+
+        return $this;
+    }
+
+    /**
+     * @return \DateTime
+     */
+    public function getDateCreationReseau()
+    {
+        return $this->dateCreationReseau;
+    }
+
+    /**
+     * @param \DateTime $dateCreationReseau
+     */
+    public function setDateCreationReseau(\DateTime $dateCreationReseau = null)
+    {
+        $this->dateCreationReseau = $dateCreationReseau;
+    }
+
+    public function __toString()
+    {
+        return $this->matricule ? $this->matricule : $this->code;
+    }
+
+    /* public function __clone()
+     {
+         $this->conseillerGauche = clone $this->conseillerGauche;
+         $this->conseillerDroite = clone $this->conseillerDroite;
+     }*/
 }

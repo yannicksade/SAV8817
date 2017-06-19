@@ -63,12 +63,6 @@ class Categorie extends TradeFactory
      */
     private $etat;
 
-    /**
-     * @var string
-     * @Assert\Url
-     * @ORM\Column(name="image", type="string", length=255, nullable=true)
-     */
-    private $image;
 
     /**
      * Id
@@ -102,7 +96,7 @@ class Categorie extends TradeFactory
      * @var Boutique
      * @ORM\ManyToOne(targetEntity="APM\VenteBundle\Entity\Boutique", inversedBy="categories")
      * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="boutique_id", referencedColumnName="id", nullable=true)
+     *   @ORM\JoinColumn(name="boutique_id", referencedColumnName="id", nullable=false)
      *     })
      */
     private $boutique;
@@ -219,30 +213,6 @@ class Categorie extends TradeFactory
     public function setEtat($etat)
     {
         $this->etat = $etat;
-
-        return $this;
-    }
-
-    /**
-     * Get image
-     *
-     * @return string
-     */
-    public function getImage()
-    {
-        return $this->image;
-    }
-
-    /**
-     * Set image
-     *
-     * @param string $image
-     *
-     * @return Categorie
-     */
-    public function setImage($image)
-    {
-        $this->image = $image;
 
         return $this;
     }
@@ -386,5 +356,10 @@ class Categorie extends TradeFactory
         $this->boutique = $boutique;
 
         return $this;
+    }
+
+    public function __toString()
+    {
+        return $this->designation;
     }
 }

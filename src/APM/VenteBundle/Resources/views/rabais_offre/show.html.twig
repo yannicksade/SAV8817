@@ -1,42 +1,42 @@
 {% extends "APMAdminBundle:_Main:layout.html.twig" %}
 
 {% block body %}
-    <h1>Rabais_offre</h1>
+    Rabais - <a href="{{ path('apm_vente_offre_show',{'id':rabais_offre.offre.id}) }}">{{ rabais_offre.offre }}</a>
 
     <table>
         <tbody>
         <tr>
-            <th>Datelimite</th>
+            <th>Code</th>
+            <td>{{ rabais_offre.code }}</td>
+        </tr>
+        <tr>
+            <th>Date Limite</th>
             <td>{% if rabais_offre.dateLimite %}{{ rabais_offre.dateLimite|date('Y-m-d H:i:s') }}{% endif %}</td>
         </tr>
         <tr>
-            <th>Nombredefois</th>
+            <th>Nombre d'utilisation</th>
             <td>{{ rabais_offre.nombreDefois }}</td>
         </tr>
         <tr>
-            <th>Prix update</th>
+            <th>Prix revu</th>
             <td>{{ rabais_offre.prixUpdate }}</td>
         </tr>
         <tr>
-            <th>Quantitemin</th>
+            <th>Quantité minimum</th>
             <td>{{ rabais_offre.quantiteMin }}</td>
-        </tr>
-        <tr>
-            <th>Id</th>
-            <td>{{ rabais_offre.code }}</td>
         </tr>
         </tbody>
     </table>
 
     <ul>
         <li>
-            <a href="{{ path('apm_vente_rabais_offre_index') }}">Back to the list</a>
+            <a href="{{ path('apm_vente_rabais_offre_index', {'id':rabais_offre.offre.id}) }}">Retour à la liste</a>
         </li>
         <li>
             <a href="{{ path('apm_vente_rabais_offre_edit', { 'id': rabais_offre.id }) }}">Edit</a>
         </li>
         <li>
-            <a href="{{ path('apm_vente_rabais_offre_new') }}">Add a new one</a>
+            <a href="{{ path('apm_vente_rabais_offre_new',{'id':rabais_offre.offre.id}) }}">Créer un nouveau rabais</a>
         </li>
 
         <li>

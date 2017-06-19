@@ -16,7 +16,7 @@ security:
 
     #--------------------------------------------
     #---Rôle du  super administrateur
-        ROLE_SUPER_ADMIN: [ROLE_ADMIN,ROLE_BOUTIQUE,ROLE_TRANSPORTEUR,ROLE_CONSEILLER]
+        ROLE_SUPER_ADMIN: [ROLE_ADMIN]
     #--------------------------------------------
     #---Rôle des utilisateurs avm
         ROLE_USERAVM:       ROLE_USER

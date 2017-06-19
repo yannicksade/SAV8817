@@ -1,49 +1,512 @@
-{% extends 'APMAdminBundle:_Main:layout.html.twig' %}
+{% extends ":base/dashboard:layout.html.twig" %}
+{%- block title -%} {{ parent() }} | Service Client {% endblock %}
 
-{% block body %}
-    <h1>Service_apres_vente list</h1>
+{% block content_body %}
+    <div class="row">
+        <h1>Service Client</h1>
+        <ul class="nav nav-tabs pull-left">
+            <li class="active" id="tab1">
+                <a href="#tab_1" data-toggle="tab"> Requêtes client </a>
+            </li>
+            {% if app.user.boutiquesProprietaire != null or app.user.boutiquesGerant != null %}
+                <li id="tab2">
+                    <a href="#tab_2" data-toggle="tab"> Boutique : Requêtes reçues </a>
+                </li>
+            {% endif %}
+        </ul>
+    </div>
+    <!-- BEGIN SAMPLE TABLE PORTLET-->
+    <div class="row">
+        <div class="tab-content">
+            <div class="portlet tab-pane active" id="tab_1">
+                <div class="portlet-title">
+                    <div class="caption font-dark">
+                        <i class="icon-settings font-dark"></i>
+                        <span class="caption-subject bold uppercase"> Table de réquêtes sur les produits </span>
+                    </div>
+                    <div class="tools pull-right">
+                        <a href="#" class="fa fa-compress" id="compress-item_1"> </a>
+                        <a href="#" class="fa fa-expand hidden" id="expand-item_1"> </a>
+                        <a href="javascript:;" class="collapse"> </a>
+                        <a href="#" data-toggle="modal" class="config"></a>
+                        <a href="javascript:;" class="reload"> </a>
+                    </div>
+                </div>
+                <div class="portlet-body">
+                    <div class="table-toolbar">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="btn-group">
+                                    <button id="sample_editable_1_new" class="btn sbold green"> Add New
+                                        <i class="fa fa-plus"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="btn-group pull-right">
+                                    <button class="btn green  btn-outline dropdown-toggle" data-toggle="dropdown">Tools
+                                        <i class="fa fa-angle-down"></i>
+                                    </button>
+                                    <ul class="dropdown-menu pull-right">
+                                        <li>
+                                            <a href="javascript:;">
+                                                <i class="fa fa-print"></i> Print </a>
+                                        </li>
+                                        <li>
+                                            <a href="javascript:;">
+                                                <i class="fa fa-file-pdf-o"></i> Save as PDF </a>
+                                        </li>
+                                        <li>
+                                            <a href="javascript:;">
+                                                <i class="fa fa-file-excel-o"></i> Export to Excel </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="tab-element_1">
+                        <table class="table table-striped table-bordered table-hover table-checkable order-column table-advance"
+                               id="sample_1">
+                            <thead>
+                            <tr>
+                                <th>
+                                    <label class="mt-checkbox mt-checkbox-single mt-checkbox-outline">
+                                        <input type="checkbox" class="group-checkable"
+                                               data-set="#sample_1 .checkboxes"/>
+                                        <span></span>
+                                    </label>
+                                </th>
+                                <th class="hidden">h</th>
+                                <th> Offre</th>
+                                <th> Boutique</th>
+                                <th> Date de l'émission</th>
+                                <th> Description du problème</th>
+                                <th> Etat du produit</th>
+                                <th> Actions</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for produit_services in service_apres_ventes_user %}
+                                {% for service_apres_vente in produit_services.services %}
+                                    <tr class="odd gradeX">
+                                        <td class="highlight">
+                                            {%- if service_apres_vente.etat == 0 %}
+                                                <div class="danger"></div>
+                                            {%- elseif service_apres_vente.etat == 1 %}
+                                                <div class="success"></div>
+                                            {%- elseif service_apres_vente.etat == 2 %}
+                                                <div class="info"></div>
+                                            {%- elseif service_apres_vente.etat == 3 %}
+                                                <div class="info"></div>
+                                            {%- elseif service_apres_vente.etat == 4 %}
+                                                <div class="danger"></div>
+                                            {%- elseif service_apres_vente.etat == 5 %}
+                                                <div class="info"></div>
+                                            {%- elseif service_apres_vente.etat == 6 %}
+                                                <div class="warning"></div>
+                                            {%- elseif service_apres_vente.etat == 7 %}
+                                                <div class="warning"></div>
+                                            {%- elseif service_apres_vente.etat == 8 %}
+                                                <div class="warning"></div>
+                                            {% endif %}
+                                            <label class="mt-checkbox mt-checkbox-single mt-checkbox-outline">
+                                                <input type="checkbox" class="checkboxes" value="1"/>
+                                                <span></span>
+                                            </label>
+                                        </td>
+                                        <td class="hidden">
+                                            <i id="code_item">{{ service_apres_vente.code }} </i>
+                                            <i id="client_item">{{ service_apres_vente.client }}</i>
+                                            <i id="comment_item">{{ service_apres_vente.commentaire }}</i>
+                                        </td>
+                                        <td><i class="hidden" id="offreID_item">{{ service_apres_vente.offre.id }}</i>
+                                            <i id="offre_item" class="hidden">{{ service_apres_vente.offre }}</i>
+                                            <a href="{{ path('apm_vente_offre_show', { 'id': service_apres_vente.id }) }}">
+                                                <i class="hidden" id="id_item">{{ service_apres_vente.id }}</i>
+                                                {{ service_apres_vente.offre|truncate(12, false) }}
+                                            </a>
+                                        </td>
+                                        <td><i id="boutique_item"
+                                               class="hidden">{{ service_apres_vente.offre.boutique }}</i>{{ service_apres_vente.offre.boutique|truncate(12, false) }}
+                                        </td>
 
-    <table>
-        <thead>
-        <tr>
-            <th>Codesav</th>
-            <th>Date</th>
-            <th>Descriptionpanne</th>
-            <th>Etat</th>
-            <th>Actions</th>
-        </tr>
-        </thead>
-        <tbody>
-        {% for service_apres_vente in service_apres_ventes %}
-            <tr>
-                <td>
-                    <a href="{{ path('apm_achat_service_apres_vente_show', { 'id': service_apres_vente.id }) }}">{{ service_apres_vente.codeSav }}</a>
-                </td>
-                <td>{% if service_apres_vente.dateDue %}{{ service_apres_vente.dateDue|date('Y-m-d H:i:s') }}{% endif %}</td>
-                <td>{{ service_apres_vente.descriptionPanne }}</td>
-                <td>{{ service_apres_vente.etat }}</td>
-                <td>
-                    <ul>
-                        <li>
-                            <a href="{{ path('apm_achat_service_apres_vente_show', { 'id': service_apres_vente.id }) }}">show</a>
-                        </li>
-                        <li>
-                            <a href="{{ path('apm_achat_service_apres_vente_edit', { 'id': service_apres_vente.id }) }}">edit</a>
-                        </li>
-                        <li>
-                            <a href="{{ path('apm_achat_service_apres_vente_deleteFromList', { 'id': service_apres_vente.id }) }}">delete</a>
-                        </li>
+                                        <td id="date_item">{{ service_apres_vente.dateDue|date('Y-m-d H:i:s') }}</td>
+                                        <td><i class="hidden"
+                                               id="desc_item">{{ service_apres_vente.descriptionPanne }}</i>{{ service_apres_vente.descriptionPanne|truncate(30, true) }}
+                                        </td>
+                                        <td id="etat_item">
+                                            {%- if service_apres_vente.etat == 0 %}     <input type="hidden"
+                                                                                               value="0"><span
+                                                    class="label label-sm label-danger"> En panne </span>
+                                            {%- elseif service_apres_vente.etat == 1 %} <input type="hidden"
+                                                                                               value="1"><span
+                                                    class="label label-sm label-success"> Problème résolu </span>
+                                            {%- elseif service_apres_vente.etat == 2 %} <input type="hidden"
+                                                                                               value="2"> <span
+                                                    class="label label-sm label-info"> En cours de diagnostic </span>
+                                            {%- elseif service_apres_vente.etat == 3 %}<input type="hidden"
+                                                                                              value="3"> <span
+                                                    class="label label-sm label-info"> En cours de depannage </span>
+                                            {%- elseif service_apres_vente.etat == 4 %} <input type="hidden"
+                                                                                               value="4"> <span
+                                                    class="label label-sm label-danger"> Déclaré hors service</span>
+                                            {%- elseif service_apres_vente.etat == 5 %} <input type="hidden"
+                                                                                               value="5"> <span
+                                                    class="label label-sm label-info"> A suivre </span>
+                                            {%- elseif service_apres_vente.etat == 6 %} <input type="hidden"
+                                                                                               value="6"> <span
+                                                    class="label label-sm label-warning"> Paiement frais attendu </span>
+                                            {%- elseif service_apres_vente.etat == 7 %} <input type="hidden"
+                                                                                               value="7"> <span
+                                                    class="label label-sm label-warning"> Rejeté </span>
+                                            {%- elseif service_apres_vente.etat == 8 %} <input type="hidden"
+                                                                                               value="8"><span
+                                                    class="label label-sm label-warning"
+                                                    value="8"> Problème soumis </span>
+                                            {% endif %}
+                                        </td>
 
-                    </ul>
-                </td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+                                        <td>
+                                            <a href="javascript:;"
+                                               class="btn btn-outline btn-circle purple btn-sm purple see_item"
+                                               data-target="#stack1" data-toggle="modal">
+                                                <i class="fa fa-eye"></i> voir </a>
+                                            <a class="btn btn-outline btn-circle blue btn-sm blue edit_item">
+                                                <i class="fa fa-edit"></i> modifier </a>
+                                            <a href="{{ path('apm_achat_service_apres_vente_delete', {'id': service_apres_vente.id}) }}"
+                                               class="btn btn-outline btn-circle red btn-sm red">
+                                                <i class="fa fa-trash-o"></i> supprimer </a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="hidden" id="form-element_1" data-focus-on="input:first">
+                    {{ form_start(form) }}
+                    <h4> demandez un service pour un produit acheté</h4>
+                    <div class="form-group">
+                        {{ form_errors(form.code) }}
+                        {{ form_widget(form.id, {'attr':{'class':'id_x hidden', 'name':'id_x'}}) }}
+                        {{ form_label(form.code, 'Code:', {'attr':{'class':'control-label'}}) }}
+                        {{ form_widget(form.code, {'attr':{'class':'code_x form-control', 'name':'code_x', 'readonly':'true'}}) }}
+                    </div>
+                    <div class="form-group">
+                        {{ form_errors(form.offre) }}
+                        <input type="checkbox" class="check_item"/>
+                        {{ form_label(form.offre, 'Offre:', {'attr':{'class':'control-label'}}) }}
+                        <input type="text" id="offre_x" class="changeable_item form-control" readonly/>
+                        <div class="hidden" id="replacer">
+                            {{ form_widget(form.offre, {'attr':{'name':'offre_x'}}) }}
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        {{ form_errors(form.etat) }}
+                        {{ form_label(form.etat, 'Etat:', {'attr':{'class':'control-label'}}) }}
+                        <div class="input-group select2-bootstrap-prepend">
+                            <span class="input-group-addon"><input type="checkbox"></span>
+                            {{ form_widget(form.etat, {'attr':{'class':'etat_x form-control select2', 'name':'etat_x', 'disabled':"true"}}) }}
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="boutique_x"> Boutique:</label>
+                        <input type="text" value="" class='form-control' id="boutique_x" readonly/>
+                    </div>
+                    <div class="form-group">
+                        {{ form_errors(form.descriptionPanne) }}
+                        {{ form_label(form.descriptionPanne, 'Description du problème:', {'attr':{'class':'control-label'}}) }}
+                        {{ form_widget(form.descriptionPanne, {'attr':{'class':'desc_x form-control', 'name':'desc_x', "placeholder": "décrivez le problème ici..."}}) }}
+                    </div>
+                    <input type="submit" value="Soumettre"/>
+                    <input type="reset" value="Effacer"/>
+                    {{ form_end(form) }}
+                </div>
+            </div>
+            <div class="portlet tab-pane" id="tab_2">
+                <div class="portlet-title">
+                    <div class="caption font-dark">
+                        <i class="icon-settings font-dark"></i>
+                        <span class="caption-subject bold uppercase"> Table de requêtes Client:Boutique </span>
+                    </div>
+                    <div class="tools pull-right">
+                        <a href="javascript:;" class="fa fa-compress" id="compress-item_2"> </a>
+                        <a href="javascript:;" class="fa fa-expand hidden" id="expand-item_2"> </a>
+                        <a href="javascript:;" class="collapse"> </a>
+                        <a href="#portlet-config" data-toggle="modal" class="config"></a>
+                        <a href="javascript:;" class="reload"> </a>
+                    </div>
+                </div>
+                <div class="portlet-body">
+                    <div class="table-toolbar">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="btn-group">
+                                    <button id="sample_editable_1_new" class="btn sbold green"> Add New
+                                        <i class="fa fa-plus"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="btn-group pull-right">
+                                    <button class="btn green  btn-outline dropdown-toggle" data-toggle="dropdown">Tools
+                                        <i class="fa fa-angle-down"></i>
+                                    </button>
+                                    <ul class="dropdown-menu pull-right">
+                                        <li>
+                                            <a href="javascript:;">
+                                                <i class="fa fa-print"></i> Print </a>
+                                        </li>
+                                        <li>
+                                            <a href="javascript:;">
+                                                <i class="fa fa-file-pdf-o"></i> Save as PDF </a>
+                                        </li>
+                                        <li>
+                                            <a href="javascript:;">
+                                                <i class="fa fa-file-excel-o"></i> Export to Excel </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="tab-element_2">
+                        <table class="table table-striped table-bordered table-hover table-checkable order-column table-advance"
+                               id="sample_2">
+                            <thead>
+                            <tr>
+                                <th>
+                                    <label class="mt-checkbox mt-checkbox-single mt-checkbox-outline">
+                                        <input type="checkbox" class="group-checkable"
+                                               data-set="#sample_2 .checkboxes"/>
+                                        <span></span>
+                                    </label>
+                                </th>
+                                <th class="hidden"></th>
+                                <th><i class="fa fa-briefcase"></i>Offre</th>
+                                <th><i class="fa fa-briefcase"></i>Boutique</th>
+                                <th><i class="fa fa-user"></i>Affiliation</th>
+                                <th><i class="fa fa-user"></i>Date</th>
+                                <th><i class="fa fa-shopping-cart"></i>Description du problème</th>
+                                <th><i class="fa fa-user"></i>Etat</th>
+                                <th><i class="fa fa-user"></i>Actions</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for produit_services in service_apres_ventes %}
+                                {% for service_apres_vente in produit_services.services %}
+                                    <tr class="odd gradeX">
+                                        <td class="highlight">
+                                            {%- if service_apres_vente.etat == 0 %}
+                                                <div class="danger"></div>
+                                            {%- elseif service_apres_vente.etat == 1 %}
+                                                <div class="success"></div>
+                                            {%- elseif service_apres_vente.etat == 2 %}
+                                                <div class="info"></div>
+                                            {%- elseif service_apres_vente.etat == 3 %}
+                                                <div class="info"></div>
+                                            {%- elseif service_apres_vente.etat == 4 %}
+                                                <div class="danger"></div>
+                                            {%- elseif service_apres_vente.etat == 5 %}
+                                                <div class="info"></div>
+                                            {%- elseif service_apres_vente.etat == 6 %}
+                                                <div class="warning"></div>
+                                            {%- elseif service_apres_vente.etat == 7 %}
+                                                <div class="warning"></div>
+                                            {%- elseif service_apres_vente.etat == 8 %}
+                                                <div class="warning"></div>
+                                            {% endif %}
+                                            <label class="mt-checkbox mt-checkbox-single mt-checkbox-outline">
+                                                <input type="checkbox" class="checkboxes" value="1"/>
+                                                <span></span>
+                                            </label>
+                                        </td>
+                                        <td class="hidden"><i id="client_item">{{ service_apres_vente.client }}</i>
+                                            <i id="comment_item">{{ service_apres_vente.commentaire }}</i>
+                                            <i id="code_item">{{ service_apres_vente.code }}</i>
+                                            <i id="id_item">{{ service_apres_vente.id }}</i>
+                                        </td>
+                                        <td><i class="hidden" id="offreID_item">{{ service_apres_vente.offre.id }}</i>
+                                            <i id="offre_item" class="hidden">{{ service_apres_vente.offre }}</i>
+                                            <a href="{{ path('apm_vente_offre_show', { 'id': service_apres_vente.offre.id }) }}">
+                                                {{ service_apres_vente.offre|truncate(12, false) }}
+                                            </a>
+                                        </td>
 
-    <ul>
-        <li>
-            <a href="{{ path('apm_achat_service_apres_vente_new') }}">Create a new entry</a>
-        </li>
-    </ul>
-{% endblock %}
+                                        <td><i id="boutique_item"
+                                               class="hidden">{{ service_apres_vente.offre.boutique }}</i>{{ service_apres_vente.offre.boutique|truncate(12, false) }}
+                                        </td>
+                                        <td><strong>
+                                                {%- if produit_services.type == 1 %}
+                                                    Propriétaire
+                                                {% else %}
+                                                    Gérant
+                                                {% endif %}
+                                            </strong></td>
+                                        <td id="date_item">{{ service_apres_vente.dateDue|date('Y-m-d H:i:s') }}</td>
+                                        <td><i class="hidden"
+                                               id="desc_item">{{ service_apres_vente.descriptionPanne }}</i>{{ service_apres_vente.descriptionPanne|truncate(30, true) }}
+                                        </td>
+                                        <td id="etat_item">
+                                            {%- if service_apres_vente.etat == 0 %}     <input type="hidden"
+                                                                                               value="0"><span
+                                                    class="label label-sm label-danger"> En panne </span>
+                                            {%- elseif service_apres_vente.etat == 1 %} <input type="hidden"
+                                                                                               value="1"><span
+                                                    class="label label-sm label-success"> Problème résolu </span>
+                                            {%- elseif service_apres_vente.etat == 2 %} <input type="hidden"
+                                                                                               value="2"> <span
+                                                    class="label label-sm label-info"> En cours de diagnostic </span>
+                                            {%- elseif service_apres_vente.etat == 3 %}<input type="hidden"
+                                                                                              value="3"> <span
+                                                    class="label label-sm label-info"> En cours de depannage </span>
+                                            {%- elseif service_apres_vente.etat == 4 %} <input type="hidden"
+                                                                                               value="4"> <span
+                                                    class="label label-sm label-danger"> Déclaré hors service</span>
+                                            {%- elseif service_apres_vente.etat == 5 %} <input type="hidden"
+                                                                                               value="5"> <span
+                                                    class="label label-sm label-info"> A suivre </span>
+                                            {%- elseif service_apres_vente.etat == 6 %} <input type="hidden"
+                                                                                               value="6"> <span
+                                                    class="label label-sm label-warning"> Paiement frais attendu </span>
+                                            {%- elseif service_apres_vente.etat == 7 %} <input type="hidden"
+                                                                                               value="7"> <span
+                                                    class="label label-sm label-warning"> Rejeté </span>
+                                            {%- elseif service_apres_vente.etat == 8 %} <input type="hidden"
+                                                                                               value="8"><span
+                                                    class="label label-sm label-warning"
+                                                    value="8"> Problème soumis </span>
+                                            {% endif %}
+                                        </td>
+
+                                        <td>
+                                            <a href="javascript:;"
+                                               class="btn btn-outline btn-circle purple btn-sm purple see_item"
+                                               data-target="#stack1" data-toggle="modal">
+                                                <i class="fa fa-eye"></i> voir </a>
+                                            <a href="javascript:;"
+                                               class="btn btn-outline btn-circle green btn-sm green repondre">
+                                                <i class="fa fa-share"></i> Repondre </a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <form class="hidden" id="form-element_2" data-focus-on="input:first">
+                    <h5> Répondre à une requête S.A.V </h5>
+                    <input type="hidden" id="id_x"/>
+                    <div class="form-group">
+                        <label for="code_x" class="control-label">Code SAV:</label>
+                        <input type="text" id="code_x" name="code_x" class="form-control" readonly/>
+                    </div>
+                    <div class="form-group">
+                        <label for="offre_x" class="control-label">Offre:</label>
+                        <input type="text" id="offre_x" name="offre_x" class="form-control" readonly/>
+                    </div>
+                    <div class="form-group">
+                        <label for="client_x" class="control-label">Client:</label>
+                        <input type="text" id="client_x" name="client_x" class="form-control" readonly/>
+                    </div>
+                    <div class="form-group">
+                        <label for="etat_x" class="control-label">Etat:</label>
+                        <div class="input-group select2-bootstrap-prepend">
+                            <span class="input-group-addon"><input type="checkbox"></span>
+                            <select id="etat_x" class="form-control select2" disabled>
+                                <option>Etat relatif au produit</option>
+                                <option value="0">En panne</option>
+                                <option value="1">Problème résolu</option>
+                                <option value="2">En cours de diagnostic</option>
+                                <option value="3">En cours de depannage</option>
+                                <option value="4">Déclaré hors service</option>
+                                <option value="5">requête à suivre</option>
+                                <option value="6">Frais exigible</option>
+                                <option value="7">Réjeter la demande</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="comment_x" class="control-label">Commentaire:</label>
+                        <textarea id="comment_x" name="comment_x" class="form-control focus-blue-sharp"
+                                  placeholder="décrivez la résolution adoptée ici..."></textarea>
+                    </div>
+                    <input type="submit" value="Envoyer"/>
+                    <input type="reset" value="Effacer"/>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!-- BEGIN MODAL -->
+    <div id="stack1" class="modal fade" tabindex="-1" data-focus-on="input:first">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+            <h4 class="modal-title">Aperçu de la requête</h4>
+        </div>
+        <div class="modal-body">
+            <table>
+                <tbody>
+                <tr>
+                    <th>Code service:</th>
+                    <td class="hidden" id="id_y"></td>
+                    <td id="code_y"></td>
+                </tr>
+                <tr>
+                    <th>Date:</th>
+                    <td id="date_y"></td>
+                </tr>
+                <tr>
+                    <th>Boutique:</th>
+                    <td id="boutique_y"></td>
+                </tr>
+                <tr>
+                    <th>Offre:</th>
+                    <td id="offre_y"></td>
+                </tr>
+                <tr>
+                    <th>Etat:</th>
+                    <td class="hidden" id="etat-value"></td>
+                    <td id="etat_y"></td>
+                </tr>
+                <tr>
+                    <th>Commentaire du fournisseur:</th>
+                    <td id="comment_y"></td>
+                </tr>
+                <tr>
+                    <th>Client:</th>
+                    <td id="client_y"></td>
+                </tr>
+                <tr>
+                    <th>Description du problème:</th>
+                    <td id="desc_y"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="modal-footer">
+            <a href="#" type="button" data-dismiss="modal" class="btn btn-outline btn-circle blue btn-sm gray-dark"><i
+                        class="fa fa-eye"></i> OK </a>
+            <a href="#" class="btn btn-outline btn-circle blue btn-sm blue edit_item" style="display: inline-block"
+               data-dismiss="modal">
+                <i class="fa fa-edit"></i> modifier </a>
+            <a href="#"
+               class="btn btn-outline btn-circle red btn-sm red delete_item" style="display: inline-block">
+                <i class="fa fa-trash-o"></i> supprimer </a>
+            <a href="#"
+               class="btn btn-outline btn-circle green btn-sm green repondre" style="display: none"
+               id="repondre_item" data-dismiss="modal">
+                <i class="fa fa-share"></i> Repondre </a>
+        </div>
+    </div>
+    <!-- END MODAL-->
+    <!-- END SAMPLE TABLE PORTLET-->
+{% endblock content_body %}
+
+    {% block javascripts %}
+        {% javascripts "dashboard/assets/pages/scripts/custom.js" %}
+        <script src="{{ asset_url }}" type="text/javascript"></script>
+        {% endjavascripts %}
+    {% endblock javascripts %}

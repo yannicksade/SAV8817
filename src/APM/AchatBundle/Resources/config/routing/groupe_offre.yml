@@ -1,28 +1,18 @@
 apm_achat_groupe_index:
     path:     /
     defaults: { _controller: "APMAchatBundle:Groupe_offre:index" }
-    methods:  GET
-
-apm_achat_groupe_show:
-    path:     /{id}/show
-    defaults: { _controller: "APMAchatBundle:Groupe_offre:show" }
-    methods:  GET
-
-apm_achat_groupe_new:
-    path:     /new
-    defaults: { _controller: "APMAchatBundle:Groupe_offre:new" }
     methods:  [GET, POST]
+
+apm_achat_groupe_offres_index:
+    path:     /{id}/offres
+    defaults: { _controller: "APMAchatBundle:Groupe_offre:listeOffresGroupe" }
+    methods:  GET
 
 apm_achat_groupe_edit:
     path:     /{id}/edit
-    defaults: { _controller: "APMAchatBundle:Groupe_offre:edit" }
+    defaults: { _controller: "APMAchatBundle:Groupe_offre:index" }
     methods:  [GET, POST]
 
 apm_achat_groupe_delete:
     path:     /{id}/delete
     defaults: { _controller: "APMAchatBundle:Groupe_offre:delete" }
-    methods:  DELETE
-
-apm_achat_groupe_deleteFromList:
-    path:     /list/{id}/delete
-    defaults: { _controller: "APMAchatBundle:Groupe_offre:deleteFromList" }

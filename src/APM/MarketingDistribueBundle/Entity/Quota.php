@@ -55,6 +55,13 @@ class Quota extends TradeFactory
     private $valeurQuota;
 
     /**
+     * @Assert\Image()
+     * @var string
+     * @ORM\Column(name="image", type="string", nullable=true)
+     */
+    private $image;
+
+    /**
      * Id
      * @var integer
      *
@@ -270,5 +277,34 @@ class Quota extends TradeFactory
     public function setDate(\DateTime $date)
     {
         $this->date = $date;
+    }
+
+    public function __toString()
+    {
+        return $this->code;
+    }
+
+    /**
+     * Get image
+     *
+     * @return string
+     */
+    public function getImage()
+    {
+        return $this->image;
+    }
+
+    /**
+     * Set image
+     *
+     * @param string $image
+     *
+     * @return Quota
+     */
+    public function setImage($image)
+    {
+        $this->image = $image;
+
+        return $this;
     }
 }

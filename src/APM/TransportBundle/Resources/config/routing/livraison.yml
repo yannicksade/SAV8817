@@ -3,13 +3,45 @@ apm_transport_livraison_index:
     defaults: { _controller: "APMTransportBundle:Livraison:index" }
     methods:  GET
 
+apm_transport_livraison_boutique_index:
+    path:     /boutique/{id}
+    defaults: { _controller: "APMTransportBundle:Livraison:index" }
+    methods:  GET
+
+
+apm_transport_livraison_listeOperation_index:
+    path:     /liste-operation/{id}
+    defaults: { _controller: "APMTransportBundle:Livraison:listTransactions" }
+    methods:  GET
+
+
 apm_transport_livraison_show:
     path:     /{id}/show
     defaults: { _controller: "APMTransportBundle:Livraison:show" }
     methods:  GET
 
+apm_transport_livraison_operation_show:
+    path:     /{id}/operation/{transaction_id}/show
+    defaults: { _controller: "APMTransportBundle:Livraison:show" }
+    methods:  GET
+
 apm_transport_livraison_new:
     path:     /new
+    defaults: { _controller: "APMTransportBundle:Livraison:new" }
+    methods:  [GET, POST]
+
+apm_transport_livraison_boutique_new:
+    path:     /boutique/new/{id}
+    defaults: { _controller: "APMTransportBundle:Livraison:new" }
+    methods:  [GET, POST]
+
+apm_transport_livraison_operation_boutique:
+    path:     /livraison-boutique/{id}/new/{transaction_id}
+    defaults: { _controller: "APMTransportBundle:Livraison:new" }
+    methods:  [GET, POST]
+
+apm_transport_livraison_operation:
+    path:     /livraison-operation/new/{transaction_id}
     defaults: { _controller: "APMTransportBundle:Livraison:new" }
     methods:  [GET, POST]
 

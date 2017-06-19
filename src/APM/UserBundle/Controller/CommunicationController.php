@@ -26,8 +26,20 @@ class CommunicationController extends Controller
         $communicationsSent = $user->getEmetteurCommunications();
         $communicationsReceived = $user->getRecepteurCommunications();
         return $this->render('APMUserBundle:communication:index.html.twig', array(
-            'communications' => [$communicationsSent, $communicationsReceived]
+            'communicationsSent' => $communicationsSent,
+            'communicationsReceived' => $communicationsReceived,
         ));
+    }
+
+    private function listAndShowSecurity()
+    {
+        //-----------------------------------security-------------------------------------------
+        // Unable to access the controller unless you have a USERAVM role
+        $this->denyAccessUnlessGranted('ROLE_USERAVM', null, 'Unable to access this page!');
+        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
+            throw $this->createAccessDeniedException();
+        }
+        //----------------------------------------------------------------------------------------
     }
 
     /**
@@ -56,6 +68,19 @@ class CommunicationController extends Controller
             'communication' => $communication,
             'form' => $form->createView(),
         ));
+    }
+
+    private function createSecurity()
+    {
+        //---------------------------------security-----------------------------------------------
+        // Unable to access the controller unless you have a USERAVM role
+        $this->denyAccessUnlessGranted('ROLE_USERAVM', null, 'Unable to access this page!');
+
+        /* ensure that the user is logged in */
+        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY')) {
+            throw $this->createAccessDeniedException();
+        }
+        //----------------------------------------------------------------------------------------
     }
 
     /**
@@ -119,6 +144,26 @@ class CommunicationController extends Controller
     }
 
     /**
+     * @param Communication $communication
+     */
+    private function editAndDeleteSecurity($communication)
+    {
+        //---------------------------------security-----------------------------------------------
+        // Unable to access the controller unless you have a USERAVM role
+        $this->denyAccessUnlessGranted('ROLE_USERAVM', null, 'Unable to access this page!');
+
+        /* ensure that the user is logged in
+        *  and that the one is the owner
+        */
+        $user = $this->getUser();
+        if ((!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY')) || ($communication->getEmetteur() !== $user)) {
+            throw $this->createAccessDeniedException();
+        }
+        //----------------------------------------------------------------------------------------
+
+    }
+
+    /**
      * Deletes a Communication entity.
      * @param Request $request
      * @param Communication $communication
@@ -148,47 +193,6 @@ class CommunicationController extends Controller
         $em->flush();
 
         return $this->redirectToRoute('apm_user_communication_index');
-    }
-
-    private function listAndShowSecurity(){
-        //-----------------------------------security-------------------------------------------
-        // Unable to access the controller unless you have a USERAVM role
-        $this->denyAccessUnlessGranted('ROLE_USERAVM', null, 'Unable to access this page!');
-        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_REMEMBERED'))  {
-            throw $this->createAccessDeniedException();
-        }
-        //----------------------------------------------------------------------------------------
-    }
-
-    private function createSecurity(){
-        //---------------------------------security-----------------------------------------------
-        // Unable to access the controller unless you have a USERAVM role
-        $this->denyAccessUnlessGranted('ROLE_USERAVM', null, 'Unable to access this page!');
-
-        /* ensure that the user is logged in */
-        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY')) {
-            throw $this->createAccessDeniedException();
-        }
-        //----------------------------------------------------------------------------------------
-    }
-
-    /**
-     * @param Communication $communication
-     */
-    private function editAndDeleteSecurity($communication){
-        //---------------------------------security-----------------------------------------------
-        // Unable to access the controller unless you have a USERAVM role
-        $this->denyAccessUnlessGranted('ROLE_USERAVM', null, 'Unable to access this page!');
-
-        /* ensure that the user is logged in
-        *  and that the one is the owner
-        */
-        $user = $this->getUser();
-        if ((!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY')) || ($communication->getEmetteur() !== $user)) {
-            throw $this->createAccessDeniedException();
-        }
-        //----------------------------------------------------------------------------------------
-
     }
 
 }

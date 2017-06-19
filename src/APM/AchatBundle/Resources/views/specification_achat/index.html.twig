@@ -1,6 +1,6 @@
-{% extends 'APMAdminBundle:_Main:layout.html.twig' %}
+{% extends ":base/dashboard:layout.html.twig" %}
 
-{% block body %}
+{% block content_body %}
     <h1>Specification_achat list</h1>
 
     <table>
@@ -44,8 +44,10 @@
     </table>
 
     <ul>
-        <li>
-            <a href="{{ path('apm_achat_specification_achat_new') }}">Create a new entry</a>
-        </li>
+        {% if offre %}
+            <li>
+                <a href="{{ path('apm_achat_specification_achat_new', {'id': offre.id}) }}">Passer une commande</a>
+            </li>
+        {% endif %}
     </ul>
 {% endblock %}

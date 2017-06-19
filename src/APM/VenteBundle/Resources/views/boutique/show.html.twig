@@ -1,6 +1,7 @@
-{% extends "APMAdminBundle:_Main:layout.html.twig" %}
+{% extends ":base/dashboard:layout.html.twig" %}
 
-{% block body %}
+{% block content_body %}
+
     <h1>Boutique</h1>
 
     <table>
@@ -44,14 +45,6 @@
                 {% endif %}</td>
         </tr>
         <tr>
-            <th>Categories des offres</th>
-            {% for categorie in boutique.categories %}
-                <td>
-                    <a href="{{ path('apm_vente_categorie_show', { 'id': categorie.id }) }}">{{ categorie.designation }}</a>|
-                </td>
-            {% endfor %}
-        </tr>
-        <tr>
             <th>Offres hors categorie</th>
             {% for offre in boutique.offres %}
                  {% if offre.categorie == null %}
@@ -61,18 +54,83 @@
                  {% endif %}
             {% endfor %}
         </tr>
+        <tr>
+            <th>Image</th>
+            <td><img src="{{ asset(url_image ~ boutique.image) }}"/></td>
+        </tr>
 
         </tbody>
     </table>
 
     <ul>
         <li>
-            <a href="{{ path('apm_vente_boutique_index') }}"> Retour à la boutique</a>
+            <a href="{{ path('apm_vente_offre_boutique_index', {'id':boutique.id}) }}"> Liste toutes les offres de cette
+                boutique </a>
         </li>
         <li>
-            <a href="{{ path('apm_vente_boutique_edit', { 'id': boutique.id }) }}">Modifier</a>
+            <a href="{{ path('apm_vente_categorie_index', {'id':boutique.id}) }}"> Liste les catégories de cette
+                boutique </a>
         </li>
-
+        <li>
+            <a href="{{ path('apm_vente_boutique_index') }}"> Retour à la liste de mes boutiques</a>
+        </li>
+        <li>
+            <a href="{{ path('apm_vente_boutique_edit', { 'id': boutique.id }) }}">Modifier la boutique</a>
+        </li>
+        <li>
+            <a href="{{ path('apm_vente_remise_boutique_index', {'id':boutique.id}) }}">Liste les remises d'offres
+                boutique</a>
+        </li>
+        <li>
+            <a href="{{ path('apm_vente_transaction_boutique_index', {'id':boutique.id}) }}">Liste les transactions de
+                la boutique</a>
+        </li>
+        <li>
+            <a href="{{ path('apm_transport_livraison_boutique_index', {'id':boutique.id}) }}">Liste les livraisons de
+                la boutique</a>
+        </li>
+        <li>
+            <a href="{{ path('apm_vente_transaction_boutique_new', {'id':boutique.id}) }}">Créer une transaction
+                boutique</a>
+        </li>
+        <li>
+            <a href="{{ path('apm_transport_livraison_boutique_new', {'id':boutique.id}) }}">Créer une livraison à
+                partir de cette boutique</a>
+        </li>
+        <li>
+            <a href="{{ path('apm_vente_transaction_produit_accueil_new') }}">Créer une transaction des produits de la
+                boutique</a>
+        </li>
+        <li>
+            <a href="{{ path('apm_marketing_conseiller_boutique_shop_new',  {'id':boutique.id}) }}">S'enregistrer comme
+                conseiller de cette boutique</a>
+        </li>
+        <li>
+            <a href="{{ path('apm_marketing_boutique_conseiller_index', {'id':boutique.id}) }}">Liste les conseillers de
+                cette boutique</a>
+        </li>
+        {% if app.user.profileConseiller %}
+            <li>
+                <a href="{{ path('apm_marketing_conseiller_boutique_deleteFromBoutique',
+                {'conseiller_id':app.user.profileConseiller.id,'boutique_id':boutique.id}) }}"> désactiver mon
+                    enregistrement conseiller pour cette boutique</a>
+            </li>
+        {% endif %}
+        <li>
+            <a href="{{ path('apm_marketing_quota_new', {'id':boutique.id}) }}">Créer des commissions</a>
+        </li>
+        <li>
+            <a href="{{ path('apm_marketing_commissionnement_new', {'id':boutique.id}) }}">Attribuer des commissions aux
+                conseillers</a>
+        </li>
+        <li>
+            <a href="{{ path('apm_marketing_commissionnement_boutique_index', {'id':boutique.id}) }}">Lister les
+                commissionnements accordées par la boutique</a>
+        </li>
+        <li>
+            <a href="{{ path('apm_achat_service_apres_vente_boutique_index', {'id':boutique.id}) }}">Liste les SAV
+                enregistrées sur les produits de cette boutique</a>
+        </li>
         {% if delete_form %}
         <li>
             {{ form_start(delete_form) }}
@@ -81,4 +139,4 @@
         </li>
         {% endif %}
     </ul>
-{% endblock %}
+{% endblock content_body %}

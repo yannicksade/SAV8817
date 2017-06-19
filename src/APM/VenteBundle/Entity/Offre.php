@@ -4,6 +4,7 @@ namespace APM\VenteBundle\Entity;
 
 use APM\AchatBundle\Entity\Service_apres_vente;
 use APM\AchatBundle\Entity\Specification_achat;
+use APM\AnimationBundle\Entity\Base_documentaire;
 use APM\UserBundle\Entity\Commentaire;
 use APM\UserBundle\Entity\Communication;
 use APM\UserBundle\Entity\Utilisateur_avm;
@@ -11,14 +12,17 @@ use APM\VenteBundle\Factory\TradeFactory;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Vich\UploaderBundle\Mapping\Annotation as Vich;
 
 /**
  * Offre
  *
  * @ORM\Table(name="offre")
  * @ORM\Entity(repositoryClass="APM\VenteBundle\Repository\OffreRepository")
+ * @Vich\Uploadable
  * @UniqueEntity("code", message="impossible de creer l'offre, veuillez ressayer plus tard! ")
  */
 class Offre extends TradeFactory
@@ -103,32 +107,40 @@ class Offre extends TradeFactory
 
     /**
      * @var string
-     * @Assert\Url
-     * @ORM\Column(name="image", type="string", length=255, nullable=true)
+     * @ORM\Column(name="image", type="string", nullable=true)
      */
     private $image;
 
+    /**
+     * @Assert\Image()
+     * @Vich\UploadableField(mapping="entity_images", fileNameProperty="image")
+     * @var File
+     */
+    private $imageFile;
+
+    /**
+     * @ORM\Column(name="updatedAt", type="datetime", nullable= true)
+     * @var \DateTime
+     */
+    private $updatedAt;
     /**
      * @var string
      * @Assert\Choice({0,1,2,3})
      * @ORM\Column(name="modeVente", type="string", length=255, nullable=true)
      */
     private $modeVente;
-
     /**
      * @var string
      * @Assert\Issn
      * @ORM\Column(name="numeroDeSerie", type="string", length=255, nullable=true)
      */
     private $numeroDeSerie;
-
     /**
      * @var string
      *
      * @ORM\Column(name="prixUnitaire", type="decimal", nullable=true)
      */
     private $prixUnitaire;
-
     /**
      * @var integer
      * @Assert\GreaterThan(0)
@@ -141,56 +153,48 @@ class Offre extends TradeFactory
      * @ORM\Column(name="credit", type="integer", nullable=true)
      */
     private $credit;
-
     /**
      * @var integer
      * @Assert\Range(min=0, max=10)
      * @ORM\Column(name="rateEvaluation", type="smallint", nullable=true)
      */
     private $evaluation;
-
     /**
      * @var string
      * @Assert\Length(min=2, max=254)
      * @ORM\Column(name="reference", type="string", length=255, nullable=true)
      */
     private $reference;
-
     /**
      * @var string
      *
      * @ORM\Column(name="remiseProduit", type="decimal", nullable=true)
      */
     private $remiseProduit;
-
     /**
      * @var string
      * @Assert\Choice({0,1,2})
      * @ORM\Column(name="typeOffre", type="string", length=255, nullable=true)
      */
     private $typeOffre;
-
     /**
      * @var boolean
      * @Assert\Choice({0,1})
      * @ORM\Column(name="valide", type="boolean", nullable=true)
      */
     private $valide;
-
     /**
      * @var boolean
      * @Assert\Choice({0,1})
      * @ORM\Column(name="disponibleEnStock", type="boolean", nullable=true)
      */
     private $disponibleEnStock;
-
     /**
      * @var boolean
      * @Assert\Choice({0,1})
      * @ORM\Column(name="publiable", type="boolean", nullable=true)
      */
     private $publiable;
-
     /**
      * @var integer
      *
@@ -199,27 +203,24 @@ class Offre extends TradeFactory
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id;
-
     /**
      * @var Categorie
      *
      * @ORM\ManyToOne(targetEntity="APM\VenteBundle\Entity\Categorie", inversedBy="offres")
      * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="categorie_id", referencedColumnName="id", nullable=false)
+     *   @ORM\JoinColumn(name="categorie_id", referencedColumnName="id")
      * })
      */
     private $categorie;
-
     /**
      * @var Boutique
      *
      * @ORM\ManyToOne(targetEntity="APM\VenteBundle\Entity\Boutique", inversedBy="offres")
      * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="boutique_id", referencedColumnName="id", nullable=true)
+     *   @ORM\JoinColumn(name="boutique_id", referencedColumnName="id")
      * })
      */
     private $boutique;
-
     /**
      * @var Utilisateur_avm
      *
@@ -229,52 +230,49 @@ class Offre extends TradeFactory
      * })
      */
     private $vendeur;
-
-
     /**
      * @var Collection
-     * @ORM\OneToMany(targetEntity="APM\AchatBundle\Entity\Service_apres_vente", mappedBy="offres")
+     * @ORM\OneToMany(targetEntity="APM\AchatBundle\Entity\Service_apres_vente", mappedBy="offre")
      *
      */
     private $service_apres_ventes;
-
-
     /**
      * @ORM\OneToMany(targetEntity="APM\UserBundle\Entity\Commentaire", mappedBy="offre")
      */
     private $commentaires;
-
     /**
      * @ORM\OneToMany(targetEntity="APM\VenteBundle\Entity\Remise", mappedBy="offre")
      */
     private $remises;
-
-
     /**
      * @var Specification_achat
      * @ORM\OneToMany(targetEntity="APM\AchatBundle\Entity\Specification_achat" , mappedBy="offre", cascade={"remove"})
      */
     private $specifications;
-
     /**
      * @var Collection
      * @ORM\oneToMany(targetEntity="APM\VenteBundle\Entity\Transaction_produit", mappedBy="produit")
      */
     private $produitTransactions;
-
     /**
      * @var Collection
      * @ORM\ManyToMany(targetEntity="APM\UserBundle\Entity\Communication", mappedBy="offres")
      */
     private $communications;
-
-
     /**
      * @var Collection
      * @ORM\OneToMany(targetEntity="APM\VenteBundle\Entity\Rabais_offre", mappedBy="offre")
      */
     private $rabais;
-
+    /**
+     * @var Base_documentaire
+     *
+     * @ORM\ManyToOne(targetEntity="APM\AnimationBundle\Entity\Base_documentaire", inversedBy="produits")
+     * @ORM\JoinColumns({
+     *   @ORM\JoinColumn(name="document_id", referencedColumnName="id", nullable=true)
+     * })
+     */
+    private $document;
 
     /**
      * Constructor
@@ -289,6 +287,24 @@ class Offre extends TradeFactory
         $this->specifications = new ArrayCollection();
         $this->communications = new ArrayCollection();
         $this->rabais = new ArrayCollection();
+    }
+
+    public function getImageFile()
+    {
+        return $this->imageFile;
+    }
+
+    public function setImageFile(File $image = null)
+    {
+        $this->imageFile = $image;
+
+        // VERY IMPORTANT:
+        // It is required that at least one field changes if you are using Doctrine,
+        // otherwise the event listeners won't be called and the file is lost
+        if ($image) {
+            // if 'updatedAt' is not defined in your entity, use another property
+            $this->updatedAt = new \DateTime('now');
+        }
     }
 
     /**
@@ -1219,5 +1235,58 @@ class Offre extends TradeFactory
     public function getServiceApresVentes()
     {
         return $this->service_apres_ventes;
+    }
+
+    public function __toString()
+    {
+        return $this->designation;
+    }
+
+    /**
+     * Get updatedAt
+     *
+     * @return \DateTime
+     */
+    public function getUpdatedAt()
+    {
+        return $this->updatedAt;
+    }
+
+    /**
+     * Set updatedAt
+     *
+     * @param \DateTime $updatedAt
+     *
+     * @return Offre
+     */
+    public function setUpdatedAt($updatedAt)
+    {
+        $this->updatedAt = $updatedAt;
+
+        return $this;
+    }
+
+    /**
+     * Get document
+     *
+     * @return \APM\AnimationBundle\Entity\Base_documentaire
+     */
+    public function getDocument()
+    {
+        return $this->document;
+    }
+
+    /**
+     * Set document
+     *
+     * @param \APM\AnimationBundle\Entity\Base_documentaire $document
+     *
+     * @return Offre
+     */
+    public function setDocument(\APM\AnimationBundle\Entity\Base_documentaire $document = null)
+    {
+        $this->document = $document;
+
+        return $this;
     }
 }

@@ -10,7 +10,7 @@
 
     <ul>
         <li>
-            <a href="{{ path('apm_vente_rabais_offre_index') }}">Back to the list</a>
+            <a href="{{ path('apm_vente_rabais_offre_index', {'id':rabais_offre.offre.id}) }}">Retour à la liste</a>
         </li>
         <li>
             {{ form_start(delete_form) }}

@@ -4,7 +4,6 @@ namespace APM\TransportBundle\Form;
 
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -19,10 +18,12 @@ class Livreur_boutiqueType extends AbstractType
     {
         $builder
             ->add('reference', TextType::class)
-            ->add('boutique', EntityType::class, [
+            ->add('boutiques', EntityType::class, [
                 'class' => 'APMVenteBundle:Boutique',
-                'choice_label' => 'code'
+                'multiple' => true,
+                'required' => false,
             ])
+            ->add('transporteur', Profile_transporteurType::class)
         ;
     }
     

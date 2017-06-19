@@ -3,47 +3,89 @@
 namespace APM\UserBundle\Controller;
 
 use APM\UserBundle\Entity\Commentaire;
-use APM\UserBundle\Entity\Utilisateur_avm;
 use APM\UserBundle\Factory\TradeFactory;
+use APM\VenteBundle\Entity\Offre;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Commentaire controller.
+ * Tout utilisateur peut éditer, modifier ou supprimer des commentaires sur n'importe qu'elle offre; mais seul le proprietaire
+ * de l'offre peut les publier
  *
  */
 class CommentaireController extends Controller
 {
     /**
-     * Lists all Commentaire entities.
+     * Liste les commentaires faits sur une offre
+     * un commentaire sur une offre pourrait être publié ou non
+     * Tant q'un commentaire n'est pas publié, il n'est accessible qu'à celui qui l'a poster et aux ayants droits de l'offre
      *
+     * @param Offre $offre
+     * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function indexAction()
+    public function indexAction(Offre $offre)
     {
         $this->listAndShowSecurity();
-        /** @var Utilisateur_avm $user */
+        $vendeur = $offre->getVendeur();
+        $boutique = $offre->getBoutique();
+        $gerant = null;
+        $proprietaire = null;
+        $commentaires = null;
+        if ($boutique) {
+            $gerant = $boutique->getGerant();
+            $proprietaire = $boutique->getProprietaire();
+        }
+        $comments = $offre->getCommentaires();
+        $commentaires = $comments;
         $user = $this->getUser();
-        $commentaires = $user->getCommentaires();
+        if ($user !== $vendeur && $user !== $gerant && $user !== $proprietaire) {
+            $commentaires = null;
+            /** @var Commentaire $commentaire */
+            foreach ($comments as $commentaire) { //presenter uniquement les commentaires publiés au publique
+                if ($commentaire->isPubliable() || $commentaire->getUtilisateur() === $user) {
+                    $commentaires [] = $commentaire;
+                }
+            }
+        }
+
         return $this->render('APMUserBundle:commentaire:index.html.twig', array(
             'commentaires' => $commentaires,
+            'offre' => $offre,
         ));
+    }
+
+    /**
+     *
+     * @internal param bool $access
+     */
+    private function listAndShowSecurity()
+    {
+        //-----------------------------------security-------------------------------------------
+        $this->denyAccessUnlessGranted('ROLE_USERAVM', null, 'Unable to access this page!');
+        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
+            throw $this->createAccessDeniedException();
+        }
+        //----------------------------------------------------------------------------------------
     }
 
     /**
      * Creates a new Commentaire entity.
      * @param Request $request
+     * @param Offre $offre
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function newAction(Request $request)
+    public function newAction(Request $request, Offre $offre)
     {
-        $this->createSecurity();
+        $this->createSecurity($offre);
         /** @var Commentaire $commentaire */
         $commentaire = TradeFactory::getTradeProvider("commentaire");
         $form = $this->createForm('APM\UserBundle\Form\CommentaireType', $commentaire);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            $this->createSecurity();
+            $this->createSecurity($offre);
             $commentaire->setUtilisateur($this->getUser());
+            $commentaire->setOffre($offre);
             $em = $this->getDoctrine()->getManager();
             $em->persist($commentaire);
             $em->flush();
@@ -53,8 +95,23 @@ class CommentaireController extends Controller
 
         return $this->render('APMUserBundle:commentaire:new.html.twig', array(
             'commentaire' => $commentaire,
+            'offre' => $offre,
             'form' => $form->createView(),
         ));
+    }
+
+    /**
+     * @param Offre $offre
+     */
+    private function createSecurity($offre)
+    {
+        //---------------------------------security-----------------------------------------------
+        $this->denyAccessUnlessGranted('ROLE_USERAVM', null, 'Unable to access this page!');
+        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY')) {
+            throw $this->createAccessDeniedException();
+        }
+        if (!$offre->getPubliable()) throw $this->createAccessDeniedException();
+        //----------------------------------------------------------------------------------------
     }
 
     /**
@@ -119,6 +176,26 @@ class CommentaireController extends Controller
     }
 
     /**
+     * @param Commentaire $commentaire
+     */
+    private function editAndDeleteSecurity($commentaire)
+    {
+        //---------------------------------security-----------------------------------------------
+        $this->denyAccessUnlessGranted('ROLE_USERAVM', null, 'Unable to access this page!');
+        /* ensure that the user is logged in
+        *  and that the one is the author
+        */
+        $user = $this->getUser();
+        if ((!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY')) || ($commentaire->getUtilisateur() !== $user)) {
+            throw $this->createAccessDeniedException();
+        }
+        //----------------------------------------------------------------------------------------
+
+    }
+
+    // pour soumettre un commentaire il faut que l'offre soit publique
+
+    /**
      * Deletes a Commentaire entity.
      * @param Request $request
      * @param Commentaire $commentaire
@@ -139,54 +216,14 @@ class CommentaireController extends Controller
         return $this->redirectToRoute('apm_user_commentaire_index');
     }
 
-    public function deleteFromListAction(Commentaire $object)
+    public function deleteFromListAction(Commentaire $commentaire)
     {
         $this->editAndDeleteSecurity($commentaire);
         $em = $this->getDoctrine()->getManager();
-        $em->remove($object);
+        $em->remove($commentaire);
         $em->flush();
 
         return $this->redirectToRoute('apm_user_commentaire_index');
-    }
-
-
-    private function listAndShowSecurity(){
-        //-----------------------------------security-------------------------------------------
-        // Unable to access the controller unless you have a USERAVM role
-        $this->denyAccessUnlessGranted('ROLE_USERAVM', null, 'Unable to access this page!');
-        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_REMEMBERED'))  {
-            throw $this->createAccessDeniedException();
-        }
-        //----------------------------------------------------------------------------------------
-    }
-
-
-    private function createSecurity(){
-        //---------------------------------security-----------------------------------------------
-        // Unable to access the controller unless you have a USERAVM role
-        $this->denyAccessUnlessGranted('ROLE_USERAVM', null, 'Unable to access this page!');
-        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY')) {
-            throw $this->createAccessDeniedException();
-        }
-        //----------------------------------------------------------------------------------------
-    }
-
-    /**
-     * @param Commentaire $commentaire
-     */
-    private function editAndDeleteSecurity($commentaire){
-        //---------------------------------security-----------------------------------------------
-        // Unable to access the controller unless you have a USERAVM role
-        $this->denyAccessUnlessGranted('ROLE_USERAVM', null, 'Unable to access this page!');
-        /* ensure that the user is logged in
-        *  and that the one is the owner
-        */
-        $user = $this->getUser();
-        if ((!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY')) || ($commentaire->getUtilisateur() !== $user)) {
-            throw $this->createAccessDeniedException();
-        }
-        //----------------------------------------------------------------------------------------
-
     }
 
 }

@@ -36,9 +36,8 @@ class Zone_interventionType extends AbstractType
             ->add('pays', CountryType::class, [
                     'placeholder' => 'choisir un pays']
             )
-            ->add('livreur_boutique', EntityType::class,[
-                'class' =>'APMTransportBundle:Livreur_boutique',
-                'choice_label' =>'reference',
+            ->add('transporteur', EntityType::class, [
+                'class' => 'APMTransportBundle:Profile_transporteur',
                 'required' =>false
             ])
         ;

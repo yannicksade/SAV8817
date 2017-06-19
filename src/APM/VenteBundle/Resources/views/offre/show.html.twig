@@ -1,13 +1,15 @@
-{% extends "APMAdminBundle:_Main:layout.html.twig" %}
+{% extends ":base/dashboard:layout.html.twig" %}
 
-{% block body %}
-    <h1>Offre</h1>
+{% block content_body %}
+    <h1><strong>{{ offre }}</strong></h1>
 
     <table>
         <tbody>
         <tr>
             <th>Boutique</th>
-            <td>{% if offre.boutique %}<a href="{{ path('apm_vente_boutique_show', { 'id': offre.boutique.id }) }}"><strong>{{ offre.boutique.designation }}</strong></a>{% else %}<i>Free lance</i>{% endif %}</td>
+            <td>{% if offre.boutique %}<a
+                    href="{{ path('apm_vente_boutique_show', { 'id': offre.boutique.id }) }}">
+                    <strong>{{ offre.boutique }}</strong></a>{% else %}<i>Free lance</i>{% endif %}</td>
         </tr>
         <tr>
             <th>Vendeur</th>
@@ -16,11 +18,7 @@
 
         <tr>
             <th>Catégorie</th>
-            <td>{% if offre.categorie.categorieCourante %}{{ offre.categorie.categorieCourante.designation }}{% endif %}</td>
-
-            <th>Catégorie parent</th>
-            <td>{% if offre.categorie %}{{ offre.categorie.designation }}{% endif %}</td>
-
+            <td>{% if offre.categorie %}{{ offre.categorie }}{% endif %}</td>
         </tr>
 
         <tr>
@@ -58,10 +56,6 @@
             <td>{{ offre.etat }}</td>
         </tr>
         <tr>
-            <th>Image</th>
-            <td>{{ offre.image }}</td>
-        </tr>
-        <tr>
             <th>Modevente</th>
             <td>{{ offre.modeVente }}</td>
         </tr>
@@ -94,26 +88,78 @@
             <th>Valide</th>
             <td>{% if offre.valide %}Yes{% else %}No{% endif %}</td>
         </tr>
-            <tr>
-                <th>Remiseproduit</th>
-                {% for remise in offre.remises %}
-                    <td>
-                         <a href="{{ path('apm_vente_remise_show', { 'id': remise.id }) }}"> {{ remise.code }}</a>
-                    </td>
-                {% endfor %}
-            </tr>
+        <tr>
+            <th>Image</th>
+            <td><img src="{{ asset(url_image ~ offre.image) }}"/></td>
+        </tr>
+        {#<tr>asset
+            <th>Remiseproduit</th>
+            {% for remise in offre.remises %}
+                <td>
+                     <a href="{{ path('apm_vente_remise_show', { 'id': remise.id }) }}"> {{ remise.code }}</a>
+                </td>
+            {% endfor %}
+        </tr>#}
         </tbody>
     </table>
-
     <ul>
+
         <li>
-            <a href="{{ path('apm_vente_remise_new', {'id': offre.id}) }}">Créer une remise</a>
+            <a href="{{ path('apm_vente_offre_index') }}">Liste mes offres</a>
+        </li>
+        {% if app.user == offre.vendeur or offre.boutique !=null and offre.boutique.gerant == app.user or offre.boutique !=null and offre.boutique.proprietaire ==app.user %}
+            <li>
+                <a href="{{ path('apm_vente_transaction_produit_new', {'id': offre.id}) }}">Faites une
+                    transaction sur
+                    ce produit</a>
+            </li>
+            <li>
+                <a href="{{ path('apm_vente_remise_offre_new', {'id': offre.id}) }}">Créer une remise sur
+                    l'offre</a>
+            </li>
+            <li>
+                <a href="{{ path('apm_vente_offre_edit', { 'id': offre.id }) }}">Modifier</a>
+            </li>
+            <li>
+                <a href="{{ path('apm_vente_rabais_offre_new', { 'id': offre.id }) }}">Créer un rabais</a>
+            </li>
+            {% if offre.boutique %}
+                <li>
+                    <a href="{{ path('apm_vente_boutique_show', { 'id': offre.boutique.id }) }}">Afficher la
+                        boutique</a>
+                </li>
+            {% endif %}
+            {% if offre.categorie %}
+                <li>
+                    <a href="{{ path('apm_vente_categorie_show', { 'id': offre.categorie.id }) }}">Retour à la
+                        catégorie</a>
+                </li>
+            {% endif %}
+            <li>
+                <a href="{{ path('apm_vente_remise_offre_index', {'id':offre.id}) }}">liste les remise sur
+                    l'offre</a>
+            </li>
+            <li>
+                <a href="{{ path('apm_vente_transaction_produit_offre_index', {'offre_id':offre.id}) }}">liste
+                    les
+                    transactions produits sur cette offre</a>
+            </li>
+        {% endif %}
+        <li>
+            <a href="{{ path('apm_vente_transaction_produit_user_index') }}"> retour à la liste de mes
+                transactions produits</a>
         </li>
         <li>
-            <a href="{{ path('apm_vente_offre_index')}}">Retour à la liste</a>
+            <a href="{{ path('apm_core_user-dashboard_index') }}"> Retour à l'accueil</a>
         </li>
         <li>
-            <a href="{{ path('apm_vente_offre_edit', { 'id': offre.id }) }}">Modifier</a>
+            <a href="{{ path('apm_achat_specification_achat_new', {'id':offre.id}) }}">passer une commande ou
+                faire une spécification sur l'offre</a>
+        </li>
+
+        <li>
+            <a href="{{ path('apm_achat_specification_achat_offre_index', {'id':offre.id}) }}">Lister les
+                spécifications sur l'offre</a>
         </li>
         <li>
             {{ form_start(delete_form) }}
@@ -121,4 +167,6 @@
             {{ form_end(delete_form) }}
         </li>
     </ul>
-{% endblock %}
+    {# </div>
+ </div>#}
+{% endblock content_body %}

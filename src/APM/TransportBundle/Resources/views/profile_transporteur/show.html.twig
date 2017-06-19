@@ -1,7 +1,7 @@
 {% extends "APMAdminBundle:_Main:layout.html.twig" %}
 
 {% block body %}
-    <h1>profile_transporteur</h1>
+    <h1>Profile du transporteur</h1>
 
     <table>
         <tbody>
@@ -10,31 +10,39 @@
             <td>{{ profile_transporteur.code }}</td>
         </tr>
         <tr>
-            <th>Livreurboutique</th>
-            <td>{% if profile_transporteur.livreurBoutique %}Yes{% else %}No{% endif %}</td>
+            <th>Transporteur autonome</th>
+            <td><b>YES</b></td>
         </tr>
         <tr>
             <th>Matricule</th>
             <td>{{ profile_transporteur.matricule }}</td>
         </tr>
+        <tr>
+            <th>Prenom/pseudo de l'agent</th>
+            <td>{{ profile_transporteur.utilisateur }}</td>
         </tbody>
     </table>
 
     <ul>
         <li>
-            <a href="{{ path('apm_transport_transporteur_index') }}">Back to the list</a>
+            <a href="{{ path('apm_transport_transporteur_All_index') }}">Retour à la liste des transporteurs</a>
         </li>
         <li>
-            <a href="{{ path('apm_transport_transporteur_edit', { 'id': profile_transporteur.id }) }}">Edit</a>
+            <a href="{{ path('apm_zone_transporteur-zone_intervention_index',{'id': profile_transporteur.id }) }}">Liste
+                les zones d'interventions du transporteur</a>
         </li>
-        <li>
-            <a href="{{ path('apm_transport_transporteur_new') }}">Add a new one</a>
-        </li>
-
-        <li>
-            {{ form_start(delete_form) }}
-            <input type="submit" value="Delete">
-            {{ form_end(delete_form) }}
-        </li>
+        {% if app.user == profile_transporteur.utilisateur or profile_transporteur.livreurBoutique != null and app.user == profile_transporteur.livreurBoutique.transporteur.utilisateur %}
+            <li>
+                <a href="{{ path('apm_transport_transporteur_edit', { 'id': profile_transporteur.id }) }}">Modifier</a>
+            </li>
+            <li>
+                <a href="{{ path('apm_transport_transporteur_new') }}">Supprimer</a>
+            </li>
+            <li>
+                {{ form_start(delete_form) }}
+                <input type="submit" value="Delete">
+                {{ form_end(delete_form) }}
+            </li>
+        {% endif %}
     </ul>
 {% endblock %}

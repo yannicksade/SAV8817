@@ -28,6 +28,30 @@ class Base_documentaireController extends Controller
         ));
     }
 
+    /*
+     * Rename and Download a file
+     */
+    public function downloadFileAction(Base_documentaire $document)
+    {
+        $this->listAndShowSecurity();
+        $downloadHandler = $this->get('vich_uploader.download_handler');
+        $fileName = $document->getBrochure();
+        $fileName = explode('.', $fileName);
+        $fileName = $document->getObjet() . '.' . $fileName[1];
+        return $downloadHandler->downloadObject($document, $fileField = 'productFile', $objectClass = null, $fileName);
+    }
+
+    private function listAndShowSecurity()
+    {
+        //---------------------------------security-----------------------------------------------
+        // Unable to access the controller unless you have a USERAVM role
+        $this->denyAccessUnlessGranted('ROLE_USERAVM', null, 'Unable to access this page!');
+        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
+            throw $this->createAccessDeniedException();
+        }
+        //----------------------------------------------------------------------------------------
+    }
+
     /**
      * Creates a new Base_documentaire entity.
      * @param Request $request
@@ -54,6 +78,18 @@ class Base_documentaireController extends Controller
             'document' => $document,
             'form' => $form->createView(),
         ));
+    }
+
+    private function createSecurity()
+    {
+        //---------------------------------security-----------------------------------------------
+        // Unable to access the controller unless you have a USERAVM role
+        $this->denyAccessUnlessGranted('ROLE_USERAVM', null, 'Unable to access this page!');
+
+        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY')) {
+            throw $this->createAccessDeniedException();
+        }
+        //----------------------------------------------------------------------------------------
     }
 
     /**
@@ -118,6 +154,24 @@ class Base_documentaireController extends Controller
     }
 
     /**
+     * @param Base_documentaire $document
+     */
+    private function editAndDeleteSecurity($document)
+    {
+        //---------------------------------security-----------------------------------------------
+        // Unable to access the controller unless you have a USERAVM role
+        $this->denyAccessUnlessGranted('ROLE_USERAVM', null, 'Unable to access this page!');
+        if ((!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY'))) {
+            throw $this->createAccessDeniedException();
+        }
+        $user = $this->getUser();
+        if ($document->getProprietaire() !== $user) {
+            throw $this->createAccessDeniedException();
+        }
+        //----------------------------------------------------------------------------------------
+    }
+
+    /**
      * Deletes a Base_documentaire entity.
      * @param Request $request
      * @param Base_documentaire $document
@@ -148,51 +202,5 @@ class Base_documentaireController extends Controller
         $em->flush();
 
         return $this->redirectToRoute('apm_animation_base_documentaire_index');
-    }
-
-    /**
-     * @param Base_documentaire $document
-     */
-    private function editAndDeleteSecurity($document){
-        //---------------------------------security-----------------------------------------------
-        // Unable to access the controller unless you have a USERAVM role
-        $this->denyAccessUnlessGranted('ROLE_USERAVM', null, 'Unable to access this page!');
-
-        /* ensure that the user is logged in  # granted even through remembering cookies
-        *  and that the one is the owner
-        */
-        $user = $this->getUser();
-        if ((!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY')) || ($document->getProprietaire() !== $user)) {
-            throw $this->createAccessDeniedException();
-        }
-        //----------------------------------------------------------------------------------------
-    }
-
-    private function listAndShowSecurity(){
-        //---------------------------------security-----------------------------------------------
-        // Unable to access the controller unless you have a USERAVM role
-        $this->denyAccessUnlessGranted('ROLE_USERAVM', null, 'Unable to access this page!');
-
-        /* ensure that the user is logged in  # granted even through remembering cookies
-        *  and that the one is the owner
-        */
-        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
-            throw $this->createAccessDeniedException();
-        }
-        //----------------------------------------------------------------------------------------
-    }
-
-    private function createSecurity(){
-        //---------------------------------security-----------------------------------------------
-        // Unable to access the controller unless you have a USERAVM role
-        $this->denyAccessUnlessGranted('ROLE_USERAVM', null, 'Unable to access this page!');
-
-        /* ensure that the user is logged in  # granted even through remembering cookies
-        *  and that the one is the owner
-        */
-        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY')) {
-            throw $this->createAccessDeniedException();
-        }
-        //----------------------------------------------------------------------------------------
     }
 }

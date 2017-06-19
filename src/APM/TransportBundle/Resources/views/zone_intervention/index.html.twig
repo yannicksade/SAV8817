@@ -1,8 +1,53 @@
 {% extends "APMAdminBundle:_Main:layout.html.twig" %}
 
 {% block body %}
-    <h1>Zone_intervention list</h1>
+    <h1> Zones d'interventions </h1> <strong>{% if transporteur != null %} Transporteur:
+        {% if transporteur.livreurBoutique %}
+            <a href="{{ path('apm_transport_livreur_boutique_show', { 'id':transporteur.livreurBoutique.id }) }}">{{ transporteur }}</a>
+        {% else %}
+            <a href="{{ path('apm_transport_transporteur_show', { 'id': transporteur.id }) }}">{{ transporteur }}</a>
+        {% endif %}{% endif %}</strong>
 
+    {% if zoneInterventionsCreees != null %}
+        <table>
+            <thead>
+            <tr>
+                <th>Code</th>
+                <th>Désignation</th>
+                <th>Pays</th>
+                <th>Description</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            <p>-------------------------------- Zones d'interventions --------------------------------</p>
+            {% for zone_intervention in zoneInterventionsCreees %}
+
+                <tr>
+                    <td>
+                        <a href="{{ path('apm_zone_intervention_show', { 'id': zone_intervention.id }) }}">{{ zone_intervention.code }}</a>
+                    </td>
+                    <td>{{ zone_intervention.designation }}</td>
+                    <td>{{ zone_intervention.pays }}</td>
+                    <td>{{ zone_intervention.description }}</td>
+                    <td>
+                        <ul>
+                            <li>
+                                <a href="{{ path('apm_zone_intervention_show', { 'id': zone_intervention.id }) }}">détail</a>
+                            </li>
+                            <li>
+                                <a href="{{ path('apm_zone_intervention_edit', { 'id': zone_intervention.id }) }}">modifier</a>
+                            </li>
+                            <li>
+                                <a href="{{ path('apm_zone_intervention_deleteFromList', { 'id': zone_intervention.id }) }}">supprimer</a>
+                            </li>
+                        </ul>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
     <table>
         <thead>
         <tr>
@@ -14,7 +59,17 @@
         </tr>
         </thead>
         <tbody>
-        {% for zone_intervention in zone_interventions %}
+        {% if zoneInterventionsCreees == null %}
+            <p>-------------------------------- Toutes les Zones d'interventions disponibles
+                --------------------------------</p>
+        {% else %}
+            <p>-------------------------------- Autres Zones d'interventions
+                --------------------------------</p>
+        {% endif %}
+        {% for zone_intervention in zoneInterventions %}
+            {% if transporteur %}
+                <p> Transporteur: <strong>{{ transporteur }}</strong></p>
+            {% endif %}
             <tr>
                 <td>
                     <a href="{{ path('apm_zone_intervention_show', { 'id': zone_intervention.id }) }}">{{ zone_intervention.code }}</a>
@@ -25,25 +80,22 @@
                 <td>
                     <ul>
                         <li>
-                            <a href="{{ path('apm_zone_intervention_show', { 'id': zone_intervention.id }) }}">show</a>
+                            <a href="{{ path('apm_zone_intervention_show', { 'id': zone_intervention.id }) }}">détail</a>
                         </li>
-                        <li>
-                            <a href="{{ path('apm_zone_intervention_edit', { 'id': zone_intervention.id }) }}">edit</a>
-                        </li>
-                        <li>
-                            <a href="{{ path('apm_zone_intervention_deleteFromList', { 'id': zone_intervention.id }) }}">delete</a>
-                        </li>
-
                     </ul>
                 </td>
             </tr>
         {% endfor %}
         </tbody>
     </table>
-
     <ul>
         <li>
-            <a href="{{ path('apm_zone_intervention_new') }}">Create a new entry</a>
+            <a href="{{ path('apm_zone_intervention_new') }}">Créer une zone d'intervention</a>
         </li>
+        {% if zoneInterventionsCreees == null %}
+            <li>
+                <a href="{{ path('apm_zone_intervention_index') }}">Liste toutes des zones</a>
+            </li>
+        {% endif %}
     </ul>
 {% endblock %}

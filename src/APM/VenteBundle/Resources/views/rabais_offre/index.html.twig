@@ -1,48 +1,119 @@
 {% extends "APMAdminBundle:_Main:layout.html.twig" %}
 
 {% block body %}
-    <h1>Rabais_offre list</h1>
-
-    <table>
-        <thead>
-        <tr>
-            <th>Code</th>
-            <th>Nombredefois</th>
-            <th>prixUpdate</th>
-            <th>Quantitemin</th>
-            <th>Actions</th>
-        </tr>
-        </thead>
-        <tbody>
-        {% for rabais_offre in rabais_offres %}
+    {% if offre %}{% if offre.boutique %} - <a
+            href="{{ path('apm_vente_boutique_show', {'id': offre.boutique.id}) }}"> {{ offre.boutique }}</a>{% endif %}{% endif %}
+    {% if rabais_offres %}
+        <table>
+            <thead>
             <tr>
-                <td>
-                    <a href="{{ path('apm_vente_rabais_offre_show', { 'id': rabais_offre.id }) }}">{{ rabais_offre.code }}</a>
-                </td>
-                <td>{{ rabais_offre.nombreDefois }}</td>
-                <td>{{ rabais_offre.prixUpdate }}</td>
-                <td>{{ rabais_offre.quantiteMin }}</td>
-                <td>
-                    <ul>
-                        <li>
-                            <a href="{{ path('apm_vente_rabais_offre_show', { 'id': rabais_offre.id }) }}">show</a>
-                        </li>
-                        <li>
-                            <a href="{{ path('apm_vente_rabais_offre_edit', { 'id': rabais_offre.id }) }}">edit</a>
-                        </li>
-                        <li>
-                            <a href="{{ path('apm_vente_rabais_offre_deleteFromList', { 'id': rabais_offre.id }) }}">delete</a>
-                        </li>
-                    </ul>
-                </td>
+                <th>Code</th>
+                <th>Nombre d'utilisation</th>
+                <th>prix Revu</th>
+                <th>Quantite minimale</th>
+                <th>Actions</th>
             </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+            <p>-------------------------------------------------- Rabais Offre
+                --------------------------------------------------</p>
+            {% for rabais_offre in rabais_offres %}
+                <tr>
+                    <td>
+                        <a href="{{ path('apm_vente_rabais_offre_show', { 'id': rabais_offre.id }) }}">{{ rabais_offre.code }}</a>
+                    </td>
+                    <td>{{ rabais_offre.nombreDefois }}</td>
+                    <td>{{ rabais_offre.prixUpdate }}</td>
+                    <td>{{ rabais_offre.quantiteMin }}</td>
+                    <td>
+
+                        <a href="{{ path('apm_vente_rabais_offre_show', { 'id': rabais_offre.id }) }}">show</a>
+
+                        <a href="{{ path('apm_vente_rabais_offre_edit', { 'id': rabais_offre.id }) }}">edit</a>
+
+                        <a href="{{ path('apm_vente_rabais_offre_deleteFromList', { 'id': rabais_offre.id }) }}">delete</a>
+
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
+    {% endif %}
+
+    {% if rabais_accordes %}
+
+        <table>
+            <thead>
+            <tr>
+                <th>Code</th>
+                <th>Offre</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            <p>-------------------------------------------------- Rabais Accordés
+                --------------------------------------------------</p>
+            {% for rabais in rabais_accordes %}
+                <tr>
+                    <td><a href="{{ path('apm_vente_rabais_offre_show', { 'id': rabais.id }) }}">{{ rabais.code }}</a>
+                    </td>
+                    ->
+                    <td><a href="{{ path('apm_vente_offre_show', {'id': rabais.offre.id}) }}">{{ rabais.offre }}</a>
+                    </td>
+                    <td>;
+                        <a href="{{ path('apm_vente_rabais_offre_edit', { 'id': rabais.id }) }}">modifier</a>
+
+                        <a href="{{ path('apm_vente_rabais_offre_deleteFromList', { 'id': rabais.id }) }}">supprimer</a>
+
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
+    {% endif %}
+
+    {% if rabais_recus %}
+
+        <table>
+            <thead>
+            <tr>
+                <th>Code</th>
+                <th>Offre</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            <p>-------------------------------------------------- Rabais Reçus
+                --------------------------------------------------</p>
+            {% for rabais in rabais_recus %}
+                <tr>
+                    <td><a href="{{ path('apm_vente_rabais_offre_show', { 'id': rabais.id }) }}">{{ rabais.code }}</a>
+                    </td>
+                    <td><a href="{{ path('apm_vente_offre_show', {'id': rabais.offre.id}) }}">{{ rabais.offre }}</a>
+                    </td>
+                    <td><a href="{{ path('apm_vente_rabais_offre_edit', { 'id': rabais.id }) }}">edit</a></td>
+                    <td><a href="{{ path('apm_vente_rabais_offre_deleteFromList', { 'id': rabais.id }) }}">delete</a>
+                    </td>
+                </tr>
+            {% endfor %}
+
+            </tbody>
+        </table>
+    {% endif %}
 
     <ul>
-        <li>
-            <a href="{{ path('apm_vente_rabais_offre_new') }}">Create a new entry</a>
-        </li>
+        {% if offre %}
+            <li>
+                <a href="{{ path('apm_vente_rabais_offre_new', {'id': offre.id}) }}">Créer un nouveau rabais</a>
+            </li>
+            {% if offre.boutique %}
+                <li>
+                    <a href="{{ path('apm_vente_boutique_show', {'id': offre.boutique.id}) }}">Retour à la boutique</a>
+                </li>
+            {% endif %}
+        {% endif %}
+
     </ul>
 {% endblock %}

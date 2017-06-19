@@ -9,6 +9,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Vich\UploaderBundle\Form\Type\VichImageType;
 
 class BoutiqueType extends AbstractType
 {
@@ -37,7 +38,12 @@ class BoutiqueType extends AbstractType
                 ],
                 'required' => false
             ))
-            ->add('gerant');
+            ->add('imageFile', VichImageType::class, [
+                'required' => false,
+                'allow_delete' => true,
+
+            ])
+            ->add('gerant'); //<= le proprietaire doit rechercher le gérant avec son code, le system lui renverra son profile pour validation
     }
 
     /**

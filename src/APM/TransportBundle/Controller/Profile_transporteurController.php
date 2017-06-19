@@ -8,7 +8,6 @@ use APM\UserBundle\Entity\Utilisateur_avm;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 
-
 /**
  * Profile_transporteur controller.
  *
@@ -16,17 +15,24 @@ use Symfony\Component\HttpFoundation\Request;
 class Profile_transporteurController extends Controller
 {
     /**
-     *  Afficher le profile du transporteur
+     * fonction search des transporteurs
+     * @param string $name
+     * @param $value
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function indexAction()
+    public function indexAction($name = null, $value = null)
     {
         $this->listeAndShowSecurity();
-        /** @var Utilisateur_avm $user */
-        $user = $this->getUser();
-        $profile_transporteur = $user->getTransporteur();
+        $em = $this->getDoctrine()->getManager();
+        if ($name || $value) {
+            $profile_transporteurs = $em->getRepository('APMTransportBundle:Profile_transporteur')->findBy([$name => $value]);
+        } else {
+            $profile_transporteurs = $em->getRepository('APMTransportBundle:Profile_transporteur')->findAll();
+        }
+
         return $this->render('APMTransportBundle:profile_transporteur:index.html.twig', array(
-            'profile_transporteurs' => $profile_transporteur,
+            'profile_transporteurs' => $profile_transporteurs,
+            'zone' => null,
         ));
     }
 
@@ -34,8 +40,8 @@ class Profile_transporteurController extends Controller
     {
         //---------------------------------security-----------------------------------------------
         // Unable to access the controller unless you have a USERAVM role
-        $this->denyAccessUnlessGranted('ROLE_TRANSPORTEUR', null, 'Unable to access this page!');
-        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
+        $this->denyAccessUnlessGranted('ROLE_USERAVM', null, 'Unable to access this page!');
+        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY')) {
             throw $this->createAccessDeniedException();
         }
         //----------------------------------------------------------------------------------------
@@ -52,6 +58,7 @@ class Profile_transporteurController extends Controller
         /** @var Profile_transporteur $profile_transporteur */
         $profile_transporteur = TradeFactory::getTradeProvider("transporteur");
         $form = $this->createForm('APM\TransportBundle\Form\Profile_transporteurType', $profile_transporteur);
+        $form->remove('utilisateur');
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             $this->createSecurity();
@@ -74,10 +81,16 @@ class Profile_transporteurController extends Controller
         //---------------------------------security-----------------------------------------------
         // Unable to access the controller unless you have a USERAVM role
         $this->denyAccessUnlessGranted('ROLE_TRANSPORTEUR', null, 'Unable to access this page!');
-
         if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY')) {
             throw $this->createAccessDeniedException();
         }
+        //vérifier si l'utilisateur n'est pas déjà enregistré comme transporteur ou livreur
+        /** @var Utilisateur_avm $user */
+        $user = $this->getUser();
+        $em = $this->getDoctrine()->getManager();
+        $utilisateur = null;
+        $utilisateur = $em->getRepository('APMTransportBundle:Profile_transporteur')->findOneBy(['utilisateur' => $user->getId()]);
+        if (null !== $utilisateur) throw $this->createAccessDeniedException();
         //----------------------------------------------------------------------------------------
     }
 
@@ -123,6 +136,7 @@ class Profile_transporteurController extends Controller
         $this->editAndDeleteSecurity($profile_transporteur);
         $deleteForm = $this->createDeleteForm($profile_transporteur);
         $editForm = $this->createForm('APM\TransportBundle\Form\Profile_transporteurType', $profile_transporteur);
+        $editForm->remove('utilisateur');
         $editForm->handleRequest($request);
 
         if ($editForm->isSubmitted() && $editForm->isValid()) {
@@ -148,8 +162,12 @@ class Profile_transporteurController extends Controller
         //---------------------------------security-----------------------------------------------
         // Unable to access the controller unless you have a USERAVM role
         $this->denyAccessUnlessGranted('ROLE_TRANSPORTEUR', null, 'Unable to access this page!');
+        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY')) {
+            throw $this->createAccessDeniedException();
+        }
+        //autoriser la modification uniquement qau transporteur autonome de droit exclut tout livreur boutique
         $user = $this->getUser();
-        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY') || $user !== $transporteur->getUtilisateur()) {
+        if ($transporteur->getLivreurBoutique() || $user !== $transporteur->getUtilisateur()) {
             throw $this->createAccessDeniedException();
         }
         //----------------------------------------------------------------------------------------

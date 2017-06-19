@@ -2,6 +2,6 @@ apm_marketing_reseau_homepage:
     path:     /marketing_reseau
     defaults: { _controller: APMMarketingReseauBundle:Default:index }
 
-apm_marketing_reseau_conseillers:
+apm_marketing_reseau:
     resource: "@APMMarketingReseauBundle/Resources/config/routing/reseau_conseillers.yml"
-    prefix:   /marketing_reseau_conseillers
+    prefix:   /marketing/reseau

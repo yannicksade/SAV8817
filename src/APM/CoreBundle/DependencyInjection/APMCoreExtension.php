@@ -19,10 +19,13 @@ class APMCoreExtension extends Extension
      */
     public function load(array $configs, ContainerBuilder $container)
     {
-//        $configuration = new Configuration();
-//        $config = $this->processConfiguration($configuration, $configs);
+        //$value = $container->get('apm_core.crop_image')->setCropParameters(216, 79);
+
+        /*$container->setParameter('_x_', 200);
+        $container->setParameter('_y_', 100);*/
 
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
+        $loader->load('config.yml');
         $loader->load('services.yml');
     }
 }

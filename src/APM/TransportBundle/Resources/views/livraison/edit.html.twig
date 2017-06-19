@@ -8,9 +8,16 @@
     {{ form_end(edit_form) }}
 
     <ul>
-        <li>
-            <a href="{{ path('apm_transport_livraison_index') }}">Back to the list</a>
-        </li>
+        {% if livraison.boutique %}
+            <li>
+                <a href="{{ path('apm_transport_livraison_boutique_index', {'id':livraison.boutique.id}) }}">Retour aux
+                    livraisons de la boutique</a>
+            </li>
+        {% else %}
+            <li>
+                <a href="{{ path('apm_transport_livraison_index') }}">Retour aux livraisons de l'utilisateur</a>
+            </li>
+        {% endif %}
         <li>
             {{ form_start(delete_form) }}
             <input type="submit" value="Delete">

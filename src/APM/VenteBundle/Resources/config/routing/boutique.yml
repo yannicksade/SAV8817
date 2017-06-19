@@ -1,13 +1,23 @@
 #--------------------------- Objects factory ------------------------------------------
 apm_vente_boutique_index:
-    path:     /
+    path:     /personal
     defaults: { _controller: "APMVenteBundle:Boutique:index" }
+    methods:  GET
+
+apm_vente_boutique_search:
+    path:     /search-byCriterias/{name}/{value}
+    defaults: { _controller: "APMVenteBundle:Boutique:search" }
     methods:  GET
 
 apm_vente_boutique_show:
     path:     /{id}/show
     defaults: { _controller: "APMVenteBundle:Boutique:show" }
     methods:  GET
+
+apm_vente_boutique_show-image:
+    path:     /{id}/show-image
+    defaults: { _controller: "APMVenteBundle:Boutique:showImage" }
+    methods:  [GET, POST]
 
 apm_vente_boutique_new:
     path:     /new
@@ -27,3 +37,8 @@ apm_vente_boutique_delete:
 apm_vente_boutique_deleteFromList:
     path:     /list/{id}/delete
     defaults: { _controller: "APMVenteBundle:Boutique:deleteFromList" }
+
+apm_vente_AjaxBoutique_index:
+    path:     /query/ajax-boutique
+    defaults: { _controller: "APMVenteBundle:AjaxQueryVente:indexBoutique" }
+    methods:  GET

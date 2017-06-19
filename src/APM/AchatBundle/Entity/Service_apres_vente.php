@@ -2,23 +2,19 @@
 
 namespace APM\AchatBundle\Entity;
 
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use APM\AchatBundle\Factory\TradeFactory;
 use Symfony\Component\Validator\Constraints as Assert;
 use APM\UserBundle\Entity\Utilisateur_avm;
 use APM\VenteBundle\Entity\Offre;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
-
-
 
 /**
  * Service_apres_vente
  *
  * @ORM\Table(name="Service_apres_vente")
  * @ORM\Entity(repositoryClass="APM\AchatBundle\Repository\Service_apres_venteRepository")
- * @UniqueEntity("codeSav")
+ * @UniqueEntity("code")
  */
 class Service_apres_vente extends TradeFactory
 {
@@ -28,7 +24,7 @@ class Service_apres_vente extends TradeFactory
      * @ORM\Column(name="codeSAV", type="string", length=255, nullable=false)
      *
      */
-    private $codeSav;
+    private $code;
 
     /**
      * @var \DateTime
@@ -50,6 +46,14 @@ class Service_apres_vente extends TradeFactory
      * @ORM\Column(name="etat", type="string", length=255, nullable=true)
      */
     private $etat;
+
+    /**
+     * @var string
+     * @Assert\Length(min=2)
+     * @ORM\Column(name="commentaire", type="string", length=255, nullable=true)
+     */
+    private $commentaire;
+
 
     /**
      * @var integer
@@ -86,30 +90,31 @@ class Service_apres_vente extends TradeFactory
      */
     public function __construct($var)
     {
-        $this->codeSav = "SV" . $var;
+        $this->etat = 8;
+        $this->code = "SC" . $var;
         $this->dateDue = new \DateTime();
     }
 
     /**
-     * Get codeSav
+     * Get code
      *
      * @return string
      */
-    public function getCodeSav()
+    public function getCode()
     {
-        return $this->codeSav;
+        return $this->code;
     }
 
     /**
      * Set codeSav
      *
-     * @param string $codeSav
+     * @param string $code
      *
      * @return Service_apres_vente
      */
-    public function setCodeSav($codeSav)
+    public function setCode($code)
     {
-        $this->codeSav = $codeSav;
+        $this->code = $code;
 
         return $this;
     }
@@ -222,6 +227,15 @@ class Service_apres_vente extends TradeFactory
         return $this;
     }
 
+    /**
+     * Get offre
+     *
+     * @return \APM\VenteBundle\Entity\Offre
+     */
+    public function getOffre()
+    {
+        return $this->offre;
+    }
 
     /**
      * Set offre
@@ -237,13 +251,32 @@ class Service_apres_vente extends TradeFactory
         return $this;
     }
 
-    /**
-     * Get offre
-     *
-     * @return \APM\VenteBundle\Entity\Offre
-     */
-    public function getOffre()
+    public function __toString()
     {
-        return $this->offre;
+        return $this->code;
+    }
+
+    /**
+     * Get commentaire
+     *
+     * @return string
+     */
+    public function getCommentaire()
+    {
+        return $this->commentaire;
+    }
+
+    /**
+     * Set commentaire
+     *
+     * @param string $commentaire
+     *
+     * @return Service_apres_vente
+     */
+    public function setCommentaire($commentaire)
+    {
+        $this->commentaire = $commentaire;
+
+        return $this;
     }
 }

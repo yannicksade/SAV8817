@@ -1,19 +1,17 @@
 {% extends "APMAdminBundle:_Main:layout.html.twig" %}
 
 {% block body %}
-    <h1>Livreur_boutique creation</h1>
+    <h1> Création d'un Livreur pour la boutique {{ boutique }} </h1>
 
     {{ form_start(form) }}
     {{ form_widget(form) }}
-    {{ form_start(form2) }}
-    {{ form_widget(form2) }}
     <input type="submit" value="Create"/>
-    {{ form_end(form2) }}
     {{ form_end(form) }}
 
     <ul>
         <li>
-            <a href="{{ path('apm_transport_livreur_boutique_index') }}">Back to the list</a>
+            <a href="{{ path('apm_transport_livreur_boutique_index', {'id':boutique.id}) }}">Retour à la liste des
+                livreurs boutique</a>
         </li>
     </ul>
 {% endblock %}

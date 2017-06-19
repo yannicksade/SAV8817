@@ -1,15 +1,14 @@
-{% extends "APMAdminBundle:_Main:layout.html.twig" %}
+{% extends ":base/dashboard:layout.html.twig" %}
 
-{% block body %}
-    <div>
+{% block content_body %}
     <table>
         <thead>
-        <tr>- Mes Boutique Propres -</tr>
-        ---------------------------------------------------------
+        <tr>---------------------------- Boutiques -------------------------------</tr>
         <tr>
             <th>Code</th>
             <th>Designation</th>
             <th>Statut Social</th>
+            <th>Proprietaire</th>
             <th>Actions</th>
         </tr>
         </thead>
@@ -21,6 +20,7 @@
                 </td>
                 <td>{{ boutique.designation }}</td>
                 <td>{{ boutique.statutSocial }}</td>
+                <td>{{ boutique.proprietaire }}</td>
                 <td>
                     <ul>
                         <li>
@@ -45,12 +45,11 @@
             <a href="{{ path('apm_vente_boutique_new') }}">Créer une nouvelle boutique</a>
         </li>
     </ul>
-    </div>
-<div>
+
+    {% if boutiquesGerant %}
     <table>
         <thead>
-             <tr>- Boutiques Gérances -</tr>
-        ---------------------------------------------------------
+        <tr>----------------------------- Boutiques Gérances ------------------------------</tr>
         <tr>
             <th>Code</th>
             <th>Nationalite</th>
@@ -82,5 +81,6 @@
         {% endfor %}
         </tbody>
     </table>
-</div>
-{% endblock %}
+    {% endif %}
+    <p><a href="{{ path('apm_core_user-dashboard_index') }}"> Retour à l'accueil</a></p>
+{% endblock content_body %}

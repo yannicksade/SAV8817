@@ -5,6 +5,7 @@ namespace APM\AchatBundle\Controller;
 use APM\AchatBundle\Entity\Specification_achat;
 use APM\AchatBundle\Factory\TradeFactory;
 use APM\UserBundle\Entity\Utilisateur_avm;
+use APM\VenteBundle\Entity\Offre;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -15,28 +16,64 @@ use Symfony\Component\HttpFoundation\Request;
 class Specification_achatController extends Controller
 {
     /**
-     * Liste les Specification faites par le client
+     * Liste les Specification faites par le client sur les offres
+     * Liste les spécifications sur une offre
+     * @param Offre $offre
      * @return \Symfony\Component\HttpFoundation\Response
      * @internal param Utilisateur $utilisateur
      */
-    public function indexAction()
+    public function indexAction(Offre $offre = null)
     {
-        $this->listAndShowSecurity();
-        /** @var Utilisateur_avm $user */
-        $user = $this->getUser();
-        $specification_achats = $user->getSpecifications();
+        $this->listAndShowSecurity($offre);
+        if ($offre) {
+            $specification_achats = $offre->getSpecifications();
+        } else {
+            /** @var Utilisateur_avm $user */
+            $user = $this->getUser();
+            $specification_achats = $user->getSpecifications();
+        }
 
         return $this->render('APMAchatBundle:specification_achat:index.html.twig', array(
             'specification_achats' => $specification_achats,
+            'offre' => $offre,
         ));
     }
 
+    /**
+     * @param Offre |null $offre
+     */
+    private function listAndShowSecurity($offre = null)
+    {
+        //---------------------------------security-----------------------------------------------
+        // Unable to access the controller unless you have a USERAVM role
+        $this->denyAccessUnlessGranted('ROLE_USERAVM', null, 'Unable to access this page!');
+        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY')) {
+            throw $this->createAccessDeniedException();
+        }
+        if ($offre) {
+            $user = $this->getUser();
+            $vendeur = $offre->getVendeur();
+            $boutique = $offre->getBoutique();
+            $gerant = null;
+            $proprietaire = null;
+            if ($boutique) {
+                $gerant = $boutique->getGerant();
+                $proprietaire = $boutique->getProprietaire();
+            }
+            if ($user !== $vendeur && $user !== $gerant && $user !== $proprietaire) {
+                throw $this->createAccessDeniedException();
+            }
+
+        }
+        //----------------------------------------------------------------------------------------
+    }
 
     /**
      * @param Request $request
+     * @param Offre $offre
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function newAction(Request $request)
+    public function newAction(Request $request, Offre $offre)
     {
         $this->createSecurity();
         /** @var Specification_achat $specification_achat */
@@ -46,6 +83,7 @@ class Specification_achatController extends Controller
         if ($form->isSubmitted() && $form->isValid()) {
             $this->createSecurity();
             $specification_achat->setUtilisateur($this->getUser());
+            $specification_achat->setOffre($offre);
             $em = $this->getDoctrine()->getManager();
             $em->persist($specification_achat);
             $em->flush();
@@ -57,6 +95,19 @@ class Specification_achatController extends Controller
             'specification_achat' => $specification_achat,
             'form' => $form->createView(),
         ));
+    }
+
+    private function createSecurity()
+    {
+        //---------------------------------security-----------------------------------------------
+        // Unable to access the controller unless you have a USERAVM role
+        $this->denyAccessUnlessGranted('ROLE_USERAVM', null, 'Unable to access this page!');
+
+        /* ensure that the user is logged in */
+        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY')) {
+            throw $this->createAccessDeniedException();
+        }
+        //----------------------------------------------------------------------------------------
     }
 
     /**
@@ -122,6 +173,24 @@ class Specification_achatController extends Controller
     }
 
     /**
+     * @param Specification_achat $specification_achat
+     */
+    private function editAndDeleteSecurity($specification_achat)
+    {
+        //---------------------------------security-----------------------------------------------
+        // Unable to access the controller unless you have a USERAVM role
+        $this->denyAccessUnlessGranted('ROLE_USERAVM', null, 'Unable to access this page!');
+
+        /* ensure that the user is logged in  # granted even through remembering cookies
+        */
+        $user = $this->getUser();
+        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_REMEMBERED') || $user !== $specification_achat->getUtilisateur()) {
+            throw $this->createAccessDeniedException();
+        }
+        //----------------------------------------------------------------------------------------
+    }
+
+    /**
      * Deletes a Specification_achat entity.
      * @param Request $request
      * @param Specification_achat $specification_achat
@@ -156,45 +225,5 @@ class Specification_achatController extends Controller
         $em->flush();
 
         return $this->redirectToRoute('apm_achat_specification_achat_index');
-    }
-
-    private function listAndShowSecurity(){
-        //---------------------------------security-----------------------------------------------
-        // Unable to access the controller unless you have a USERAVM role
-        $this->denyAccessUnlessGranted('ROLE_USERAVM', null, 'Unable to access this page!');
-        /* ensure that the user is logged in
-        */
-        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY')) {
-            throw $this->createAccessDeniedException();
-        }
-        //----------------------------------------------------------------------------------------
-    }
-    private function createSecurity(){
-        //---------------------------------security-----------------------------------------------
-        // Unable to access the controller unless you have a USERAVM role
-        $this->denyAccessUnlessGranted('ROLE_USERAVM', null, 'Unable to access this page!');
-
-        /* ensure that the user is logged in */
-        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY')) {
-            throw $this->createAccessDeniedException();
-        }
-        //----------------------------------------------------------------------------------------
-    }
-
-    /**
-     * @param Specification_achat $specification_achat
-     */
-    private function editAndDeleteSecurity($specification_achat){
-        //---------------------------------security-----------------------------------------------
-        // Unable to access the controller unless you have a USERAVM role
-        $this->denyAccessUnlessGranted('ROLE_USERAVM', null, 'Unable to access this page!');
-
-        /* ensure that the user is logged in  # granted even through remembering cookies
-        */
-        $user = $this->getUser();
-        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_REMEMBERED') || $user !== $specification_achat->getUtilisateur()) {
-            throw $this->createAccessDeniedException();
-        }
-        //----------------------------------------------------------------------------------------
     }
 }

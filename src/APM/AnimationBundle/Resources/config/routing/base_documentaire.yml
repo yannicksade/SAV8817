@@ -27,3 +27,7 @@ apm_animation_base_documentaire_deleteFromList:
     path:     /list/{id}/delete
     defaults: { _controller: "APMAnimationBundle:Base_documentaire:deleteFromList" }
 
+apm_animation_base_documentaire_download:
+    path:     /{id}/download
+    defaults: { _controller: "APMAnimationBundle:Base_documentaire:downloadFile" }
+    methods:  GET

@@ -19,9 +19,38 @@ class UsersRolePromptType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('utilisateurs', EntityType::class, array('class' => 'APMUserBundle:Utilisateur', 'choice_label' => 'username', 'multiple' => true, 'required' => true))->add('role', ChoiceType::class, array('choices' => ['DOS' => 'ROLE_NO_ACCESS', 'UtilisateurAVM' => 'ROLE_USERAVM', 'TiersUtilisateur' => 'ROLE_USER', 'Analyste' => 'ROLE_ANALYSE', 'Explorateur' => 'ROLE_EXP', 'Auditeur' => 'ROLE_AUDIT', 'Comptable' => 'ROLE_COMP', 'Administrateur' => 'ROLE_ADMIN', 'Boutique' => 'ROLE_BOUTIQUE', 'Transporteur' => 'ROLE_TRANSPORTEUR', 'Conseiller' => 'ROLE_CONSEILLER',], 'required' => false, 'placeholder' => 'mode Affichage...'
+        $builder
+            ->add('utilisateurs', EntityType::class, array(
+                    'class' => 'APMUserBundle:Utilisateur',
+                    'multiple' => true,
+                )
+            )
+            ->add('role', ChoiceType::class, array(
+                'choices' => [
+                    'DOS' => 'ROLE_NO_ACCESS',
+                    'UtilisateurAVM' => 'ROLE_USERAVM',
+                    'TiersUtilisateur' => 'ROLE_USER',
+                    'Analyste' => 'ROLE_ANALYSE',
+                    'Explorateur' => 'ROLE_EXP',
+                    'Auditeur' => 'ROLE_AUDIT',
+                    'Comptable' => 'ROLE_COMP',
+                    'Administrateur' => 'ROLE_ADMIN',
+                    'Boutique' => 'ROLE_BOUTIQUE',
+                    'Transporteur' => 'ROLE_TRANSPORTEUR',
+                    'Conseiller' => 'ROLE_CONSEILLER',
+                    'Master Conseiller' => 'ROLE_CONSEILLER_A2',
+                ],
+                'required' => false,
+                'placeholder' => 'aucun=>mode Affichage'
 
-            ))->add('ajouterRole', CheckboxType::class, ['required' => false])->add('supprimerRole', CheckboxType::class, ['required' => false]);
+            ))->add('ajouterRole', CheckboxType::class, [
+                    'required' => false
+                ]
+            )
+            ->add('supprimerRole', CheckboxType::class, [
+                    'required' => false
+                ]
+            );
 
     }
 

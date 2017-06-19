@@ -4,20 +4,36 @@ namespace APM\UserBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use FOS\UserBundle\Model\User as BaseUser;
+use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Validator\Constraints as Assert;
+use Vich\UploaderBundle\Mapping\Annotation as Vich;
 use Symfony\Component\Validator\Constraints\Date;
 
 /**
- * @ORM\Entity
  * @ORM\Entity(repositoryClass="APM\UserBundle\Repository\UtilisateurRepository")
+ * @Vich\Uploadable
  * @ORM\Table(name="utilisateur")
  * @ORM\InheritanceType("JOINED")
  * @ORM\DiscriminatorColumn(name="type", type="string")
  * @ORM\DiscriminatorMap({"admin" = "Admin", "utilisateur_avm" = "Utilisateur_avm"})
- *
  */
 abstract class Utilisateur extends BaseUser
 {
+    /**
+     * @var string
+     * @Assert\Length(min=2)
+     * @ORM\Column(name="profession", type="string", length=255, nullable=true)
+     */
+    protected $profession;
+
+    /**
+     * @var \DateTime
+     * @Assert\DateTime
+     * @ORM\Column(name="dateEnregistrement", type="datetime", nullable=true)
+     */
+    protected $dateEnregistrement;
+
+
     /**
      * @ORM\Id
      * @ORM\Column(type="integer")
@@ -63,10 +79,61 @@ abstract class Utilisateur extends BaseUser
 
     /**
      * @var string
-     *
      * @ORM\Column(name="code", type="string", length=255, nullable=true)
      */
     protected $code;
+
+    /**
+     * @var integer
+     * @Assert\Choice({0,1,2,3})
+     * @ORM\Column(name="etatCompte", type="integer", nullable=true)
+     */
+    protected $etatDuCompte;
+
+    /**
+     * @var string
+     * @Assert\Length(min=2, max=255)
+     * @ORM\Column(name="adresse", type="string", nullable=true)
+     */
+    protected $adresse;
+
+    /**
+     * @var string
+     * @ORM\Column(name="image", type="string", nullable=true)
+     */
+    protected $image;
+
+
+    /**
+     * @Assert\Image()
+     * @Vich\UploadableField(mapping="entity_images", fileNameProperty="image")
+     * @var File
+     */
+    protected $imageFile;
+
+    /**
+     * @ORM\Column(name="updatedAt", type="datetime", nullable=true)
+     * @var \DateTime
+     */
+    protected $updatedAt;
+
+    public function getImageFile()
+    {
+        return $this->imageFile;
+    }
+
+    public function setImageFile(File $image = null)
+    {
+        $this->imageFile = $image;
+
+        // VERY IMPORTANT:
+        // It is required that at least one field changes if you are using Doctrine,
+        // otherwise the event listeners won't be called and the file is lost
+        if ($image) {
+            // if 'updatedAt' is not defined in your entity, use another property
+            $this->updatedAt = new \DateTime('now');
+        }
+    }
 
     /**
      * Get nom
@@ -232,6 +299,155 @@ abstract class Utilisateur extends BaseUser
     public function setCode($code)
     {
         $this->code = $code;
+
+        return $this;
+    }
+
+    public function __toString()
+    {
+        return $this->prenom ? $this->prenom : $this->username;
+    }
+
+    /**
+     * Get image
+     *
+     * @return string
+     */
+    public function getImage()
+    {
+        return $this->image;
+    }
+
+    /**
+     * Set image
+     *
+     * @param string $image
+     *
+     * @return Utilisateur
+     */
+    public function setImage($image)
+    {
+        $this->image = $image;
+
+        return $this;
+    }
+
+    /**
+     * Get updatedAt
+     *
+     * @return \DateTime
+     */
+    public function getUpdatedAt()
+    {
+        return $this->updatedAt;
+    }
+
+    /**
+     * Set updatedAt
+     *
+     * @param \DateTime $updatedAt
+     *
+     * @return Utilisateur
+     */
+    public function setUpdatedAt($updatedAt)
+    {
+        $this->updatedAt = $updatedAt;
+
+        return $this;
+    }
+
+    /**
+     * Get profession
+     *
+     * @return string
+     */
+    public function getProfession()
+    {
+        return $this->profession;
+    }
+
+    /**
+     * Set profession
+     *
+     * @param string $profession
+     *
+     * @return Utilisateur
+     */
+    public function setProfession($profession)
+    {
+        $this->profession = $profession;
+
+        return $this;
+    }
+
+    /**
+     * Get dateEnregistrement
+     *
+     * @return \DateTime
+     */
+    public function getDateEnregistrement()
+    {
+        return $this->dateEnregistrement;
+    }
+
+    /**
+     * Set dateEnregistrement
+     *
+     * @param \DateTime $dateEnregistrement
+     *
+     * @return Utilisateur
+     */
+    public function setDateEnregistrement($dateEnregistrement)
+    {
+        $this->dateEnregistrement = $dateEnregistrement;
+
+        return $this;
+    }
+
+    /**
+     * Get etatDuCompte
+     *
+     * @return integer
+     */
+    public function getEtatDuCompte()
+    {
+        return $this->etatDuCompte;
+    }
+
+    /**
+     * Set etatDuCompte
+     *
+     * @param integer $etatDuCompte
+     *
+     * @return Utilisateur
+     */
+    public function setEtatDuCompte($etatDuCompte)
+    {
+        $this->etatDuCompte = $etatDuCompte;
+
+        return $this;
+    }
+
+    /**
+     * Get adresse
+     *
+     * @return string
+     */
+    public function getAdresse()
+    {
+        return $this->adresse;
+    }
+
+    /**
+     * Set adresse
+     *
+     * @param string $adresse
+     *
+     * @return Utilisateur
+     */
+    public function setAdresse($adresse)
+    {
+        $this->adresse = $adresse;
 
         return $this;
     }

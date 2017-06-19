@@ -1,6 +1,6 @@
 {% extends "APMAdminBundle:_Main:layout.html.twig" %}
 {% block body %}
-    <h1>Categorie creation</h1>
+    <h1> Nouvelle Categorie - {{ boutique }}</h1>
 
     {{ form_start(form) }}
 
@@ -11,7 +11,7 @@
 
     <ul>
         <li>
-            <a href="{{ path('apm_vente_categorie_index', {'id': boutique.id}) }}">Back to the list</a>
+            <a href="{{ path('apm_vente_categorie_index', {'id': boutique.id}) }}">Retour à la liste</a>
         </li>
     </ul>
 {% endblock %}

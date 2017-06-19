@@ -1,11 +1,11 @@
 apm_marketing_conseiller_boutique_index:
-    path:     /{id}/liste-boutiques
+    path:     /
     defaults: { _controller: "APMMarketingDistribueBundle:Conseiller_boutique:index" }
     methods:  GET
 
-apm_marketing_conseiller_boutique_index-boutique:
-    path:     /{id}/liste-conseillers
-    defaults: { _controller: "APMMarketingDistribueBundle:Conseiller_boutique:indexListeConseillerBoutique" }
+apm_marketing_boutique_conseiller_index:
+    path:     boutique/{id}/conseillers
+    defaults: { _controller: "APMMarketingDistribueBundle:Conseiller_boutique:index" }
     methods:  GET
 
 apm_marketing_conseiller_boutique_show:
@@ -15,6 +15,11 @@ apm_marketing_conseiller_boutique_show:
 
 apm_marketing_conseiller_boutique_new:
     path:     /new
+    defaults: { _controller: "APMMarketingDistribueBundle:Conseiller_boutique:new" }
+    methods:  [GET, POST]
+
+apm_marketing_conseiller_boutique_shop_new:
+    path:     /new/{id}
     defaults: { _controller: "APMMarketingDistribueBundle:Conseiller_boutique:new" }
     methods:  [GET, POST]
 
@@ -30,6 +35,10 @@ apm_marketing_conseiller_boutique_delete:
 
 apm_marketing_conseiller_boutique_deleteFromList:
     path:     /list/{id}/delete
+    defaults: { _controller: "APMMarketingDistribueBundle:Conseiller_boutique:deleteFromList" }
+
+apm_marketing_conseiller_boutique_deleteFromBoutique:
+    path:     /conseiller/{conseiller_id}/boutique/{boutique_id}/delete
     defaults: { _controller: "APMMarketingDistribueBundle:Conseiller_boutique:deleteFromList" }
 
 

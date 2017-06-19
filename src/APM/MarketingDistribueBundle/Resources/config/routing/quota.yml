@@ -9,7 +9,7 @@ apm_marketing_quota_show:
     methods:  GET
 
 apm_marketing_quota_new:
-    path:     /new
+    path:     /{id}/new
     defaults: { _controller: "APMMarketingDistribueBundle:Quota:new" }
     methods:  [GET, POST]
 

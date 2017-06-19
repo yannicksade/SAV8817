@@ -21,16 +21,8 @@ class Transaction_produitType extends AbstractType
             ->add('quantite', NumberType::class, ['required' => false])
             ->add('produit', EntityType::class, [
                 'class' => 'APMVenteBundle:Offre',
-                'choice_label' => 'designation',
-                'multiple' => true,
                 'required' => true
             ])
-            ->add('rabais', EntityType::class, [
-                'class' => 'APMVenteBundle:Rabais_offre',
-                'choice_label' => 'code',
-                'required' => false
-            ])
-
             ->add('transaction', TransactionType::class)
         ;
     }

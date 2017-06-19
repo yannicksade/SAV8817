@@ -1,6 +1,17 @@
-#services:
-#
-##---------- sécurise les créations et les modification d'objets ---------
-#    apm_core.objet_security:
-#        class: APM\CoreBundle\Security\SafeHandler
-#        arguments: ['@security.authorization_checker']
+services:
+#---------- Upload files ---------
+    apm_core.packages_maker:
+        class: APM\CoreBundle\Util\PackagesMaker
+        calls:
+              - ['setValues', ['%images_url%',"%docs_url%", "%resolve_images_url%"]]
+
+    apm_core.vich_listener_remove:
+        class: APM\CoreBundle\EventListener\VichEventListener
+        arguments: ['@liip_imagine.cache.manager', '%basic_filter%']
+        tags:
+            - { name: kernel.event_listener, event: vich_uploader.pre_remove }
+
+    apm_core.crop_image:
+        class: APM\CoreBundle\Util\CropMaker
+        calls:
+              - ['setContainer', ['@service_container', '%basic_filter%']]

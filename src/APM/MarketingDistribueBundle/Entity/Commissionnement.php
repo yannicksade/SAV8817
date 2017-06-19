@@ -74,6 +74,7 @@ class Commissionnement extends TradeFactory
 
     /**
      * @var Conseiller_boutique
+     *
      * @ORM\ManyToOne(targetEntity="APM\MarketingDistribueBundle\Entity\Conseiller_boutique", inversedBy="commissionnements")
      * @ORM\JoinColumns({
      *     @ORM\JoinColumn(name="conseillerBoutique_id", referencedColumnName="id", nullable=false)
@@ -305,5 +306,10 @@ class Commissionnement extends TradeFactory
         $this->commission = $commission;
 
         return $this;
+    }
+
+    public function __toString()
+    {
+        return $this->code;
     }
 }

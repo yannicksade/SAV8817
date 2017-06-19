@@ -1,6 +1,5 @@
     <h1>Connectez-vous </h1>
     {% trans_default_domain 'FOSUserBundle' %}
-
 {% if error %}
     <div>{{ error.messageKey|trans(error.messageData, 'security') }}</div>
 {% endif %}

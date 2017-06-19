@@ -3,16 +3,17 @@
 namespace APM\UserBundle\Controller;
 
 
-use FOS\UserBundle\Controller\RegistrationController as BaseController;
-use Symfony\Component\HttpFoundation\Request;
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
-class RegistrationUtilisateurAVMController extends BaseController
+class RegistrationUtilisateurAVMController extends Controller
 {
-    public function registerAction(Request $request)
+    public function registerAction()
     {
         return $this
                     ->get('pugx_multi_user.registration_manager')
                     ->register('APM\UserBundle\Entity\Utilisateur_avm');
+
     }
+
 
 }

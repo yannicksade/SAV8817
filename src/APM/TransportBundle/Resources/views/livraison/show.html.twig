@@ -33,14 +33,34 @@
     </table>
 
     <ul>
+        {% if app.user == livraison.utilisateur or livraison.boutique != null and app.user == livraison.boutique.gerant or livraison.boutique != null and app.user == livraison.boutique.proprietaire %}
+            {% if livraison.boutique %}
+                <li>
+                    <a href="{{ path('apm_transport_livraison_boutique_index', {'id':livraison.boutique.id}) }}">Retour
+                        aux livraisons de la boutique</a>
+                </li>
+                <li>
+                    <a href="{{ path('apm_transport_livraison_boutique_new', {'id':livraison.boutique.id}) }}">Créer une
+                        nouvelle livraison</a>
+                </li>
+            {% else %}
+                <li>
+                    <a href="{{ path('apm_transport_livraison_index') }}">Retour aux livraisons de l'utilisateur</a>
+                </li>
+                <li>
+                    <a href="{{ path('apm_transport_livraison_new') }}">Créer une nouvelle livraison</a>
+                </li>
+            {% endif %}
+            <li>
+                <a href="{{ path('apm_transport_livraison_edit', { 'id': livraison.id }) }}">Modifier</a>
+            </li>
+        {% endif %}
         <li>
-            <a href="{{ path('apm_transport_livraison_index') }}">Back to the list</a>
+            <a href="{{ path('apm_transport_livraison_listeOperation_index', { 'id': livraison.id }) }}">Liste les
+                opérations de cette livraison</a>
         </li>
         <li>
-            <a href="{{ path('apm_transport_livraison_edit', { 'id': livraison.id }) }}">Edit</a>
-        </li>
-        <li>
-            <a href="{{ path('apm_transport_livraison_new') }}">Add a new one</a>
+            <a href="{{ path('apm_vente_transaction_index') }}">Retour à mes transactions </a>
         </li>
 
         <li>

@@ -1,41 +1,29 @@
 {% extends "APMAdminBundle:_Main:layout.html.twig" %}
 
 {% block body %}
-    <h1>Individu_to_groupe list</h1>
 
-    <table>
-        <thead>
-        <tr>
-            <th>Utilisateur</th>
-            <th>Actions</th>
-        </tr>
-        </thead>
-        <tbody>
-        {% for individu_to_groupe in individu_to_groupes %}
-            <tr>
-                <td>{{ individu_to_groupe.individu }}</td>
-                <td>
-                    <ul>
-                        <li>
-                            <a href="{{ path('apm_user_individu-to-groupe_show', { 'id': individu_to_groupe.id }) }}">show</a>
-                        </li>
-                        <li>
-                            <a href="{{ path('apm_user_individu-to-groupe_edit', { 'id': individu_to_groupe.id }) }}">edit</a>
-                        </li>
-                        <li>
-                            <a href="{{ path('apm_user_individu-to-groupe_delete', { 'id': individu_to_groupe.id }) }}">delete</a>
-                        </li>
+    <h1 xmlns="http://www.w3.org/1999/html"> Liste de Groupes d'Individus</h1>
 
-                    </ul>
-                </td>
-            </tr>
+    {% for relations in individu_to_groupes %}
+        <a href="{{ path('apm_user_groupe-relationnel_show', {'id':relations.groupe.id}) }}">{{ relations.groupe }}</a>
+        {% for membre in relations.personnes %}
+            <p>
+                {{ membre.individu }}
+                <a href="{{ path('apm_user_individu-to-groupe_edit', {'id':membre.id}) }}"> |modifier </a>
+                <a href="{{ path('apm_user_individu-to-groupe_deleteFromList', {'id':membre.id}) }}"> retirer du
+                    groupe|</a>
+            </p>
         {% endfor %}
-        </tbody>
-    </table>
+    {% endfor %}
+
 
     <ul>
         <li>
-            <a href="{{ path('apm_user_individu-to-groupe_new') }}">Create a new entry</a>
+            <a href="{{ path('apm_user_individu-to-groupe_new') }}">Insérer une nouvelle personne</a>
+        </li>
+        <li>
+            <a href="{{ path('apm_user_groupe-relationnel_index') }}">Retour à la liste des groupes</a>
         </li>
     </ul>
-{% endblock %}
+
+{% endblock body %}

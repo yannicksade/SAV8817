@@ -4,6 +4,7 @@ namespace APM\MarketingDistribueBundle\Controller;
 
 use APM\MarketingDistribueBundle\Entity\Quota;
 use APM\MarketingDistribueBundle\Factory\TradeFactory;
+use APM\UserBundle\Entity\Utilisateur_avm;
 use APM\VenteBundle\Entity\Boutique;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
@@ -17,34 +18,64 @@ class QuotaController extends Controller
 {
     /**
      *
-     *  Lister en fonction de la boutique ou des valeurs [name => valeur]
+     *  Liste les commissions de la boutique
      * @param Boutique $boutique
      * @return \Symfony\Component\HttpFoundation\Response
      */
     public function indexAction(Boutique $boutique)
     {
         $this->listAndShowSecurity($boutique);
-       $quotas = $boutique->getCommissionnements();
+        $quotas = $boutique->getCommissionnements();
         return $this->render('APMMarketingDistribueBundle:quota:index.html.twig', array(
             'quotas' => $quotas,
+            'boutique' => $boutique,
         ));
+    }
+
+    /**
+     * @param Boutique $boutique
+     */
+    private function listAndShowSecurity($boutique = null)
+    {
+        //-----------------------------------security-----------------------------------------------------------
+        // Unable to access the controller unless are the owner or you have the CONSEILLER role
+        // Le Conseiller et la boutique à le droit de lister tous les quotas
+        $this->denyAccessUnlessGranted(['ROLE_CONSEILLER', 'ROLE_BOUTIQUE'], null, 'Unable to access this page!');
+        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY')) {
+            throw $this->createAccessDeniedException();
+        }
+
+        /** @var Utilisateur_avm $user */
+        $user = $this->getUser();
+        $conseiller = $user->getProfileConseiller();
+        $gerant = null;
+        $proprietaire = null;
+        if ($boutique) {
+            $gerant = $boutique->getGerant();
+            $proprietaire = $boutique->getProprietaire();
+        }
+        if (null === $conseiller && $user !== $gerant && $user !== $proprietaire) throw $this->createAccessDeniedException();
+
+        //------------------------------------------------------------------------------------------------------
     }
 
     /**
      * Creates a new Quota entity.
      * @param Request $request
+     * @param Boutique $boutique
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function newAction(Request $request)
+    public function newAction(Request $request, Boutique $boutique)
     {
-        $this->createSecurity();
+        $this->createSecurity($boutique);
 
         /** @var Quota $quotum */
         $quotum = TradeFactory::getTradeProvider("quota");
         $form = $this->createForm('APM\MarketingDistribueBundle\Form\QuotaType', $quotum);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            $this->createSecurity($form->getData()['boutique']);
+            $this->createSecurity($boutique);
+            $quotum->setBoutiqueProprietaire($boutique);
             $em = $this->getDoctrine()->getManager();
             $em->persist($quotum);
             $em->flush();
@@ -55,7 +86,30 @@ class QuotaController extends Controller
         return $this->render('APMMarketingDistribueBundle:quota:new.html.twig', array(
             'quotum' => $quotum,
             'form' => $form->createView(),
+            'boutique' => $boutique,
         ));
+    }
+
+    /**
+     * @param Boutique $boutique
+     */
+    private function createSecurity($boutique = null)
+    {
+        //---------------------------------security-----------------------------------------------
+        // Unable to access the controller unless you have a USERAVM role
+        $this->denyAccessUnlessGranted('ROLE_BOUTIQUE', null, 'Unable to access this page!');
+        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY')) {
+            throw $this->createAccessDeniedException();
+        }
+        if ($boutique) {
+            $user = $this->getUser();
+            $gerant = $boutique->getGerant();
+            $proprietaire = $boutique->getProprietaire();
+            if ($user !== $gerant && $user !== $proprietaire) {
+                throw $this->createAccessDeniedException();
+            }
+        }
+        //----------------------------------------------------------------------------------------
     }
 
     /**
@@ -120,6 +174,27 @@ class QuotaController extends Controller
     }
 
     /**
+     * @param Quota $quotum
+     */
+    private function editAndDeleteSecurity($quotum)
+    {
+        //---------------------------------security-----------------------------------------------
+        // Unable to Edit or delete unless you are the owner
+        $this->denyAccessUnlessGranted('ROLE_BOUTIQUE', null, 'Unable to access this page!');
+        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY')) {
+            throw $this->createAccessDeniedException();
+        }
+        $user = $this->getUser();
+        $gerant = $quotum->getBoutiqueProprietaire()->getGerant();
+        $proprietaire = $quotum->getBoutiqueProprietaire()->getProprietaire();
+        if ($gerant !== $user && $user !== $proprietaire) {
+            throw $this->createAccessDeniedException();
+        }
+        //----------------------------------------------------------------------------------------
+
+    }
+
+    /**
      * Deletes a Quota entity.
      * @param Request $request
      * @param Quota $quotum
@@ -151,62 +226,5 @@ class QuotaController extends Controller
         $em->flush();
 
         return $this->redirectToRoute('apm_marketing_quota_index', ['id' => $quotum->getBoutiqueProprietaire()->getId()]);
-    }
-
-    /**
-     * @param Boutique $boutique
-     */
-    private function listAndShowSecurity($boutique){
-        //-----------------------------------security-----------------------------------------------------------
-        // Unable to access the controller unless are the owner or you have the CONSEILLER role
-        // Le Conseiller à le droit de lister tous les quotas
-        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY')) {
-            throw $this->createAccessDeniedException();}
-        $user = $this->getUser();
-        $gerant = $boutique->getGerant()||$boutique->getProprietaire();
-        $user === $gerant?: $this->denyAccessUnlessGranted('ROLE_CONSEILLER', null, 'Unable to access this page!');
-
-        //------------------------------------------------------------------------------------------------------
-    }
-
-    /**
-     * @param Quota $quotum
-     */
-    private function editAndDeleteSecurity($quotum){
-        //---------------------------------security-----------------------------------------------
-        // Unable to Edit or delete unless you are the owner
-        $this->denyAccessUnlessGranted('ROLE_BOUTIQUE', null, 'Unable to access this page!');
-        /* ensure that the user is logged in  # granted*/
-        $user = $this->getUser();
-        $gerant = $quotum->getBoutiqueProprietaire()->getGerant() || $quotum->getBoutiqueProprietaire()->getProprietaire();
-        if ((!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY')) || ( $gerant!== $user)) {
-            throw $this->createAccessDeniedException();
-        }
-        //----------------------------------------------------------------------------------------
-
-    }
-
-    /**
-     * @param Boutique $boutique
-     */
-    private function createSecurity($boutique = null){
-        //---------------------------------security-----------------------------------------------
-        // Unable to access the controller unless you have a USERAVM role
-        $this->denyAccessUnlessGranted('ROLE_BOUTIQUE', null, 'Unable to access this page!');
-        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY')) {
-            throw $this->createAccessDeniedException();
-        }
-
-        /* ensure that the user is logged in  # granted even through remembering cookies
-        *  and that the one is the the manager of the shop
-        */
-        if($boutique) {
-            $user = $this->getUser();
-            $gerant = $boutique->getGerant() || $boutique->getProprietaire();
-            if ($user !== $gerant) {
-                throw $this->createAccessDeniedException();
-            }
-        }
-        //----------------------------------------------------------------------------------------
     }
 }

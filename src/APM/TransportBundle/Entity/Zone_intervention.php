@@ -340,4 +340,9 @@ class Zone_intervention extends TradeFactory
     {
         return $this->zone_transporteurs;
     }
+
+    public function __toString()
+    {
+        return $this->designation;
+    }
 }

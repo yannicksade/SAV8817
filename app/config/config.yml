@@ -9,11 +9,11 @@ parameters:
     locale: fr
     value1: 80
     value2: 20 #value use in the test of my core bundle
-    mailer_user: yannicksade@gmail.com
-    mailer_password: iundykptsilgqiqi
-    mailer_transport: gmail
-    mailer_host: 127.0.0.1
-    mailer_port: 25
+    images_url: dashboard/assets/entity/images
+    docs_url: dashboard/assets/brochure/files
+    resolve_images_url: 'http://localhost/SAV8817.git/web/app_dev.php/media/cache/resolve/basic_filter600x600/%images_url%'
+    basic_filter: "basic_filter600x600"
+
 
 framework:
     validation:  { enable_annotations: true }
@@ -92,7 +92,7 @@ fos_user:
         sender_name:       webmaster
     registration:
         confirmation:
-            enabled: true
+            enabled: false
             from_email:
                 address:     registration@esay-trade.com
                 sender_name: Easy Trade Team
@@ -106,36 +106,81 @@ fos_user:
 
 # Configuratio de PUGXMultiuserBundle pour  utilisateur-avm et admin
 pugx_multi_user:
-  users:
-    utilisateur_avm:
-        entity:
-          class: APM\UserBundle\Entity\Utilisateur_avm
+    users:
+        utilisateur_avm:
+            entity:
+                class: APM\UserBundle\Entity\Utilisateur_avm
 #          factory:
-        registration:
-          form:
-            type: APM\UserBundle\Form\Type\Utilisateur_avmType
-            name: apm_utilisateur_avm_registration
-            validation_groups:  [Registration, Default]
-          template: FOSUserBundle:Registration:utilisateur_avm.form.html.twig
-        profile:
-          form:
-            type: APM\UserBundle\Form\Type\ProfileUtilisateur_avmFormType
-            name: apm_utilisateur_profile
-            validation_groups:  [Profile, Default]
-    admin:
-        entity:
-          class: APM\UserBundle\Entity\Admin
-    #      factory:
-        registration:
-          form:
-            type: APM\UserBundle\Form\Type\RegistrationAdminFormType
-            name: apm_admin_registration
-            validation_groups:  [Registration, Default]
-          template: FOSUserBundle:Registration:admin.form.html.twig
-        profile:
-            form:
-              type: APM\UserBundle\Form\Type\ProfileAdminFormType
-              name: apm_admin_profile
+            registration:
+                form:
+                    type: APM\UserBundle\Form\Type\Utilisateur_avmType
+                    name: apm_utilisateur_avm_registration
+                    validation_groups:  [Registration, Default]
+                template: FOSUserBundle:Registration:utilisateur_avm.form.html.twig
+            profile:
+                form:
+                    type: APM\UserBundle\Form\Type\ProfileUtilisateur_avmFormType
+                    name: apm_utilisateur_avm_profile
+                    validation_groups:  [Profile, Default]
+                template: FOSUserBundle:profile:utilisateur_avm.form.html.twig
+        admin:
+            entity:
+                class: APM\UserBundle\Entity\Admin
+            #      factory:
+            registration:
+                 form:
+                     type: APM\UserBundle\Form\Type\RegistrationAdminFormType
+                     name: apm_admin_registration
+                     validation_groups:  [Registration, Default]
+                 template: FOSUserBundle:Registration:admin.form.html.twig
+            profile:
+                 form:
+                     type: APM\UserBundle\Form\Type\ProfileAdminFormType
+                     name: apm_admin_profile
+                     validation_groups:  [Profile, Default]
+                 template: FOSUserBundle:profile:admin.form.html.twig
+
+web_profiler :
+    intercept_redirects : false
+
+vich_uploader:
+    db_driver: orm # or mongodb or propel or phpcr
+    mappings:
+        entity_images:
+            uri_prefix:         "%images_url%"
+            upload_destination: '%kernel.root_dir%/../web/%images_url%'
+            namer:               vich_uploader.namer_uniqid
+
+        brochures:
+            uri_prefix:         "%docs_url%"
+            upload_destination: '%kernel.root_dir%/../web/%docs_url%'
+            namer:              vich_uploader.namer_uniqid
+
+liip_imagine :
+    # configure resolvers
+    resolvers :
+        # setup the default resolver
+        default :
+            # use the default web path
+            web_path : ~
+    # your filter sets are defined here
+    filter_sets :
+        # use the default cache configuration
+        cache : ~
+        basic_filter600x600 :
+# adjust the image quality to 75%
+            #quality : 75
+ # list of transformations to apply (the "filters")
+            #filters
+ # use and setup the "crop" filter
+                #crop:
+
+                    # set the size of the cropping area
+                    #size: [600, 514 ]
+
+                    # set the starting coordinates of the crop
+                    #start: [ %_x_%, %_y_% ]
+
 
 apm_achat:
     nombre1: "%value1%"

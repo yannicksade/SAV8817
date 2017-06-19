@@ -1,6 +1,6 @@
-{% extends "APMAdminBundle:_Main:layout.html.twig" %}
+{% extends ":base/dashboard:layout.html.twig" %}
 
-{% block body %}
+{% block content_body %}
     <h1>Groupe_relationnel creation</h1>
 
     {{ form_start(form) }}
@@ -10,7 +10,8 @@
 
     <ul>
         <li>
-            <a href="{{ path('apm_user_groupe-relationnel_index') }}">Back to the list</a>
+            <a href="{{ path('apm_user_groupe-relationnel_index') }}">Retour à la liste des groupes</a>
         </li>
     </ul>
-{% endblock %}
+
+{% endblock content_body %}

@@ -1,6 +1,6 @@
 {% extends "APMAdminBundle:_Main:layout.html.twig" %}
 {% block body %}
-    <h1>Quota creation</h1>
+    <h1>Créer des Commissions pour conseiller</h1>
 
     {{ form_start(form) }}
     {{ form_widget(form) }}
@@ -9,8 +9,8 @@
 
     <ul>
         <li>
-            <a href="{{ path('apm_marketing_quota_index', {'id':quotum.boutiqueProprietaire.id}) }}">Back to the
-                list</a>
+            <a href="{{ path('apm_marketing_quota_index', {'id':boutique.id}) }}">Retour à la liste de commissions
+                enregistrées</a>
         </li>
     </ul>
 {% endblock %}

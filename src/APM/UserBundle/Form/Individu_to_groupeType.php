@@ -26,7 +26,6 @@ class Individu_to_groupeType extends AbstractType
                 )))
             ->add('groupeRelationnel', EntityType::class, [
                 'class' => 'APMUserBundle:Groupe_relationnel',
-                'choice_label' => 'code',
                 'required' => true
             ])
         ;

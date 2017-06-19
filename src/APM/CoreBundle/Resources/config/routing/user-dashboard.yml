@@ -1,9 +1,10 @@
-apm_core_dashboard_show:
-    path:     /show/{id}
-    defaults: { _controller: "APMCoreBundle:UserDashboard:show" }
+apm_core_user-dashboard_index:
+    path:     /
+    defaults: { _controller: "APMCoreBundle:UserDashboard:index" }
     methods:  GET
 
-apm_core_dashboard_groupes-offres:
-    path:     /groupes-offres
-    defaults: { _controller: "APMCoreBundle:UserDashboard:showGroupeOffre" }
+
+apm_core_user-dashboard_ajax-notification:
+    path:     /ajax-notification
+    defaults: { _controller: "APMCoreBundle:AjaxNotification:index" }
     methods:  GET

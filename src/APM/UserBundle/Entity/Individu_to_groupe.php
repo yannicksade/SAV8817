@@ -5,12 +5,14 @@ namespace APM\UserBundle\Entity;
 use APM\UserBundle\Factory\TradeFactory;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 /**
  * Individu_to_groupe
  *
  * @ORM\Table(name="individu_to_groupe")
  * @ORM\Entity(repositoryClass="APM\UserBundle\Repository\Individu_to_groupeRepository")
+ *
  */
 class Individu_to_groupe extends TradeFactory
 {
@@ -21,6 +23,12 @@ class Individu_to_groupe extends TradeFactory
      * @ORM\Column(name="propriete", type="integer", length=255, nullable=true)
      */
     private $propriete;
+
+    /**
+     * @var string
+     * @ORM\Column(name="description", type= "string", nullable=true)
+     */
+    private $description;
 
     /**
      * @var integer
@@ -40,6 +48,7 @@ class Individu_to_groupe extends TradeFactory
      * })
      */
     private $groupeRelationnel;
+
 
     /**
      * @var Utilisateur_avm
@@ -131,6 +140,30 @@ class Individu_to_groupe extends TradeFactory
     public function setIndividu(Utilisateur_avm $individu = null)
     {
         $this->individu = $individu;
+
+        return $this;
+    }
+
+    /**
+     * Get description
+     *
+     * @return string
+     */
+    public function getDescription()
+    {
+        return $this->description;
+    }
+
+    /**
+     * Set description
+     *
+     * @param string $description
+     *
+     * @return Individu_to_groupe
+     */
+    public function setDescription($description)
+    {
+        $this->description = $description;
 
         return $this;
     }

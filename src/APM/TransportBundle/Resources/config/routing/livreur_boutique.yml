@@ -1,5 +1,5 @@
 apm_transport_livreur_boutique_index:
-    path:     /
+    path:     /{id}
     defaults: { _controller: "APMTransportBundle:Livreur_boutique:index" }
     methods:  GET
 
@@ -9,7 +9,7 @@ apm_transport_livreur_boutique_show:
     methods:  GET
 
 apm_transport_livreur_boutique_new:
-    path:     /new
+    path:     /new/{id}
     defaults: { _controller: "APMTransportBundle:Livreur_boutique:new" }
     methods:  [GET, POST]
 

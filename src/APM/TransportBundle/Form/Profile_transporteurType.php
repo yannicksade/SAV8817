@@ -4,7 +4,6 @@ namespace APM\TransportBundle\Form;
 
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -17,12 +16,18 @@ class Profile_transporteurType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('matricule', TextType::class)
-            ->add('transporteurZones', EntityType::class, [
+            ->add('matricule')
+            /*->add('transporteurZones', EntityType::class, [
                 'class' => 'APMTransportBundle:Zone_intervention',
                 'choice_label' => 'code',
                 'multiple' => true,
                 'required' => false
+            ])*/
+            ->add('utilisateur')
+            ->add('zones', EntityType::class, [
+                'class' => 'APMTransportBundle:Zone_intervention',
+                'multiple' => true,
+                'required' => false,
             ])
         ;
     }

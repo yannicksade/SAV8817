@@ -14,8 +14,11 @@
             <td>{{ document.objet }}</td>
         </tr>
         <tr>
-            <th>Urlcontenu</th>
-            <td>{{ document.urlContenu }}</td>
+            <th>Fichier</th>
+            <td>
+                <a href="{{ path('apm_animation_base_documentaire_download',{'id':document.id} ) }}"> cliquez-ici pour
+                    téléchager la pièce jointe</a>
+            </td>
         </tr>
         </tbody>
     </table>

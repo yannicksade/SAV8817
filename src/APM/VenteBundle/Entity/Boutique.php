@@ -6,18 +6,22 @@ use APM\MarketingDistribueBundle\Entity\Conseiller_boutique;
 use APM\MarketingDistribueBundle\Entity\Quota;
 use APM\TransportBundle\Entity\Livraison;
 use APM\TransportBundle\Entity\Livreur_boutique;
+use APM\UserBundle\Entity\Groupe_relationnel;
 use APM\UserBundle\Entity\Utilisateur_avm;
 use APM\VenteBundle\Factory\TradeFactory;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Validator\Constraints as Assert;
+use Vich\UploaderBundle\Mapping\Annotation as Vich;
 
 /**
  * Boutique
  * @ORM\Table(name="boutique")
  * @ORM\Entity(repositoryClass="APM\VenteBundle\Repository\BoutiqueRepository")
+ * @Vich\Uploadable
  * @UniqueEntity("code")
  */
 class Boutique extends TradeFactory
@@ -85,7 +89,7 @@ class Boutique extends TradeFactory
     /**
      * @var Utilisateur_avm
      *
-     * @ORM\ManyToOne(targetEntity="APM\UserBundle\Entity\Utilisateur_avm", inversedBy="boutiques")
+     * @ORM\ManyToOne(targetEntity="APM\UserBundle\Entity\Utilisateur_avm", inversedBy="boutiquesGerant")
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="gerant_id", referencedColumnName="id")
      * })
@@ -103,12 +107,20 @@ class Boutique extends TradeFactory
     private $proprietaire;
 
     /**
-     * @var Offre
+     * @var Collection
      *
      * @ORM\OneToMany(targetEntity="APM\VenteBundle\Entity\Offre", mappedBy="boutique")
      *
      */
     private $offres;
+
+    /**
+     * @var Collection
+     *
+     * @ORM\OneToMany(targetEntity="APM\TransportBundle\Entity\Livreur_boutique", mappedBy="boutiqueProprietaire")
+     *
+     */
+    private $livreurBoutiques;
 
     /**
      * @var Collection
@@ -132,7 +144,7 @@ class Boutique extends TradeFactory
 
     /**
      * @var Collection
-     * @ORM\OneToMany(targetEntity="APM\VenteBundle\Entity\Categorie", mappedBy="boutique", cascade={"remove"})
+     * @ORM\OneToMany(targetEntity="APM\VenteBundle\Entity\Categorie", mappedBy="boutique")
      */
     private $categories;
 
@@ -149,6 +161,37 @@ class Boutique extends TradeFactory
     private $livraisons;
 
     /**
+     * @var Collection
+     * @ORM\OneToMany(targetEntity="APM\UserBundle\Entity\Groupe_relationnel", mappedBy="boutique", cascade={"remove"})
+     */
+    private $groupesRelationnels;
+
+    /**
+     * @var Collection
+     * @ORM\OneToMany(targetEntity="APM\VenteBundle\Entity\Transaction", mappedBy="boutiqueBeneficiaire")
+     */
+    private $transactionsRecues;
+
+    /**
+     * @var string
+     * @ORM\Column(name="image", type="string", nullable=true)
+     */
+    private $image;
+
+    /**
+     * @Assert\Image()
+     * @Vich\UploadableField(mapping="entity_images", fileNameProperty="image")
+     * @var File
+     *     */
+    private $imageFile;
+
+    /**
+     * @ORM\Column(name="updatedAt", type="datetime", nullable= true)
+     * @var \DateTime
+     */
+    private $updatedAt;
+
+    /**
      * Constructor
      * @param string $var
      */
@@ -161,7 +204,28 @@ class Boutique extends TradeFactory
         $this->categories = new ArrayCollection();
         $this->transactions = new ArrayCollection();
         $this->livraisons = new ArrayCollection();
+        $this->groupesRelationnels = new ArrayCollection();
+        $this->transactionsRecues = new ArrayCollection();
+        $this->livreurBoutiques = new ArrayCollection();
         $this->code = "BQ" . $var;
+    }
+
+    public function getImageFile()
+    {
+        return $this->imageFile;
+    }
+
+    public function setImageFile(File $image = null)
+    {
+        $this->imageFile = $image;
+
+        // VERY IMPORTANT:
+        // It is required that at least one field changes if you are using Doctrine,
+        // otherwise the event listeners won't be called and the file is lost
+        if ($image) {
+            // if 'updatedAt' is not defined in your entity, use another property
+            $this->updatedAt = new \DateTime('now');
+        }
     }
 
     /**
@@ -626,5 +690,160 @@ class Boutique extends TradeFactory
     public function getLivraisons()
     {
         return $this->livraisons;
+    }
+
+    public function __toString()
+    {
+        return $this->designation;
+    }
+
+    /**
+     * Add groupesRelationnel
+     *
+     * @param Groupe_relationnel $groupesRelationnel
+     *
+     * @return Boutique
+     */
+    public function addGroupesRelationnel(Groupe_relationnel $groupesRelationnel)
+    {
+        $this->groupesRelationnels[] = $groupesRelationnel;
+
+        return $this;
+    }
+
+    /**
+     * Remove groupesRelationnel
+     *
+     * @param Groupe_relationnel $groupesRelationnel
+     */
+    public function removeGroupesRelationnel(Groupe_relationnel $groupesRelationnel)
+    {
+        $this->groupesRelationnels->removeElement($groupesRelationnel);
+    }
+
+    /**
+     * Get groupesRelationnels
+     *
+     * @return Collection
+     */
+    public function getGroupesRelationnels()
+    {
+        return $this->groupesRelationnels;
+    }
+
+    /**
+     * Add transactionsRecue
+     *
+     * @param Transaction $transactionsRecue
+     *
+     * @return Boutique
+     */
+    public function addTransactionsRecue(Transaction $transactionsRecue)
+    {
+        $this->transactionsRecues[] = $transactionsRecue;
+
+        return $this;
+    }
+
+    /**
+     * Remove transactionsRecue
+     *
+     * @param Transaction $transactionsRecue
+     */
+    public function removeTransactionsRecue(Transaction $transactionsRecue)
+    {
+        $this->transactionsRecues->removeElement($transactionsRecue);
+    }
+
+    /**
+     * Get transactionsRecues
+     *
+     * @return Collection
+     */
+    public function getTransactionsRecues()
+    {
+        return $this->transactionsRecues;
+    }
+
+    /**
+     * Add livreurBoutique
+     *
+     * @param Livreur_boutique $livreurBoutique
+     *
+     * @return Boutique
+     */
+    public function addLivreurBoutique(Livreur_boutique $livreurBoutique)
+    {
+        $this->livreurBoutiques[] = $livreurBoutique;
+
+        return $this;
+    }
+
+    /**
+     * Remove livreurBoutique
+     *
+     * @param Livreur_boutique $livreurBoutique
+     */
+    public function removeLivreurBoutique(Livreur_boutique $livreurBoutique)
+    {
+        $this->livreurBoutiques->removeElement($livreurBoutique);
+    }
+
+    /**
+     * Get livreurBoutiques
+     *
+     * @return Collection
+     */
+    public function getLivreurBoutiques()
+    {
+        return $this->livreurBoutiques;
+    }
+
+    /**
+     * Get image
+     *
+     * @return string
+     */
+    public function getImage()
+    {
+        return $this->image;
+    }
+
+    /**
+     * Set image
+     *
+     * @param string $image
+     *
+     * @return Boutique
+     */
+    public function setImage($image)
+    {
+        $this->image = $image;
+
+        return $this;
+    }
+
+    /**
+     * Get updatedAt
+     *
+     * @return \DateTime
+     */
+    public function getUpdatedAt()
+    {
+        return $this->updatedAt;
+    }
+
+    /**
+     * Set updatedAt
+     *
+     * @param \DateTime $updatedAt
+     *
+     * @return Boutique
+     */
+    public function setUpdatedAt($updatedAt)
+    {
+        $this->updatedAt = $updatedAt;
+
+        return $this;
     }
 }

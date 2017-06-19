@@ -1,11 +1,10 @@
 <!-- Ce code definit la barre d'état du pied de page-->
-<html>
-<body>
 <nav class="row navbar navbar-fixed-bottom" id="authcontrol">
     <div class="col-lg-3">
         {% if is_granted("IS_AUTHENTICATED_REMEMBERED") %}
             {{ 'layout.logged_in_as'|trans({'%username%': app.user.username}, 'FOSUserBundle') }},
-            <a href="{{ path('apm_core_dashboard_show', {'id': app.user.id}) }}"> accedez à votre dashboard ici </a> |
+            <a href="{{ path('apm_core_user-dashboard_show', {'id': app.user.id}) }}"> accedez à votre dashboard
+                ici </a> |
             <a href="{{ path('fos_user_security_logout') }}">
                 {{ 'layout.logout'|trans({}, 'FOSUserBundle') }}
             </a>
@@ -48,5 +47,3 @@
         {% endblock notification_content %}
     </div>
 </nav> <!--fin ligne nav-->
-</body>
-</html>

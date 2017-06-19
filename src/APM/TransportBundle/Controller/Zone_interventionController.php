@@ -2,12 +2,9 @@
 
 namespace APM\TransportBundle\Controller;
 
-
-use APM\TransportBundle\Entity\Livreur_boutique;
 use APM\TransportBundle\Entity\Profile_transporteur;
 use APM\TransportBundle\Entity\Zone_intervention;
 use APM\TransportBundle\Factory\TradeFactory;
-use APM\UserBundle\Entity\Utilisateur_avm;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -18,17 +15,19 @@ use Symfony\Component\HttpFoundation\Request;
 class Zone_interventionController extends Controller
 {
     /**
-     * acceder les zones d'intervention créée par le transporteur
+     * liste toutes les zones d'intervention
      * @return \Symfony\Component\HttpFoundation\Response
      */
     public function indexAction()
     {
         $this->listeAndShowSecurity();
-        /** @var Utilisateur_avm $user */
-        $user = $this->getUser();
-        $zone_interventions = $user->getTransporteur()->getZones();
+        $em = $this->getDoctrine()->getManager();
+        $AllZones = $em->getRepository('APMTransportBundle:Zone_intervention')->findAll();
+
         return $this->render('APMTransportBundle:zone_intervention:index.html.twig', array(
-            'zone_interventions' => $zone_interventions,
+            'zoneInterventions' => $AllZones,
+            'zoneInterventionsCreees' => null,
+            'transporteur' => null,
         ));
     }
 
@@ -36,7 +35,7 @@ class Zone_interventionController extends Controller
     {
         //---------------------------------security-----------------------------------------------
         // Unable to access the controller unless you have a USERAVM role
-        $this->denyAccessUnlessGranted( 'ROLE_TRANSPORTEUR', null, 'Unable to access this page!');
+        $this->denyAccessUnlessGranted('ROLE_USERAVM', null, 'Unable to access this page!');
         if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
             throw $this->createAccessDeniedException();
         }
@@ -52,12 +51,9 @@ class Zone_interventionController extends Controller
         $form = $this->createForm('APM\TransportBundle\Form\Zone_interventionType', $zone_intervention);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            $this->createSecurity();
-            /** @var Livreur_boutique $livreur_boutique */
-            $livreur_boutique = $form->getData()['livreur_boutique'];
-            /** @var Profile_transporteur $transporteur */
-            $transporteur = $this->getUser()->getTransporteur()|| $livreur_boutique->getTransporteur();
-            $zone_intervention->setTransporteur($transporteur);
+            $transporteur = $form->get('transporteur')->getData();
+            $this->createSecurity($transporteur);
+            if (!$transporteur) $zone_intervention->setTransporteur($this->getUser()->getTransporteur());
             $em = $this->getDoctrine()->getManager();
             $em->persist($zone_intervention);
             $em->flush();
@@ -71,12 +67,29 @@ class Zone_interventionController extends Controller
         ));
     }
 
-    private function createSecurity()
+    /**
+     * @param Profile_transporteur $transporteur
+     */
+    private function createSecurity($transporteur = null)
     {
         //---------------------------------security-----------------------------------------------
         $this->denyAccessUnlessGranted(['ROLE_TRANSPORTEUR', 'ROLE_BOUTIQUE'], null, 'Unable to access this page!');
-        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY') ) {
+        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY')) {
             throw $this->createAccessDeniedException();
+        }
+        $gerant = null;
+        $proprietaire = null;
+        if ($transporteur) {
+            $user = $this->getUser();
+            $livreur = $transporteur->getLivreurBoutique();
+            if ($livreur) {
+                $boutique = $livreur->getBoutiqueProprietaire();
+                $gerant = $boutique->getGerant();
+                $proprietaire = $boutique->getProprietaire();
+                if ($user !== $gerant && $user !== $proprietaire) {
+                    throw $this->createAccessDeniedException();
+                }
+            }
         }
         //----------------------------------------------------------------------------------------
     }
@@ -147,15 +160,27 @@ class Zone_interventionController extends Controller
      * @param Zone_intervention $zone_intervention
      */
     private function editAndDeleteSecurity($zone_intervention)
-    {
-        //---------------------------------security-----------------------------------------------
-        // Unable to access the controller unless they have the required role
-        $this->denyAccessUnlessGranted(['ROLE_TRANSPORTEUR','ROLE_BOUTIQUE'], null, 'Unable to access this page!');
-        /** @var Utilisateur_avm $user */
-       $user = $this->getUser();
-        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY') || $user !== $zone_intervention->getTransporteur()->getUtilisateur()){
+    { //
+        //--------------------------------- security: uniquement la boutique ou le le Transporteur autonome peut modifier et supprimer les ZI -----------------------------------------------
+        $this->denyAccessUnlessGranted(['ROLE_TRANSPORTEUR', 'ROLE_BOUTIQUE'], null, 'Unable to access this page!');
+        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY')) {
             throw $this->createAccessDeniedException();
         }
+        $user = $this->getUser();
+        $transporteur = $zone_intervention->getTransporteur();
+        $livreur = $transporteur->getLivreurBoutique();
+        if ($livreur) {
+            $boutique = $livreur->getBoutiqueProprietaire();
+            $gerant = $boutique->getGerant();
+            $proprietaire = $boutique->getProprietaire();
+            if ($user !== $gerant && $user !== $proprietaire) {
+                throw $this->createAccessDeniedException();
+            }
+
+        } else if ($user !== $transporteur->getUtilisateur()) {
+            throw $this->createAccessDeniedException();
+        }
+
         //----------------------------------------------------------------------------------------
     }
 

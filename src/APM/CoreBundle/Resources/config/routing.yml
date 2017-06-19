@@ -1,13 +1,17 @@
 #-------- DANGER: creer toute route dans le path correct pour garantir un accès dédiée ex: /easy-trade/user dédié aux utilisateurs ayant le role USERAVM---------
 
 apm_core_homepage:
-    path:     /
+    path:     / #masque fos_user.registration_register et redirige vers la plateforme
     defaults: { _controller: APMCoreBundle:Default:index }
 
 #--------------------- pages utilisateur ----------------------------------------------
 apm_core_user-registration:
-    resource: "@APMCoreBundle/Resources/config/user/user-registration.yml"
+    resource: "@APMCoreBundle/Resources/config/user/registration.yml"
     prefix:   /register/utilisateur-avm
+
+apm_core_user-profile:
+    resource: "@APMCoreBundle/Resources/config/user/profile.yml"
+    prefix:   /profile
 
 apm_core_shop:
     resource: "@APMCoreBundle/Resources/config/routing/shop.yml"

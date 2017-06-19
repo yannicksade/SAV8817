@@ -41,7 +41,7 @@ abstract class TradeFactory
         } else if ($var === "communication") {
             $communication = null;
             while ($i < $n && $communication == null) {
-                $communication = new Communication();
+                $communication = new Communication(CodeGenerator::getGenerator($length));
                 $i++;
             }
             return $communication;

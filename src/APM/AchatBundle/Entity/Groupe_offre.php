@@ -27,10 +27,10 @@ class Groupe_offre extends TradeFactory
      * @ORM\Column(name="code", type="string", length=255, nullable=false)
      */
     private $code;
+
     /**
-     * @var \DateTime
-     * @Assert\DateTime()
-     * @ORM\Column(name="dateDeVigueur", type="datetime", nullable=true)
+     * @var string
+     * @ORM\Column(name="dateDeVigueur", type="string", nullable=true)
      */
     private $dateDeVigueur;
 
@@ -97,7 +97,6 @@ class Groupe_offre extends TradeFactory
     public function __construct($var)
     {
         $this->offres = new ArrayCollection();
-        $this->dateDeVigueur = new \DateTime;
         $this->code = "GO" . $var;
     }
 
@@ -320,5 +319,10 @@ class Groupe_offre extends TradeFactory
         $this->propriete = $propriete;
 
         return $this;
+    }
+
+    public function __toString()
+    {
+        return $this->designation;
     }
 }

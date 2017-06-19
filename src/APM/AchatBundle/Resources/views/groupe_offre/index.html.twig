@@ -1,49 +1,107 @@
-{% extends 'APMAdminBundle:_Main:layout.html.twig' %}
+{% extends ":base/dashboard:layout.html.twig" %}
+{%- block title -%} {{ parent() }} | Groupe d'offres {% endblock %}
 
-{% block body %}
-    <h1>Groupe_offre list</h1>
-
-    <table>
-        <thead>
-        <tr>
-            <th>Code</th>
-            <th>Designation</th>
-            <th>Datedevigueur</th>
-            <th>Description</th>
-            <th>Recurrent</th>
-            <th>Actions</th>
-        </tr>
-        </thead>
-        <tbody>
-        {% for groupe_offre in groupe_offres %}
-            <tr>
-                <td><a href="{{ path('apm_achat_groupe_show', { 'id': groupe_offre.id}) }}">{{ groupe_offre.code }}</a>
-                </td>
-                <td>{{ groupe_offre.designation }}</td>
-                <td>{{ groupe_offre.description }}</td>
-                <td>{% if groupe_offre.recurrent %}Yes{% else %}No{% endif %}</td>
-                <td>
-                    <ul>
-                        <li>
-                            <a href="{{ path('apm_achat_groupe_show', { 'id': groupe_offre.id }) }}">show</a>
-                        </li>
-                        <li>
-                            <a href="{{ path('apm_achat_groupe_edit', { 'id': groupe_offre.id }) }}">edit</a>
-                        </li>
-                        <li>
-                            <a href="{{ path('apm_achat_groupe_deleteFromList', { 'id': groupe_offre.id }) }}">delete</a>
-                        </li>
-
+{% block content_body %}
+    <div class="page-bar">
+        <h1>Groupement de produits</h1>
+        <ul class="page-breadcrumb">
+            <li>
+                <i class="fa fa-circle"></i>
+                <a href="#">Groupe produit</a>
+            </li>
+            <li>
+                <i class="fa fa-circle"></i>
+                <a href="#">Manipulation</a>
+            </li>
+        </ul>
+    </div>
+    <div class="row">
+        <div class="col-lg-9">
+            {% for groupe_offre in groupe_offres %}
+                <div class="thumbnail margin-top-10">
+                    <h1>{{- groupe_offre }}</h1>
+                    Pour <strong> {%- if groupe_offre.propriete == 0 %} Acheter
+                        {%- elseif groupe_offre.propriete == 1 %} Suivre
+                        {%- elseif groupe_offre.propriete == 2 %} Contacter le vendeur
+                        {%- elseif groupe_offre.propriete == 3 %} Stocker
+                        {%- elseif groupe_offre.propriete == 4 %} Revendre
+                        {%- elseif groupe_offre.propriete == 5 %} Autre raison{% endif %}
+                    </strong><br/>
+                    {% if groupe_offre.dateDeVigueur %}
+                        <small>date de l'opération: {{ groupe_offre.dateDeVigueur }}</small>{% endif %}
+                    <br/>Alerte activée: {% if groupe_offre.recurrent %}<b>Oui</b>{% else %}<b>non</b>{% endif %}
+                    <ul class="pull-right">
+                        {% for offre in groupe_offre.offres %}
+                            <li><a href="{{ path('apm_vente_offre_show', {'id':offre.id}) }}">{{ offre }}</a></li>
+                        {% endfor %}
                     </ul>
-                </td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+                    <div class="caption">
+                        <h3>
+                            <a href="{{ path('apm_achat_groupe_edit', { 'id': groupe_offre.id}) }}">{{ groupe_offre.code }}</a>
+                        </h3>
+                        <p>{{ groupe_offre.description }}</p>
 
-    <ul>
-        <li>
-            <a href="{{ path('apm_achat_groupe_new') }}">Create a new entry</a>
-        </li>
-    </ul>
-{% endblock %}
+                        <a href="{{ path('apm_achat_groupe_edit', { 'id': groupe_offre.id }) }}"
+                           class="btn btn-primary">edit</a>
+                        <a href="{{ path('apm_achat_groupe_delete', { 'id': groupe_offre.id }) }}"
+                           class="btn btn-primary">delete</a>
+                        <a href="{{ path('apm_achat_groupe_offres_index', { 'id': groupe_offre.id }) }}"
+                           class="btn btn-primary">liste tous les produits &raquo</a>
+                        <a href="#" class="btn btn-primary fa fa-user"> partager</a>
+
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+        <div class="col-lg-3">
+            {{ form_start(form) }}
+            {{ form_errors(form) }}
+            <div class="thumbnail margin-top-10">
+                <h3>Créer ou modifier un groupe pour produits</h3>
+                <i>{{ form_row(form.code, {'attr':{'class':'form-control','readonly':'true'}}) }}</i>
+                <div class="form-group">
+                    {{ form_label(form.designation, 'Désignation', {'attr':{'class':'control-label'}}) }}
+                    {{ form_widget(form.designation, {'attr':{'class':'form-control'}}) }}
+                </div>
+                <div class="form-group">
+                    {{ form_label(form.dateDeVigueur, 'date de l\'operation futur', {'attr':{'class':'control-label'}}) }}
+                    <div class="input-group date datetime form_datetime bs-datetime"
+                         data-date-format="yyyy-dd-mm - hh:ii">
+                        <span class="input-group-addon">
+                            <button class="btn default date-set" type="button">
+                                <i class="fa fa-calendar"></i>
+                            </button>
+                        </span>
+                        {{ form_widget(form.dateDeVigueur, {'attr':{'class':'form-control','readonly':'true'}}) }}
+                        <span class="input-group-addon">
+                            <button class="btn default date-reset" type="button">
+                                <i class="fa fa-times"></i>
+                            </button>
+                        </span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    {{ form_label(form.recurrent, 'Me rapeler un jour avant?', {'attr':{'class':'control-label'}}) }}
+                    {{ form_widget(form.recurrent) }}
+                </div>
+                <div class="form-group">
+                    {{ form_label(form.propriete, 'Action', {'attr':{'class':'control-label'}}) }}
+                    {{ form_widget(form.propriete, {'attr':{'class':'form-control'}}) }}
+                </div>
+                <div class="form-group">
+                    {{ form_label(form.description, 'Description', {'attr':{'class':'control-label'}}) }}
+                    {{ form_widget(form.description, {'attr':{'class':'form-control'}}) }}
+                </div>
+
+                <div class="center-block">
+                    <input type="submit" value="Valider" class="margin-right-10"/>
+                    <input type="reset" value="Reset" class="margin-left-10 margin-right-10"/>
+                    <a href="{{ path('apm_achat_groupe_index') }}">
+                        <button class="margin-left-10">Annuler</button>
+                    </a>
+                </div>
+            </div>
+            {{ form_end(form) }}
+        </div>
+    </div>
+{% endblock content_body %}

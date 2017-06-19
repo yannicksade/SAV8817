@@ -38,10 +38,20 @@ class Livreur_boutique extends TradeFactory
      *
      * @ORM\OneToOne(targetEntity="APM\TransportBundle\Entity\Profile_transporteur", inversedBy="livreurBoutique", cascade={"persist","remove"})
      * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="transporteur_id", referencedColumnName="id", nullable=false)
+     *   @ORM\JoinColumn(name="transporteur_id", referencedColumnName="id", nullable=true)
      * })
      */
     private $transporteur;
+
+    /**
+     * @var Boutique
+     *
+     * @ORM\ManyToOne(targetEntity="APM\VenteBundle\Entity\Boutique", inversedBy="livreurBoutiques")
+     * @ORM\JoinColumns({
+     *   @ORM\JoinColumn(name="boutique_id", referencedColumnName="id", nullable=false)
+     * })
+     */
+    private $boutiqueProprietaire;
 
     /**
      * @var Collection
@@ -160,5 +170,34 @@ class Livreur_boutique extends TradeFactory
     public function getBoutiques()
     {
         return $this->boutiques;
+    }
+
+    public function __toString()
+    {
+        return $this->transporteur->getMatricule();
+    }
+
+    /**
+     * Get boutiqueProprietaire
+     *
+     * @return Boutique
+     */
+    public function getBoutiqueProprietaire()
+    {
+        return $this->boutiqueProprietaire;
+    }
+
+    /**
+     * Set boutiqueProprietaire
+     *
+     * @param Boutique $boutiqueProprietaire
+     *
+     * @return Livreur_boutique
+     */
+    public function setBoutiqueProprietaire(Boutique $boutiqueProprietaire = null)
+    {
+        $this->boutiqueProprietaire = $boutiqueProprietaire;
+
+        return $this;
     }
 }

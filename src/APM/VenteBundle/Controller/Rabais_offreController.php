@@ -19,34 +19,76 @@ class Rabais_offreController extends Controller
     /**
      * Le vendeur crée des rabais pour un utilisateur donné
      * Liste les rabais créé par le vendeur
-     *
+     * @param Offre $offre
+     * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function indexAction()
+    public function indexAction(Offre $offre = null)
     {
-        $this->listAndShowSecurity();
+        $this->listAndShowSecurity($offre);
         /** @var Utilisateur_avm $user */
         $user = $this->getUser();
-        $rabais_offres = $user->getRabais();
+        $rabais_offres = null;
+        if ($offre) $rabais_offres = $offre->getRabais();
+        $rabais_recus = $user->getRabaisRecus();
+        $rabais_accordes = $user->getRabaisAccordes();
         return $this->render('APMVenteBundle:rabais_offre:index.html.twig', array(
             'rabais_offres' => $rabais_offres,
+            'rabais_recus' => $rabais_recus,
+            'rabais_accordes' => $rabais_accordes,
+            'offre' => $offre,
         ));
+    }
+
+    /**
+     * @param Rabais_offre|null $rabais
+     * @param Offre $offre
+     */
+    private function listAndShowSecurity($offre = null, $rabais = null)
+    {
+        //-----------------------------------security-------------------------------------------
+        // Unable to access the controller unless you have a USERAVM role
+        $this->denyAccessUnlessGranted('ROLE_USERAVM', null, 'Unable to access this page!');
+        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
+            throw $this->createAccessDeniedException();
+        }
+
+        if ($offre) { /// N'autorise que le vendeur, le gerant ou le proprietaire ou le bénéficiare à pouvoir afficher des rabais sur l'offre
+            $user = $this->getUser();
+            $boutique = $offre->getBoutique();
+            $gerant = null;
+            $proprietaire = null;
+            $beneficiaire = null;
+            if ($boutique) {
+                $gerant = $boutique->getGerant();
+                $proprietaire = $boutique->getProprietaire();
+            }
+            $vendeur = $offre->getVendeur();
+            if ($rabais) {//beneficiare
+                $beneficiaire = $rabais->getBeneficiaireRabais();
+            }
+            if ($user !== $gerant && $user !== $proprietaire && $user !== $vendeur && $user !== $beneficiaire) {
+                throw $this->createAccessDeniedException();
+            }
+        }
+        //----------------------------------------------------------------------------------------
     }
 
     /**
      * Creates a new Rabais_offre entity.
      * @param Request $request
+     * @param Offre $offre
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function newAction(Request $request)
+    public function newAction(Request $request, Offre $offre)
     {
-        $this->createSecurity();
+        $this->createSecurity($offre);
         /** @var Rabais_offre $rabais */
         $rabais = TradeFactory::getTradeProvider('rabais');
+        $rabais->setOffre($offre);
         $form = $this->createForm('APM\VenteBundle\Form\Rabais_offreType', $rabais);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            $offre = $form->get('offre');
-            $this->createSecurity($offre->getData());
+            $this->createSecurity($offre, $rabais);
             $rabais->setVendeur($this->getUser());
             $em = $this->getDoctrine()->getManager();
             $em->persist($rabais);
@@ -56,9 +98,42 @@ class Rabais_offreController extends Controller
         }
 
         return $this->render('APMVenteBundle:rabais_offre:new.html.twig', array(
-            'rabais_offre' => $rabais,
+            'offre' => $offre,
             'form' => $form->createView(),
         ));
+    }
+
+    /**
+     * @param Offre $offre
+     * @param Rabais_offre|null $rabais
+     */
+    private function createSecurity($offre = null, $rabais = null)
+    {
+        //---------------------------------security-----------------------------------------------
+        // Unable to access the controller unless you have a USERAVM role
+        $this->denyAccessUnlessGranted('ROLE_USERAVM', null, 'Unable to access this page!');
+        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY')) {
+            throw $this->createAccessDeniedException();
+        }
+
+        if ($offre) { /// N'autorise que le vendeur, le gerant ou le proprietaire à pouvoir  faire des rabais
+            $user = $this->getUser();
+            $boutique = $offre->getBoutique();
+            $gerant = null;
+            $proprietaire = null;
+            $beneficiaire = null;
+            if ($boutique) {
+                $gerant = $boutique->getGerant();
+                $proprietaire = $boutique->getProprietaire();
+            }
+            $vendeur = $offre->getVendeur();
+            if ($rabais) $beneficiaire = $rabais->getBeneficiaireRabais();
+            //le beneficiaire du rabais ne peut être celui qui le cree et le createur ne devrait être que le vendeur ayant droit,
+            if ($user !== $gerant && $user !== $proprietaire && $user !== $vendeur || $beneficiaire === $user) {
+                throw $this->createAccessDeniedException();
+            }
+        }
+        //----------------------------------------------------------------------------------------
     }
 
     /**
@@ -68,7 +143,7 @@ class Rabais_offreController extends Controller
      */
     public function showAction(Rabais_offre $rabais_offre)
     {
-        $this->listAndShowSecurity();
+        $this->listAndShowSecurity($rabais_offre->getOffre(), $rabais_offre);
         $deleteForm = $this->createDeleteForm($rabais_offre);
         return $this->render('APMVenteBundle:rabais_offre:show.html.twig', array(
             'rabais_offre' => $rabais_offre,
@@ -121,6 +196,36 @@ class Rabais_offreController extends Controller
     }
 
     /**
+     * @param Rabais_offre $rabais
+     */
+    private function editAndDeleteSecurity($rabais)
+    {
+        //---------------------------------security-----------------------------------------------
+        // Unable to access the controller unless you have a USERAVM role
+        $this->denyAccessUnlessGranted('ROLE_USERAVM', null, 'Unable to access this page!');
+        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY')) {
+            throw $this->createAccessDeniedException();
+        }
+
+        /// N'autorise que le vendeur, le gerant ou le proprietaire à pouvoir modifier ou supprimer des rabais sur l'offre
+        // à condition qu'ils ne soyent pas ledit bénéficiaire
+        $boutique = $rabais->getOffre()->getBoutique();
+        $user = $this->getUser();
+        $gerant = null;
+        $proprietaire = null;
+        if ($boutique) {
+            $gerant = $boutique->getGerant();
+            $proprietaire = $boutique->getProprietaire();
+        }
+        $vendeur = $rabais->getOffre()->getVendeur();
+        if ($user !== $gerant && $user !== $proprietaire && $user !== $vendeur || $user === $rabais->getBeneficiaireRabais()) {
+            throw $this->createAccessDeniedException();
+        }
+        //----------------------------------------------------------------------------------------
+
+    }
+
+    /**
      * Deletes a Rabais_offre entity.
      * @param Request $request
      * @param Rabais_offre $rabais_offre
@@ -139,7 +244,7 @@ class Rabais_offreController extends Controller
             $em->flush();
         }
 
-        return $this->redirectToRoute('apm_vente_rabais_offre_index');
+        return $this->redirectToRoute('apm_vente_rabais_offre_index', ['id' => $rabais_offre->getOffre()->getId()]);
     }
 
     public function deleteFromListAction(Rabais_offre $rabais_offre)
@@ -150,64 +255,6 @@ class Rabais_offreController extends Controller
         $em->remove($rabais_offre);
         $em->flush();
 
-        return $this->redirectToRoute('apm_vente_rabais_offre_index');
-    }
-
-
-    private function listAndShowSecurity(){
-        //-----------------------------------security-------------------------------------------
-        // Unable to access the controller unless you have a USERAVM role
-        $this->denyAccessUnlessGranted('ROLE_USERAVM', null, 'Unable to access this page!');
-        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_REMEMBERED'))  {
-            throw $this->createAccessDeniedException();
-        }
-        //----------------------------------------------------------------------------------------
-    }
-
-
-    /**
-     * @param Offre $offre
-     */
-    private function createSecurity($offre =null){
-        //---------------------------------security-----------------------------------------------
-        // Unable to access the controller unless you have a USERAVM role
-        $this->denyAccessUnlessGranted('ROLE_USERAVM', null, 'Unable to access this page!');
-        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY')) {
-            throw $this->createAccessDeniedException();}
-
-        if($offre) { /// N'autorise que le vendeur, le gerant ou le proprietaire à pouvoir  faire des rabais
-            $user = $this->getUser();
-            $boutique = $offre->getBoutique();
-            $gerant = null;
-            $proprietaire = null;
-            if($boutique) {
-                $gerant = $boutique->getGerant();
-                $proprietaire = $boutique->getProprietaire();
-            }
-            $vendeur = $offre->getVendeur();
-            if ($user !== $gerant && $user !== $proprietaire && $user !== $vendeur) {
-                throw $this->createAccessDeniedException();
-            }
-        }
-        //----------------------------------------------------------------------------------------
-    }
-
-    /**
-     * @param Rabais_offre $rabais
-     */
-    private function editAndDeleteSecurity($rabais){
-        //---------------------------------security-----------------------------------------------
-        // Unable to access the controller unless you have a USERAVM role
-        $this->denyAccessUnlessGranted('ROLE_USERAVM', null, 'Unable to access this page!');
-        /* ensure that the user is logged in  # granted even through remembering cookies
-        *  and that the one is the owner
-        */
-        $user = $this->getUser();
-        $vendeur = $rabais->getVendeur();
-        if ((!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY')) || ($vendeur!== $user)) {
-            throw $this->createAccessDeniedException();
-        }
-        //----------------------------------------------------------------------------------------
-
+        return $this->redirectToRoute('apm_vente_rabais_offre_index', ['id' => $rabais_offre->getOffre()->getId()]);
     }
 }

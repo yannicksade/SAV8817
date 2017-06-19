@@ -10,7 +10,7 @@ apm_vente_categorie_show:
     methods:  GET
 
 apm_vente_categorie_new:
-    path:     /new
+    path:     /new/{id}
     defaults: { _controller: "APMVenteBundle:Categorie:new" }
     methods:  [GET, POST]
 

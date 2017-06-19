@@ -1,61 +1,86 @@
 {% extends "APMAdminBundle:_Main:layout.html.twig" %}
 {% block body %}
-    <h1>Transaction list</h1>
+    <h1>Transactions</h1>
 
     <table>
         <thead>
         <tr>
             <th>Code</th>
-            <th>Montant</th>
             <th>Nature</th>
-            <th>Statut</th>
-            <th>Ordre</th>
+            <th>Boutique Bénéficiaire</th>
             <th>Auteur</th>
-            <th>Livraison</th>
-            <th>Objet</th>
-            <th>Bénéficiaire</th>
-
+            <th>Bénéficiaire individuel</th>
+            <th>Livrable?</th>
+            <th>Code livraison</th>
             <th>Actions</th>
         </tr>
         </thead>
         <tbody>
-        {% for transaction in transactions %}
+        {% if boutique %}<a href="{{ path('apm_vente_boutique_index') }}"><strong>{{ boutique }}</strong></a>{% endif %}
+        <p>---------------------------------------Transactions
+            effectuées-------------------------------------------------------</p>
+        {% for transaction in transactionsEffectues %}
             <tr>
                 <td>
                     <a href="{{ path('apm_vente_transaction_show', { 'id': transaction.id }) }}">{{ transaction.code }}</a>
                 </td>
-                <td>{{ transaction.montant }}</td>
-                <td>{{ transaction.nature }}</td>
-                <td>{{ transaction.statut }}</td>
-                {% if transaction.ordre %}
-                    <td> {{ transaction.ordre.code }}</td>{% endif %}
-                {% if transaction.auteur %}
-                    <td> {{ transaction.auteur.username }}</td>{% endif %}
-                {% if transaction.livraison %}
-                    <td> {{ transaction.livraison.code }}</td>{% endif %}
-                {% if transaction.transactionProduits %}
-                    {% for transaction in transaction.transactionProduits %}
-                        <td> {{ transaction.produit.designation }}</td>
-                        <td> {{ transaction.produit.vendeur.username }}</td>
-                    {% endfor %}
-                {% endif %}
-                {% if transaction.boutique %}
-                    <td> {{ transaction.boutique.designation }}</td>
-                    <td> {{ transaction.boutique.proprietaire.username }}</td>
-                {% endif %}
-                <td>
-                    <ul>
-                        <li>
-                            <a href="{{ path('apm_vente_transaction_show', { 'id': transaction.id }) }}">show</a>
-                        </li>
-                        <li>
-                            <a href="{{ path('apm_vente_transaction_edit', { 'id': transaction.id }) }}">edit</a>
-                        </li>
-                        <li>
-                            <a href="{{ path('apm_vente_transaction_deleteFromList', { 'id': transaction.id }) }}">delete</a>
-                        </li>
+                <td> {{ transaction.nature }}</td>
+                <td>{% if transaction.boutiqueBeneficiaire %}
+                        {{ transaction.boutiqueBeneficiaire }} {% else %} - {% endif %}</td>
+                <td> {{ transaction.auteur }}</td>
+                <td> {{ transaction.beneficiaire }}</td>
+                <td> {% if transaction.shipped %} Yes {% else %} No {% endif %}</td>
+                <td> {% if transaction.livraison %} <a
+                        href="{{ path('apm_transport_livraison_show',{'id':transaction.livraison.id}) }}">{{ transaction.livraison }} </a>{% else %} - {% endif %}
+                </td>
 
-                    </ul>
+                <td>
+                    <a href="{{ path('apm_vente_transaction_show', { 'id': transaction.id }) }}">afficher</a> |
+
+                    <a href="{{ path('apm_vente_transaction_edit', { 'id': transaction.id }) }}">modifier</a> |
+
+                    <a href="{{ path('apm_vente_transaction_deleteFromList', { 'id': transaction.id }) }}">supprimer</a>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <table>
+        <thead>
+        <tr>
+            <th>Code</th>
+            <th>Nature</th>
+            <th>Boutique Bénéficiaire</th>
+            <th>Auteur</th>
+            <th>Bénéficiaire individuel</th>
+            <th>Livrable?</th>
+            <th>Code livraison</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <p>--------------------------------------------------Transactions
+            reçues--------------------------------------------------</p>
+        {% for transaction in transactionsRecues %}
+            <tr>
+                <td>
+                    <a href="{{ path('apm_vente_transaction_show', { 'id': transaction.id }) }}">{{ transaction.code }}</a>
+                </td>
+
+                <td> {{ transaction.nature }}</td>
+                <td> {% if transaction.boutiqueBeneficiaire %}
+                        {{ transaction.boutiqueBeneficiaire }} {% else %} - {% endif %}</td>
+                <td> {{ transaction.auteur }}</td>
+                <td> {{ transaction.beneficiaire }}</td>
+                <td> {% if transaction.shipped %} Yes {% else %} No {% endif %}</td>
+                <td> {% if transaction.livraison %} <a
+                        href="{{ path('apm_transport_livraison_operation_show',{'id':transaction.livraison.id, 'transaction_id':transaction.id}) }}">{{ transaction.livraison }} </a>{% else %} - {% endif %}
+                </td>
+
+                <td>
+                    <a href="{{ path('apm_vente_transaction_show', { 'id': transaction.id }) }}">afficher</a> |
+
                 </td>
             </tr>
         {% endfor %}
@@ -64,7 +89,41 @@
 
     <ul>
         <li>
-            <a href="{{ path('apm_vente_transaction_new') }}">Create a new entry</a>
+            <a href="{{ path('apm_vente_transaction_new') }}">Faites une transaction ordinaire</a>
+        </li>
+        <li>
+            <a href="{{ path('apm_vente_transaction_produit_accueil_new') }}">Faites une transaction de produit</a>
+        </li>
+        <li>
+            <a href="{{ path('apm_vente_boutique_index') }}">Liste les boutiques</a>
+        </li>
+        {% if boutique %}
+            <li>
+                <a href="{{ path('apm_vente_boutique_show', {'id':boutique.id}) }}">Retour à la boutique</a>
+            </li>
+            <li>
+                <a href="{{ path('apm_vente_transaction_produit_boutique_index', {'id':boutique.id}) }}">Liste les
+                    transactions des produits de la boutique</a>
+            </li>
+            <li>
+                <a href="{{ path('apm_transport_livraison_new', {'id': boutique.id}) }}">Créer une livraison
+                    boutique</a>
+            </li>
+            <li>
+                <a href="{{ path('apm_transport_livraison_boutique_index', {'id':boutique.id}) }}">Liste les livraisons
+                    de la boutique</a>
+            </li>
+        {% else %}
+            <li>
+                <a href="{{ path('apm_transport_livraison_new') }}">Créer une livraison</a>
+            </li>
+        {% endif %}
+        <li>
+            <a href="{{ path('apm_vente_transaction_produit_user_index') }}">Liste les transaction de produits
+                effectuées </a>
+        </li>
+        <li>
+            <a href="{{ path('apm_transport_livraison_index') }}">Liste toutes mes livraiosons</a>
         </li>
     </ul>
 {% endblock %}

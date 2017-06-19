@@ -1,0 +1,3 @@
+apm_utilisateur_avm_registration:
+    path:     /
+    defaults: { _controller: APMUserBundle:RegistrationUtilisateurAVM:register }

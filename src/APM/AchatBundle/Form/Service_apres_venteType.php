@@ -2,6 +2,7 @@
 
 namespace APM\AchatBundle\Form;
 
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
@@ -18,17 +19,29 @@ class Service_apres_venteType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('dateDue', DateTimeType::class, ['required' => false])
-            ->add('descriptionPanne', TextareaType::class, ['required' => false])
+            ->add('id')
             ->add('etat', ChoiceType::class, [
-                'choices' => array(
-                    "EN PANNE" => 0,
-                    "DEPANNE" => 1,
-                    "EN COURS DE DEPANNAGE" => 2,
-                    "Autre" => 3
-                )
+                'choices' => [
+                    'En panne' => 0,
+                    'Problème résolu' => 1,
+                    'En cours de diagnostic' => 2,
+                    'En cours de depannage' => 3,
+                    'Déclaré hors service' => 4,
+                    'requête à suivre' => 5,
+                    'Frais exigible' => 6,
+                    'Demande réjeté' => 7,
+                    'Alerte' => 8,
+                ]
             ])
-        ;
+            ->add('code')
+            ->add('offre', EntityType::class, [
+                'placeholder' => '',
+                'class' => 'APMVenteBundle:Offre',
+                'choice_name' => 'id',
+                'choice_label' => 'designation',
+                'attr' => ['class' => 'js-data-example-ajax form-control'],
+            ])
+            ->add('descriptionPanne', TextareaType::class, ['required' => true,]);
     }
 
     /**

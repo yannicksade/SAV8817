@@ -2,7 +2,6 @@
 
 namespace APM\MarketingDistribueBundle\Form;
 
-use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\MoneyType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
@@ -25,11 +24,6 @@ class QuotaType extends AbstractType
                 'grouping' => true,
                 'currency' => 'XAF',
                 'required' => false
-            ])
-            ->add('boutiqueProprietaire', EntityType::class, [
-                'class' => 'APMVenteBundle:Boutique',
-                'choice_label' => 'code',
-                'required' => true
             ])
         ;
     }

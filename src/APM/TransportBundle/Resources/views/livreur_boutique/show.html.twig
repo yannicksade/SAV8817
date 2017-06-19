@@ -1,13 +1,13 @@
 {% extends "APMAdminBundle:_Main:layout.html.twig" %}
 
 {% block body %}
-    <h1>Livreur_boutique</h1>
+    <h1>Livreur boutique</h1>
 
     <table>
         <tbody>
         <tr>
             <th>Code</th>
-            {% if livreur_boutique.transporteur==null %} {% else %}{{ livreur_boutique.transporteur.code }}{% endif %}
+            <td>{{ livreur_boutique.transporteur.code }}</td>
         </tr>
 
         <tr>
@@ -18,24 +18,41 @@
             <th>Reférence</th>
             <td>{{ livreur_boutique.reference }}</td>
         </tr>
+        <tr>
+            <th>Prenom/pseudo de l'agent</th>
+            <td>{{ livreur_boutique.transporteur.utilisateur }}</td>
+        </tr>
+        <tr>
+            <th>Boutique proprietaire</th>
+            <td>{{ livreur_boutique.boutiqueProprietaire }}</td>
+        </tr>
         </tbody>
     </table>
 
     <ul>
         <li>
-            <a href="{{ path('apm_transport_livreur_boutique_index') }}">Back to the list</a>
+            <a href="{{ path('apm_transport_transporteur_All_index') }}">Retour à la liste les transporteurs</a>
         </li>
-        <li>
-            <a href="{{ path('apm_transport_livreur_boutique_edit', { 'id': livreur_boutique.id }) }}"> Edit </a>
-        </li>
-        <li>
-            <a href="{{ path('apm_transport_livreur_boutique_new') }}"> Add a new one </a>
-        </li>
+        {% if app.user == livreur_boutique.boutiqueProprietaire.gerant or app.user == livreur_boutique.boutiqueProprietaire.proprietaire %}
+            <li>
+                <a href="{{ path('apm_transport_livreur_boutique_edit', { 'id': livreur_boutique.id }) }}">
+                    modifier </a>
+            </li>
+            <li>
+                <a href="{{ path('apm_transport_livreur_boutique_new', {'id':livreur_boutique.boutiqueProprietaire.id}) }}">
+                    Créer un nouveau livreur pour la boutique </a>
+            </li>
+            <li>
+                <a href="{{ path('apm_transport_livreur_boutique_index', {'id':livreur_boutique.boutiqueProprietaire.id}) }}">Liste
+                    les livreurs de la boutique</a>
+            </li>
 
-        <li>
-            {{ form_start(delete_form) }}
-            <input type="submit" value="Delete">
-            {{ form_end(delete_form) }}
-        </li>
+            <li>
+                {{ form_start(delete_form) }}
+                <input type="submit" value="Delete">
+                {{ form_end(delete_form) }}
+            </li>
+        {% endif %}
+
     </ul>
 {% endblock %}

@@ -1,49 +1,49 @@
 {% extends "APMAdminBundle:_Main:layout.html.twig" %}
 
 {% block body %}
-    <h1>Commissionnement list</h1>
+    <h1>Liste des Commissionnements</h1>
 
     <table>
         <thead>
         <tr>
             <th>Code</th>
-            <th>Crédit dépensé</th>
+            <th>Boutique offrante</th>
             <th>Libellé</th>
-            <th>Conseiller</th>
+            <th>Conseiller Bénéficiaire</th>
             <th>Actions</th>
         </tr>
         </thead>
         <tbody>
-        {% for commissionnement in commissionnements %}
-            <tr>
-                <td>
-                    <a href="{{ path('apm_marketing_commissionnement_show', { 'id': commissionnement.id }) }}">{{ commissionnement.code }}</a>
-                </td>
-                <td>{{ commissionnement.creditDepense }}</td>
-                <td>{{ commissionnement.libelle }}</td>
-                <td>{{ commissionnement.conseillerBoutique.conseiller.utilisateur }}</td>
-                <td>
-                    <ul>
-                        <li>
-                            <a href="{{ path('apm_marketing_commissionnement_show', { 'id': commissionnement.id }) }}">show</a>
-                        </li>
-                        <li>
-                            <a href="{{ path('apm_marketing_commissionnement_edit', { 'id': commissionnement.id }) }}">edit</a>
-                        </li>
-                        <li>
-                            <a href="{{ path('apm_marketing_commissionnement_deleteFromList', { 'id': commissionnement.id }) }}">delete</a>
-                        </li>
-                    </ul>
-                </td>
-            </tr>
+        {% for boutique_commissionnements in boutiques_commissionnements %}
+            {% for commissionnement in boutique_commissionnements.commissionnements %}
+                <tr>
+                    <td>
+                        <a href="{{ path('apm_marketing_commissionnement_show', { 'id': commissionnement.id }) }}">{{ commissionnement.code }}</a>
+                    </td>
+                    <td>
+                        <a href="{{ path('apm_vente_boutique_show', { 'id':boutique_commissionnements.boutique.id }) }}">{{ boutique_commissionnements.boutique }}</a>
+                    </td>
+                    <td>{{ commissionnement.libelle }}</td>
+                    <td>
+                        <a href="{{ path('apm_marketing_conseiller_show', { 'id': boutique_commissionnements.conseiller.id }) }}">{{ boutique_commissionnements.conseiller }}</a>
+                    </td>
+                    <td>
+                        <ul>
+                            <li>
+                                <a href="{{ path('apm_marketing_commissionnement_show', { 'id': commissionnement.id }) }}">show</a>
+                            </li>
+                            <li>
+                                <a href="{{ path('apm_marketing_commissionnement_edit', { 'id': commissionnement.id }) }}">edit</a>
+                            </li>
+                            <li>
+                                <a href="{{ path('apm_marketing_commissionnement_deleteFromList', { 'id': commissionnement.id }) }}">delete</a>
+                            </li>
+                        </ul>
+                    </td>
+                </tr>
+            {% endfor %}
         {% endfor %}
         </tbody>
     </table>
 
-    <ul>
-        <li>
-            <a href="{{ path('apm_marketing_commissionnement_new', {'id':  commissionnements|first().conseillerBoutique.id}) }}">Create
-                a new entry</a>
-        </li>
-    </ul>
 {% endblock %}

@@ -1,19 +1,91 @@
-<h1>Votre Profile</h1>
-{% trans_default_domain 'FOSUserBundle' %}
+{% extends ":base/dashboard:layout.html.twig" %}
 
+{%- block title -%} E-Trade | user profile {% endblock %}
 
-<div class="fos_user_user_show">
-    <p>{{ 'profile.show.username'|trans }}: {{ user.username }}</p>
-    <p>{{ 'profile.show.email'|trans }}: {{ user.email }}</p>
+{% block content_body %}
 
+    <h1>Votre Profile: {{ user }}</h1>
+    {% trans_default_domain 'FOSUserBundle' %}
+    <div class="row">
+        <div class="col-lg-6">
+            <table>
+                <tbody>
+                <tr>
+                    <th>Etat du compte:</th>
+                    <td>{{ user.etatDuCompte }} </td>
+                </tr>
+                <tr>
+                    <th>Code de l'utilisateur:</th>
+                    <td>{{ user.code }}</td>
+                </tr>
+                <tr>
+                    <th>Date de la création du compte:</th>
+                    <td>{{ user.dateEnregistrement |date('d-m-y H:i') }}</td>
+                </tr>
+                <tr>
+                    <th>{{ 'profile.show.username'|trans }}:</th>
+                    <td> {{ user.username }} </td>
+                </tr>
 
-    <a href="{{ path('fos_user_profile_edit') }}">
-        <button class="btn btn-default">Modifier</button>
-    </a>
+                <tr>
+                    <th>{{ 'profile.show.email'|trans }}:</th>
+                    <td> {{ user.email }} </td>
+                </tr>
 
-    <a href="{{ path('apm_core_dashboard_show', {'id': app.user.id}) }}">
-        <button class="btn btn-default">Retour</button>
-    </a>
+                <tr>
+                    <th>Nom:</th>
+                    <td>{{ user.nom }}</td>
+                </tr>
+                <tr>
+                    <th>Prenom:</th>
+                    <td>{{ user.prenom }}</td>
+                </tr>
 
-</div>
+                <tr>
+                    <th>Date de naissance:</th>
+                    <td>{{ user.dateNaissance|date('d-m-y') }}</td>
+                </tr>
+                <tr>
+                    <th>Nationalité:</th>
+                    <td>{{ user.pays }}</td>
+                </tr>
+                <tr>
+                    <th>Genre:</th>
+                    <td>{{ user.genre }}</td>
+                </tr>
+                <tr>
+                    <th>Téléphone:</th>
+                    <td>{{ user.telephone }}</td>
+                </tr>
+                <tr>
+                    <th>Profession:</th>
+                    <td>{{ user.profession }}</td>
+                </tr>
+                <tr>
+                    <th>Ville et Adresse:</th>
+                    <td>{{ user.adresse }}</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="col-lg-4">
+            <h2> Votre Image de Profile</h2>
+            <img src="{{ asset( url_image ~ user.image) }}" alt="erreur d\'affichage"/>
+        </div>
+    </div>
+    <div class="row">
+        {% if type %}
+            admin
+            <a href="{{ path('apm_admin_profile_edit') }}">
+                <button class="btn btn-default">Modifier</button>
+            </a>
+        {% else %}
+            user
+            <a href="{{ path('apm_user_profile_edit') }}">
+                <button class="btn btn-default">Modifier</button>
+            </a>
+        {% endif %}
+        <a href="{{ path('fos_user_change_password') }}" class="btn btn-default">Changer votre mot de passe</a>
+    </div>
 
+{% endblock content_body %}

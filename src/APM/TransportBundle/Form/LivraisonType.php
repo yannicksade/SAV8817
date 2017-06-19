@@ -48,12 +48,6 @@ class LivraisonType extends AbstractType
                 'required' => true,
                 'multiple' => true
             ])
-            ->add('valide', CheckboxType::class, ['required' => false])
-            ->add('livreur', EntityType::class, [
-                'class' => 'APMTransportBundle:Profile_transporteur',
-                'choice_label' => 'code',
-                'required' =>true
-            ])
         ;
     }
     

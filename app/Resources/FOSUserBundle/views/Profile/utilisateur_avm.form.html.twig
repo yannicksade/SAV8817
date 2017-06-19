@@ -1,0 +1,13 @@
+{% extends ":base/dashboard:layout.html.twig" %}
+{% trans_default_domain 'FOSUserBundle' %}
+{%- block title -%} E-Trade | edit profile {% endblock %}
+{% block content_body %}
+    <h1>Edit profile form for users!</h1>
+    <h2> Modifier votre profile </h2>
+    {{ form_start(form, {'method':'POST', 'action': path('apm_user_profile_edit')}) }}
+    {{ form_widget(form) }}
+    <div>
+        <input type="submit" value="{{ 'profile.edit.submit'|trans }}"/>
+    </div>
+    {{ form_end(form) }}
+{% endblock content_body %}
