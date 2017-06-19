@@ -1,4 +1,4 @@
-services:
+#services:
 #    apm_marketing_reseau.example:
 #        class: APM\MarketingReseauBundle\Example
 #        arguments: ["@service_id", "plain_value", "%parameter%"]

@@ -37,9 +37,5 @@ class APMAchatExtension extends Extension
 
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('services.yml');
-
-
-        $this->addClassesToCompile(array(//definir les classes à compiler une fois pour besoin de performance(reduire les chargements E/S répétés).
-        ));
     }
 }
