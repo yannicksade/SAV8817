@@ -1,7 +1,14 @@
 apm_achat_service_apres_vente_index:
     path:     /
     defaults: { _controller: "APMAchatBundle:Service_apres_vente:index" }
-    methods:  [GET, POST]
+
+apm_achat_service_apres_vente_save:
+    path:     /save
+    defaults: { _controller: "APMAchatBundle:AjaxSav:save" }
+
+apm_achat_service_apres_vente_update:
+    path:     /update
+    defaults: { _controller: "APMAchatBundle:AjaxSav:update" }
 
 apm_achat_service_apres_vente_delete:
     path:     /{id}/delete

@@ -5,8 +5,9 @@ namespace APM\AchatBundle\Form;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
-use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -19,7 +20,9 @@ class Service_apres_venteType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('id')
+            ->add('id', HiddenType::class, [
+                'mapped' => false,
+            ])
             ->add('etat', ChoiceType::class, [
                 'choices' => [
                     'En panne' => 0,
@@ -31,17 +34,24 @@ class Service_apres_venteType extends AbstractType
                     'Frais exigible' => 6,
                     'Demande réjeté' => 7,
                     'Alerte' => 8,
-                ]
+                ],
+                'attr' => ['class' => 'form-control select2 etat_x'],
+                'required'=> false,
             ])
-            ->add('code')
+            ->add('code', TextType::class, ['mapped' => false])
             ->add('offre', EntityType::class, [
-                'placeholder' => '',
+                'placeholder' => 'Selectionnez le produit',
                 'class' => 'APMVenteBundle:Offre',
                 'choice_name' => 'id',
                 'choice_label' => 'designation',
-                'attr' => ['class' => 'js-data-example-ajax form-control'],
+                'attr' => ['class' => 'form-control select2 offre_x'],
             ])
-            ->add('descriptionPanne', TextareaType::class, ['required' => true,]);
+            ->add('boutique', TextType::class, [
+                'mapped'=>false,
+                'attr' => ['class' => 'form-control boutique_x'],
+            ])
+            ->add('descriptionPanne', TextareaType::class, ['required' => true,])
+    ;
     }
 
     /**

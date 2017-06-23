@@ -22,28 +22,32 @@ var Alert = (function () {
             var xhr = new XMLHttpRequest();
             xhr.open('GET', 'http://localhost/SAV8817.git/web/app_dev.php/easy-trade/user/dashboard/ajax-notification');
             xhr.onreadystatechange = function () {
-                if (xhr.readyState == 4 && xhr.status == 200) {
-                    var groupe_notifications = JSON.parse(xhr.responseText);
-                    //var message;
-                    var i = 0;
-                    for (var type in groupe_notifications) {
-                        for (var id in groupe_notifications[type]) {
-                            (function (_id, _type) {
-                                var message = groupe_notifications[_type][_id];
-                                if (message.indexOf('_&') > -1) {
-                                    setTimeout(function () {
-                                        var header_message = message.split('_&');
-                                        settings.heading = header_message[0];
-                                        notify(_type, header_message[1]);
-                                    }, 3000 * i++);
-                                } else {
-                                    setTimeout(function () {
-                                        SystemNotification(_type, message);
-                                    }, 5000 * i++);
-                                }
-                            })(id, type);
+                try {
+                    if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
+                        var groupe_notifications = JSON.parse(xhr.responseText);
+                        //var message;
+                        var i = 0;
+                        for (var type in groupe_notifications) {
+                            for (var id in groupe_notifications[type]) {
+                                (function (_id, _type) {
+                                    var message = groupe_notifications[_type][_id];
+                                    if (message.indexOf('_&') > -1) {
+                                        setTimeout(function () {
+                                            var header_message = message.split('_&');
+                                            settings.heading = header_message[0];
+                                            notify(_type, header_message[1]);
+                                        }, 3000 * i++);
+                                    } else {
+                                        setTimeout(function () {
+                                            SystemNotification(_type, message);
+                                        }, 5000 * i++);
+                                    }
+                                })(id, type);
+                            }
                         }
                     }
+                } catch (e) {
+                    alert('Caught Exception: ' + e.description);
                 }
             };
             xhr.send(null);
@@ -85,6 +89,9 @@ var Alert = (function () {
 
 jQuery(document).ready(function () {
     document.body.onfocus = (function () {
-        setInterval(Alert.init(), 1000);
+        setTimeout(Alert.init(), 200);
+        document.querySelector('#notif-active').onclick = function () {
+            setTimeout(Alert.init(), 100);
+        }
     })();
 });

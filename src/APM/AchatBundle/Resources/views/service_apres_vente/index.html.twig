@@ -115,15 +115,15 @@
                                                 <span></span>
                                             </label>
                                         </td>
-                                        <td class="hidden">
+                                        <td class="hidden"><i id="id_item">{{ service_apres_vente.id }}</i>
+                                            <i id="id_item">{{ service_apres_vente.id }} </i>
                                             <i id="code_item">{{ service_apres_vente.code }} </i>
                                             <i id="client_item">{{ service_apres_vente.client }}</i>
                                             <i id="comment_item">{{ service_apres_vente.commentaire }}</i>
                                         </td>
                                         <td><i class="hidden" id="offreID_item">{{ service_apres_vente.offre.id }}</i>
                                             <i id="offre_item" class="hidden">{{ service_apres_vente.offre }}</i>
-                                            <a href="{{ path('apm_vente_offre_show', { 'id': service_apres_vente.id }) }}">
-                                                <i class="hidden" id="id_item">{{ service_apres_vente.id }}</i>
+                                            <a href="{{ path('apm_vente_offre_show', { 'id': service_apres_vente.offre.id }) }}">
                                                 {{ service_apres_vente.offre|truncate(12, false) }}
                                             </a>
                                         </td>
@@ -169,10 +169,13 @@
 
                                         <td>
                                             <a href="javascript:;"
-                                               class="btn btn-outline btn-circle purple btn-sm purple see_item" data-target="#stack" data-toggle="modal">
+                                               class="btn btn-outline btn-circle purple btn-sm purple see_item"
+                                               data-target="#stack" data-toggle="modal">
                                                 <i class="fa fa-eye"></i> voir </a>
-                                            <a class="btn btn-outline btn-circle blue btn-sm blue edit_item"><i class="fa fa-edit"></i> modifier </a>
-                                            <a href="{{ path('apm_achat_service_apres_vente_delete', {'id': service_apres_vente.id}) }}" class="btn btn-outline btn-circle red btn-sm red">
+                                            <a class="btn btn-outline btn-circle blue btn-sm blue edit_item"><i
+                                                        class="fa fa-edit"></i> modifier </a>
+                                            <a href="{{ path('apm_achat_service_apres_vente_delete', {'id': service_apres_vente.id}) }}"
+                                               class="btn btn-outline btn-circle red btn-sm red">
                                                 <i class="fa fa-trash-o"></i> supprimer </a>
                                         </td>
                                     </tr>
@@ -182,42 +185,40 @@
                         </table>
                     </div>
                 </div>
-                <div class="hidden" id="form-element_1" data-focus-on="input:first">
-                    {{ form_start(form) }}
-                    <h4> demandez un service pour un produit acheté</h4>
+                <div class="hidden" id="form-element_1">
+                    {{ form_start(form, {"attr":{"enctype":"multipart/form-data", "method":"post", "name":"form1"}}) }}
+                    <h4> demandez un service pour un produit achete</h4>
                     <div class="form-group">
-                        {{ form_errors(form.code) }}
-                        {{ form_widget(form.id, {'attr':{'class':'id_x hidden', 'name':'id_x'}}) }}
+                        {{ form_widget(form.id, {'attr':{'class':'id_x', 'name':'id'}}) }}
                         {{ form_label(form.code, 'Code:', {'attr':{'class':'control-label'}}) }}
-                        {{ form_widget(form.code, {'attr':{'class':'code_x form-control', 'name':'code_x', 'readonly':'true'}}) }}
+                        {{ form_widget(form.code, {'attr':{'class':'code_x form-control', 'name':'code', 'readonly':'true'}}) }}
                     </div>
                     <div class="form-group">
                         {{ form_errors(form.offre) }}
-                        <input type="checkbox" class="check_item"/>
                         {{ form_label(form.offre, 'Offre:', {'attr':{'class':'control-label'}}) }}
-                        <input type="text" id="offre_x" class="changeable_item form-control" readonly/>
-                        <div class="hidden" id="replacer">
-                            {{ form_widget(form.offre, {'attr':{'name':'offre_x'}}) }}
+                        <div class="input-group select2-bootstrap-prepend">
+                            <span class="input-group-addon"><input type="checkbox"></span>
+                            {{ form_widget(form.offre, {'attr':{'name':'offre', 'readonly':'true'}}) }}
                         </div>
                     </div>
                     <div class="form-group">
                         {{ form_errors(form.etat) }}
                         {{ form_label(form.etat, 'Etat:', {'attr':{'class':'control-label'}}) }}
                         <div class="input-group select2-bootstrap-prepend">
-                            <span class="input-group-addon"><input type="checkbox"></span>
-                            {{ form_widget(form.etat, {'attr':{'class':'etat_x form-control select2', 'name':'etat_x', 'disabled':"true"}}) }}
+                            <span class="input-group-addon"><input type="checkbox" id="check2_x" disabled></span>
+                            {{ form_widget(form.etat, {'attr':{'name':'etat', 'disabled':"true"}}) }}
                         </div>
                     </div>
                     <div class="form-group">
-                        <label for="boutique_x"> Boutique:</label>
-                        <input type="text" value="" class='form-control' id="boutique_x" readonly/>
+                        {{ form_label(form.boutique, 'Boutique:', {'attr':{'class':'control-label'}}) }}
+                        {{ form_widget(form.boutique, {'attr':{'name':'boutique', 'disabled':"true"}}) }}
                     </div>
                     <div class="form-group">
                         {{ form_errors(form.descriptionPanne) }}
                         {{ form_label(form.descriptionPanne, 'Description du problème:', {'attr':{'class':'control-label'}}) }}
-                        {{ form_widget(form.descriptionPanne, {'attr':{'class':'desc_x form-control', 'name':'desc_x', "placeholder": "décrivez le problème ici..."}}) }}
+                        {{ form_widget(form.descriptionPanne, {'attr':{'class':'desc_x form-control', 'name':'description', "placeholder": "décrivez le problème ici..."}}) }}
                     </div>
-                    <input type="submit" value="Soumettre"/>
+                    <input type="submit" value="Soumettre" id="submit_x"/>
                     <input type="reset" value="Effacer"/>
                     {{ form_end(form) }}
                 </div>
@@ -320,10 +321,10 @@
                                                 <span></span>
                                             </label>
                                         </td>
-                                        <td class="hidden"><i id="client_item">{{ service_apres_vente.client }}</i>
+                                        <td class="hidden"><i id="id_item">{{ service_apres_vente.id }}</i>
+                                            <i id="client_item">{{ service_apres_vente.client }}</i>
                                             <i id="comment_item">{{ service_apres_vente.commentaire }}</i>
                                             <i id="code_item">{{ service_apres_vente.code }}</i>
-                                            <i id="id_item">{{ service_apres_vente.id }}</i>
                                         </td>
                                         <td><i class="hidden" id="offreID_item">{{ service_apres_vente.offre.id }}</i>
                                             <i id="offre_item" class="hidden">{{ service_apres_vente.offre }}</i>
@@ -380,7 +381,8 @@
 
                                         <td>
                                             <a href="javascript:;"
-                                               class="btn btn-outline btn-circle purple btn-sm purple see_item" data-target="#stack" data-toggle="modal">
+                                               class="btn btn-outline btn-circle purple btn-sm purple see_item"
+                                               data-target="#stack" data-toggle="modal">
                                                 <i class="fa fa-eye"></i> voir </a>
                                             <a href="javascript:;"
                                                class="btn btn-outline btn-circle green btn-sm green repondre">
@@ -393,46 +395,48 @@
                         </table>
                     </div>
                 </div>
-                <form class="hidden" id="form-element_2" data-focus-on="input:first">
-                    <h5> Répondre à une requête S.A.V </h5>
-                    <input type="hidden" id="id_x"/>
-                    <div class="form-group">
-                        <label for="code_x" class="control-label">Code SAV:</label>
-                        <input type="text" id="code_x" name="code_x" class="form-control" readonly/>
-                    </div>
-                    <div class="form-group">
-                        <label for="offre_x" class="control-label">Offre:</label>
-                        <input type="text" id="offre_x" name="offre_x" class="form-control" readonly/>
-                    </div>
-                    <div class="form-group">
-                        <label for="client_x" class="control-label">Client:</label>
-                        <input type="text" id="client_x" name="client_x" class="form-control" readonly/>
-                    </div>
-                    <div class="form-group">
-                        <label for="etat_x" class="control-label">Etat:</label>
-                        <div class="input-group select2-bootstrap-prepend">
-                            <span class="input-group-addon"><input type="checkbox"></span>
-                            <select id="etat_x" class="form-control select2" disabled>
-                                <option>Etat relatif au produit</option>
-                                <option value="0">En panne</option>
-                                <option value="1">Problème résolu</option>
-                                <option value="2">En cours de diagnostic</option>
-                                <option value="3">En cours de depannage</option>
-                                <option value="4">Déclaré hors service</option>
-                                <option value="5">requête à suivre</option>
-                                <option value="6">Frais exigible</option>
-                                <option value="7">Réjeter la demande</option>
-                            </select>
+                <div class="hidden" id="form-element_2">
+                    <form enctype="multipart/form-data" method="post" action="{{ path('apm_achat_service_apres_vente_index') }}" name="form2">
+                        <h5> Répondre à une requête S.A.V </h5>
+                        <div class="form-group">
+                            <input type="hidden" id="id_x" name="id"/>
+                            <label for="code_x" class="control-label">Code SAV:</label>
+                            <input type="text" id="code_x" name="code" class="form-control" readonly/>
                         </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="comment_x" class="control-label">Commentaire:</label>
-                        <textarea id="comment_x" name="comment_x" class="form-control focus-blue-sharp"
-                                  placeholder="décrivez la résolution adoptée ici..."></textarea>
-                    </div>
-                    <input type="submit" value="Envoyer"/>
-                    <input type="reset" value="Effacer"/>
-                </form>
+                        <div class="form-group">
+                            <label for="offre_x" class="control-label">Offre:</label>
+                            <input type="text" id="offre_x" name="offre" class="form-control" readonly/>
+                        </div>
+                        <div class="form-group">
+                            <label for="client_x" class="control-label">Client:</label>
+                            <input type="text" id="client_x" name="client" class="form-control" readonly/>
+                        </div>
+                        <div class="form-group">
+                            <label for="etat_x" class="control-label">Etat:</label>
+                            <div class="input-group select2-bootstrap-prepend">
+                                <span class="input-group-addon"><input type="checkbox"></span>
+                                <select id="etat_x" class="form-control select2" name="etat" disabled>
+                                    <option>Etat relatif au produit</option>
+                                    <option value="0">En panne</option>
+                                    <option value="1">Problème résolu</option>
+                                    <option value="2">En cours de diagnostic</option>
+                                    <option value="3">En cours de depannage</option>
+                                    <option value="4">Déclaré hors service</option>
+                                    <option value="5">requête à suivre</option>
+                                    <option value="6">Frais exigible</option>
+                                    <option value="7">Réjeter la demande</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="comment_x" class="control-label">Commentaire:</label>
+                            <textarea id="comment_x" name="commentaire" autofocus class="form-control focus-blue-sharp"
+                                      placeholder="décrivez la résolution adoptée ici..."></textarea>
+                        </div>
+                        <input type="submit" value="Envoyer" id="submit_x"/>
+                        <input type="reset" value="Effacer"/>
+                    </form>
+                </div>
             </div>
         </div>
         <!-- BEGIN MODAL -->
@@ -445,8 +449,7 @@
                 <table>
                     <tbody>
                     <tr>
-                        <th>Code service:</th>
-                        <td class="hidden" id="id_y"></td>
+                        <th><input type="hidden" id="id_y"/>Code service:</th>
                         <td id="code_y"></td>
                     </tr>
                     <tr>
@@ -458,7 +461,7 @@
                         <td id="boutique_y"></td>
                     </tr>
                     <tr>
-                        <th>Offre:</th>
+                        <th><i id="offreID_y"></i>Offre:</th>
                         <td id="offre_y"></td>
                     </tr>
                     <tr>
@@ -482,10 +485,14 @@
                 </table>
             </div>
             <div class="modal-footer">
-                <a class="btn btn-outline btn-circle gray btn-sm gray" data-dismiss="modal"><i class="fa fa-eye"></i> OK </a>
-                <a class="btn btn-outline btn-circle blue btn-sm blue edit_item" data-dismiss="modal" style="display:inline-block"><i class="fa fa-edit"></i> modifier </a>
-                <a class="btn btn-outline btn-circle red btn-sm red delete_item" data-dismiss="modal" style="display: inline-block"><i class="fa fa-trash-o"></i> supprimer </a>
-                <a class="btn btn-outline btn-circle green btn-sm green repondre" data-dismiss="modal" style="display: none"><i class="fa fa-share"></i> repondre </a>
+                <a class="btn btn-outline btn-circle gray btn-sm gray" data-dismiss="modal"><i class="fa fa-eye"></i> OK
+                </a>
+                <a class="btn btn-outline btn-circle blue btn-sm blue edit_item" data-dismiss="modal"
+                   style="display:inline-block"><i class="fa fa-edit"></i> modifier </a>
+                <a class="btn btn-outline btn-circle red btn-sm red delete_item" data-dismiss="modal"
+                   style="display: inline-block"><i class="fa fa-trash-o"></i> supprimer </a>
+                <a class="btn btn-outline btn-circle green btn-sm green repondre" data-dismiss="modal"
+                   style="display: none"><i class="fa fa-share"></i> repondre </a>
             </div>
         </div>
         <!-- END MODAL-->
@@ -493,7 +500,7 @@
     <!-- END SAMPLE TABLE PORTLET-->
 {% endblock content_body %}
     {% block javascripts %}
-    {% javascripts "dashboard/assets/pages/scripts/custom.js" %}
-    <script src="{{ asset_url }}" type="text/javascript"></script>
-    {% endjavascripts %}
-{% endblock javascripts %}
+        {% javascripts "dashboard/assets/achat/SavPage.js" %}
+        <script src="{{ asset_url }}" type="text/javascript"></script>
+        {% endjavascripts %}
+    {% endblock javascripts %}
