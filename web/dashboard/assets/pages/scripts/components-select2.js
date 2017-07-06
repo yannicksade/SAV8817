@@ -48,12 +48,6 @@ var ComponentsSelect2 = function () {
             return repo.designation || repo.text;
         }
 
-        var offre;
-        /*        var xhr = new XMLHttpRequest();
-         xhr.open('GET');
-         xhr.onreadystatechange = function () {
-         if (xhr.readyState == 4 && xhr.status == 200) {
-         var data = JSON.parse(xhr.responseText);*/
         $(".js-data-example-ajax").select2({
             width: "off",
             placeholder: "Saisissez de préférence le code du produit",

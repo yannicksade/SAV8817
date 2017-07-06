@@ -2,14 +2,14 @@ apm_achat_service_apres_vente_index:
     path:     /
     defaults: { _controller: "APMAchatBundle:Service_apres_vente:index" }
 
-apm_achat_service_apres_vente_save:
-    path:     /save
-    defaults: { _controller: "APMAchatBundle:AjaxSav:save" }
+apm_achat_service_apres_vente_loader:
+    path:     /ajax-table_1
+    defaults: { _controller: "APMAchatBundle:Service_apres_vente:loadTable" }
 
-apm_achat_service_apres_vente_update:
-    path:     /update
-    defaults: { _controller: "APMAchatBundle:AjaxSav:update" }
+apm_achat_service_apres_vente_loader2:
+    path:     /ajax-table_2
+    defaults: { _controller: "APMAchatBundle:Service_apres_vente:loadTable" }
 
 apm_achat_service_apres_vente_delete:
-    path:     /{id}/delete
+    path:     /delete
     defaults: { _controller: "APMAchatBundle:Service_apres_vente:delete" }

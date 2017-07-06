@@ -6,39 +6,39 @@ var TableDatatablesAjax = function () {
             rtl: App.isRTL(),
             autoclose: true
         });
-    }
+    };
 
-    var handleDemo1 = function () {
+    var handleDemo = function () {
 
         var grid = new Datatable();
-
+        var parent = $('#tab_1');
         grid.init({
-            src: $("#datatable_ajax"),
+            src: $(".datatable_ajax", parent),
             onSuccess: function (grid, response) {
                 // grid:        grid object
                 // response:    json object of server side ajax response
                 // execute some code after table records loaded
+                $('#notif-active').click();
             },
             onError: function (grid) {
-                // execute some code on network or other general error  
+                // execute some code on network or other general error
             },
-            onDataLoad: function (grid) {
+            onDataLoad: function(grid) {
                 // execute some code on ajax data load
             },
-            loadingMessage: 'Loading...',
-            dataTable: { // here you can define a typical datatable settings from http://datatables.net/usage/options 
+
+            dataTable: { // here you can define a typical datatable settings from http://datatables.net/usage/options
 
                 // Uncomment below line("dom" parameter) to fix the dropdown overflow issue in the datatable cells. The default datatable layout
-                // setup uses scrollable div(table-scrollable) with overflow:auto to enable vertical scroll(see: assets/global/scripts/datatable.js). 
-                // So when dropdowns used the scrollable div should be removed. 
+                // setup uses scrollable div(table-scrollable) with overflow:auto to enable vertical scroll(see: assets/global/scripts/datatable.js).
+                // So when dropdowns used the scrollable div should be removed.
                 //"dom": "<'row'<'col-md-8 col-sm-12'pli><'col-md-4 col-sm-12'<'table-group-actions pull-right'>>r>t<'row'<'col-md-8 col-sm-12'pli><'col-md-4 col-sm-12'>>",
 
                 // save datatable state(pagination, sort, etc) in cookie.
                 "bStateSave": true,
-
                 // save custom filters to the state
-                "fnStateSaveParams": function (oSettings, sValue) {
-                    $("#datatable_ajax tr.filter .form-control").each(function () {
+                "fnStateSaveParams":    function ( oSettings, sValue ) {
+                    $(".datatable_ajax tr.filter .form-control", parent).each(function() {
                         sValue[$(this).attr('name')] = $(this).val();
                     });
 
@@ -46,12 +46,12 @@ var TableDatatablesAjax = function () {
                 },
 
                 // read the custom filters from saved state and populate the filter inputs
-                "fnStateLoadParams": function (oSettings, oData) {
+                "fnStateLoadParams" : function ( oSettings, oData ) {
                     //Load custom filters
-                    $("#datatable_ajax tr.filter .form-control").each(function () {
+                    $(".datatable_ajax tr.filter .form-control", parent).each(function() {
                         var element = $(this);
                         if (oData[element.attr('name')]) {
-                            element.val(oData[element.attr('name')]);
+                            element.val( oData[element.attr('name')] );
                         }
                     });
 
@@ -59,87 +59,84 @@ var TableDatatablesAjax = function () {
                 },
 
                 "lengthMenu": [
-                    [10, 20, 50, 100, 150, -1],
-                    [10, 20, 50, 100, 150, "All"] // change per page values here
+                    [5, 10, 15, 20, 30 -1],
+                    [5, 10, 15, 20, 30, "All"] // change per page values here
                 ],
-                "pageLength": 50, // default record count per page
+                "pageLength": 10, // default record count per page
                 "ajax": {
-                    "url": "../demo/table_ajax.php", // ajax source
+                    "url": "ajax-table_1"  // ajax source
                 },
                 "ordering": false,
-                "order": [
-                    [1, "asc"]
-                ]// set first column as a default sort by asc
+                "order": [],// set first column as a default sort by asc
+                "loadingRecords": "Loading...",
+                "processing":     "Processing..."
             }
         });
 
         // handle group actionsubmit button click
-        grid.getTableWrapper().on('click', '.table-group-action-submit', function (e) {
-            e.preventDefault();
-            var action = $(".table-group-action-input", grid.getTableWrapper());
-            if (action.val() != "" && grid.getSelectedRowsCount() > 0) {
-                grid.setAjaxParam("customActionType", "group_action");
-                grid.setAjaxParam("customActionName", action.val());
-                grid.setAjaxParam("id", grid.getSelectedRows());
-                grid.getDataTable().ajax.reload();
-                grid.clearAjaxParams();
-            } else if (action.val() == "") {
-                App.alert({
-                    type: 'danger',
-                    icon: 'warning',
-                    message: 'Please select an action',
-                    container: grid.getTableWrapper(),
-                    place: 'prepend'
-                });
-            } else if (grid.getSelectedRowsCount() === 0) {
-                App.alert({
-                    type: 'danger',
-                    icon: 'warning',
-                    message: 'No record selected',
-                    container: grid.getTableWrapper(),
-                    place: 'prepend'
-                });
-            }
-        });
+        /*   grid.getTableWrapper().on('click', '.table-group-action-submit', function (e) {
+         e.preventDefault();
+         var action = $(".table-group-action-input", grid.getTableWrapper());
+         if (action.val() !== "" && grid.getSelectedRowsCount() > 0) {
+         grid.setAjaxParam("customActionType", "group_action");
+         grid.setAjaxParam("customActionName", action.val());
+         grid.setAjaxParam("id", grid.getSelectedRows());
+         grid.getDataTable().ajax.reload();
+         grid.clearAjaxParams();
+         } else if (action.val() === "") {
+         App.alert({
+         type: 'danger',
+         icon: 'warning',
+         message: 'Please select an action',
+         container: grid.getTableWrapper(),
+         place: 'prepend'
+         });
+         } else if (grid.getSelectedRowsCount() === 0) {
+         App.alert({
+         type: 'danger',
+         icon: 'warning',
+         message: 'No record selected',
+         container: grid.getTableWrapper(),
+         place: 'prepend'
+         });
+         }
+         });*/
 
-        //grid.setAjaxParam("customActionType", "group_action");
+        //grid.setAjaxParam("order", order);
         //grid.getDataTable().ajax.reload();
         //grid.clearAjaxParams();
-    }
-
+    };
     var handleDemo2 = function () {
 
         var grid = new Datatable();
-
+        var parent = $('#tab_2');
         grid.init({
-            src: $("#datatable_ajax_2"),
+            src: $(".datatable_ajax", parent),
             onSuccess: function (grid, response) {
                 // grid:        grid object
                 // response:    json object of server side ajax response
                 // execute some code after table records loaded
+                $('#notif-active').click();
             },
             onError: function (grid) {
-                // execute some code on network or other general error  
+                // execute some code on network or other general error
             },
-            onDataLoad: function (grid) {
+            onDataLoad: function(grid) {
                 // execute some code on ajax data load
             },
 
-            dataTable: { // here you can define a typical datatable settings from http://datatables.net/usage/options 
+            dataTable: { // here you can define a typical datatable settings from http://datatables.net/usage/options
 
                 // Uncomment below line("dom" parameter) to fix the dropdown overflow issue in the datatable cells. The default datatable layout
-                // setup uses scrollable div(table-scrollable) with overflow:auto to enable vertical scroll(see: assets/global/scripts/datatable.js). 
-                // So when dropdowns used the scrollable div should be removed. 
+                // setup uses scrollable div(table-scrollable) with overflow:auto to enable vertical scroll(see: assets/global/scripts/datatable.js).
+                // So when dropdowns used the scrollable div should be removed.
                 //"dom": "<'row'<'col-md-8 col-sm-12'pli><'col-md-4 col-sm-12'<'table-group-actions pull-right'>>r>t<'row'<'col-md-8 col-sm-12'pli><'col-md-4 col-sm-12'>>",
-
-                "dom": "<'row'<'col-md-8 col-sm-12'i><'col-md-4 col-sm-12'<'table-group-actions pull-right'>>r>t<'row'<'col-md-8 col-sm-12'i><'col-md-4 col-sm-12'>>",
 
                 // save datatable state(pagination, sort, etc) in cookie.
                 "bStateSave": true,
-
                 // save custom filters to the state
-                "fnStateSaveParams": function (oSettings, sValue) {
-                    $("#datatable_ajax_2 tr.filter .form-control").each(function () {
+                "fnStateSaveParams":    function ( oSettings, sValue ) {
+                    $(".datatable_ajax tr.filter .form-control", parent).each(function() {
                         sValue[$(this).attr('name')] = $(this).val();
                     });
 
@@ -147,83 +144,73 @@ var TableDatatablesAjax = function () {
                 },
 
                 // read the custom filters from saved state and populate the filter inputs
-                "fnStateLoadParams": function (oSettings, oData) {
+                "fnStateLoadParams" : function ( oSettings, oData ) {
                     //Load custom filters
-                    $("#datatable_ajax_2 tr.filter .form-control").each(function () {
+                    $(".datatable_ajax tr.filter .form-control", parent).each(function() {
                         var element = $(this);
                         if (oData[element.attr('name')]) {
-                            element.val(oData[element.attr('name')]);
+                            element.val( oData[element.attr('name')] );
                         }
                     });
 
                     return true;
                 },
 
+                "lengthMenu": [
+                    [5, 10, 15, 20, 30 -1],
+                    [5, 10, 15, 20, 30, "All"] // change per page values here
+                ],
                 "pageLength": 10, // default record count per page
-
                 "ajax": {
-                    "url": "../demo/table_ajax.php", // ajax source
+                    "url": "ajax-table_2"  // ajax source
                 },
-                "order": [
-                    [1, "asc"]
-                ],// set first column as a default sort by asc,
-
-                "language": {
-                    "loadingRecords": "Please wait ...",
-                    "zeroRecords": "No records",
-                    "emptyTable": "No data available in table",
-                    "info": "Showing _START_ to _END_ of _TOTAL_ entries",
-                },
-
-                scrollY: 400,
-                deferRender: true,
-                scroller: {
-                    loadingIndicator: true
-                }
+                "ordering": false,
+                "order": [],// set first column as a default sort by asc
+                "loadingRecords": "Loading...",
+                "processing":     "Processing..."
             }
         });
 
         // handle group actionsubmit button click
-        grid.getTableWrapper().on('click', '.table-group-action-submit', function (e) {
-            e.preventDefault();
-            var action = $(".table-group-action-input", grid.getTableWrapper());
-            if (action.val() != "" && grid.getSelectedRowsCount() > 0) {
-                grid.setAjaxParam("customActionType", "group_action");
-                grid.setAjaxParam("customActionName", action.val());
-                grid.setAjaxParam("id", grid.getSelectedRows());
-                grid.getDataTable().ajax.reload();
-                grid.clearAjaxParams();
-            } else if (action.val() == "") {
-                App.alert({
-                    type: 'danger',
-                    icon: 'warning',
-                    message: 'Please select an action',
-                    container: grid.getTableWrapper(),
-                    place: 'prepend'
-                });
-            } else if (grid.getSelectedRowsCount() === 0) {
-                App.alert({
-                    type: 'danger',
-                    icon: 'warning',
-                    message: 'No record selected',
-                    container: grid.getTableWrapper(),
-                    place: 'prepend'
-                });
-            }
-        });
+        /*   grid.getTableWrapper().on('click', '.table-group-action-submit', function (e) {
+         e.preventDefault();
+         var action = $(".table-group-action-input", grid.getTableWrapper());
+         if (action.val() !== "" && grid.getSelectedRowsCount() > 0) {
+         grid.setAjaxParam("customActionType", "group_action");
+         grid.setAjaxParam("customActionName", action.val());
+         grid.setAjaxParam("id", grid.getSelectedRows());
+         grid.getDataTable().ajax.reload();
+         grid.clearAjaxParams();
+         } else if (action.val() === "") {
+         App.alert({
+         type: 'danger',
+         icon: 'warning',
+         message: 'Please select an action',
+         container: grid.getTableWrapper(),
+         place: 'prepend'
+         });
+         } else if (grid.getSelectedRowsCount() === 0) {
+         App.alert({
+         type: 'danger',
+         icon: 'warning',
+         message: 'No record selected',
+         container: grid.getTableWrapper(),
+         place: 'prepend'
+         });
+         }
+         });*/
 
-        //grid.setAjaxParam("customActionType", "group_action");
+        //grid.setAjaxParam("order", order);
         //grid.getDataTable().ajax.reload();
         //grid.clearAjaxParams();
-    }
+    };
 
     return {
 
         //main function to initiate the module
         init: function () {
-
             initPickers();
-            handleDemo1();
+            handleDemo();
             handleDemo2();
         }
 

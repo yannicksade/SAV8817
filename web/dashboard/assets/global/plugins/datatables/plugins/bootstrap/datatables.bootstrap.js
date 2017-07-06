@@ -114,7 +114,7 @@ $.fn.dataTable.ext.renderer.pageButton.bootstrap = function (settings, host, idx
         $(host).empty().html('<ul class="pagination"/>').children('ul'),
         buttons
     );
-}
+};
 
 /***
  Custom Pagination

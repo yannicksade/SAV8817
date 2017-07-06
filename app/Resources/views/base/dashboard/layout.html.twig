@@ -2376,13 +2376,15 @@ License: You must have a valid license purchased only from themeforest(the above
     {% javascripts 'dashboard/assets/global/plugins/datatables/datatables.min.js'
     'dashboard/assets/global/plugins/datatables/plugins/bootstrap/datatables.bootstrap.js'
     'dashboard/assets/global/plugins/select2/js/select2.full.min.js'
-    'dashboard/assets/global/plugins/bootstrap-datetimepicker/js/bootstrap-datetimepicker.min.js'%}
+    'dashboard/assets/global/plugins/bootstrap-datetimepicker/js/bootstrap-datetimepicker.min.js'
+    'dashboard/assets/global/plugins/bootstrap-datepicker/js/bootstrap-datepicker.min.js'%}
     <script src="{{ asset_url }}" type="text/javascript"></script>
     {% endjavascripts %}
 
+    {#'dashboard/assets/pages/scripts/table-datatables-managed.js'#}
     <!-- BEGIN PAGE LEVEL SCRIPTS -->
     {% javascripts 'dashboard/assets/pages/scripts/components-date-time-pickers.min.js'
-    'dashboard/assets/pages/scripts/table-datatables-managed.min.js'
+    'dashboard/assets/pages/scripts/table-datatables-ajax.js'
     'dashboard/assets/pages/scripts/ui-notific8.js'
     'dashboard/assets/pages/scripts/components-select2.js'
     'dashboard/assets/pages/scripts/ui-extended-modals.js'%}

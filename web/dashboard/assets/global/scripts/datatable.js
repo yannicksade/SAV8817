@@ -35,14 +35,13 @@ var Datatable = function () {
 
             // default settings
             options = $.extend(true, {
-                src: "", // actual table  
+                src: "", // actual table
                 filterApplyAction: "filter",
                 filterCancelAction: "filter_cancel",
                 resetGroupActionInputOnSuccess: true,
                 loadingMessage: 'Loading...',
                 dataTable: {
                     "dom": "<'row'<'col-md-8 col-sm-12'pli><'col-md-4 col-sm-12'<'table-group-actions pull-right'>>r><'table-responsive't><'row'<'col-md-8 col-sm-12'pli><'col-md-4 col-sm-12'>>", // datatable layout
-                    "pageLength": 10, // default records per page
                     "language": { // language settings
                         // metronic spesific
                         "metronicGroupActions": "_TOTAL_ records selected:  ",
@@ -65,8 +64,8 @@ var Datatable = function () {
                     },
 
                     "orderCellsTop": true,
-                    "columnDefs": [{ // define columns sorting options(by default all columns are sortable extept the first checkbox column)
-                        'orderable': false,
+                    "columnDefs": [{ // define columns sorting options(by default all columns are sortable except the first checkbox column)
+                        'orderable': true,
                         'targets': [0]
                     }],
 
@@ -94,8 +93,8 @@ var Datatable = function () {
                         "dataSrc": function (res) { // Manipulate the data returned from the server
                             if (res.customActionMessage) {
                                 App.alert({
-                                    type: (res.customActionStatus == 'OK' ? 'success' : 'danger'),
-                                    icon: (res.customActionStatus == 'OK' ? 'check' : 'warning'),
+                                    type: (res.customActionStatus === 'OK' ? 'success' : 'danger'),
+                                    icon: (res.customActionStatus === 'OK' ? 'check' : 'warning'),
                                     message: res.customActionMessage,
                                     container: tableWrapper,
                                     place: 'prepend'
@@ -197,13 +196,13 @@ var Datatable = function () {
             });
 
             // handle filter submit button click
-            table.on('click', '.filter-submit', function (e) {
+            $('.filter-submit', table.parents('.portlet')).click(function (e) {
                 e.preventDefault();
                 the.submitFilter();
             });
 
             // handle filter cancel button click
-            table.on('click', '.filter-cancel', function (e) {
+            $('.filter-cancel', table.parents('.portlet')).click(function (e) {
                 e.preventDefault();
                 the.resetFilter();
             });

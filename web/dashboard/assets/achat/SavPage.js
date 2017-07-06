@@ -2,14 +2,236 @@
  Custom module for you to write your own javascript functions
  **/
 var GroupeOffrePage = function () {
-    //private function
+    //global variables
+    //----pages
+    var tabElement_1 = $('#tab_1'),
+        tabElement_2 = $('#tab_2'),
+        tab1 = document.querySelector('#tab1'),
+        tab2 = document.querySelector('#tab2');
+    //----- modal
+    var stk = $('#stack'),
+        modalID = $('.id', stk),
+        modalOffreID = $('.offreID', stk),
+        modalEtatValue = $('.etatID', stk),
+        modalOffre = $('.offre', stk),
+        modalDesc = $('.desc', stk),
+        modalEtat = $('.etat', stk),
+        modalCode = $('.code', stk),
+        modalClient = $('.client', stk),
+        modalBoutique = $('.boutique', stk),
+        modalComment = $('.comment', stk),
+        modalDate = $('.date', stk);
+    //---- notification
+    var notifAlert = document.querySelector("#notif-active");
+    //---------------------- modifier --------------------
+    var uncheckBoxes = function (parent) {
+        var chexbs = $('input[type="checkbox"]:checked', parent);
+        var len = chexbs.length;
+        for (var i = 0; i < len; i++) {
+            chexbs.click();
+        }
+    };
+    var getCheckedBoxes = function (parent) {
+        return $('input[type="checkbox"]:checked', parent);
+    };
+    var play = function (parent) {
+        var cboxes = getCheckedBoxes(parent),
+            nb = cboxes.length;
+        for (var i = 0; i < nb; i++) {
+            var elt = $(cboxes[i]);
+            if (elt === null) continue;
+            setTimeout(function () {
+                var p = elt.parents();
+                afficherImpl(p[2]);
+                uncheckBoxes(p[1]);
+            }, 100);
+        }
+    };
+    var afficher = function (parent) {
+        //-------------------------- voir ---------------------
+        $('.see_item').click(function () {
+            play(parent);
+        });
+        $('.modal-suiv', stk).click(function () {
+            play(parent);
+        });
+    };
+    var modalToFormLoad = function (parent) {
+        var form = $('.form-element', parent);
+        $('.id', form).val(modalID.val());
+        $('.code', form).val(modalCode.text());
+        $('.boutique', form).val(modalBoutique.text());
+        $('.desc', form).val(modalDesc.text());
+        var a = $('.etat', form);
+        a.val(modalEtatValue.text());
+        a.selected = "selected"; // element select
+        var offreElement = $('.offre', form);
+        offreElement.val(modalOffreID.text());
+        offreElement.selected = "selected";
+    };
+    var tableToFormLoad = function (parent, form_parent) {
+        var form = $('.form-element', form_parent);
+        $('.id', form).val($('.id', parent).text());
+        $('.code', form).val($('.code', parent).text());
+        $('.boutique', form).val($('.boutique', parent).text());
+        $('.desc', form).val($('.desc', parent).text());
+        var a = $('.etat', form);
+        a.val($('.etat input', parent).val());
+        a.selected = "selected"; // element select
+        var offreElement = $('.offre', form);
+        offreElement.val($('.offreID', parent).text());
+        offreElement.selected = "selected";
+    };
+    var reset = function () {
+        //------------------------- reinitialise chekboxes of a form after a reset click -----------------
+        $('input[type="reset"]').click(function () {
+            var p = $(this).parent();
+            uncheckBoxes(p);
+            $('.id', p).val("");
+            $('.code', p).val("");
+            $('.boutique', p).val("");
+            $('.desc', p).val("");
+            $('.offre', p).val("");
+            $('.etat', p).val("");
+        });
+    };
+    var afficherImpl = function (parent) {
+        $('.alerte', stk).addClass("hidden");
+        $('table', stk).removeClass("hidden");
+        modalID.val($('.id', parent).text());
+        modalOffreID.text($('.offreID', parent).text());
+        modalCode.text($('.code', parent).text());
+        modalClient.text($('.client', parent).text());
+        modalBoutique.text($('.boutique', parent).text());
+        modalDate.text($('.date', parent).text());
+        modalDesc.text($('.desc', parent).text());
+        var b = $('.etat', parent);
+        modalEtatValue.text($('input', b).val());
+        modalEtat.text(b.text());
+        modalComment.val($('.comment', parent).val());
+        modalOffre.text($('.offre_item', parent).text());
+    };
+    var modifierImpl = function (parent) {
+        //------ Compress the table 1 -----------------
+        var form = $('.form-element', parent);
+        $('.tab-element', parent).addClass('col-lg-9 col-md-6 col-xs-12');
+        form.removeClass('hidden');
+        $('.compress-item', parent).addClass('hidden');
+        $('.expand-item', parent).removeClass('hidden');
+        //reinitialize the form
+        $('input[type="reset"]', parent).click();
+        //formElement_1.querySelector('#check2_x').removeAttribute('disabled');
+    };
+    var modifier = function () {
+        $('.edit_item').click(function () {
+            var p = $(this).parents();
+            var ptl = p[5];// portlet
+            modifierImpl(ptl);
+            if (!$(p[0]).hasClass('modal-footer')) { //chargement du formulaire partant du tableau
+                var elt = getCheckedBoxes($('tbody', ptl));
+                elt = $(elt).last();
+                tableToFormLoad(elt.parents()[2], ptl);// 1- a row of the table 2- portlet, parent of the form
+            } else modalToFormLoad(); //chargement du formulaire partant de la modal
+        });
+    };
+    var supprimer = function () {
+        $('.delete_item').click(function () {
+            var elt, elements = [];
+            var p = $(this).parents();
+            var c;
+            if ($(p[0]).hasClass('modal-footer')) {//suppression à partir de la modal
+                c = confirm('Etes vous sûr de vouloir supprimer l\'enregistrement référencée : ' + $('.code', p[1]).text() + ' ?');
+                if (c) elements[0] = $('.id', p[1]).val();//from the modal
+            } else { //suppression apartir de la table
+                var cboxes = getCheckedBoxes($('.tab-element', p[5])), tr, //p5: search for tab element from portlet
+                    nb = cboxes.length;
+                for (var i = 0; i < nb; i++) {
+                    elt = $(cboxes[i]);
+                    tr = elt.parents()[2]; // recupérer la ligne du tableau
+                    c = confirm('etes vous sûr de vouloir supprimer l\'enregistrement référencée : ' + $('.code', tr).text() + ' ?');//confirmation
+                    if (!c)continue;// skip the current element if no
+                    elements[i] = $('.id', tr).text();
+                }
+            }
+            if (elements !== null) deleteElement(elements, p[5]);
+        });
+    };
+    var repondre = function () {
+        //---------------------------- repondre -------------------------------------
+        $('.repondre_item').click(function () {
+            var p = this.parents();
+            var parent = p[5]; //portlet, tab element
+            var form = $('.form-element', parent), etatElement;
+            //------ Compress the table 2 -----------------
+            $('.tab-element', parent).addClass('col-lg-9 col-md-6 col-xs-12');
+            form.removeClass('hidden');
+            $('.compress-item', parent).addClass('hidden');
+            $('.expand-item', parent).removeClass('hidden');
+            //------------------------------- fill the form ---------------------
+            $('input[type="reset"]', form).click(); //reinitialize the form
+            if ($(p[0]).hasClass('modal-footer')) {//from the modal data 2
+                $('.id', form).val(modalID.val());
+                $('.code', form).val(modalCode.text());
+                $('.offre', form).val(modalOffre.text());
+                $('.client', form).val(modalClient.text());
+                etatElement = $('.etat', form);
+                etatElement.val(modalEtatValue.text());
+                etatElement.selected = "selected";
+            } else {//from the table 2
+                $('.id', form).val($('.id', parent).text());
+                $('.code', form).val($('.code', parent).text());
+                $('.offre', form).val($('.offre', parent).text());
+                $('.client', form).val($('.client', parent).text());
+                etatElement = $('.etat', form);
+                etatElement.val($('.etat input', parent).val());
+                etatElement.selected = "selected";
+            }
+        });
+    };
+    var deleteElement = function (elements, parent) {
+        var items = JSON.stringify(elements);
+        return $.ajax({
+            url: "delete",
+            type: "post",
+            dataType: 'json',
+            data: 'items=' + items,
+            error: function () {
+                elements = null;
+                alert("Un problème est survenu. veuillez vérifier vos données et/ou actualiser la page, svp!");
+            },
+            beforeSend: function () {
+            },
+            complete: function () {
+                notifAlert.click();
+                elements = null;
+            },
+            success: function (json) {
+                json = JSON.parse(json);
+                var data = json.ids;
+                if (data !== null && data !== undefined) {
+                    var length = data.length;
+                    for (var i = 0; i < length; i++) {
+                        (function (i) {
+                            setTimeout(function () {
+                                var table = $('.datatable_ajax', parent).dataTable();
+                                var tr = table.find('input[name="id_' + data[i] + '"]', 'tbody').parents('tr')[0];
+                                table.api().row(tr).remove().draw();
+                            }, 100 + 50 * i);
+                        })(i);
+                    }
+                }
+            }
+        });
+    };
     var ajaxForm = function (e) {
         e.returnValue = false;
         if (e.preventDefault) {
             e.preventDefault();
         }
         var form = this.parentNode;
+        if (form === undefined) return;
         var formData = new FormData(form);
+        if (formData['service_apres_vente'] === null) return;
         return $.ajax({
             url: "http://localhost/SAV8817.git/web/app_dev.php/apm/achat/service_apres_vente/",
             type: "post",
@@ -17,272 +239,110 @@ var GroupeOffrePage = function () {
             data: formData,
             processData: false,  // tell jQuery not to process the data
             contentType: false,   // tell jQuery not to set contentType
-            error: function() {
-                alert("une erreur c'est produite; veuillez reéssayez l'opération, svp!");
-            },
-            /*beforeSend: function() {
-                //$('#cart > button').button('loading');
-            },*/
-            complete: function() {
+            error: function () {
+                alert("Un problème est survenu. Veuillez vérifier vos données et réactualiser la page, svp!");
                 form.querySelector('input[type="reset"]').click(); //reinitialize the form
-                document.querySelector("#notif-active").click();
             },
-            success: function(json) {
+            beforeSend: function () {
+            },
+            complete: function () {
+                form.querySelector('input[type="reset"]').click(); //reinitialize the form
+                notifAlert.click();
+            },
+            success: function (json) {
                 json = JSON.parse(json);
                 var data = json.item;
-                if(data !== null){
-                      setTimeout(function () {
-                     var table = form.parentNode.parentNode.querySelector('table'),
-                     tr = document.createElement('tr'),
-                     td = document.createElement('td');
-                     tr.className = "odd gradeX";
-                     td.className = "highlight";
-                     td.innerHTML = '<div class="danger"></div><label class="mt-checkbox mt-checkbox-single mt-checkbox-outline"><input type="checkbox" class="checkboxes" value="1"/><span></span></label>';
-                     var td1 = td.cloneNode(false);
-                     td1.className = "hidden";
-                     td1.innerHTML = data.id+'</i><i id="id_item">'+data.id+'</i><i id="code_item">'+data.code+'</i><i id="client_item">'+data.client+'</i><i id="comment_item">'+data.commentaire+'</i>';
-                     var td2 = td1.cloneNode(false);
-                     td2.className = "";
-                     td2.innerHTML = '<i id="offre_item" class="hidden">'+data.offre+'</i><i class="hidden" id="offreID_item">'+data.offreID+'</i><a href="{{ path('+"'apm_vente_offre_show', { 'id': service_apres_vente.offre.id })"+'}}"> '+data.offre+'</a>';
-                     var td3 = td2.cloneNode(false);
-                     td3.innerHTML = '<i id="boutique_item" class="hidden">'+data.boutique+'</i> '+data.boutique;
-                     var td4 = td3.cloneNode(false);
-                     td4.id = '"date_item"';
-                     td4.innerHTML = ' '+ data.date;
-                     var td5 =  td4.cloneNode(false);
-                     td5.id ="";
-                     td5.innerHTML = '<i class="hidden" id="desc_item">'+data.descriptionPanne+'</i> '+data.descriptionPanne;
-                     var td6 = td5.cloneNode(false);
-                     td6.id = "etat_item";
-                     td6.innerHTML = '<input type="hidden" value="0"><span class="label label-sm label-danger">  En panne </span>';
-                     var td7 = td6.cloneNode(false);
-                     td7.id ="";
-                     td7.innerHTML = '<a href="javascript:;" class="btn btn-outline btn-circle purple btn-sm purple see_item" data-target="#stack" data-toggle="modal"><i class="fa fa-eye"></i>  voir </a><a class="btn btn-outline btn-circle blue btn-sm blue edit_item"><i class="fa fa-edit"></i> modifier </a><a href="{{ path('+"'apm_achat_service_apres_vente_delete', {'id': service_apres_vente.id})"+'}}" class="btn btn-outline btn-circle red btn-sm red"><i class="fa fa-trash-o"></i> supprimer </a>';
-                     tr.appendChild(td);tr.appendChild(td1);tr.appendChild(td2);tr.appendChild(td3);tr.appendChild(td4);
-                     tr.appendChild(td5); tr.appendChild(td6);tr.appendChild(td7);
-                     table.querySelector('tbody').appendChild(tr);
-                     tr.querySelector("input[type='checkbox']").click();
-                     }, 100);
-                }else
-                alert("Un problème est survenu lors de l'actualisation de la page, veuillez le faire manuellement");
+                var parent = $(form).parents('.portlet');
+                if (data !== null && data.isNew === true) {
+                    setTimeout(function () { //on create, clear and reload the table
+                        $('.filter-cancel', parent).click();
+                    }, 50);
+                } else if (data !== null && data.id !== null && data.isNew === false) {//Update the table
+                    if (data.descriptionPanne !== "undefined") {
+                        var table = $('.datatable_ajax', parent).dataTable();
+                        var tr = table.find('input[name="id_' + data.id + '"]', 'tbody').parents('tr')[0];
+                        table.api().cell(tr, '.desc').data('<span class="desc">' + data.descriptionPanne + '</span>');
+                    }
+                }
             }
+        })
+    };
+    var pageForm = function (parent) {
+        //----------------- compression et extension de la page -------------------------
+        //parent = parent.parents('.portlet');
+        $('.compress-item', parent).click(function () {
+            $('.tab-element', parent).addClass('col-lg-9 col-md-6 col-xs-12');
+            $('.form-element', parent).removeClass('hidden');
+            $('.compress-item', parent).addClass('hidden');
+            $('.expand-item', parent).removeClass('hidden');
         });
+        $('.expand-item', parent).click(function () {
+            $('.tab-element', parent).removeClass('col-lg-9 col-md-6 col-xs-12');
+            $('.form-element', parent).addClass('hidden');
+            $('.expand-item', parent).addClass('hidden');
+            $('.compress-item', parent).removeClass('hidden');
+        });
+    };
+    var remplacerElement = function () {
+        //----------- replacer un element: changing check box -------------
+        var checkBoxes = document.querySelectorAll('.check_item');
+        length = checkBoxes.length;
+        for (i = 0; i < length; i++) {
+            checkBoxes[i].onchange = function () {
+                var parent = this.parentNode,
+                    etatItem = parent.querySelector('.changeable_item');
+                if (this.checked) {
+                    parent.querySelector('#replacer').className = '';
+                    etatItem.className = 'hidden changeable_item';
+                } else {
+                    parent.querySelector('#replacer').className = 'hidden';
+                    etatItem.className = 'form-control changeable_item';
+                }
+                //parent.parentNode.querySelector('#etat_x').value = "Non soumise";
+            };
+        }
     };
     // public functions
     return {
         init: function () {
-            var compressItem1 = document.querySelector('#compress-item_1');
-            var compressItem2 = document.querySelector('#compress-item_2');
-            var expandItem1 = document.querySelector('#expand-item_1');
-            var expandItem2 = document.querySelector('#expand-item_2');
-            var tableElement_1 = document.querySelector('#tab-element_1');
-            var tableElement_2 = document.querySelector('#tab-element_2');
-            var formElement_1 = document.querySelector('#form-element_1');
-            var formElement_2 = document.querySelector('#form-element_2');
-            var repondreItems = document.querySelectorAll('.repondre');
-            var voirItems = document.querySelectorAll('.see_item');
-            var modifierItems = document.querySelectorAll('.edit_item');
-            var checkBoxes = document.querySelectorAll('.check_item');
-            var submitItem = document.querySelector('#submit_x');
-            var tab1 = document.querySelector('#tab1'),
-                tab2 = document.querySelector('#tab2'),
-                modalOffre = document.querySelector('#offre_y'),
-                modalOffreID = document.querySelector('#offreID_y'),
-                modalDesc = document.querySelector('#desc_y'),
-                modalEtat = document.querySelector('#etat_y'),
-                modalEtatValue = document.querySelector('#etat-value'),
-                modalCode = document.querySelector('#code_y'),
-                modalClient = document.querySelector('#client_y'),
-                modalBoutique = document.querySelector('#boutique_y'),
-                modalDate = document.querySelector('#date_y'),
-                modalID = document.querySelector('#id_y');
-
-
-            //----------------- compression extension de la page -------------------------
-            compressItem1.onclick = function () {
-                tableElement_1.className = 'col-lg-9';
-                formElement_1.className = 'col-lg-3 thumbnail';
-                compressItem1.className = 'hidden';
-                expandItem1.className = 'fa fa-expand';
-            };
-            expandItem1.onclick = function () {
-                tableElement_1.className = '';
-                formElement_1.className = 'hidden';
-                expandItem1.className = 'hidden';
-                compressItem1.className = 'fa fa-compress';
-            };
-            compressItem2.onclick = function () {
-                tableElement_2.className = 'col-lg-9';
-                formElement_2.className = 'col-lg-3 thumbnail';
-                compressItem2.className = 'hidden';
-                expandItem2.className = 'fa fa-expand';
-            };
-            expandItem2.onclick = function () {
-                tableElement_2.className = '';
-                formElement_2.className = 'hidden';
-                expandItem2.className = 'hidden';
-                compressItem2.className = 'fa fa-compress';
-            };
-
+            reset();
+            modifier();
+            supprimer();
+            repondre();
+            pageForm(tabElement_1);
+            afficher(tabElement_1);
             tab1.onclick = function () {
-                document.querySelector('.modal-footer .repondre').style = "display: none";
-                document.querySelector('.modal-footer .edit_item').style = "display: inline-block";
-                document.querySelector('.modal-footer .delete_item').style = "display: inline-block";
+                pageForm(tabElement_1);
+                afficher(tabElement_1);
+                var modalRep = $('.modal-footer .repondre_item');
+                modalRep.addClass('hidden');
+                var modalModif = $('.modal-footer .edit_item'); // boutton a afficher
+                modalModif.removeClass('hidden');
+                var modalDelete = $('.modal-footer .delete_item');
+                modalDelete.css('href', ".form-element_1");
+                modalModif.removeClass('hidden');
+                modalDelete.href = ".form-element_1"
             };
+
             tab2.onclick = function () {
-                document.querySelector('.modal-footer .repondre').style = "display: inline-block";
-                document.querySelector('.modal-footer .edit_item').style = "display: none";
-                document.querySelector('.modal-footer .delete_item').style = "display: none";
-
+                pageForm(tabElement_2);
+                afficher(tabElement_2);
+                var modalRep = $('.modal-footer .repondre_item');
+                modalRep.removeClass('hidden');
+                modalRep.css('href', ".form-element_2");
+                $('.modal-footer .edit_item').addClass('hidden');
+                $('.modal-footer .delete_item').addClass('hidden');
             };
 
-            //----------------------------- Modification et Chargement des formulaires --------------------------------------------
-
-            //----------- changing check box -------------
-            length = checkBoxes.length;
-            for (i = 0; i < length; i++) {
-                checkBoxes[i].onchange = function () {
-                    var parent = this.parentNode,
-                        etatItem = parent.querySelector('.changeable_item');
-                    if (this.checked) {
-                        parent.querySelector('#replacer').className = '';
-                        etatItem.className = 'hidden changeable_item';
-                    } else {
-                        parent.querySelector('#replacer').className = 'hidden';
-                        etatItem.className = 'form-control changeable_item';
-                    }
-                    //parent.parentNode.querySelector('#etat_x').value = "Non soumise";
-                };
-            }
-            //------------------------- reinitialise chekboxes of a form after a reset click -----------------
-            var resetItems = document.querySelectorAll('input[type="reset"]');
-            var length = resetItems.length;
-            for (var i = 0; i < length; i++) {
-                resetItems[i].onclick = function () {
-                    var p = this.parentNode;
-                    var chexbs = p.querySelectorAll('input[type="checkbox"]');
-                    var elt;
-                    var length2 = chexbs.length;
-                    for (var o = 0; o < length2; o++) {
-                        if ((elt = chexbs[o]).checked) elt.click();
-                    }
-                    var check2 = p.querySelector("#check2_x");
-                    if (check2 !== 'undefined') check2.disabled = true;
-                    /*var etatElement = p.querySelector('select option');
-                     etatElement.innerText = 'Etat relatif au produit';
-                     etatElement.selected = "selected";*/
-
-                };
-            }
-
-            //---------------------------- repondre -------------------------------------
-            length = repondreItems.length;
-            for (i = 0; i < length; i++) {
-                (function (i) {
-                    var item = repondreItems[i];
-                    item.onclick = function () {
-                        //------ Compress the table 2 -----------------
-                        tableElement_2.className = 'col-lg-9 col-md-6 col-xs-12';
-                        formElement_2.className = 'col-lg-3 thumbnail';
-                        compressItem2.className = 'hidden';
-                        expandItem2.className = 'fa fa-expand';
-                        //------------------------------- fill the form ---------------------
-                        var parent = item.parentNode.parentNode, etatElement;
-                        formElement_2.querySelector('input[type="reset"]').click(); //reinitialize the form
-                        if (parent.id === "stack") {//from the modal data 2
-                            formElement_2.querySelector('#id_x').value = modalID.value;
-                            formElement_2.querySelector('#code_x').value = document.querySelector('#code_y').innerText;
-                            formElement_2.querySelector('#offre_x').value = document.querySelector('#offre_y').innerText;
-                            formElement_2.querySelector('#client_x').value = document.querySelector('#client_y').innerText;
-                            etatElement = formElement_2.querySelector('#etat_x');
-                            etatElement.value = modalEtatValue.innerText;
-                            etatElement.selected = "selected";
-                        } else {//from the table 2
-                            formElement_2.querySelector('#id_x').value = parent.querySelector('#id_item').innerText;
-                            formElement_2.querySelector('#code_x').value = parent.querySelector('#code_item').innerText;
-                            formElement_2.querySelector('#offre_x').value = parent.querySelector('#offre_item').innerText;
-                            formElement_2.querySelector('#client_x').value = parent.querySelector('#client_item').innerText;
-                            etatElement = formElement_2.querySelector('#etat_x');
-                            etatElement.value = parent.querySelector('#etat_item input').value;
-                            etatElement.selected = "selected";
-                        }
-
-
-                    };
-                })(i);
-            }
-            //-------------------------- voir ---------------------
-            length = voirItems.length;
-            for (var j = 0; j < length; j++) { // show modal
-                (function (i) {
-                    var item = voirItems[i];
-                    item.onclick = function () {
-                        var parent = item.parentNode.parentNode;
-                        modalID.value = parent.querySelector('#id_item').innerText;
-                        modalOffreID.innerText = parent.querySelector('#offreID_item').innerText;
-                        modalCode.innerText = parent.querySelector('#code_item').innerText;
-                        modalClient.innerText = parent.querySelector('#client_item').innerText;
-                        modalBoutique.innerText = parent.querySelector('#boutique_item').innerText;
-                        modalDate.innerText = parent.querySelector('#date_item').innerText;
-                        modalDesc.innerText = parent.querySelector('#desc_item').innerText;
-                        var b = parent.querySelector('#etat_item');
-                        modalEtatValue.innerText = b.querySelector('input').value;
-                        modalEtat.innerText = b.innerText;
-                        document.querySelector('#comment_y').value = parent.querySelector('#comment_item').value;
-                        modalOffre.innerText = parent.querySelector('#offre_item').innerText;
-                    }
-                })(j);
-            }
-            //---------------------- modifier --------------------
-            length = modifierItems.length;
-            for (var k = 0; k < length; k++) {
-                (function (i) {
-                    var item = modifierItems[i];
-                    item.onclick = function () {
-                        //------ Compress the table 1 -----------------
-                        tableElement_1.className = 'col-lg-9 col-md-6 col-xs-12';
-                        formElement_1.className = 'col-lg-3 thumbnail';
-                        compressItem1.className = 'hidden';
-                        expandItem1.className = 'fa fa-expand';
-                        //------------------------------- fill form ---------------------
-                        var parent = item.parentNode.parentNode, offreElement;
-                        var a;
-                        formElement_1.querySelector('input[type="reset"]').click(); //reinitialize the form
-                        formElement_1.querySelector('#check2_x').removeAttribute('disabled');
-                        if (parent.id === "stack") {//from model data 1
-                            formElement_1.querySelector('.id_x').value = modalID.value;
-                            formElement_1.querySelector('.code_x').value = document.querySelector('#code_y').innerText;
-                            formElement_1.querySelector('.boutique_x').value = document.querySelector('#boutique_y').innerText;
-                            formElement_1.querySelector('.desc_x').value = document.querySelector('#desc_y').innerText;
-                            a = formElement_1.querySelector('.etat_x');
-                            a.value = modalEtatValue.innerText;
-                            a.selected = "selected"; // element select
-                            offreElement = formElement_1.querySelector('.offre_x');
-                            offreElement.value = modalOffreID.innerText;
-                            offreElement.selected = "selected";
-                        } else {//from the table 1
-                            formElement_1.querySelector('.id_x').value = parent.querySelector('#id_item').innerText;
-                            formElement_1.querySelector('.code_x').value = parent.querySelector('#code_item').innerText;
-                            formElement_1.querySelector('.boutique_x').value = parent.querySelector('#boutique_item').innerText;
-                            formElement_1.querySelector('.desc_x').value = parent.querySelector('#desc_item').innerText;
-                            a = formElement_1.querySelector('.etat_x');
-                            a.value = parent.querySelector('#etat_item input').value;
-                            a.selected = "selected"; // element select
-                            offreElement = formElement_1.querySelector('.offre_x');
-                            offreElement.value = parent.querySelector('#offreID_item').innerText;
-                            offreElement.selected = "selected";
-                        }
-                    }
-                })(k);
-            }
-            //var form = document.forms.namedItem("fileinfo");
-            formElement_1.querySelector('#submit_x').addEventListener('click', ajaxForm, false);
-            formElement_2.querySelector('#submit_x').addEventListener('click', ajaxForm, false);
+            $('.composer_item').click(function () {
+                modifierImpl($(this).parents('.portlet'));
+            });
+            $('.tab-reload').click(function () {
+                $('.datatable_ajax', $(this).parents('.portlet')).DataTable().ajax.reload();
+            });
+            document.querySelector('input[type="submit"]').addEventListener('click', ajaxForm, false);
         }
-
     };
-
-
 }();
 
 jQuery(document).ready(function () {

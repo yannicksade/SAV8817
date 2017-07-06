@@ -22,6 +22,7 @@ class Service_apres_venteType extends AbstractType
         $builder
             ->add('id', HiddenType::class, [
                 'mapped' => false,
+                'attr' => ['class' => 'id'],
             ])
             ->add('etat', ChoiceType::class, [
                 'choices' => [
@@ -30,27 +31,40 @@ class Service_apres_venteType extends AbstractType
                     'En cours de diagnostic' => 2,
                     'En cours de depannage' => 3,
                     'Déclaré hors service' => 4,
-                    'requête à suivre' => 5,
+                    'En observation' => 5,
                     'Frais exigible' => 6,
                     'Demande réjeté' => 7,
                     'Alerte' => 8,
                 ],
-                'attr' => ['class' => 'form-control select2 etat_x'],
+                'attr' => ['class' => 'form-control select2 etat'],
                 'required'=> false,
             ])
-            ->add('code', TextType::class, ['mapped' => false])
+            ->add('code', TextType::class, [
+                'mapped' => false,
+                'attr' => ['class' => 'form-control code'],
+            ])
             ->add('offre', EntityType::class, [
-                'placeholder' => 'Selectionnez le produit',
                 'class' => 'APMVenteBundle:Offre',
                 'choice_name' => 'id',
                 'choice_label' => 'designation',
-                'attr' => ['class' => 'form-control select2 offre_x'],
+                'attr' => ['class' => 'form-control select2 offre'],
+                'required' => true,
             ])
             ->add('boutique', TextType::class, [
                 'mapped'=>false,
-                'attr' => ['class' => 'form-control boutique_x'],
+                'attr' => ['class' => 'form-control boutique'],
             ])
-            ->add('descriptionPanne', TextareaType::class, ['required' => true,])
+            ->add('descriptionPanne', TextareaType::class, [
+                'mapped' => false,
+                'required' => true,
+                ])
+            ->add('client', EntityType::class, [
+                'mapped' => false,
+                'class' =>'APMUserBundle:Utilisateur_avm',
+            ])
+            ->add('commentaire', TextareaType::class, [
+                'mapped' => false,
+            ])
     ;
     }
 

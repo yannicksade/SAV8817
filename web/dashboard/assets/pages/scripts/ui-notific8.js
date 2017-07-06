@@ -1,11 +1,11 @@
 var Alert = (function () {
-    var settings = {
+    var settings = { // notification 1 popout for user interactions
         sticky: false,
         horizontalEdge: 'top',
         verticalEdge: 'right',
         life: 10000
     };
-    var SystemNotificationSettings = {
+    var SystemNotificationSettings = { // notification 2 central page for entity events
         ele: 'body', // which element to append to
         offset: {from: 'top', amount: 52},
         align: 'center', // 'top', or 'bottom'
