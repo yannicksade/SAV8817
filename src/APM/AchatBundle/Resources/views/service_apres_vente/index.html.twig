@@ -44,7 +44,7 @@
                                 <div class="btn-group">
                                     <button style="margin-bottom: auto"
                                             class="btn btn-sm dark btn-outline dark see_item"
-                                            data-target="#stack" data-toggle="modal">
+                                            data-target="#stack1" data-toggle="modal">
                                         <i class="fa fa-eye"></i> See
                                     </button>
                                 </div>
@@ -120,8 +120,8 @@
                             </tr>
                             <tr role="row" class="filter">
                                 <td></td>
-                                <td><strong>Save results</strong>
-                                    <input type="checkbox" class="form-filter" name="record_filter"></td>
+                                <td><strong>save state:</strong>
+                                    <input type="checkbox" class="form-filter" name="code_filter" placeholder="reference:"></td>
                                 <td>
                                     <input type="text" class="form-control form-filter input-sm"
                                            name="offre_filter"></td>
@@ -170,8 +170,8 @@
                         </table>
                     </div>
                 </div>
-                <div class="col-lg-3 hidden form-element thumbnail">
-                    {{ form_start(form, {"attr":{"enctype":"multipart/form-data", "method":"post", "name":"form1"}}) }}
+                <div class="col-lg-3 hidden form-element thumbnail form1">
+                    {{ form_start(form, {"attr":{"enctype":"multipart/form-data", "method":"post"}}) }}
                     <h4> demandez un service pour un produit achete</h4>
                     <div class="form-group">
                         {{ form_widget(form.id, {'attr':{'name':'id'}}) }}
@@ -230,14 +230,18 @@
                                         <i class="fa fa-plus"></i>
                                     </button>
                                 </div>
-                                <button style="margin-bottom: auto" class="btn btn-sm btn-outline dark see_item"
-                                        data-target="#stack" data-toggle="modal"> Aperçu
-                                    <i class="fa fa-eye"></i>
-                                </button>
-                                <button style="margin-bottom: auto" class="btn btn-sm purple btn-outline repondre_item"
-                                        data-target="#stack" data-toggle="modal"> Repondre
-                                    <i class="fa fa-send-o"></i>
-                                </button>
+                                <div class="btn-group">
+                                    <button style="margin-bottom: auto" class="btn btn-sm btn-outline dark see_item"
+                                            data-target="#stack2" data-toggle="modal"> Aperçu
+                                        <i class="fa fa-eye"></i>
+                                    </button>
+                                </div>
+                                <div class="btn-group">
+                                    <button style="margin-bottom: auto" class="btn btn-sm purple btn-outline edit_item">
+                                        Repondre
+                                        <i class="fa fa-send-o"></i>
+                                    </button>
+                                </div>
                             </div>
                             <div class="col-md-3">
                                 <div class="btn-group">
@@ -298,8 +302,8 @@
                             </tr>
                             <tr role="row" class="filter">
                                 <td></td>
-                                <td><strong>Save results</strong>
-                                    <input type="checkbox" class="form-filter" name="record_filter"></td>
+                                <td><strong>save state:</strong>
+                                    <input type="checkbox" class="form-filter" name="code_filter" placeholder="reference:"></td>
                                 <td>
                                     <input type="text" class="form-control form-filter input-sm"
                                            name="offre_filter"></td>
@@ -320,7 +324,7 @@
                                                                               type="button"><i
                                                         class="fa fa-calendar"></i></button></span>
                                     </div>
-                                   {# <span class="input-group-btn"><button class="btn btn-sm default date-reset" type="button"><i class="fa fa-times"></i></button></span>#}
+                                    {# <span class="input-group-btn"><button class="btn btn-sm default date-reset" type="button"><i class="fa fa-times"></i></button></span>#}
                                     <div class="input-group date date-picker" data-date-format="dd-mm-yyyy">
                                         <input type="text" class="form-control form-filter input-sm" readonly
                                                name="date_to_filter" placeholder="To:">
@@ -353,8 +357,8 @@
                         </table>
                     </div>
                 </div>
-                <div class="col-lg-3 hidden form-element thumbnail">
-                    {{ form_start(form2, {"attr":{"enctype":"multipart/form-data", "method":"post", "name":"form2"}}) }}
+                <div class="col-lg-3 hidden form-element thumbnail form2">
+                    {{ form_start(form2, {"attr":{"enctype":"multipart/form-data", "method":"post"}}) }}
                     <h4> Répondre à une requête </h4>
                     <div class="form-group">
                         {{ form_widget(form2.id, {'attr':{'name':'id'}}) }}
@@ -369,10 +373,7 @@
                     <div class="form-group">
                         {{ form_errors(form2.etat) }}
                         {{ form_label(form2.etat, 'Etat:', {'attr':{'class':'control-label'}}) }}
-                        <div class="input-group select2-bootstrap-prepend">
-                            <span class="input-group-addon"><input type="checkbox"></span>
-                            {{ form_widget(form2.etat, {'attr':{'name':'etat', 'disabled':"true"}, 'placeholder': 'précisez l\'état actuel de la réquête ici..' }) }}
-                        </div>
+                        {{ form_widget(form2.etat, {'attr':{'name':'etat', 'readonly':"true"}, 'placeholder': 'précisez l\'état actuel de la réquête ici..' }) }}
                     </div>
                     <div class="form-group">
                         {{ form_label(form2.boutique, 'Boutique:', {'attr':{'class':'control-label'}}) }}
@@ -393,66 +394,116 @@
                     {{ form_end(form2) }}
                 </div>
             </div>
+            <!-- BEGIN MODAL -->
+            <div id="stack1" class="modal fade">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                    <h1 class="modal-title"> Aperçu de la sélection #1 </h1>
+                </div>
+                <div class="modal-body">
+                    <h5 class="alerte">Veuillez sélectionner aumoins un élément!</h5>
+                    <table class="hidden">
+                        <tbody>
+                        <tr>
+                            <th><input type="hidden" class="id"/>Code service:</th>
+                            <td class="code"></td>
+                        </tr>
+                        <tr>
+                            <th>Date:</th>
+                            <td class="date"></td>
+                        </tr>
+                        <tr>
+                            <th>Boutique:</th>
+                            <td class="boutique"></td>
+                        </tr>
+                        <tr>
+                            <th><i class="offreID"></i>Offre:</th>
+                            <td class="offre"></td>
+                        </tr>
+                        <tr>
+                            <th>Etat:</th>
+                            <td class="hidden etatID"></td>
+                            <td class="etat"></td>
+                        </tr>
+                        <tr>
+                            <th>Commentaire du fournisseur:</th>
+                            <td class="comment"></td>
+                        </tr>
+                        <tr>
+                            <th>Client:</th>
+                            <td class="client"></td>
+                        </tr>
+                        <tr>
+                            <th>Description du problème:</th>
+                            <td class="desc"></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <a class="btn green pull-left" data-dismiss="modal"> OK </a>
+                    <a class="btn btn-outline blue btn-sm blue edit_item" data-dismiss="modal"><i
+                                class="fa fa-edit"></i> Modifier </a>
+                    <a class="btn btn-outline red btn-sm red delete_item" data-dismiss="modal"><i
+                                class="fa fa-trash-o"></i> Supprimer </a>
+                </div>
+            </div>
+            <!-- END MODAL-->
+            <!-- BEGIN MODAL -->
+            <div id="stack2" class="modal fade">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                    <h1 class="modal-title"> Aperçu de la sélection #2 </h1>
+                </div>
+                <div class="modal-body">
+                    <h5 class="alerte">Veuillez sélectionner aumoins un élément!</h5>
+                    <table class="hidden">
+                        <tbody>
+                        <tr>
+                            <th><input type="hidden" class="id"/>Code service:</th>
+                            <td class="code"></td>
+                        </tr>
+                        <tr>
+                            <th>Date:</th>
+                            <td class="date"></td>
+                        </tr>
+                        <tr>
+                            <th>Boutique:</th>
+                            <td class="boutique"></td>
+                        </tr>
+                        <tr>
+                            <th><i class="offreID"></i>Offre:</th>
+                            <td class="offre"></td>
+                        </tr>
+                        <tr>
+                            <th>Etat:</th>
+                            <td class="hidden etatID"></td>
+                            <td class="etat"></td>
+                        </tr>
+                        <tr>
+                            <th>Commentaire du fournisseur:</th>
+                            <td class="comment"></td>
+                        </tr>
+                        <tr>
+                            <th>Client:</th>
+                            <td class="hidden clientID"></td>
+                            <td class="client"></td>
+                        </tr>
+                        <tr>
+                            <th>Description du problème:</th>
+                            <td class="desc"></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <a class="btn green pull-left" data-dismiss="modal"> Ok </a>
+                    <a class="btn btn-outline green btn-sm green edit_item" data-dismiss="modal"><i
+                                class="fa fa-share"></i> Repondre </a>
+                </div>
+            </div>
+            <!-- END MODAL-->
         </div>
-        <!-- BEGIN MODAL -->
-        <div id="stack" class="modal fade">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
-                <h1 class="modal-title"> Aperçu de la sélection </h1>
-            </div>
-            <div class="modal-body">
-                <h5 class="alerte">Veuillez sélectionner aumoins un élément!</h5>
-                <table class="hidden">
-                    <tbody>
-                    <tr>
-                        <th><input type="hidden" class="id"/>Code service:</th>
-                        <td class="code"></td>
-                    </tr>
-                    <tr>
-                        <th>Date:</th>
-                        <td class="date"></td>
-                    </tr>
-                    <tr>
-                        <th>Boutique:</th>
-                        <td class="boutique"></td>
-                    </tr>
-                    <tr>
-                        <th><i class="offreID"></i>Offre:</th>
-                        <td class="offre"></td>
-                    </tr>
-                    <tr>
-                        <th>Etat:</th>
-                        <td class="hidden etatID"></td>
-                        <td class="etat"></td>
-                    </tr>
-                    <tr>
-                        <th>Commentaire du fournisseur:</th>
-                        <td class="comment"></td>
-                    </tr>
-                    <tr>
-                        <th>Client:</th>
-                        <td class="client"></td>
-                    </tr>
-                    <tr>
-                        <th>Description du problème:</th>
-                        <td class="desc"></td>
-                    </tr>
-                    </tbody>
-                </table>
-            </div>
-            <div class="modal-footer">
-                <a class="btn green pull-left modal-suiv"> suivant </a>
-                <a class="btn btn-outline btn-circle gray btn-sm gray" data-dismiss="modal"><i class="fa fa-eye"></i> OK
-                </a>
-                <a class="btn btn-outline blue btn-sm blue edit_item" data-dismiss="modal"
-                   style="display:inline-block"><i class="fa fa-edit"></i> modifier </a>
-                <a class="btn btn-outline red btn-sm red delete_item" data-dismiss="modal"
-                   style="display: inline-block"><i class="fa fa-trash-o"></i> supprimer </a>
-                <a class="btn btn-outline green btn-sm green repondre_item" data-dismiss="modal"
-                   style="display: none"><i class="fa fa-share"></i> repondre </a>
-            </div>
-        </div>
-        <!-- END MODAL-->
     </div>
     <!-- END SAMPLE TABLE PORTLET-->
 {% endblock content_body %}

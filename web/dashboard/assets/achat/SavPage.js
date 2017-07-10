@@ -9,18 +9,9 @@ var GroupeOffrePage = function () {
         tab1 = document.querySelector('#tab1'),
         tab2 = document.querySelector('#tab2');
     //----- modal
-    var stk = $('#stack'),
-        modalID = $('.id', stk),
-        modalOffreID = $('.offreID', stk),
-        modalEtatValue = $('.etatID', stk),
-        modalOffre = $('.offre', stk),
-        modalDesc = $('.desc', stk),
-        modalEtat = $('.etat', stk),
-        modalCode = $('.code', stk),
-        modalClient = $('.client', stk),
-        modalBoutique = $('.boutique', stk),
-        modalComment = $('.comment', stk),
-        modalDate = $('.date', stk);
+    var modal_stk = {'modalElement': "#stack1"};
+
+    //this.modalElement = stk;
     //---- notification
     var notifAlert = document.querySelector("#notif-active");
     //---------------------- modifier --------------------
@@ -31,43 +22,65 @@ var GroupeOffrePage = function () {
             chexbs.click();
         }
     };
+    var reinitializeModal = function () {
+        // var parent = $(elt).parents('.portlet').find('.modal-body');
+        if (!$('table', modal_stk.modalElement).hasClass("hidden")) $('table', '.modal').addClass("hidden");
+        if ($('.alerte', modal_stk.modalElement).hasClass('hidden')) $('.alerte', '.modal').removeClass("hidden");
+        $('.id', modal_stk.modalElement).val('');
+        $('.offreID', modal_stk.modalElement).text('');
+        $('.code', modal_stk.modalElement).text('');
+        $('.client', modal_stk.modalElement).text('');
+        $('.clientID', modal_stk.modalElement).text('');
+        $('.boutique', modal_stk.modalElement).text('');
+        $('.date', modal_stk.modalElement).text('');
+        $('.etatID', modal_stk.modalElement).text('');
+        $('.etat', modal_stk.modalElement).text('');
+        $('.comment', modal_stk.modalElement).val('');
+        $('.offre', modal_stk.modalElement).text('');
+    };
     var getCheckedBoxes = function (parent) {
         return $('input[type="checkbox"]:checked', parent);
     };
     var play = function (parent) {
-        var cboxes = getCheckedBoxes(parent),
-            nb = cboxes.length;
+        //var parent = $(e).parents('.portlet');
+        var cboxes = getCheckedBoxes(parent);
+        var nb = cboxes.length;
+        if (cboxes === undefined || nb === 0) {
+            reinitializeModal();
+            return;
+        }
         for (var i = 0; i < nb; i++) {
-            var elt = $(cboxes[i]);
-            if (elt === null) continue;
+            var elt = cboxes[i];
             setTimeout(function () {
-                var p = elt.parents();
-                afficherImpl(p[2]);
-                uncheckBoxes(p[1]);
+                var p = $(elt).parents();
+                afficherImpl(p[2]); // row line portlet
+                uncheckBoxes(p[1]); //td cell
             }, 100);
         }
     };
-    var afficher = function (parent) {
+    var afficher = function () {
         //-------------------------- voir ---------------------
         $('.see_item').click(function () {
-            play(parent);
-        });
-        $('.modal-suiv', stk).click(function () {
-            play(parent);
+            play($(this).parents('.portlet')); // remplacer "this" par le "parent" pour une rotation des elements selections
         });
     };
     var modalToFormLoad = function (parent) {
         var form = $('.form-element', parent);
-        $('.id', form).val(modalID.val());
-        $('.code', form).val(modalCode.text());
-        $('.boutique', form).val(modalBoutique.text());
-        $('.desc', form).val(modalDesc.text());
+        $('.id', form).val($('.id', modal_stk.modalElement).val());
+        $('.code', form).val($('.code', modal_stk.modalElement).text());
+        $('.boutique', form).val($('.boutique', modal_stk.modalElement).text());
+        $('.desc', form).val($('.desc', modal_stk.modalElement).text());
         var a = $('.etat', form);
-        a.val(modalEtatValue.text());
-        a.selected = "selected"; // element select
-        var offreElement = $('.offre', form);
-        offreElement.val(modalOffreID.text());
-        offreElement.selected = "selected";
+        a.val($('.etatID', modal_stk.modalElement).text());
+        a.select(); // element select
+        var element = $('.offre', form);
+        element.val($('.offreID', modal_stk.modalElement).text());
+        element.select();
+        if (form.hasClass('form2')) {
+            element = $('.client', form);
+            element.val($('.clientID', modal_stk.modalElement).text()); element.select();
+            $('.comment', form).val($('.comment', modal_stk.modalElement).text());
+        }
     };
     var tableToFormLoad = function (parent, form_parent) {
         var form = $('.form-element', form_parent);
@@ -77,39 +90,48 @@ var GroupeOffrePage = function () {
         $('.desc', form).val($('.desc', parent).text());
         var a = $('.etat', form);
         a.val($('.etat input', parent).val());
-        a.selected = "selected"; // element select
-        var offreElement = $('.offre', form);
-        offreElement.val($('.offreID', parent).text());
-        offreElement.selected = "selected";
+        a.select(); // element select
+        var element  = $('.offre', form);
+        element.val($('.offreID', parent).text());
+        element .select();
+        if (form.hasClass('form2')) {
+            element = $('.client', form);
+            element.val($('.clientID', parent).text());element.select();
+            $('.comment', form).val($('.comment', parent).text());
+        }
     };
     var reset = function () {
         //------------------------- reinitialise chekboxes of a form after a reset click -----------------
         $('input[type="reset"]').click(function () {
             var p = $(this).parent();
-            uncheckBoxes(p);
+            uncheckBoxes(p); //p= form
             $('.id', p).val("");
             $('.code', p).val("");
             $('.boutique', p).val("");
             $('.desc', p).val("");
             $('.offre', p).val("");
             $('.etat', p).val("");
+            if($('.clientID', p) !== null)$('.clientID', p).val('');
+            if($('.comment', p) !== null)$('.comment', p).val('');
         });
     };
     var afficherImpl = function (parent) {
-        $('.alerte', stk).addClass("hidden");
-        $('table', stk).removeClass("hidden");
-        modalID.val($('.id', parent).text());
-        modalOffreID.text($('.offreID', parent).text());
-        modalCode.text($('.code', parent).text());
-        modalClient.text($('.client', parent).text());
-        modalBoutique.text($('.boutique', parent).text());
-        modalDate.text($('.date', parent).text());
-        modalDesc.text($('.desc', parent).text());
+        //parent is a row here
+        $('.alerte', modal_stk.modalElement).addClass("hidden");
+        $('table', modal_stk.modalElement).removeClass("hidden");
+        $('.code', modal_stk.modalElement).text($('.code', parent).text());
+        $('.id', modal_stk.modalElement).val($('.id', parent).text());
+        $('.offreID', modal_stk.modalElement).text($('.offreID', parent).text());
+        $('.client', modal_stk.modalElement).text($('.client', parent).text());
+        $('.clientID', modal_stk.modalElement).text($('.clientID', parent).text());
+        $('.boutique', modal_stk.modalElement).text($('.boutique', parent).text());
+        $('.date', modal_stk.modalElement).text($('.date', parent).text());
+        $('.desc', modal_stk.modalElement).text($('.desc', parent).text());
         var b = $('.etat', parent);
-        modalEtatValue.text($('input', b).val());
-        modalEtat.text(b.text());
-        modalComment.val($('.comment', parent).val());
-        modalOffre.text($('.offre_item', parent).text());
+        $('.etatID', modal_stk.modalElement).text($('input', b).val());
+        $('.etat', modal_stk.modalElement).text(b.text());
+        $('.comment', modal_stk.modalElement).text($('.comment', parent).text());
+        $('.offre', modal_stk.modalElement).text($('.offre', parent).text());
     };
     var modifierImpl = function (parent) {
         //------ Compress the table 1 -----------------
@@ -119,19 +141,34 @@ var GroupeOffrePage = function () {
         $('.compress-item', parent).addClass('hidden');
         $('.expand-item', parent).removeClass('hidden');
         //reinitialize the form
-        $('input[type="reset"]', parent).click();
-        //formElement_1.querySelector('#check2_x').removeAttribute('disabled');
+        $('input[type="reset"]', form).click();
     };
     var modifier = function () {
         $('.edit_item').click(function () {
             var p = $(this).parents();
             var ptl = p[5];// portlet
-            modifierImpl(ptl);
             if (!$(p[0]).hasClass('modal-footer')) { //chargement du formulaire partant du tableau
-                var elt = getCheckedBoxes($('tbody', ptl));
-                elt = $(elt).last();
-                tableToFormLoad(elt.parents()[2], ptl);// 1- a row of the table 2- portlet, parent of the form
-            } else modalToFormLoad(); //chargement du formulaire partant de la modal
+                modifierImpl(ptl);
+                var cboxes= getCheckedBoxes($('tbody', ptl));
+                var nb = cboxes.length;
+                for (var i = 0; i < nb; i++) {
+                    var elt = cboxes[i];
+                    setTimeout(function () {
+                        var p = $(elt).parents();
+                        tableToFormLoad(p[2], ptl);// 1- a row of the table 2- portlet, parent of the form
+                        uncheckBoxes(p[1]); //td cell
+                    });
+                }
+            } else {
+                //chargement du formulaire partant de la modal
+                if (modal_stk.modalElement === '#stack1') {
+                    modifierImpl(tabElement_1);
+                    modalToFormLoad(tabElement_1);
+                } else if (modal_stk.modalElement === '#stack2') {
+                    modifierImpl(tabElement_2);
+                    modalToFormLoad(tabElement_2);
+                }
+            }
         });
     };
     var supprimer = function () {
@@ -153,41 +190,10 @@ var GroupeOffrePage = function () {
                     elements[i] = $('.id', tr).text();
                 }
             }
-            if (elements !== null) deleteElement(elements, p[5]);
+            if (elements.length > 0) deleteElement(elements, p[5]);
         });
     };
-    var repondre = function () {
-        //---------------------------- repondre -------------------------------------
-        $('.repondre_item').click(function () {
-            var p = this.parents();
-            var parent = p[5]; //portlet, tab element
-            var form = $('.form-element', parent), etatElement;
-            //------ Compress the table 2 -----------------
-            $('.tab-element', parent).addClass('col-lg-9 col-md-6 col-xs-12');
-            form.removeClass('hidden');
-            $('.compress-item', parent).addClass('hidden');
-            $('.expand-item', parent).removeClass('hidden');
-            //------------------------------- fill the form ---------------------
-            $('input[type="reset"]', form).click(); //reinitialize the form
-            if ($(p[0]).hasClass('modal-footer')) {//from the modal data 2
-                $('.id', form).val(modalID.val());
-                $('.code', form).val(modalCode.text());
-                $('.offre', form).val(modalOffre.text());
-                $('.client', form).val(modalClient.text());
-                etatElement = $('.etat', form);
-                etatElement.val(modalEtatValue.text());
-                etatElement.selected = "selected";
-            } else {//from the table 2
-                $('.id', form).val($('.id', parent).text());
-                $('.code', form).val($('.code', parent).text());
-                $('.offre', form).val($('.offre', parent).text());
-                $('.client', form).val($('.client', parent).text());
-                etatElement = $('.etat', form);
-                etatElement.val($('.etat input', parent).val());
-                etatElement.selected = "selected";
-            }
-        });
-    };
+
     var deleteElement = function (elements, parent) {
         var items = JSON.stringify(elements);
         return $.ajax({
@@ -223,17 +229,12 @@ var GroupeOffrePage = function () {
             }
         });
     };
-    var ajaxForm = function (e) {
-        e.returnValue = false;
-        if (e.preventDefault) {
-            e.preventDefault();
-        }
-        var form = this.parentNode;
-        if (form === undefined) return;
+    var ajaxForm = function (form) { // create and update
+        if (form === undefined || !$(form).parent().hasClass('form1') && !$(form).parent().hasClass('form2')) return;
         var formData = new FormData(form);
         if (formData['service_apres_vente'] === null) return;
         return $.ajax({
-            url: "http://localhost/SAV8817.git/web/app_dev.php/apm/achat/service_apres_vente/",
+            url: "index",
             type: "post",
             dataType: 'json',
             data: formData,
@@ -253,30 +254,36 @@ var GroupeOffrePage = function () {
                 json = JSON.parse(json);
                 var data = json.item;
                 var parent = $(form).parents('.portlet');
+                var table = $('.datatable_ajax', parent).dataTable();
                 if (data !== null && data.isNew === true) {
                     setTimeout(function () { //on create, clear and reload the table
                         $('.filter-cancel', parent).click();
                     }, 50);
                 } else if (data !== null && data.id !== null && data.isNew === false) {//Update the table
-                    if (data.descriptionPanne !== "undefined") {
-                        var table = $('.datatable_ajax', parent).dataTable();
-                        var tr = table.find('input[name="id_' + data.id + '"]', 'tbody').parents('tr')[0];
-                        table.api().cell(tr, '.desc').data('<span class="desc">' + data.descriptionPanne + '</span>');
+                    if($(form).parent().hasClass('form1')) {
+                        if (data.descriptionPanne !== "undefined") {
+                            var tr = table.find('input[name="id_' + data.id + '"]', 'tbody').parents('tr')[0];
+                            table.api().cell(tr, '.desc').data('<span class="desc">' + data.descriptionPanne + '</span>');
+                        }
+                    }else if($(form).parent().hasClass('form2')){
+                        table.api().ajax.reload();
                     }
                 }
             }
         })
     };
-    var pageForm = function (parent) {
+    var pageForm = function () {
         //----------------- compression et extension de la page -------------------------
         //parent = parent.parents('.portlet');
-        $('.compress-item', parent).click(function () {
+        $('.compress-item').click(function () {
+            var parent = $(this).parents('.portlet');
             $('.tab-element', parent).addClass('col-lg-9 col-md-6 col-xs-12');
             $('.form-element', parent).removeClass('hidden');
             $('.compress-item', parent).addClass('hidden');
             $('.expand-item', parent).removeClass('hidden');
         });
-        $('.expand-item', parent).click(function () {
+        $('.expand-item').click(function () {
+            var parent = $(this).parents('.portlet');
             $('.tab-element', parent).removeClass('col-lg-9 col-md-6 col-xs-12');
             $('.form-element', parent).addClass('hidden');
             $('.expand-item', parent).addClass('hidden');
@@ -308,30 +315,14 @@ var GroupeOffrePage = function () {
             reset();
             modifier();
             supprimer();
-            repondre();
-            pageForm(tabElement_1);
-            afficher(tabElement_1);
-            tab1.onclick = function () {
-                pageForm(tabElement_1);
-                afficher(tabElement_1);
-                var modalRep = $('.modal-footer .repondre_item');
-                modalRep.addClass('hidden');
-                var modalModif = $('.modal-footer .edit_item'); // boutton a afficher
-                modalModif.removeClass('hidden');
-                var modalDelete = $('.modal-footer .delete_item');
-                modalDelete.css('href', ".form-element_1");
-                modalModif.removeClass('hidden');
-                modalDelete.href = ".form-element_1"
+            pageForm();
+            afficher();
+            tab1.onclick = function () { //gestion des affichages avec  deux modal
+                modal_stk.modalElement = '#stack1';
             };
 
             tab2.onclick = function () {
-                pageForm(tabElement_2);
-                afficher(tabElement_2);
-                var modalRep = $('.modal-footer .repondre_item');
-                modalRep.removeClass('hidden');
-                modalRep.css('href', ".form-element_2");
-                $('.modal-footer .edit_item').addClass('hidden');
-                $('.modal-footer .delete_item').addClass('hidden');
+                modal_stk.modalElement = '#stack2';
             };
 
             $('.composer_item').click(function () {
@@ -340,7 +331,13 @@ var GroupeOffrePage = function () {
             $('.tab-reload').click(function () {
                 $('.datatable_ajax', $(this).parents('.portlet')).DataTable().ajax.reload();
             });
-            document.querySelector('input[type="submit"]').addEventListener('click', ajaxForm, false);
+            $('input[type="submit"]').click(function(e){
+                e.returnValue = false;
+                if (e.preventDefault) {
+                    e.preventDefault();
+                }
+                ajaxForm(this.parentNode);
+            });
         }
     };
 }();

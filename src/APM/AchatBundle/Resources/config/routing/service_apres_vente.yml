@@ -1,5 +1,5 @@
 apm_achat_service_apres_vente_index:
-    path:     /
+    path:     /index
     defaults: { _controller: "APMAchatBundle:Service_apres_vente:index" }
 
 apm_achat_service_apres_vente_loader:
