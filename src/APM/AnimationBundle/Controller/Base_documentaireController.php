@@ -23,7 +23,7 @@ class Base_documentaireController extends Controller
         /** @var Utilisateur_avm $user */
         $user = $this->getUser();
         $documents = $user->getDocuments();
-        return $this->render('APMAnimationBundle:document:index.html.twig', array(
+        return $this->render('APMAnimationBundle:document:index_old.html.twig', array(
             'documents' => $documents,
         ));
     }

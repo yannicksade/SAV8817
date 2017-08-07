@@ -1,79 +1,617 @@
 {% extends ":base/dashboard:layout.html.twig" %}
+{%- block title -%} {{ parent() }} | Mes offres {% endblock %}
+
+{% block custom_stylesheets %}
+    {% stylesheets "dashboard/assets/global/plugins/jcrop/css/jquery.Jcrop.css"
+    "dashboard/assets/pages/css/image-crop.css"
+    "dashboard/assets/vente/offrePage.css" filter='cssrewrite' %}
+    <link href="{{ asset_url }}" rel="stylesheet" type="text/css"/>
+    {% endstylesheets %}
+{% endblock custom_stylesheets %}
 
 {% block content_body %}
-    {{ form_start(filter) }}
-    {{ form_widget(filter) }}
-    <input type="submit" value="Go"/>
-    {{ form_end(filter) }}
-    <p>----------------------------------------------------------------</p>
-
-    <h1> Mes Offres {% if boutique -%} - <a
-            href="{{ path('apm_vente_boutique_show', { 'id': boutique.id }) }}">{{ boutique }}
-            {% if categorie %}- <a
-                href="{{ path('apm_vente_categorie_show', { 'id': categorie.id }) }}">{{ categorie }}</a>{% endif %}
-            </a>{% endif %}</h1>
-    <table>
-        <thead>
-        <tr>
-            <th>Code</th>
-            <th>Désignation</th>
-            <th>Prix Unitaire</th>
-            <th>Actions</th>
-        </tr>
-        </thead>
-        <tbody>
-        {% for offre in offres %}
-            <tr>
-                <td><a href="{{ path('apm_vente_offre_show', { 'id': offre.id }) }}">{{ offre.code }}</a></td>
-                <td>{{ offre.designation }}</td>
-                <td>{{ offre.prixUnitaire }}</td>
-                <td>
-                    <ul>
-
-                        <li>
-                            <a href="{{ path('apm_vente_offre_show', { 'id': offre.id }) }}">afficher</a> |
-                        </li>
-                        {#
-                                                {% if app.user == offre.vendeur or offre.boutique !=null and offre.boutique.gerant == app.user or offre.boutique !=null and offre.boutique.proprietaire ==app.user %}
-                        #}
-                        <li>
-                            <a href="{{ path('apm_vente_offre_edit', { 'id': offre.id }) }}">modifier</a> |
-                        </li>
-                        <li>
-                            <a href="{{ path('apm_vente_offre_deleteFromList', { 'id': offre.id }) }}">supprimer</a>
-                            |
-                        </li>
-                        {#  {% endif %}#}
-                    </ul>
-                </td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
-
-    <ul>
-
-        {% if app.user == vendeur or boutique !=null and boutique.gerant == app.user or boutique !=null and boutique.proprietaire ==app.user %}
-            <li>
-                <a href="{{ path('apm_vente_offre_new') }}">Créer une nouvelle offre</a>
+    <div class="row" xmlns="http://www.w3.org/1999/html">
+        <h1>Produits et services</h1>
+        <ul class="nav nav-tabs pull-left">
+            <li class="active" id="tab1">
+                <a href="#tab_1" data-toggle="tab"> Offres </a>
             </li>
-            {% if boutique %}
-            <li>
-                <a href="{{ path('apm_vente_categorie_new', {'id': boutique.id}) }}"> Créer une nouvelle catégorie
-                    dans
-                    la boutique </a>
+            <li id="tab2">
+                <a href="#tab_2" data-toggle="tab"> Catégories </a>
             </li>
-                <li>
-                    <a href="{{ path('apm_vente_boutique_show', {'id': boutique.id}) }}"> Afficher la boutique</a>
+        </ul>
+    </div>
+    <!-- BEGIN SAMPLE TABLE PORTLET-->
+    <div class="row">
+        <div class="tab-content">
+            <div class="ajax-pane-notif"></div>
+            <div class="portlet tab-pane active" id="tab_1">
+                <div class="portlet-title">
+                    <div class="caption font-dark">
+                        <span class="caption-subject bold uppercase"> Table des offres <i
+                                    class="icon-settings font-dark"></i></span>
+                        <button class="btn btn-default mt-ladda-btn ladda-button content-spinner hidden"
+                                data-style="expand-left" data-spinner-color="#333">
+                            <span class="ladda-label" id="ajax-label-process"></span>
+                        </button>
+                    </div>
+                    <div class="tools pull-right">
+                        <a class="fa fa-compress compress-item"> </a>
+                        <a class="fa fa-expand hidden expand-item"> </a>
+                        <a href="javascript:;" class="collapse"> </a>
+                        <a class="config"></a>
+                        <a class="fa fa-refresh tab-reload"> </a>
+                    </div>
+                </div>
+                <div class="portlet-body">
+                    <div class="table-toolbar">
+                        <div class="row">
+                            <div class="col-md-9">
+                                <div class="btn-group">
+                                    <button class="btn  btn-sm sbold green composer_item">
+                                        <i class="fa fa-plus"></i> Compose
+                                    </button>
+                                </div>
+                                <div class="btn-group">
+                                    <button style="margin-bottom: auto"
+                                            class="btn btn-sm dark btn-outline dark see_item"
+                                            data-target="#m-ajax" data-toggle="modal">
+                                        <i class="fa fa-eye"></i> See
+                                    </button>
+                                </div>
+                                <div class="btn-group">
+                                    <button style="margin-bottom: auto"
+                                            class="btn  btn-sm purple btn-outline purple edit_item">
+                                        <i class="fa fa-edit"></i> Edit
+                                    </button>
+                                </div>
+                                <div class="btn-group">
+                                    <button style="margin-bottom: auto"
+                                            class="btn  btn-sm red btn-outline red delete_item" data-toggle="modal"
+                                            href="#modal-confirm">
+                                        <i class="fa fa-trash-o"></i> Delete
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="btn-group">
+                                    <button class="btn btn-sm blue btn-outline share_item">
+                                        <i class="fa fa-share"></i> Share
+                                    </button>
+                                </div>
+                                <div class="btn-group">
+                                    <button class="btn btn-sm green btn-outline filter-submit">
+                                        <i class="fa fa-search"></i> Search
+                                    </button>
+                                </div>
+                                <div class="btn-group">
+                                    <button class="btn  btn-sm red btn-outline filter-cancel">
+                                        <i class="fa fa-times"></i> Reset
+                                    </button>
+                                </div>
+                                <div class="btn-group">
+                                    <button class="btn  btn-sm green  btn-outline dropdown-toggle"
+                                            data-toggle="dropdown">Tools
+                                        <i class="fa fa-angle-down"></i>
+                                    </button>
+                                    <ul class="dropdown-menu pull-right">
+                                        <li>
+                                            <a href="javascript:;">
+                                                <i class="fa fa-print"></i> Print </a>
+                                        </li>
+                                        <li>
+                                            <a href="javascript:;">
+                                                <i class="fa fa-file-pdf-o"></i> Save as PDF </a>
+                                        </li>
+                                        <li>
+                                            <a href="javascript:;">
+                                                <i class="fa fa-file-excel-o"></i> Export to Excel </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tab-element">
+                        <table class="table table-hover table-striped table-bordered table-checkable datatable_ajax">
+                            <thead>
+                            <tr role="row" class="heading">
+                                <th>
+                                    <label class="mt-checkbox mt-checkbox-single mt-checkbox-outline">
+                                        <input type="checkbox" class="group-checkable"
+                                               data-set="#sample_2 .checkboxes"/>
+                                        <span></span>
+                                    </label>
+                                </th>
+                                <th width="2%">Records&nbsp;#</th>
+                                <th> Code</th>
+                                <th> Désignation</th>
+                                <th> Boutique</th>
+                                <th> Date de mise à jour</th>
+                                <th width="10%"> Etat du produit</th>
+                            </tr>
+                            <tr role="row" class="filter">
+                                <td></td>
+                                <td><strong>save state:</strong>
+                                    <input type="checkbox" class="form-filter" name="record_filter"
+                                           placeholder="reference:"></td>
+                                <td>
+                                    <input type="text" class="form-control form-filter input-sm"
+                                           name="code_filter"></td>
+                                <td>
+                                    <input type="text" class="form-control form-filter input-sm" name="desc_filter">
+                                </td>
+                                <td>
+                                    <input type="text" class="form-control form-filter input-sm" name="boutique_filter">
+                                </td>
+                                <td>
+                                    <div class="input-group date date-picker margin-bottom-5"
+                                         data-date-format="dd-mm-yyyy">
+                                        <input type="text" class="form-control form-filter input-sm" readonly
+                                               name="date_from_filter" placeholder="From:">
+                                        <span class="input-group-btn"><button class="btn btn-sm default"
+                                                                              type="button"><i
+                                                        class="fa fa-calendar"></i></button></span>
+                                    </div>
+                                    <div class="input-group date date-picker" data-date-format="dd-mm-yyyy">
+                                        <input type="text" class="form-control form-filter input-sm" readonly
+                                               name="date_to_filter" placeholder="To:">
+                                        <span class="input-group-btn"><button class="btn btn-sm default"
+                                                                              type="button"><i
+                                                        class="fa fa-calendar"></i></button></span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <select name="etat_filter" class="form-control form-filter input-sm">
+                                        <option value="">Selectionner...</option>
+                                        <option value="0">Disponible en stock</option>
+                                        <option value="1">Non disponible en stock</option>
+                                        <option value="2">Vente sur commande</option>
+                                        <option value="3">Vente suspendue</option>
+                                        <option value="4">Vente annulée</option>
+                                        <option value="5">Stock limité</option>
+                                        <option value="6">En panne</option>
+                                        <option value="7">Vente restreinte en région</option>
+                                        <option value="8">Vente interdite</option>
+                                    </select>
+                                </td>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="col-lg-3 hidden form-element thumbnail form1">
+                    {{ form_start(form, {"attr":{"enctype":"multipart/form-data", "method":"post"}}) }}
+                    <div class="form-group">
+                        <h3 class="inline"> Cliquez ici pour créer une offre </h3>
+                        <input type="checkbox" class="group-checkboxes-form"/>
+                    </div>
+                    <div class="form-group">
+                        {{ form_widget(form.id, {'attr':{'name':'id'}}) }}
+                        {{ form_label(form.code, 'Code:', {'attr':{'class':'control-label'}}) }}
+                        {{ form_widget(form.code, {'attr':{'name':'code', 'value':'automatique' ,'readonly':'true'}}) }}
+                    </div>
+                    <div class="form-group">
+                        {{ form_errors(form.categorie) }}
+                        {{ form_label(form.categorie, 'Catégorie:', {'attr':{'class':'control-label'}}) }}
+                        <div class="input-group">
+                            <span class="input-group-addon"><input type="checkbox"></span>
+                            {{ form_widget(form.categorie, {'attr':{'name':'categorie', 'disabled':'true'},'placeholder': 'selectionnez la catégorie de l\'offre ici...'}) }}
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        {{ form_errors(form.boutique) }}
+                        {{ form_label(form.boutique, 'Boutique:', {'attr':{'class':'control-label'}}) }}
+                        <div class="input-group">
+                            <span class="input-group-addon"><input type="checkbox"></span>
+                            {{ form_widget(form.boutique, {'attr':{'name':'boutique', 'disabled':'true'},'placeholder': 'selectionnez la boutique ici...'}) }}
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        {{ form_errors(form.etat) }}
+                        {{ form_label(form.etat, 'Etat:', {'attr':{'class':'control-label'}}) }}
+                        <div class="input-group">
+                            <span class="input-group-addon"><input type="checkbox"></span>
+                            {{ form_widget(form.etat, {'attr':{'name':'etat', 'disabled':'true'}, 'placeholder': 'précisez l\'état actuel de l\'offre ici...' }) }}
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        {{ form_errors(form.designation) }}
+                        {{ form_label(form.designation, 'Désignation:', {'attr':{'class':'control-label'}}) }}
+                        <div class="input-group">
+                            <span class="input-group-addon"><input type="checkbox"></span>
+                            {{ form_widget(form.designation, {'attr':{'name':'desigantion', 'readonly':"true"}}) }}
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        {{ form_errors(form.prixUnitaire) }}
+                        {{ form_label(form.prixUnitaire, 'Prix de l\'unité:', {'attr':{'class':'control-label'}}) }}
+                        <div class="input-group">
+                            <span class="input-group-addon"><input type="checkbox"></span>
+                            {{ form_widget(form.prixUnitaire, {'attr':{'name':'prixUnitaire', 'readonly':"true"}}) }}
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        {{ form_errors(form.quantite) }}
+                        {{ form_label(form.quantite, 'Quantite:', {'attr':{'class':'control-label'}}) }}
+                        <div class="input-group">
+                            <span class="input-group-addon"><input type="checkbox"></span>
+                            {{ form_widget(form.quantite, {'attr':{'name':'quantite', 'readonly':"true"}}) }}
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        {{ form_errors(form.remiseProduit) }}
+                        {{ form_label(form.remiseProduit, 'remise à l\'offre:', {'attr':{'class':'control-label'}}) }}
+                        <div class="input-group">
+                            <span class="input-group-addon"><input type="checkbox"></span>
+                            {{ form_widget(form.remiseProduit, {'attr':{'name':'remiseProduit', 'readonly':"true"}}) }}
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        {{ form_errors(form.publiable) }}
+                        {{ form_label(form.publiable, 'A publier?:', {'attr':{'class':'control-label'}}) }}
+                        <div class="input-group">
+                            <span class="input-group-addon"><input type="checkbox"></span>
+                            {{ form_widget(form.publiable, {'attr':{'name':'publiable', 'disabled':'true'}}) }}
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        {{ form_errors(form.apparenceNeuf) }}
+                        {{ form_label(form.apparenceNeuf, 'Apparence:', {'attr':{'class':'control-label'}}) }}
+                        <div class="input-group">
+                            <span class="input-group-addon"><input type="checkbox"></span>
+                            {{ form_widget(form.apparenceNeuf, {'attr':{'name':'apparenceNeuf', 'disabled':'true'}}) }}
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        {{ form_errors(form.dureeGarantie) }}
+                        {{ form_label(form.dureeGarantie, 'Durée de la Garantie(en mois):', {'attr':{'class':'control-label'}}) }}
+                        <div class="input-group">
+                            <span class="input-group-addon"><input type="checkbox"></span>
+                            {{ form_widget(form.dureeGarantie, {'attr':{'name':'dureeGarantie', 'readonly':"true"}}) }}
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        {{ form_errors(form.modeVente) }}
+                        {{ form_label(form.modeVente, 'Mode de vente:', {'attr':{'class':'control-label'}}) }}
+                        <div class="input-group">
+                            <span class="input-group-addon"><input type="checkbox"></span>
+                            {{ form_widget(form.modeVente, {'attr':{'name':'modeVente', 'disabled':'true'}}) }}
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        {{ form_errors(form.modelDeSerie) }}
+                        {{ form_label(form.modelDeSerie, 'Modèle de l\'offre:', {'attr':{'class':'control-label'}}) }}
+                        <div class="input-group">
+                            <span class="input-group-addon"><input type="checkbox"></span>
+                            {{ form_widget(form.modelDeSerie, {'attr':{'name':'modelDeSerie', 'readonly':"true"}}) }}
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        {{ form_errors(form.typeOffre) }}
+                        {{ form_label(form.typeOffre, 'Type de l\'offre:', {'attr':{'class':'control-label'}}) }}
+                        <div class="input-group">
+                            <span class="input-group-addon"><input type="checkbox"></span>
+                            {{ form_widget(form.typeOffre, {'attr':{'name':'typeOffre', 'disabled':'true'}}) }}
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        {{ form_errors(form.description) }}
+                        {{ form_label(form.description, 'Description:', {'attr':{'class':'control-label'}}) }}
+                        <span class="input-group-addon"><input type="checkbox"></span>
+                        {{ form_widget(form.description, {'attr':{'name':'description', 'disabled':'true'}, "placeholder": "décrivez le produit ici..."}) }}
+                    </div>
+                    <input type="submit" value="Soumettre"/>
+                    <input type="reset" value="Effacer"/>
+                    <input data-target="#m-ajax" data-toggle="modal" class="charger-image hidden" type="button"
+                           value="cliquez ici pour charger les images"/>
+                    {{ form_end(form) }}
+                </div>
+            </div>
+            <div class="tab-pane" id="tab_2">
+
+            </div>
+
+        </div>
+        <!-- BEGIN MODAL -->
+        <div id="m-ajax" class="modal fade draggable-modal" tabindex="-1">
+            <p class="alerte"></p>
+            <ul class="nav nav-tabs">
+                <li class="data-content hidden active">
+                    <a href="#modal-tab_1" data-toggle="tab"><i class="icon-settings font-dark"></i> Détails de l'offre</a>
                 </li>
-            {% else %}
-                <li>
-                    <a href="{{ path('apm_vente_boutique_index') }}"> Liste les boutiques</a>
-            </li>
-            {% endif %}
-        {% endif %}
-        <li>
-            <a href="{{ path('apm_core_user-dashboard_index') }}"> Retour à l'accueil</a>
-        </li>
-    </ul>
+                <li class="data-content hidden">
+                    <a href="#modal-tab_2" data-toggle="tab"> Aperçus des pièces jointes </a>
+                </li>
+                <li class="data-content hidden">
+                    <a href="#modal-tab_3" data-toggle="tab"> Images et photos </a>
+                </li>
+                <li class="data-content hidden">
+                    <a href="#modal-tab_4" data-toggle="tab"> Fichiers </a>
+                </li>
+                <li class="data-content hidden">
+                    <a href="#modal-tab_5" data-toggle="tab"> Données supplémentaires </a>
+                </li>
+            </ul>
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+            <div class="tab-content">
+                <div class="tab-pane data-content hidden active" id="modal-tab_1">
+                    <div class="modal-header">
+                        <h4 class="modal-title"> Aperçu de la sélection </h4>
+                    </div>
+                    <div class="modal-body">
+                        <table>
+                            <tbody>
+                            <tr>
+                                <th><input type="hidden" class="id"/>Code</th>
+                                <td class="code"></td>
+                            </tr>
+                            <tr>
+                                <th>Offre publié?</th>
+                                <td class="publiable"></td>
+                            </tr>
+                            <tr>
+                                <th>Vendeur</th>
+                                <td class="hidden vendeurID"></td>
+                                <td class="vendeur"></td>
+                            </tr>
+
+                            <tr>
+                                <th>Catégorie</th>
+                                <td class="hidden categorieID"></td>
+                                <td class="categorie"></td>
+                            </tr>
+                            <tr>
+                                <th>Boutique</th>
+                                <td class="hidden boutiqueID"></td>
+                                <td class="boutique"></td>
+                            </tr>
+                            <tr>
+                                <th>Date de mise à jour</th>
+                                <td class="updatedAt"></td>
+                            </tr>
+                            <tr>
+                                <th>Date de création</th>
+                                <td class="dateCreation"></td>
+                            </tr>
+                            <tr>
+                                <th>Date d'expiration</th>
+                                <td class="dateExpiration"></td>
+                            </tr>
+                            <tr>
+                                <th>Durée de la Garantie(mois)</th>
+                                <td class="dureeGarantie"></td>
+                            </tr>
+                            <tr>
+                                <th>Designation</th>
+                                <td class="designation"></td>
+                            </tr>
+                            <tr>
+                                <th>Apparence</th>
+                                <td class="apparence"></td>
+                            </tr>
+                            <tr>
+                                <th>Retourne?</th>
+                                <td class="retourne"></td>
+                            </tr>
+                            <tr>
+                                <th>Etat</th>
+                                <td class="hidden etatID"></td>
+                                <td class="etat"></td>
+                            </tr>
+                            <tr>
+                                <th>Rémise</th>
+                                <td class="remise"></td>
+                            </tr>
+                            <tr>
+                                <th>Mode de vente</th>
+                                <td class="hidden modeVenteID"></td>
+                                <td class="modeVente"></td>
+                            </tr>
+                            <tr>
+                                <th>Modèle de fabrication</th>
+                                <td class="modelDeSerie"></td>
+                            </tr>
+
+                            <tr>
+                                <th>Prix de l'unité</th>
+                                <td class="prix"></td>
+                            </tr>
+                            <tr>
+                                <th>Quantite</th>
+                                <td class="quantite"></td>
+                            </tr>
+                            <tr>
+                                <th>Evaluation</th>
+                                <td class="rate"></td>
+                            </tr>
+                            <tr>
+                                <th>Typeoffre</th>
+                                <td class="type"></td>
+                            </tr>
+                            <tr>
+                                <th>Description</th>
+                                <td class="desc"></td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="modal-footer">
+                        <a class="btn green pull-left modal-action-terminated" data-dismiss="modal"> OK </a>
+                        <a class="btn btn-outline blue btn-sm blue edit_item" data-dismiss="modal"><i
+                                    class="fa fa-edit"></i> Modifier </a>
+                        <a class="btn btn-outline red btn-sm red delete_item" data-toggle="modal" href="#modal-confirm"><i
+                                    class="fa fa-trash-o"></i> Supprimer </a>
+                        <button class="btn btn-default mt-ladda-btn ladda-button modal-spinner hidden"
+                                data-style="zoom-in" data-spinner-color="#333">
+                            <span class="ladda-label">traitement en cours ...</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="tab-pane data-content hidden" id="modal-tab_2">
+                    <div class="modal-header">
+                        <h4 class="modal-title">Images de l'offre</h4>
+                        {% for i in 1..4 %}
+                            <div class="thumbnail inline-block margin-right-10">
+                                <a href="#image_{{ i }}" data-toggle="tab">
+                                    <img width="50px" height="50px"
+                                         src="{{ asset('dashboard/assets/entity/images/yann.jpg') }}" alt=""
+                                         class="image-preview img-responsive"/>
+                                </a>
+                                <div class="caption"><strong>#image{{ i }}</strong></div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    <div class="modal-body tab-content">
+                        <div class="tab-pane" id='image_1'>
+                            <img src="{{ asset('dashboard/assets/entity/images/yann1.jpg') }}"
+                                 alt="" class="image-preview img-responsive"/>
+                        </div>
+                        <div class="tab-pane" id='image_2'>
+                            <img src="{{ asset('dashboard/assets/entity/images/yann2.jpg') }}"
+                                 alt="" class="image-preview img-responsive"/>
+                        </div>
+                        <div class="tab-pane" id='image_3'>
+                            <img src="{{ asset('dashboard/assets/entity/images/yann3.png') }}"
+                                 alt="" class="image-preview img-responsive"/>
+                        </div>
+                        <div class="tab-pane" id='image_4'>
+                            <img src="{{ asset('dashboard/assets/entity/images/yann2.jpg') }}"
+                                 alt="" class="image-preview img-responsive"/>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <a class="btn green pull-left modal-action-terminated" data-dismiss="modal"> OK </a>
+                        <a class="btn btn-outline red btn-sm red delete_item" data-toggle="modal" href="#modal-confirm"><i
+                                    class="fa fa-trash-o"></i> Supprimer </a>
+                        <button class="btn btn-default mt-ladda-btn ladda-button modal-spinner hidden"
+                                data-style="zoom-in" data-spinner-color="#333">
+                            <span class="ladda-label">traitement en cours ...</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="tab-pane data-content hidden" id="modal-tab_3">
+                    <div class="modal-header">
+                        <h4 class="modal-title"> Charger les images et photos relatives à l'offre</h4></div>
+                    <div class="modal-body">
+                        <div class="">
+                            <img src="{{ asset('dashboard/assets/entity/images/yann4.jpg') }}" alt=""
+                                 id="demo3"/>
+                        </div>
+                        <div id="preview-pane">
+                            <div class="preview-container">
+                                <img src="{{ asset('dashboard/assets/entity/images/yann4.jpg') }}"
+                                     alt=""
+                                     class="jcrop-preview"/>
+                            </div>
+                        </div>
+                        <input type="hidden" id="crop_x" name="x"/>
+                        <input type="hidden" id="crop_y" name="y"/>
+                        <input type="hidden" id="crop_w" name="w"/>
+                        <input type="hidden" id="crop_h" name="h"/>
+                    </div>
+                    <div class="modal-footer">
+                        <div class="form">
+                            <input type="file" value="choisir le fichier">
+                            <div class="pull-right">
+                                <input type="submit" value="Crop Image" class="btn btn-sm green"/>
+                                <input type="reset" value="Reset" class="btn btn-sm gray"/>
+                            </div>
+                        </div>
+                        <button class="btn btn-default mt-ladda-btn ladda-button modal-spinner hidden"
+                                data-style="zoom-in" data-spinner-color="#333">
+                            <span class="ladda-label">traitement en cours ...</span>
+                        </button>
+                        {# {{ form_start(image_form) }}
+                         {{ form_errors(image_form.imageFile) }}
+                         {{ form_label(image_form.imageFile, '', {'attr':{'class':'control-label'}}) }}
+                         {{ form_widget(image_form.imageFile, {'attr':{'name':'image',  'value': 'choisir le fichier'}}) }}
+                         <div class="pull-right">
+                             <input type="submit" value="Crop Image" class="btn btn-sm green"/>
+                             <input type="reset" value="Reset" class="btn btn-sm gray"/>
+                         </div>
+                         {{ form_end(image_form) }}#}
+                    </div>
+                </div>
+                <div class="tab-pane data-content hidden" id="modal-tab_4">
+                    <div class="modal-header">
+                        <h4 class="modal-title"> Charger les documents relatifs à l'offre</h4>
+                    </div>
+                    <div class="modal-body">
+                    </div>
+                    <div class="modal-footer">
+                        <div class="form">
+                            <input type="file" value="choisir le fichier">
+                            <div class="pull-right">
+                                <input type="reset" value="Reset" class="btn btn-sm gray"/>
+                            </div>
+                        </div>
+                        <button class="btn btn-default mt-ladda-btn ladda-button modal-spinner hidden"
+                                data-style="zoom-in" data-spinner-color="#333">
+                            <span class="ladda-label">traitement en cours ...</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="tab-pane data-content hidden" id="modal-tab_5">
+                    <div class="modal-header">
+                        <h4 class="modal-title"> Informations sécurisées relatives à l'offre</h4>
+                    </div>
+                    <div class="form">
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <label for="login">Votre Login:</label>
+                                <input type="text" value="" id="login">
+                            </div>
+                            <div class="form-group">
+                                <label for="pwd">Votre Mot de passe:</label>
+                                <input type="password" value="" id="pwd">
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <input type="submit" value="envoyer" class="btn btn-sm green"/>
+                            <input type="reset" value="Reset" class="btn btn-sm gray"/>
+                            <button class="btn btn-default mt-ladda-btn ladda-button modal-spinner hidden"
+                                    data-style="zoom-in" data-spinner-color="#333">
+                                <span class="ladda-label">traitement en cours ...</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!--Confirm modal-->
+        <div id="modal-confirm" class="modal fade draggable-modal" tabindex="-1" data-backdrop="static"
+             data-keyboard="false">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close action-cancel" data-dismiss="modal"
+                                aria-hidden="true"></button>
+                        <h4 class="modal-title">Confirmation</h4>
+                    </div>
+                    <div class="modal-body">
+                        <p class="alerte-confirm"></p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" data-dismiss="modal" class="btn dark btn-outline action-cancel">Annuler
+                        </button>
+                        <button type="button" data-dismiss="modal" class="btn green action-confirm">Continuer</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- END MODAL-->
+    </div>
+    <!-- END SAMPLE TABLE PORTLET-->
+
 {% endblock content_body %}
+    {% block javascripts %}
+        {% javascripts "dashboard/assets/vente/offrePage.js"
+        'dashboard/assets/global/plugins/jcrop/js/jquery.Jcrop.js'
+        'dashboard/assets/pages/scripts/form-image-crop.js' %}
+        <script src="{{ asset_url }}" type="text/javascript"></script>
+        {% endjavascripts %}
+    {% endblock javascripts %}

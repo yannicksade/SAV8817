@@ -34,7 +34,7 @@ class TransactionController extends Controller
             $transactionsRecues = $user->getTransactionsRecues();
         }
 
-        return $this->render('APMVenteBundle:transaction:index.html.twig', array(
+        return $this->render('APMVenteBundle:transaction:index_old.html.twig', array(
             'transactionsEffectues' => $transactionsEffectues,
             'transactionsRecues' => $transactionsRecues,
             'boutique' => $boutique,

@@ -474,4 +474,14 @@ class Transaction extends TradeFactory
     {
         $this->shipped = $shipped;
     }
+
+    /**
+     * Get shipped
+     *
+     * @return boolean
+     */
+    public function getShipped()
+    {
+        return $this->shipped;
+    }
 }

@@ -28,7 +28,7 @@ class Livreur_boutiqueController extends Controller
         $livreurs_Empruntes = $boutique->getLivreurs();//livreurs étrangers: empruntés
         $livreurs_boutiques = $boutique->getLivreurBoutiques();//livreurs crées par la boutique
 
-        return $this->render('APMTransportBundle:livreur_boutique:index.html.twig', array(
+        return $this->render('APMTransportBundle:livreur_boutique:index_old.html.twig', array(
             'livreurs_boutiques' => $livreurs_boutiques,
             'livreurs_Empruntes' => $livreurs_Empruntes,
             'boutique' => $boutique,

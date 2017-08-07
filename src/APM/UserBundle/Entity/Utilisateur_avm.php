@@ -223,7 +223,7 @@ class Utilisateur_avm extends Utilisateur
     public function __construct()
     {
         parent::__construct();
-        $this->dateEnregistrement = new \DateTime();
+        $this->dateEnregistrement = new \DateTime("now");
         $this->roles = array('ROLE_USERAVM');
         $this->enabled = true;
         $this->code = "X" . CodeGenerator::getGenerator(6);

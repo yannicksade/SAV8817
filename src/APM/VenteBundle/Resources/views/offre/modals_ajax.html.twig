@@ -1,0 +1,171 @@
+    <ul class="nav nav-tabs">
+        <li class="data-content hidden modal-tab1 active">
+            <a href="#modal-tab_1" data-toggle="tab"> aperçus des fichiers </a>
+        </li>
+        <li class="data-content hidden">
+            <a href="#modal-tab_2" data-toggle="tab"> détail de l'offre </a>
+        </li>
+        <li class="data-content hidden">
+            <a href="#modal-tab_3" data-toggle="tab"> charger les images de l'offre </a>
+        </li>
+    </ul>
+    <div class="tab-content">
+        <div class="tab-pane data-content hidden active" id="modal-tab_1">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                <h4 class="modal-title">Images de l'offre</h4>
+                {% for i in 1..4 %}
+                    <div class="thumbnail inline-block margin-right-10">
+                        <a href="#image_{{ i }}" data-toggle="tab">
+                            <img width="50px" height="50px"
+                                 src="{{ asset('dashboard/assets/entity/images/yann.jpg') }}" alt=""
+                                 class="image-preview img-responsive"/>
+                        </a>
+                        <div class="caption"><strong>#image{{ i }}</strong>
+                            <a><i class="fa fa-trash-o"></i></a>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+            <div class="modal-body tab-content">
+                <div class="tab-pane" id='image_1'>
+                    <img src="{{ asset('dashboard/assets/entity/images/yann1.jpg') }}"
+                         alt="" class="image-preview img-responsive"/>
+                </div>
+                <div class="tab-pane" id='image_2'>
+                    <img src="{{ asset('dashboard/assets/entity/images/yann2.jpg') }}"
+                         alt="" class="image-preview img-responsive"/>
+                </div>
+                <div class="tab-pane" id='image_3'>
+                    <img src="{{ asset('dashboard/assets/entity/images/yann3.png') }}"
+                         alt="" class="image-preview img-responsive"/>
+                </div>
+                <div class="tab-pane" id='image_4'>
+                    <img src="{{ asset('dashboard/assets/entity/images/yann2.jpg') }}"
+                         alt="" class="image-preview img-responsive"/>
+                </div>
+            </div>
+        </div>
+        <div class="tab-pane data-content hidden" id="modal-tab_2">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                <h4 class="modal-title"> Aperçu de la sélection </h4>
+            </div>
+            <div class="modal-body">
+                <table>
+                    <tbody>
+                    <tr>
+                        <th><input type="hidden" class="id"/>Code</th>
+                        <td class="code"></td>
+                    </tr>
+                    <tr>
+                        <th>Vendeur</th>
+                        <td class="hidden vendeurID"></td>
+                        <td class="vendeur"></td>
+                    </tr>
+
+                    <tr>
+                        <th>Catégorie</th>
+                        <td class="hidden categorieID"></td>
+                        <td class="categorie"></td>
+                    </tr>
+                    <tr>
+                        <th>Boutique</th>
+                        <td class="hidden boutiqueID"></td>
+                        <td class="boutique"><i>Free lance</i></td>
+                    </tr>
+                    <tr>
+                        <th>Date de mise à jour</th>
+                        <td class="date"></td>
+                    </tr>
+                    <tr>
+                        <th>Date de création</th>
+                        <td class="dateCreation"></td>
+                    </tr>
+                    <tr>
+                        <th>Date d'expiration</th>
+                        <td class="dateExpiration"></td>
+                    </tr>
+                    <tr>
+                        <th>Designation</th>
+                        <td class="designation"></td>
+                    </tr>
+                    <tr>
+                        <th>Retourne</th>
+                        <td class="retourne"></td>
+                    </tr>
+                    <tr>
+                        <th>Etat</th>
+                        <td class="hidden etatID"></td>
+                        <td class="etat"></td>
+                    </tr>
+                    <tr>
+                        <th>Rémise</th>
+                        <td class="remise"></td>
+                    </tr>
+                    <tr>
+                        <th>Mode de vente</th>
+                        <td class="hidden modeVenteID"></td>
+                        <td class="modeVente"></td>
+                    </tr>
+                    <tr>
+                        <th>Numero de série</th>
+                        <td class="numeroDeSerie"></td>
+                    </tr>
+
+                    <tr>
+                        <th>Prix de l'unité</th>
+                        <td class="prix"></td>
+                    </tr>
+                    <tr>
+                        <th>Quantite</th>
+                        <td class="quantite"></td>
+                    </tr>
+                    <tr>
+                        <th>Evaluation</th>
+                        <td class="rate"></td>
+                    </tr>
+                    <tr>
+                        <th>Typeoffre</th>
+                        <td class="type"></td>
+                    </tr>
+                    <tr>
+                        <th>Description</th>
+                        <td class="desc"></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <a class="btn green pull-left" data-dismiss="modal"> OK </a>
+                <a class="btn btn-outline blue btn-sm blue edit_item" data-dismiss="modal"><i
+                            class="fa fa-edit"></i> Modifier </a>
+                <a class="btn btn-outline red btn-sm red delete_item" data-dismiss="modal"><i
+                            class="fa fa-trash-o"></i> Supprimer </a>
+            </div>
+        </div>
+        <div class="tab-pane data-content hidden" id="modal-tab_3">
+            <div class="modal-body">
+                <div class="">
+                    <img src="{{ asset('dashboard/assets/entity/images/yann1.jpg') }}" alt=""
+                         id="demo3"/>
+                </div>
+                <div id="preview-pane">
+                    <div class="preview-container">
+                        <img src="{{ asset('dashboard/assets/entity/images/yann1.jpg') }}"
+                             alt=""
+                             class="jcrop-preview"/>
+                    </div>
+                </div>
+                <input type="hidden" id="crop_x" name="x"/>
+                <input type="hidden" id="crop_y" name="y"/>
+                <input type="hidden" id="crop_w" name="w"/>
+                <input type="hidden" id="crop_h" name="h"/>
+            </div>
+            <div class="modal-footer">
+                <input class="pull-left" type="file" value="choisir le fichier"/>
+                <input type="submit" value="Crop Image" class="btn btn-sm green"/>
+            </div>
+        </div>
+    </div>
+</div>

@@ -36,7 +36,7 @@ class LivraisonController extends Controller
             $user = $this->getUser();
             $livraisons = $user->getLivraisons();
         }
-        return $this->render('APMTransportBundle:livraison:index.html.twig', array(
+        return $this->render('APMTransportBundle:livraison:index_old.html.twig', array(
             'livraisons' => $livraisons,
             'boutique' => $boutique,
         ));
@@ -82,7 +82,7 @@ class LivraisonController extends Controller
         $em = $this->getDoctrine()->getManager();
         $livraisons = $em->getRepository('APMTransportBundle:Livraison')->findBy([$name => $value], ['orderBy' => 'DESC']);
 
-        return $this->render('APMTransportBundle:livraison:index.html.twig', array(
+        return $this->render('APMTransportBundle:livraison:index_old.html.twig', array(
             'livraisons' => $livraisons,
             'boutique' => $boutique,
         ));
@@ -93,7 +93,7 @@ class LivraisonController extends Controller
         $boutique = $livraison->getBoutique();
         $transactionsEffectues = $livraison->getOperations();
         $transactionsRecues = null;
-        return $this->render('APMVenteBundle:transaction:index.html.twig', array(
+        return $this->render('APMVenteBundle:transaction:index_old.html.twig', array(
             'transactionsEffectues' => $transactionsEffectues,
             'transactionsRecues' => $transactionsRecues,
             'boutique' => $boutique,

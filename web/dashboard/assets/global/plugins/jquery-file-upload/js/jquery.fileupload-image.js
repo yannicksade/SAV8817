@@ -77,7 +77,7 @@
         {
             action: 'saveImage',
             quality: '@imageQuality',
-            type: '@imageType',
+            type: '@ImageType',
             disabled: '@disableImageResize'
         },
         {

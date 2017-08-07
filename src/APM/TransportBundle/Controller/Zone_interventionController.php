@@ -24,7 +24,7 @@ class Zone_interventionController extends Controller
         $em = $this->getDoctrine()->getManager();
         $AllZones = $em->getRepository('APMTransportBundle:Zone_intervention')->findAll();
 
-        return $this->render('APMTransportBundle:zone_intervention:index.html.twig', array(
+        return $this->render('APMTransportBundle:zone_intervention:index_old.html.twig', array(
             'zoneInterventions' => $AllZones,
             'zoneInterventionsCreees' => null,
             'transporteur' => null,

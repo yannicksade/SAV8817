@@ -26,7 +26,7 @@ class BoutiqueController extends Controller
         $user = $this->getUser();
         $boutiques = $user->getBoutiquesProprietaire();
         $boutiquesGerant = $user->getBoutiquesGerant();
-        return $this->render('APMVenteBundle:boutique:index.html.twig', array(
+        return $this->render('APMVenteBundle:boutique:index_old.html.twig', array(
             'boutiquesProprietaire' => $boutiques,
             'boutiquesGerant' => $boutiquesGerant,
             'url_image' => $this->get('apm_core.packages_maker')->getPackages()->getUrl('/', 'resolve_img'),
@@ -60,7 +60,7 @@ class BoutiqueController extends Controller
         } else {
             $boutiques = $em->getRepository('APMVenteBundle:Boutique')->findAll();
         }
-        return $this->render('APMVenteBundle:boutique:index.html.twig', array(
+        return $this->render('APMVenteBundle:boutique:index_old.html.twig', array(
             'boutiquesProprietaire' => $boutiques,
             'boutiquesGerant' => null,
             'url_image' => $this->get('apm_core.packages_maker')->getPackages()->getUrl('/', 'resolve_img'),

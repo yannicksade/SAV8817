@@ -63,7 +63,7 @@ class Transaction_produitController extends Controller
                 );
             }
         }
-        return $this->render('APMVenteBundle:transaction_produit:index.html.twig', array(
+        return $this->render('APMVenteBundle:transaction_produit:index_old.html.twig', array(
             'transactionsEffectues' => $transactionsEffectues,
             'transactionsRecues' => $transactionsRecues,
             'boutique' => $boutique,
@@ -132,7 +132,7 @@ class Transaction_produitController extends Controller
         if ($offres) $anOffer = $offres[0];
         if ($anOffer) $vendeur = $anOffer->getVendeur();
         $boutique = $transaction->getBoutique();
-        return $this->render('APMVenteBundle:offre:index.html.twig', array(
+        return $this->render('APMVenteBundle:offre:index_old.html.twig', array(
             'offres' => $offres,
             'boutique' => $boutique,
             'categorie' => $categorie,

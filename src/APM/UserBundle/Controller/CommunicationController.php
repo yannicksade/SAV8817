@@ -25,7 +25,7 @@ class CommunicationController extends Controller
         $user = $this->getUser();
         $communicationsSent = $user->getEmetteurCommunications();
         $communicationsReceived = $user->getRecepteurCommunications();
-        return $this->render('APMUserBundle:communication:index.html.twig', array(
+        return $this->render('APMUserBundle:communication:index_old.html.twig', array(
             'communicationsSent' => $communicationsSent,
             'communicationsReceived' => $communicationsReceived,
         ));

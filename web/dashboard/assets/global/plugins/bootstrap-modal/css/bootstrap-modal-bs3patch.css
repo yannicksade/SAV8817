@@ -15,21 +15,25 @@ body.modal-open,
 }
 
 .modal {
-    left: 50%;
+    margin-top: 1% !important;
+    top: 0 !important;
+    left: 2%;
     bottom: auto;
     right: auto;
-    padding: 0;
-    width: 500px;
-    margin-left: -250px;
+    padding: 0.5%;
+    max-width: 85%;
     background-color: #ffffff;
-    border: 1px solid #999999;
     border: 1px solid rgba(0, 0, 0, 0.2);
     border-radius: 6px;
-    -webkit-box-shadow: 0 3px 9px rgba(0, 0, 0, 0.5);
-    box-shadow: 0 3px 9px rgba(0, 0, 0, 0.5);
-    background-clip: padding-box;
+
 }
 
 .modal.container {
     max-width: none;
+}
+
+@media (max-width: 979px) {
+    .modal {
+        max-width: 100%;
+    }
 }

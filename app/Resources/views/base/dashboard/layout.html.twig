@@ -46,7 +46,8 @@ License: You must have a valid license purchased only from themeforest(the above
     "dashboard/assets/global/plugins/jquery-notific8/jquery.notific8.min.css"
     "dashboard/assets/global/plugins/select2/css/select2.min.css"
     "dashboard/assets/global/plugins/select2/css/select2-bootstrap.min.css"
-    "dashboard/assets/global/plugins/bootstrap-datetimepicker/css/bootstrap-datetimepicker.min.css" filter='cssrewrite' %}
+    "dashboard/assets/global/plugins/bootstrap-datetimepicker/css/bootstrap-datetimepicker.min.css"
+    "dashboard/assets/global/plugins/ladda/ladda-themeless.min.css" filter='cssrewrite' %}
     <link rel="stylesheet" href="{{ asset_url }}" type="text/css">
     {% endstylesheets %}
 
@@ -69,9 +70,6 @@ License: You must have a valid license purchased only from themeforest(the above
     <link href="{{ asset_url }}" rel="stylesheet" type="text/css" id="style_color"/>
     {% endstylesheets %}
     {% block custom_stylesheets %}
-        {% stylesheets "dashboard/assets/layouts/layout/css/custom.min.css" filter='cssrewrite' %}
-        <link href="{{ asset_url }}" rel="stylesheet" type="text/css"/>
-        {% endstylesheets %}
     {% endblock custom_stylesheets %}
 
     <!-- END THEME LAYOUT STYLES -->
@@ -546,7 +544,7 @@ License: You must have a valid license purchased only from themeforest(the above
                         <li class="dropdown dropdown-hoverable dropdown-user">
                             <a href="{{ path('fos_user_profile_show') }}" class="dropdown-toggle">
                                 {% if url_image is defined %}
-                                    <img alt="photo" class="img-responsive"
+                                    <img alt="photo" class="img-circle"
                                          src="{{ asset( url_image ~ app.user.image) }}"/>
                                 {% endif %}
                                 <span class="username username-hide-on-mobile">{{ app.user }} </span>
@@ -660,7 +658,7 @@ License: You must have a valid license purchased only from themeforest(the above
                         <li class="nav-item start ">
                             <a href="javascript:;" class="nav-link nav-toggle">
                                 <i class="icon-home"></i>
-                                <span class="title">Achat</span>
+                                <span class="title">Service Achat</span>
                                 <span class="arrow"></span>
                             </a>
                             <ul class="sub-menu">
@@ -688,43 +686,43 @@ License: You must have a valid license purchased only from themeforest(the above
                             </ul>
                         </li>
                         <li class="heading">
-                            <h3 class="uppercase">Features</h3>
+                            <h3 class="uppercase">Vente</h3>
                         </li>
                         <li class="nav-item  ">
                             <a href="javascript:;" class="nav-link nav-toggle">
                                 <i class="icon-diamond"></i>
-                                <span class="title">UI Features</span>
+                                <span class="title">Service Vente</span>
                                 <span class="arrow"></span>
                             </a>
                             <ul class="sub-menu">
                                 <li class="nav-item  ">
-                                    <a href="ui_metronic_grid.html" class="nav-link ">
-                                        <span class="title">Metronic Grid System</span>
+                                    <a href="{{ path('apm_vente_offre_index') }}" class="nav-link ">
+                                        <span class="title">Offre</span>
                                     </a>
                                 </li>
                                 <li class="nav-item  ">
-                                    <a href="ui_colors.html" class="nav-link ">
-                                        <span class="title">Color Library</span>
+                                    <a  href="#" class="nav-link ">
+                                        <span class="title">Catégorisation</span>
                                     </a>
                                 </li>
                                 <li class="nav-item  ">
-                                    <a href="ui_general.html" class="nav-link ">
-                                        <span class="title">General Components</span>
+                                    <a href="{{ path('apm_vente_boutique_index') }}" class="nav-link ">
+                                        <span class="title">Boutique</span>
                                     </a>
                                 </li>
                                 <li class="nav-item  ">
-                                    <a href="ui_buttons.html" class="nav-link ">
-                                        <span class="title">Buttons</span>
+                                    <a href="#" class="nav-link ">
+                                        <span class="title">Rémise</span>
                                     </a>
                                 </li>
                                 <li class="nav-item  ">
-                                    <a href="ui_buttons_spinner.html" class="nav-link ">
-                                        <span class="title">Spinner Buttons</span>
+                                    <a href="#" class="nav-link ">
+                                        <span class="title">Rabais offert</span>
                                     </a>
                                 </li>
                                 <li class="nav-item  ">
                                     <a href="ui_confirmations.html" class="nav-link ">
-                                        <span class="title">Popover Confirmations</span>
+                                        <span class="title">Transactions</span>
                                     </a>
                                 </li>
                                 <li class="nav-item  ">
@@ -2363,7 +2361,9 @@ License: You must have a valid license purchased only from themeforest(the above
     "dashboard/assets/global/plugins/bootstrap-modal/js/bootstrap-modalmanager.js"
     "dashboard/assets/global/plugins/bootstrap-modal/js/bootstrap-modal.js"
     'dashboard/assets/global/plugins/jquery-notific8/jquery.notific8.min.js'
-    'dashboard/assets/global/plugins/bootstrap-growl/jquery.bootstrap-growl.min.js'%}
+    'dashboard/assets/global/plugins/bootstrap-growl/jquery.bootstrap-growl.min.js'
+    'dashboard/assets/global/plugins/ladda/spin.min.js'
+    'dashboard/assets/global/plugins/ladda/ladda.min.js' %}
     <script src="{{ asset_url }}" type="text/javascript"></script>
     {% endjavascripts %}
     <!-- END PAGE LEVEL PLUGINS -->
@@ -2381,13 +2381,15 @@ License: You must have a valid license purchased only from themeforest(the above
     <script src="{{ asset_url }}" type="text/javascript"></script>
     {% endjavascripts %}
 
-    {#'dashboard/assets/pages/scripts/table-datatables-managed.js'#}
+    {#'dashboard/assets/pages/scripts/ui-extended-modals.js'#}
     <!-- BEGIN PAGE LEVEL SCRIPTS -->
-    {% javascripts 'dashboard/assets/pages/scripts/components-date-time-pickers.min.js'
+    {% javascripts 'dashboard/assets/pages/scripts/ui-extended-modals.js'
+    'dashboard/assets/pages/scripts/components-date-time-pickers.min.js'
     'dashboard/assets/pages/scripts/table-datatables-ajax.js'
     'dashboard/assets/pages/scripts/ui-notific8.js'
     'dashboard/assets/pages/scripts/components-select2.js'
-    'dashboard/assets/pages/scripts/ui-extended-modals.js'%}
+    'dashboard/assets/pages/scripts/ui-extended-modals.js'
+    'dashboard/assets/pages/scripts/ui-buttons-spinners.js'%}
     <script src="{{ asset_url }}" type="text/javascript"></script>
     {% endjavascripts %}
     <!-- END PAGE LEVEL SCRIPTS -->

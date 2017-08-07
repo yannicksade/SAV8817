@@ -37,7 +37,7 @@ class Conseiller_boutiqueController extends Controller
             foreach ($conseiller_boutiques as $conseiller_boutique) {
                 $boutiques [] = $conseiller_boutique->getBoutique();
             }
-            return $this->render('APMVenteBundle:boutique:index.html.twig', array(
+            return $this->render('APMVenteBundle:boutique:index_old.html.twig', array(
                 'boutiquesProprietaire' => $boutiques,
                 'boutiquesGerant' => null,
             ));
@@ -48,7 +48,7 @@ class Conseiller_boutiqueController extends Controller
             foreach ($boutique_conseillers as $boutique_conseiller) {
                 $conseillers [] = $boutique_conseiller->getConseiller();
             }
-            return $this->render('APMMarketingDistribueBundle:conseiller:index.html.twig', array(
+            return $this->render('APMMarketingDistribueBundle:conseiller:index_old.html.twig', array(
                 'conseillers' => $conseillers,
                 'boutique' => $boutique,
             ));

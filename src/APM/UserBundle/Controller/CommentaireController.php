@@ -49,7 +49,7 @@ class CommentaireController extends Controller
             }
         }
 
-        return $this->render('APMUserBundle:commentaire:index.html.twig', array(
+        return $this->render('APMUserBundle:commentaire:index_old.html.twig', array(
             'commentaires' => $commentaires,
             'offre' => $offre,
         ));

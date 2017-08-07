@@ -27,7 +27,7 @@ class UtilisateurAvmController extends Controller
 
         $allUsersAvm = $this->getEM()->getRepository('APMUserBundle:Utilisateur_avm')->findAll();
 
-        return $this->render('APMAdminBundle:Utilisateur_AVM:index.html.twig', [
+        return $this->render('APMAdminBundle:Utilisateur_AVM:index_old.html.twig', [
             'users' => $allUsersAvm,
             'form' => $form->createView()
         ]);

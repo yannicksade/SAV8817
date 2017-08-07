@@ -53,7 +53,7 @@ class Groupe_offreController extends Controller
         /** @var Utilisateur_avm $user */
         $user = $this->getUser();
         $groupe_offres = $user->getGroupesOffres();//liste
-        return $this->render('APMAchatBundle:groupe_offre:index.html.twig', array(
+        return $this->render('APMAchatBundle:groupe_offre:index_old.html.twig', array(
             'groupe_offres' => $groupe_offres,
             'form' => $form->createView(),
             'url_image' => $this->get('apm_core.packages_maker')->getPackages()->getUrl('/', 'resolve_img'),
@@ -113,7 +113,7 @@ class Groupe_offreController extends Controller
     public function listeOffresGroupeAction(Groupe_offre $groupe_offre)
     {
         $offres = $groupe_offre->getOffres();
-        return $this->render('APMVenteBundle:offre:index.html.twig', array(
+        return $this->render('APMVenteBundle:offre:index_old.html.twig', array(
             'offres' => $offres,
             'boutique' => null,
             'categorie' => null,

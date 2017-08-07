@@ -44,7 +44,7 @@ class RemiseController extends Controller
         }
         $boutique = null;
 
-        return $this->render('APMVenteBundle:remise:index.html.twig', [
+        return $this->render('APMVenteBundle:remise:index_old.html.twig', [
                 "offre_remises" => $offre_remises,
                 "offre" => $offre,
                 "boutique" => $boutique,
@@ -98,7 +98,7 @@ class RemiseController extends Controller
                 "offre" => $offre,);
         }
         $offre = null;
-        return $this->render('APMVenteBundle:remise:index.html.twig', [
+        return $this->render('APMVenteBundle:remise:index_old.html.twig', [
                 "offre_remises" => $offre_remises,
                 "boutique" => $boutique,
                 "offre" => $offre

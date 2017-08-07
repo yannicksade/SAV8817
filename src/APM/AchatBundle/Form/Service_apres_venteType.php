@@ -24,6 +24,10 @@ class Service_apres_venteType extends AbstractType
                 'mapped' => false,
                 'attr' => ['class' => 'id'],
             ])
+            ->add('code', TextType::class, [
+                'mapped' => false,
+                'attr' => ['class' => 'form-control code'],
+            ])
             ->add('etat', ChoiceType::class, [
                 'choices' => [
                     'En panne' => 0,
@@ -39,10 +43,7 @@ class Service_apres_venteType extends AbstractType
                 'attr' => ['class' => 'form-control select2 etat'],
                 'required'=> false,
             ])
-            ->add('code', TextType::class, [
-                'mapped' => false,
-                'attr' => ['class' => 'form-control code'],
-            ])
+
             ->add('offre', EntityType::class, [
                 'class' => 'APMVenteBundle:Offre',
                 'choice_name' => 'id',

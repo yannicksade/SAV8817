@@ -52,7 +52,7 @@ class Individu_to_groupeController extends Controller
             }
             //---------------------------------------------------------------------------------------------------------
         }
-        return $this->render('APMUserBundle:individu_to_groupe:index.html.twig', [
+        return $this->render('APMUserBundle:individu_to_groupe:index_old.html.twig', [
             'individu_to_groupes' => $individu_to_groupes,
                 'groupe' => $groupe_relationnel,
 
@@ -99,7 +99,7 @@ class Individu_to_groupeController extends Controller
         foreach ($individu_to_groupes as $individu_to_groupe) {
             $users [] = $individu_to_groupe->getIndividu();
         }
-        return $this->render('APMUserBundle:Utilisateur_avm:index.html.twig', array(
+        return $this->render('APMUserBundle:Utilisateur_avm:index_old.html.twig', array(
             'users' => $users,
             'groupe' => $groupe_relationnel,
         ));
@@ -118,7 +118,7 @@ class Individu_to_groupeController extends Controller
                     'groupe' => $individu_groupe->getGroupeRelationnel(),
                     'personnes' => $individu_groupe);
         }
-        return $this->render('APMUserBundle:individu_to_groupe:index.html.twig',
+        return $this->render('APMUserBundle:individu_to_groupe:index_old.html.twig',
             ['individu_to_groupes' => $individu_to_groupes]
         );
     }

@@ -33,7 +33,7 @@ class Specification_achatController extends Controller
             $specification_achats = $user->getSpecifications();
         }
 
-        return $this->render('APMAchatBundle:specification_achat:index.html.twig', array(
+        return $this->render('APMAchatBundle:specification_achat:index_old.html.twig', array(
             'specification_achats' => $specification_achats,
             'offre' => $offre,
         ));

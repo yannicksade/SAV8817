@@ -26,29 +26,17 @@ var GroupeOffrePage = function () {
         // var parent = $(elt).parents('.portlet').find('.modal-body');
         if (!$('table', modal_stk.modalElement).hasClass("hidden")) $('table', '.modal').addClass("hidden");
         if ($('.alerte', modal_stk.modalElement).hasClass('hidden')) $('.alerte', '.modal').removeClass("hidden");
-        $('.id', modal_stk.modalElement).val('');
-        $('.offreID', modal_stk.modalElement).text('');
-        $('.code', modal_stk.modalElement).text('');
-        $('.client', modal_stk.modalElement).text('');
-        $('.clientID', modal_stk.modalElement).text('');
-        $('.boutique', modal_stk.modalElement).text('');
-        $('.date', modal_stk.modalElement).text('');
-        $('.etatID', modal_stk.modalElement).text('');
-        $('.etat', modal_stk.modalElement).text('');
-        $('.comment', modal_stk.modalElement).val('');
-        $('.offre', modal_stk.modalElement).text('');
+        $('td', modal_stk.modalElement).text('');
     };
     var getCheckedBoxes = function (parent) {
         return $('input[type="checkbox"]:checked', parent);
     };
     var play = function (parent) {
         //var parent = $(e).parents('.portlet');
+        reinitializeModal();
         var cboxes = getCheckedBoxes(parent);
         var nb = cboxes.length;
-        if (cboxes === undefined || nb === 0) {
-            reinitializeModal();
-            return;
-        }
+        if (cboxes === undefined || nb === 0)return;
         for (var i = 0; i < nb; i++) {
             var elt = cboxes[i];
             setTimeout(function () {
@@ -105,14 +93,7 @@ var GroupeOffrePage = function () {
         $('input[type="reset"]').click(function () {
             var p = $(this).parent();
             uncheckBoxes(p); //p= form
-            $('.id', p).val("");
-            $('.code', p).val("");
-            $('.boutique', p).val("");
-            $('.desc', p).val("");
-            $('.offre', p).val("");
-            $('.etat', p).val("");
-            if($('.clientID', p) !== null)$('.clientID', p).val('');
-            if($('.comment', p) !== null)$('.comment', p).val('');
+            $('input[type="text"]', p).val('');
         });
     };
     var afficherImpl = function (parent) {

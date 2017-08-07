@@ -4,7 +4,7 @@ var UIModals = function () {
         $("#draggable").draggable({
             handle: ".modal-header"
         });
-    }
+    };
 
     return {
         //main function to initiate the module

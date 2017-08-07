@@ -9,12 +9,10 @@ use APM\VenteBundle\Entity\Boutique;
 use APM\VenteBundle\Entity\Offre;
 use APM\VenteBundle\Entity\Transaction_produit;
 use Doctrine\Common\Collections\Collection;
-use Doctrine\DBAL\Driver\SQLAnywhere\SQLAnywhereException;
 use Doctrine\DBAL\Exception\ConstraintViolationException;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use SebastianBergmann\CodeCoverage\RuntimeException;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
@@ -47,7 +45,7 @@ class Service_apres_venteController extends Controller
                     //autorisation d'accès
                     //***---double vérification à l'aide du code ---
                     if ($data['code'] !== $service_apres_vente->getCode()) {
-                        $session->getFlashBag()->add('danger', "Vous n'êtes pas autorisé à effectuer cette opération: <br>Vous devez au préalable achêté le produit sur la plateforme!");
+                        $session->getFlashBag()->add('danger', "pération! <br>Vous devez au préalable achêté l'offre sur la plateforme!");
                         return $this->json(json_encode(["item" => null]));
                     }
                     //***-----------------------------------------
@@ -59,13 +57,13 @@ class Service_apres_venteController extends Controller
                     $commentaire = "undefined";
                     $etat = "undefined";
                     if ($client === $user) {//auteur -> faire les mises à jour d'attributs ici
-                        $description = $data['descriptionPanne'];
-                        if ($service_apres_vente->getDescriptionPanne() !== $description) $service_apres_vente->setDescriptionPanne($description);
+                        $desc = $data['descriptionPanne'];
+                        if ($service_apres_vente->getDescriptionPanne() !== $desc) { $description = $desc; $service_apres_vente->setDescriptionPanne($description);}
                     } else {// destinataire -> faire les mises à jour d'attributs ici
-                        $commentaire = $data['commentaire'];
-                        if ($service_apres_vente->getCommentaire() !== $commentaire) $service_apres_vente->setCommentaire($commentaire);
-                        $etat = $data['etat'];
-                        if ($service_apres_vente->getEtat() !== $etat) $service_apres_vente->setEtat($etat);
+                        $comment = $data['commentaire'];
+                        if ($service_apres_vente->getCommentaire() !== $comment){ $commentaire = $comment; $service_apres_vente->setCommentaire($commentaire);}
+                        $e = $data['etat'];
+                        if ($service_apres_vente->getEtat() !== $e) {$etat = $e; $service_apres_vente->setEtat($etat);}
                     }
                     //----------------------------------------------------------------------------------------
                     //-------- prepareration de la reponse du client ----
@@ -119,7 +117,7 @@ class Service_apres_venteController extends Controller
                             $session->getFlashBag()->add('success', "<strong> Soumission de votre requête, référence:" . $service_apres_vente->getCode() . "</strong><br>Opération effectuée avec succès!");
                             return $this->json(json_encode($json));
                         } else {
-                            $session->getFlashBag()->add('danger', "<strong>Produit non sélectionné.</strong> <br>Vous devez indiquer le produit!");
+                            $session->getFlashBag()->add('danger', "<strong>Produit non identifié.</strong> <br>Vous devez indiquer le produit!");
                             return $this->json(json_encode(["item" => null]));
                         }
                     }
@@ -132,7 +130,7 @@ class Service_apres_venteController extends Controller
                     $session->getFlashBag()->add('danger', "<strong>Echec de l'opération.</strong><br>L'enregistrement a échoué. bien vouloir réessayer plutard, svp!");
                     return $this->json(json_encode(["item" => null]));
                 } catch (AccessDeniedException $ads) {
-                    $session->getFlashBag()->add('danger', "<strong>Echec de l'opération. </strong><br>L'enregistrement a échoué dû à une contrainte de données!!");
+                    $session->getFlashBag()->add('danger', "<strong>Echec de l'opération. </strong><br>Vous devez avoir achetés l'offre sur WE-TRADE au préalable!!");
                     return $this->json(json_encode(["item" => null]));
                 }
             }
@@ -190,11 +188,10 @@ class Service_apres_venteController extends Controller
                     array("danger" => "Déclaré hors service"),//4
                     array("info" => "En observation"),//5
                     array("warning" => "Frais exigible"),//6
-                    array("danger" => "Demande rejeté"),//7
+                    array("danger" => "Demande rejetée"),//7
                     array("info" => "Problème soumis"),//8
                 );
 
-                $service_apres_ventes = null;
                 //-----Source -------
                 /** @var Utilisateur_avm $user */
                 $user = $this->getUser();
@@ -286,6 +283,8 @@ class Service_apres_venteController extends Controller
      */
     private function elementsFilter($services)
     {
+        if($services == null) return array();
+
         if ($this->affiliation_filter === 'P') {
             $services = $services->filter(function ($e) {//filtering per owner
                 /** @var Service_apres_vente $e */
@@ -407,13 +406,15 @@ class Service_apres_venteController extends Controller
 
         if ($offre) {
             $produit_transactions = $offre->getProduitTransactions();
-            /** @var Transaction_produit $produit_transaction */
-            foreach ($produit_transactions as $produit_transaction) {
-                $produit = $produit_transaction->getProduit();
-                $client = $produit_transaction->getTransaction()->getBeneficiaire();
-                if ($produit === $offre && $client === $this->getUser()) {
-                    $clientDeOffre = true;
-                    break;
+            if(null !== $produit_transactions) {
+                /** @var Transaction_produit $produit_transaction */
+                foreach ($produit_transactions as $produit_transaction) {
+                    $produit = $produit_transaction->getProduit();
+                    $client = $produit_transaction->getTransaction()->getBeneficiaire();
+                    if ($produit === $offre && $client === $this->getUser()) {
+                        $clientDeOffre = true;
+                        break;
+                    }
                 }
             }
             if (!$clientDeOffre) throw $this->createAccessDeniedException();

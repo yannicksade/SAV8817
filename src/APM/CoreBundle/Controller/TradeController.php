@@ -197,7 +197,7 @@ class TradeController extends Controller
         $this->getEM()->flush();
 
         $liste_boutiques = $this->getEM()->getRepository('APMVenteBundle:Boutique')->findAll();
-        return $this->render('APMVenteBundle:boutique:index.html.twig', array(
+        return $this->render('APMVenteBundle:boutique:index_old.html.twig', array(
             'boutiques' => $liste_boutiques
         ));
     }
@@ -208,7 +208,7 @@ class TradeController extends Controller
         $this->getEM()->flush();
 
         $liste_boutiques = $this->getEM()->getRepository('APMVenteBundle:Boutique')->findAll();
-        return $this->render('APMVenteBundle:boutique:index.html.twig', array(
+        return $this->render('APMVenteBundle:boutique:index_old.html.twig', array(
             'boutiques' => $liste_boutiques
         ));
     }
@@ -225,7 +225,7 @@ class TradeController extends Controller
         $this->getEM()->flush();
 
         $liste_categories = $boutique->getCategories();
-        return $this->render('APMVenteBundle:categorie:index.html.twig', array(
+        return $this->render('APMVenteBundle:categorie:index_old.html.twig', array(
             'categories' => $liste_categories
         ));
     }
@@ -242,7 +242,7 @@ class TradeController extends Controller
         $this->getEM()->flush();
 
         $liste_categories = $boutique->getCategories();
-        return $this->render('APMVenteBundle:categorie:index.html.twig', array(
+        return $this->render('APMVenteBundle:categorie:index_old.html.twig', array(
             'categories' => $liste_categories
         ));
     }
@@ -268,7 +268,7 @@ class TradeController extends Controller
             $em = $this->getEM();
             $em->flush();
             $liste_offres = $utilisateur->getUtilisateurOffres();
-            return $this->render('APMVenteBundle:offre:index.html.twig', array(
+            return $this->render('APMVenteBundle:offre:index_old.html.twig', array(
                 'offres' => $liste_offres
             ));
         }
@@ -300,7 +300,7 @@ class TradeController extends Controller
             $em = $this->getEM();
             $em->flush();
             $liste_offres = $utilisateur->getUtilisateurOffres();
-            return $this->render('APMVenteBundle:offre:index.html.twig', array(
+            return $this->render('APMVenteBundle:offre:index_old.html.twig', array(
                 'offres' => $liste_offres
             ));
             // }

@@ -23,7 +23,7 @@ class Reseau_conseillersController extends Controller
             $user = $this->getUser();
             $conseiller = $user->getProfileConseiller();
         }
-        return $this->render('APMMarketingReseauBundle:reseau_conseillers:index.html.twig', array(
+        return $this->render('APMMarketingReseauBundle:reseau_conseillers:index_old.html.twig', array(
             'conseiller' => $conseiller,
         ));
     }

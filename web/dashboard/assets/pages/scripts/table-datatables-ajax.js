@@ -68,8 +68,7 @@ var TableDatatablesAjax = function () {
                 },
                 "ordering": false,
                 "order": [],// set first column as a default sort by asc
-                "loadingRecords": "Loading...",
-                "processing":     "Processing..."
+                "processing":     "En cours..."
             }
         });
 
@@ -166,7 +165,7 @@ var TableDatatablesAjax = function () {
                 },
                 "ordering": false,
                 "order": [],// set first column as a default sort by asc
-                "loadingRecords": "Loading...",
+                //"loadingRecords": "Loading...",
                 "processing":     "Processing..."
             }
         });

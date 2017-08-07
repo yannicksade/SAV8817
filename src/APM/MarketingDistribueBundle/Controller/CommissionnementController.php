@@ -60,7 +60,7 @@ class CommissionnementController extends Controller
             }
         }
 
-        return $this->render('APMMarketingDistribueBundle:commissionnement:index.html.twig', array(
+        return $this->render('APMMarketingDistribueBundle:commissionnement:index_old.html.twig', array(
             'boutiques_commissionnements' => $boutiques_commissionnements,
         ));
     }

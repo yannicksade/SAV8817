@@ -42,7 +42,7 @@ class Transporteur_zoneInterventionController extends Controller
         foreach ($transporteurZones as $transporteurZone) {
             $zoneInterventions [] = $transporteurZone->getZoneIntervention();
         }
-        return $this->render('APMTransportBundle:zone_intervention:index.html.twig', array(
+        return $this->render('APMTransportBundle:zone_intervention:index_old.html.twig', array(
                 'zoneInterventions' => $zoneInterventions,
                 'transporteur' => $transporteur,
                 'zoneInterventionsCreees' => $zoneInterventionsCreees,
@@ -76,7 +76,7 @@ class Transporteur_zoneInterventionController extends Controller
         foreach ($zoneTransporteurs as $zoneTransporteur) {
             $transporteurs [] = $zoneTransporteur->getTransporteur();
         }
-        return $this->render('APMTransportBundle:profile_transporteur:index.html.twig', array(
+        return $this->render('APMTransportBundle:profile_transporteur:index_old.html.twig', array(
                 'profile_transporteurs' => $transporteurs,
                 'zone' => $zone_intervention,
             )

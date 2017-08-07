@@ -36,13 +36,6 @@ class Offre extends TradeFactory
     private $code;
 
     /**
-     * @var boolean
-     * @Assert\Choice({0,1})
-     * @ORM\Column(name="Garantie", type="boolean", nullable=true)
-     */
-    private $garantie;
-
-    /**
      * @var string
      * @Assert\Url
      * @ORM\Column(name="dataSheet", type="string", length=255, nullable=true)
@@ -50,14 +43,14 @@ class Offre extends TradeFactory
     private $dataSheet;
 
     /**
-     * @var DateTime
+     * @var \DateTime
      * @Assert\DateTime
      * @ORM\Column(name="dateCreation", type="datetime", nullable=true)
      */
     private $dateCreation;
 
     /**
-     * @var DateTime
+     * @var \DateTime
      * @Assert\DateTime
      * @ORM\Column(name="dateExpiration", type="datetime", nullable=true)
      */
@@ -79,11 +72,10 @@ class Offre extends TradeFactory
     private $designation;
 
     /**
-     * @var \DateTime
-     * @Assert\DateTime
-     * @ORM\Column(name="dateFinGarantie", type="datetime", nullable=true)
+     * @var integer
+     * @ORM\Column(name="dureeGarantie", nullable=false)
      */
-    private $dateFinGarantie;
+    private $dureeGarantie;
 
     /**
      * @var boolean
@@ -99,11 +91,17 @@ class Offre extends TradeFactory
      */
     private $unite;
     /**
-     * @var string
-     * @Assert\Choice({0,1})
-     * @ORM\Column(name="etat", type="string", length=255, nullable=true)
+     * @var integer
+     * @Assert\Choice()
+     * @ORM\Column(name="etat",nullable=false)
      */
     private $etat;
+
+    /**
+     * @var boolean
+     * @ORM\Column(name="apparenceNeuf", nullable=false)
+     */
+    private $apparenceNeuf;
 
     /**
      * @var string
@@ -124,33 +122,32 @@ class Offre extends TradeFactory
      */
     private $updatedAt;
     /**
-     * @var string
+     * @var integer
      * @Assert\Choice({0,1,2,3})
-     * @ORM\Column(name="modeVente", type="string", length=255, nullable=true)
+     * @ORM\Column(name="modeVente", nullable=false)
      */
     private $modeVente;
     /**
      * @var string
-     * @Assert\Issn
-     * @ORM\Column(name="numeroDeSerie", type="string", length=255, nullable=true)
+     * @Assert\length(min=2, max=254)
+     * @ORM\Column(name="modelDeSerie", type="string", length=255, nullable=true)
      */
-    private $numeroDeSerie;
+    private $modelDeSerie;
     /**
-     * @var string
-     *
-     * @ORM\Column(name="prixUnitaire", type="decimal", nullable=true)
+     * @var decimal
+     * @ORM\Column(name="prixUnitaire", nullable=true)
      */
     private $prixUnitaire;
     /**
      * @var integer
      * @Assert\GreaterThan(0)
-     * @ORM\Column(name="quantite", type="integer", nullable=true)
+     * @ORM\Column(name="quantite", nullable=true)
      */
     private $quantite;
     /**
      * @var integer
      * @Assert\Range(min=0)
-     * @ORM\Column(name="credit", type="integer", nullable=true)
+     * @ORM\Column(name="credit", nullable=true)
      */
     private $credit;
     /**
@@ -159,40 +156,28 @@ class Offre extends TradeFactory
      * @ORM\Column(name="rateEvaluation", type="smallint", nullable=true)
      */
     private $evaluation;
+
     /**
-     * @var string
-     * @Assert\Length(min=2, max=254)
-     * @ORM\Column(name="reference", type="string", length=255, nullable=true)
-     */
-    private $reference;
-    /**
-     * @var string
+     * @var decimal
      *
-     * @ORM\Column(name="remiseProduit", type="decimal", nullable=true)
+     * @ORM\Column(name="remiseProduit", nullable=true)
      */
     private $remiseProduit;
     /**
      * @var string
      * @Assert\Choice({0,1,2})
-     * @ORM\Column(name="typeOffre", type="string", length=255, nullable=true)
+     * @ORM\Column(name="typeOffre", type="string", length=255, nullable=false)
      */
     private $typeOffre;
     /**
      * @var boolean
-     * @Assert\Choice({0,1})
      * @ORM\Column(name="valide", type="boolean", nullable=true)
      */
     private $valide;
+
     /**
      * @var boolean
-     * @Assert\Choice({0,1})
-     * @ORM\Column(name="disponibleEnStock", type="boolean", nullable=true)
-     */
-    private $disponibleEnStock;
-    /**
-     * @var boolean
-     * @Assert\Choice({0,1})
-     * @ORM\Column(name="publiable", type="boolean", nullable=true)
+     * @ORM\Column(name="publiable", nullable=true)
      */
     private $publiable;
     /**
@@ -287,6 +272,7 @@ class Offre extends TradeFactory
         $this->specifications = new ArrayCollection();
         $this->communications = new ArrayCollection();
         $this->rabais = new ArrayCollection();
+        $this->dateCreation = new \DateTime('now');
     }
 
     public function getImageFile()
@@ -305,40 +291,6 @@ class Offre extends TradeFactory
             // if 'updatedAt' is not defined in your entity, use another property
             $this->updatedAt = new \DateTime('now');
         }
-    }
-
-    /**
-     * Get garantie
-     *
-     * @return boolean
-     */
-    public function isGarantie()
-    {
-        return $this->garantie;
-    }
-
-    /**
-     * Get garantie
-     *
-     * @return boolean
-     */
-    public function getGarantie()
-    {
-        return $this->garantie;
-    }
-
-    /**
-     * Set garantie
-     *
-     * @param boolean $garantie
-     *
-     * @return Offre
-     */
-    public function setGarantie($garantie)
-    {
-        $this->garantie = $garantie;
-
-        return $this;
     }
 
     /**
@@ -361,6 +313,7 @@ class Offre extends TradeFactory
     public function setDataSheet($dataSheet)
     {
         $this->dataSheet = $dataSheet;
+        $this->updatedAt = new \DateTime('now');
 
         return $this;
     }
@@ -368,7 +321,7 @@ class Offre extends TradeFactory
     /**
      * Get dateCreation
      *
-     * @return DateTime
+     * @return \DateTime
      */
     public function getDateCreation()
     {
@@ -385,14 +338,14 @@ class Offre extends TradeFactory
     public function setDateCreation($dateCreation)
     {
         $this->dateCreation = $dateCreation;
-
+        $this->updatedAt = new \DateTime('now');
         return $this;
     }
 
     /**
      * Get dateExpiration
      *
-     * @return DateTime
+     * @return \DateTime
      */
     public function getDateExpiration()
     {
@@ -409,7 +362,7 @@ class Offre extends TradeFactory
     public function setDateExpiration($dateExpiration)
     {
         $this->dateExpiration = $dateExpiration;
-
+        $this->updatedAt = new \DateTime('now');
         return $this;
     }
 
@@ -433,7 +386,7 @@ class Offre extends TradeFactory
     public function setDescription($description)
     {
         $this->description = $description;
-
+        $this->updatedAt = new \DateTime('now');
         return $this;
     }
 
@@ -457,31 +410,7 @@ class Offre extends TradeFactory
     public function setDesignation($designation)
     {
         $this->designation = $designation;
-
-        return $this;
-    }
-
-    /**
-     * Get dateGarantie
-     *
-     * @return \DateTime
-     */
-    public function getDateFinGarantie()
-    {
-        return $this->dateFinGarantie;
-    }
-
-    /**
-     * Set dateFinGarantie
-     *
-     * @param integer $dateFinGarantie
-     *
-     * @return Offre
-     */
-    public function setDateFinGarantie($dateFinGarantie)
-    {
-        $this->dateFinGarantie = $dateFinGarantie;
-
+        $this->updatedAt = new \DateTime('now');
         return $this;
     }
 
@@ -512,36 +441,13 @@ class Offre extends TradeFactory
      *
      * @return Offre
      */
-    public function setRetourne($estRetourne)
+    public function setRetourne($estRetourne = false)
     {
         $this->retourne = $estRetourne;
-
+        $this->updatedAt = new \DateTime('now');
         return $this;
     }
 
-    /**
-     * Get etat
-     *
-     * @return string
-     */
-    public function getEtat()
-    {
-        return $this->etat;
-    }
-
-    /**
-     * Set etat
-     *
-     * @param string $etat
-     *
-     * @return Offre
-     */
-    public function setEtat($etat)
-    {
-        $this->etat = $etat;
-
-        return $this;
-    }
 
     /**
      * Get image
@@ -570,7 +476,7 @@ class Offre extends TradeFactory
     /**
      * Get modeVente
      *
-     * @return string
+     * @return integer
      */
     public function getModeVente()
     {
@@ -580,38 +486,38 @@ class Offre extends TradeFactory
     /**
      * Set modeVente
      *
-     * @param string $modeVente
+     * @param integer $modeVente
      *
      * @return Offre
      */
-    public function setModeVente($modeVente)
+    public function setModeVente($modeVente = 0)
     {
         $this->modeVente = $modeVente;
-
+        $this->updatedAt = new \DateTime('now');
         return $this;
     }
 
     /**
-     * Get numeroDeSerie
+     * Get modelDeSerie
      *
      * @return string
      */
-    public function getNumeroDeSerie()
+    public function getModelDeSerie()
     {
-        return $this->numeroDeSerie;
+        return $this->modelDeSerie;
     }
 
     /**
-     * Set numeroDeSerie
+     * Set modelDeSerie
      *
-     * @param string $numeroDeSerie
+     * @param string $modelDeSerie
      *
      * @return Offre
      */
-    public function setNumeroDeSerie($numeroDeSerie)
+    public function setModelDeSerie($modelDeSerie)
     {
-        $this->numeroDeSerie = $numeroDeSerie;
-
+        $this->modelDeSerie = $modelDeSerie;
+        $this->updatedAt = new \DateTime('now');
         return $this;
     }
 
@@ -635,7 +541,7 @@ class Offre extends TradeFactory
     public function setPrixunitaire($prixUnitaire)
     {
         $this->prixUnitaire = $prixUnitaire;
-
+        $this->updatedAt = new \DateTime('now');
         return $this;
     }
 
@@ -659,7 +565,7 @@ class Offre extends TradeFactory
     public function setQuantite($quantite)
     {
         $this->quantite = $quantite;
-
+        $this->updatedAt = new \DateTime('now');
         return $this;
     }
 
@@ -683,31 +589,6 @@ class Offre extends TradeFactory
     public function setEvaluation($evaluation)
     {
         $this->evaluation = $evaluation;
-
-        return $this;
-    }
-
-    /**
-     * Get reference
-     *
-     * @return string
-     */
-    public function getReference()
-    {
-        return $this->reference;
-    }
-
-    /**
-     * Set reference
-     *
-     * @param string $reference
-     *
-     * @return Offre
-     */
-    public function setReference($reference)
-    {
-        $this->reference = $reference;
-
         return $this;
     }
 
@@ -731,7 +612,7 @@ class Offre extends TradeFactory
     public function setRemiseProduit($remiseProduit)
     {
         $this->remiseProduit = $remiseProduit;
-
+        $this->updatedAt = new \DateTime('now');
         return $this;
     }
 
@@ -748,14 +629,14 @@ class Offre extends TradeFactory
     /**
      * Set typeOffre
      *
-     * @param string $typeOffre
+     * @param int $typeOffre
      *
      * @return Offre
      */
-    public function setTypeOffre($typeOffre)
+    public function setTypeOffre($typeOffre = 0)
     {
         $this->typeOffre = $typeOffre;
-
+        $this->updatedAt = new \DateTime('now');
         return $this;
     }
 
@@ -786,10 +667,10 @@ class Offre extends TradeFactory
      *
      * @return Offre
      */
-    public function setValide($estValide)
+    public function setValide($estValide = true)
     {
         $this->valide = $estValide;
-
+        $this->updatedAt = new \DateTime('now');
         return $this;
     }
 
@@ -823,7 +704,7 @@ class Offre extends TradeFactory
     public function setCategorie(Categorie $categorie = null)
     {
         $this->categorie = $categorie;
-
+        if($categorie)$this->updatedAt = new \DateTime('now');
         return $this;
     }
 
@@ -848,7 +729,7 @@ class Offre extends TradeFactory
     public function setBoutique(Boutique $boutique = null)
     {
         $this->boutique = $boutique;
-
+       if($boutique) $this->updatedAt = new \DateTime('now');
         return $this;
     }
 
@@ -872,7 +753,7 @@ class Offre extends TradeFactory
     public function setVendeur(Utilisateur_avm $vendeur = null)
     {
         $this->vendeur = $vendeur;
-
+        if($vendeur)$this->updatedAt = new \DateTime('now');
         return $this;
     }
 
@@ -1013,31 +894,7 @@ class Offre extends TradeFactory
     public function setUnite($unite)
     {
         $this->unite = $unite;
-
-        return $this;
-    }
-
-    /**
-     * Get disponibleEnStock
-     *
-     * @return boolean
-     */
-    public function getDisponibleEnStock()
-    {
-        return $this->disponibleEnStock;
-    }
-
-    /**
-     * Set disponibleEnStock
-     *
-     * @param boolean $disponibleEnStock
-     *
-     * @return Offre
-     */
-    public function setDisponibleEnStock($disponibleEnStock)
-    {
-        $this->disponibleEnStock = $disponibleEnStock;
-
+        $this->updatedAt = new \DateTime('now');
         return $this;
     }
 
@@ -1058,10 +915,10 @@ class Offre extends TradeFactory
      *
      * @return Offre
      */
-    public function setPubliable($publiable)
+    public function setPubliable($publiable = false)
     {
         $this->publiable = $publiable;
-
+        $this->updatedAt = new \DateTime('now');
         return $this;
     }
 
@@ -1279,14 +1136,90 @@ class Offre extends TradeFactory
     /**
      * Set document
      *
-     * @param \APM\AnimationBundle\Entity\Base_documentaire $document
+     * @param Base_documentaire $document
      *
      * @return Offre
      */
-    public function setDocument(\APM\AnimationBundle\Entity\Base_documentaire $document = null)
+    public function setDocument(Base_documentaire $document = null)
     {
         $this->document = $document;
-
+        $this->updatedAt = new \DateTime('now');
         return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isApparenceNeuf()
+    {
+        return $this->apparenceNeuf;
+    }
+
+    /**
+     * @param bool $apparenceNeuf
+     *  @return Offre
+     */
+    public function setApparenceNeuf(bool $apparenceNeuf = true)
+    {
+        $this->apparenceNeuf = $apparenceNeuf;
+        $this->updatedAt = new \DateTime('now');
+        return $this;
+    }
+
+    /**
+     * Get apparenceNeuf
+     *
+     * @return boolean
+     */
+    public function getApparenceNeuf()
+    {
+        return $this->apparenceNeuf;
+    }
+
+    /**
+     * Set dureeGarantie
+     *
+     * @param integer $dureeGarantie
+     * @return Offre
+     */
+    public function setDureeGarantie($dureeGarantie = 0)
+    {
+        $this->dureeGarantie = $dureeGarantie;
+        $this->updatedAt = new \DateTime('now');
+        return $this;
+    }
+
+    /**
+     * Get dureeGarantie
+     *
+     * @return integer
+     */
+    public function getDureeGarantie()
+    {
+        return $this->dureeGarantie;
+    }
+
+    /**
+     * Set etat
+     *
+     * @param integer $etat
+     *
+     * @return Offre
+     */
+    public function setEtat($etat = 0)
+    {
+        $this->etat = $etat;
+        $this->updatedAt = new \DateTime('now');
+        return $this;
+    }
+
+    /**
+     * Get etat
+     *
+     * @return integer
+     */
+    public function getEtat()
+    {
+        return $this->etat;
     }
 }

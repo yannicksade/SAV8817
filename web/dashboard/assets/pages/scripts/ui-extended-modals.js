@@ -1,5 +1,10 @@
 var UIExtendedModals = function () {
 
+    var draggableModals = function () {
+        $(".draggable-modal").draggable({
+            handle: ".modal-header"
+        });
+    };
 
     return {
         //main function to initiate the module
@@ -63,6 +68,8 @@ var UIExtendedModals = function () {
                             '</div>');
                 }, 1000);
             });
+
+            draggableModals();
         }
 
     };

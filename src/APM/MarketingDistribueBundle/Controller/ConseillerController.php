@@ -23,7 +23,7 @@ class ConseillerController extends Controller
         $this->listAndShowSecurity();
         $em = $this->getDoctrine()->getManager();
         $conseillers = $em->getRepository('APMMarketingDistribueBundle:conseiller')->findAll();
-        return $this->render('APMMarketingDistribueBundle:conseiller:index.html.twig', array(
+        return $this->render('APMMarketingDistribueBundle:conseiller:index_old.html.twig', array(
             'conseillers' => $conseillers,
         ));
     }

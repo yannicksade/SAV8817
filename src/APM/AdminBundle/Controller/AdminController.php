@@ -26,7 +26,7 @@ class AdminController extends Controller {
 
         $allAdmins = $em->getRepository('APMUserBundle:Admin')->findAll();
 
-        return $this->render('APMAdminBundle:Administrateur:index.html.twig', [
+        return $this->render('APMAdminBundle:Administrateur:index_old.html.twig', [
             'form' => $form->createView(),
             'admins' => $allAdmins,
         ]);
