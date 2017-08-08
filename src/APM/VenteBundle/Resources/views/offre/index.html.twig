@@ -30,8 +30,8 @@
                     <div class="caption font-dark">
                         <span class="caption-subject bold uppercase"> Table des offres <i
                                     class="icon-settings font-dark"></i></span>
-                        <button class="btn btn-default mt-ladda-btn ladda-button content-spinner hidden"
-                                data-style="expand-left" data-spinner-color="#333">
+                        <button autofocus class="btn btn-default mt-ladda-btn ladda-button content-spinner hidden"
+                                data-style="expand-left" data-spinner-color="#333" tabindex="-1">
                             <span class="ladda-label" id="ajax-label-process"></span>
                         </button>
                     </div>
@@ -187,6 +187,7 @@
                     <div class="form-group">
                         <h3 class="inline"> Cliquez ici pour créer une offre </h3>
                         <input type="checkbox" class="group-checkboxes-form"/>
+                        <button disabled class="copier pull-right" data-toggle="modal" href="#modal-confirm">copier</button>
                     </div>
                     <div class="form-group">
                         {{ form_widget(form.id, {'attr':{'name':'id'}}) }}
@@ -214,7 +215,7 @@
                         {{ form_label(form.etat, 'Etat:', {'attr':{'class':'control-label'}}) }}
                         <div class="input-group">
                             <span class="input-group-addon"><input type="checkbox"></span>
-                            {{ form_widget(form.etat, {'attr':{'name':'etat', 'disabled':'true'}, 'placeholder': 'précisez l\'état actuel de l\'offre ici...' }) }}
+                            {{ form_widget(form.etat, {'attr':{'name':'etat', 'disabled':'true'}}) }}
                         </div>
                     </div>
                     <div class="form-group">
@@ -239,6 +240,14 @@
                         <div class="input-group">
                             <span class="input-group-addon"><input type="checkbox"></span>
                             {{ form_widget(form.quantite, {'attr':{'name':'quantite', 'readonly':"true"}}) }}
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        {{ form_errors(form.unite) }}
+                        {{ form_label(form.unite, 'Unité de mesure:', {'attr':{'class':'control-label'}}) }}
+                        <div class="input-group">
+                            <span class="input-group-addon"><input type="checkbox"></span>
+                        {{ form_widget(form.unite, {'attr':{'name':'unite' ,'readonly':'true'}}) }}
                         </div>
                     </div>
                     <div class="form-group">
@@ -303,10 +312,10 @@
                         <span class="input-group-addon"><input type="checkbox"></span>
                         {{ form_widget(form.description, {'attr':{'name':'description', 'disabled':'true'}, "placeholder": "décrivez le produit ici..."}) }}
                     </div>
-                    <input type="submit" value="Soumettre"/>
+                    <input type="submit" value="Soumettre" disabled/>
                     <input type="reset" value="Effacer"/>
-                    <input data-target="#m-ajax" data-toggle="modal" class="charger-image hidden" type="button"
-                           value="cliquez ici pour charger les images"/>
+                    <input data-target="#m-ajax" data-toggle="modal" class="charger-image" type="button"
+                           value="cliquez ici pour charger une image"/>
                     {{ form_end(form) }}
                 </div>
             </div>
@@ -391,9 +400,11 @@
                             <tr>
                                 <th>Apparence</th>
                                 <td class="apparence"></td>
+                                <td class="hidden apparenceID"></td>
                             </tr>
                             <tr>
                                 <th>Retourne?</th>
+                                <td class="hidden retourneID"></td>
                                 <td class="retourne"></td>
                             </tr>
                             <tr>
@@ -424,11 +435,16 @@
                                 <td class="quantite"></td>
                             </tr>
                             <tr>
+                                <th>Unité de mesure</th>
+                                <td class="unite"></td>
+                            </tr>
+                            <tr>
                                 <th>Evaluation</th>
                                 <td class="rate"></td>
                             </tr>
                             <tr>
                                 <th>Typeoffre</th>
+                                <td class="hidden typeID"></td>
                                 <td class="type"></td>
                             </tr>
                             <tr>
@@ -445,8 +461,8 @@
                         <a class="btn btn-outline red btn-sm red delete_item" data-toggle="modal" href="#modal-confirm"><i
                                     class="fa fa-trash-o"></i> Supprimer </a>
                         <button class="btn btn-default mt-ladda-btn ladda-button modal-spinner hidden"
-                                data-style="zoom-in" data-spinner-color="#333">
-                            <span class="ladda-label">traitement en cours ...</span>
+                                data-style="zoom-in" data-spinner-color="#333" tabindex="-1">
+                            <span class="ladda-label">traitement en cours...</span>
                         </button>
                     </div>
                 </div>
@@ -487,7 +503,7 @@
                         <a class="btn btn-outline red btn-sm red delete_item" data-toggle="modal" href="#modal-confirm"><i
                                     class="fa fa-trash-o"></i> Supprimer </a>
                         <button class="btn btn-default mt-ladda-btn ladda-button modal-spinner hidden"
-                                data-style="zoom-in" data-spinner-color="#333">
+                                data-style="zoom-in" data-spinner-color="#333" tabindex="-1">
                             <span class="ladda-label">traitement en cours ...</span>
                         </button>
                     </div>
@@ -521,7 +537,7 @@
                             </div>
                         </div>
                         <button class="btn btn-default mt-ladda-btn ladda-button modal-spinner hidden"
-                                data-style="zoom-in" data-spinner-color="#333">
+                                data-style="zoom-in" data-spinner-color="#333" tabindex="-1">
                             <span class="ladda-label">traitement en cours ...</span>
                         </button>
                         {# {{ form_start(image_form) }}
@@ -549,7 +565,7 @@
                             </div>
                         </div>
                         <button class="btn btn-default mt-ladda-btn ladda-button modal-spinner hidden"
-                                data-style="zoom-in" data-spinner-color="#333">
+                                data-style="zoom-in" data-spinner-color="#333" tabindex="-1">
                             <span class="ladda-label">traitement en cours ...</span>
                         </button>
                     </div>
@@ -573,7 +589,7 @@
                             <input type="submit" value="envoyer" class="btn btn-sm green"/>
                             <input type="reset" value="Reset" class="btn btn-sm gray"/>
                             <button class="btn btn-default mt-ladda-btn ladda-button modal-spinner hidden"
-                                    data-style="zoom-in" data-spinner-color="#333">
+                                    data-style="zoom-in" data-spinner-color="#333" tabindex="-1">
                                 <span class="ladda-label">traitement en cours ...</span>
                             </button>
                         </div>
@@ -593,12 +609,11 @@
                         <h4 class="modal-title">Confirmation</h4>
                     </div>
                     <div class="modal-body">
-                        <p class="alerte-confirm"></p>
+                        <p class="alerte"></p>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" data-dismiss="modal" class="btn dark btn-outline action-cancel">Annuler
-                        </button>
-                        <button type="button" data-dismiss="modal" class="btn green action-confirm">Continuer</button>
+                        <button type="button" data-dismiss="modal" class="btn dark btn-outline action-cancel">Annuler</button>
+                        <button type="button" data-dismiss="modal" class="btn green" id="action-confirm">Continuer</button>
                     </div>
                 </div>
             </div>

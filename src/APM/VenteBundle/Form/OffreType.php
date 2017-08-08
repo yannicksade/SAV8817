@@ -46,9 +46,9 @@ class OffreType extends AbstractType
 
         $builder
             //recupérer uniquement les catégories des boutiques dont l'utilisateur est, en tant que gérant ou proprietaire
-            ->add('id', HiddenType::class, [
+            ->add('id', TextType::class, [
                 'mapped' => false,
-                'attr' => ['class' => 'id'],
+                'attr' => ['class' => 'id hidden'],
             ])
             ->add('code', TextType::class, [
                 'mapped' => false,
@@ -115,13 +115,13 @@ class OffreType extends AbstractType
                     'Vente régionale' => 7,
                     'Vente interdite' => 8,
                 ],
-                'attr' => ['class' => 'form-control select2 etat'],
-                'required'=> false,
+                'attr' => ['class' => 'form-control etat'],
+                'required'=> true,
             ])
             ->add('apparenceNeuf', ChoiceType::class, [
                 'choices' => [
-                    'Neuf' => 0,
-                    'Occassion' => 1,
+                    'Neuf' => 1,
+                    'Occassion' => 0,
                 ],
                 'required' => false,
                 'attr' => ['class' => 'form-control apparence'],
@@ -134,6 +134,7 @@ class OffreType extends AbstractType
                     'VENTE RESTREINTE' => 3,
                 ),
                 'attr' => ['class' => 'form-control modeVente'],
+                'required' => true,
             ])
             ->add('modelDeSerie', TextType::class, [
                 'required' => false,
@@ -149,6 +150,10 @@ class OffreType extends AbstractType
                 'attr' => ['class' => 'form-control quantite']
                 ])
 
+            ->add('unite', TextType::class, [
+                'required' => false,
+                'attr' => ['class' => 'form-control unite']
+            ])
             ->add('remiseProduit', TextType::class, [
                 'required' => false,
                 'attr' => ['class' => 'form-control remise']
@@ -160,7 +165,9 @@ class OffreType extends AbstractType
                     'SERVICE' => 2
                 ],
                 'attr' => ['class' => 'form-control type'],
+                    'required' => true,
                 ]
+
             )
            /* ->add('imageFile', VichImageType::class, [
                 'required' => false,

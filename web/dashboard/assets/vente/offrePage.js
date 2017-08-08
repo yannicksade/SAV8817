@@ -26,21 +26,36 @@ var OffrePage = function () {
         'linkTabActive': 'a[href="#modal-tab_1"]'
     };
 
+    var confirmationModal = function (message) {
+        var tmpl = [
+            // tabindex is required for focus
+            '<div class="modal hide fade" tabindex="-1">',
+            '<div class="modal-header">',
+            '<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>',
+            '<h4 class="modal-title">Modal header</h4>',
+            '</div>',
+            '<div class="modal-body">',
+            '<p>'+message+'</p>',
+            '</div>',
+            '<div class="modal-footer">',
+            '<a href="#" data-dismiss="modal" class="btn btn-default">Close</a>',
+            '<a href="#" class="btn btn-primary">Save changes</a>',
+            '</div>',
+            '</div>'
+        ].join('');
+
+        $(tmpl).modal();
+    };
     var nbProcessusEnCours = 0,
         labelProcess = $('#ajax-label-process');
-
+    var isEditMode = false;
     //---- notification
     var notifAlert = document.querySelector("#notif-active");
     //---------------------- modifier --------------------
     var uncheckBoxes = function (parent) {
-        var chexbs = $('input[type="checkbox"]:checked', parent);
-        var len = chexbs.length;
-        for (var i = 0; i < len; i++) {
-            chexbs.click();
-        }
+         $('input[type="checkbox"]:checked', parent).attr('checked', false);
     };
     var reinitializeModal = function () {
-        // var parent = $(elt).parents('.portlet').find('.modal-body');
         $('.data-content', modal_stk.modalElement).addClass("hidden");
         $('.alerte', modal_stk.modalElement).removeClass("hidden");
 
@@ -93,15 +108,16 @@ var OffrePage = function () {
         a.val($('.vendeurID', modal_stk.modalElement).text());
         a.select();
         $('.desc', form).val($('.desc', modal_stk.modalElement).text());
-        $('.publiable', form).val($('.publiable', modal_stk.modalElement).text());
+        $('.publiable', form).val($('.publiableID', modal_stk.modalElement).text());
         $('.dureeGarantie', form).val($('.dureeGarantie', modal_stk.modalElement).text());
-        $('.apparence', form).val($('.apparence', modal_stk.modalElement).text());
+        $('.apparence', form).val($('.apparenceID', modal_stk.modalElement).text());
         $('.modeVente', form).val($('.modeVenteID', modal_stk.modalElement).text());
         $('.modelDeSerie', form).val($('.modelDeSerie', modal_stk.modalElement).text());
         $('.prix', form).val($('.prix', modal_stk.modalElement).text());
         $('.quantite', form).val($('.quantite', modal_stk.modalElement).text());
+        $('.unite', form).val($('.unite', modal_stk.modalElement).text());
         $('.remise', form).val($('.remise', modal_stk.modalElement).text());
-        $('.type', form).val($('.type', modal_stk.modalElement).text());
+        $('.type', form).val($('.typeID', modal_stk.modalElement).text());
     };
     var tableToFormLoad = function (parent, form_parent) {
         var form = $('.form-element', form_parent);
@@ -122,22 +138,28 @@ var OffrePage = function () {
         a.val($('.vendeurID', parent).text());
         a.select();
         $('.desc', form).val($('.desc', parent).text());
-        $('.publiable', form).val($('.publiable', parent).text());
+        $('.publiable', form).val($('.publiableID', parent).text());
         $('.dureeGarantie', form).val($('.dureeGarantie', parent).text());
-        $('.apparence', form).val($('.apparence', parent).text());
+        $('.apparence', form).val($('.apparenceID', parent).text());
         $('.modeVente', form).val($('.modeVenteID', parent).text());
         $('.modelDeSerie', form).val($('.modelDeSerie', parent).text());
         $('.prix', form).val($('.prix', parent).text());
         $('.quantite', form).val($('.quantite', parent).text());
-        $('.type', form).val($('.type', parent).text());
+        $('.unite', form).val($('.unite', parent).text());
+        $('.type', form).val($('.typeID', parent).text());
         $('.remise', form).val($('.remise', parent).text());
     };
     var reset = function () {
-        //------------------------- reinitialise chekboxes of a form after a reset click -----------------
+        //------------------------- reinitialize chekboxes of a form after a reset click -----------------
         $('input[type="reset"]').click(function () {
             var p = $(this).parent();
-            uncheckBoxes(p);//p= form
-            $('input[type="text"]', p).val('');
+            $('input[type="text"]', p).val(''); // in a case where p = form, rinitialize the form
+            $('input[type="text"]', p).attr('readonly', true);
+            $('select, textarea', p).attr('disabled', true);
+            uncheckBoxes(p);
+            $('input[type="submit"]', p).attr('disabled', true);
+            $('.form-group .copier', p).attr('disabled', true);
+            isEditMode = false;
         });
     };
     var afficherImpl = function (parent) {
@@ -162,18 +184,22 @@ var OffrePage = function () {
         $('.updatedAt', modal_stk.modalElement).text($('.updatedAt', parent).text());
         $('.credit', modal_stk.modalElement).text($('.credit', parent).text());
         $('.publiable', modal_stk.modalElement).text($('.publiable', parent).text());
+        $('.publiableID', modal_stk.modalElement).text($('.publiableID', parent).text());
         $('.dureeGarantie', modal_stk.modalElement).text($('.dureeGarantie', parent).text());
         $('.dateExpiration', modal_stk.modalElement).text($('.dateExpiration', parent).text());
         $('.retourne', modal_stk.modalElement).html($('.retourne', parent).text());
         $('.apparence', modal_stk.modalElement).text($('.apparence', parent).text());
+        $('.apparenceID', modal_stk.modalElement).text($('.apparenceID', parent).text());
         $('.modeVente', modal_stk.modalElement).text($('.modeVente', parent).text());
         $('.modeVenteID', modal_stk.modalElement).text($('.modeVenteID', parent).text());
         $('.modelDeSerie', modal_stk.modalElement).text($('.modelDeSerie', parent).text());
         $('.prix', modal_stk.modalElement).text($('.prix', parent).text());
         $('.quantite', modal_stk.modalElement).text($('.quantite', parent).text());
+        $('.unite', modal_stk.modalElement).html($('.unite', parent).text());
         $('.rate', modal_stk.modalElement).text($('.rate', parent).text());
         $('.remise', modal_stk.modalElement).text($('.remise', parent).text());
         $('.type', modal_stk.modalElement).text($('.type', parent).text());
+        $('.typeID', modal_stk.modalElement).text($('.typeID', parent).text());
     };
     var modifierImpl = function (parent) {
         //------ Compress the table 1 -----------------
@@ -211,31 +237,30 @@ var OffrePage = function () {
                     modalToFormLoad(tabElement_2);
                 }
             }
+            isEditMode = true;
         });
     };
     var supprimer = function () {
         $('.delete_item').click(function () {
+           //alt.removeEventListener('click',null, false);
             var elt, elements = [];
             var p = $(this).parents();
             if ($(p[0]).hasClass('modal-footer')) {//suppression à partir de la modal
-                //$('.action-confirm').click(function () {
                 elements[0] = $('.id', p[1]).val();
-                //});
-                $('.alerte-confirm').html('Vous êtes sur le point de supprimer définitivement l\'offre de référence:<strong>' + $('.code', p[1]).text() + '</strong><br/> Voulez-vous continuer?');
+                $('.alerte', '#modal-confirm').html('Vous êtes sur le point de supprimer définitivement l\'offre de référence:<strong>' + $('.code', p[1]).text() + '</strong><br/> Voulez-vous continuer?');
             } else { //suppression apartir de la table
                 var cboxes = getCheckedBoxes($('.tab-element', p[5])), tr, //p5: search for tab element from portlet
                     nb = cboxes.length;
-                $('.alerte-confirm').html('Vous êtes sur le point de supprimer définitivement <strong>' + nb + '</strong> offre(s)<br/> Voulez-vous continuer?');
+                $('.alerte', '#modal-confirm').html('Vous êtes sur le point de supprimer définitivement <strong>' + nb + '</strong> offre(s)<br/> Voulez-vous continuer?');
                 for (var i = 0; i < nb; i++) {
                     elt = $(cboxes[i]);
                     tr = elt.parents()[2]; // recupérer la ligne du tableau
-                    /* c = confirm('etes vous sûr de vouloir supprimer l\'enregistrement référencée : ' + $('.code', tr).text() + ' ?');//confirmation*/
 
                     elements[i] = $('.id', tr).text();
                 }
 
             }
-            $('.action-confirm').click(function () {
+            $('#action-confirm').click(function () {
                 if (elements.length > 0) deleteElement(elements, p[5], p[0]);
                 elements = [];
             });
@@ -448,7 +473,7 @@ var OffrePage = function () {
                 $(modal_stk.modalTab3, modal_stk.modalElement).parents('.modal').find('.alerte').addClass('hidden');
                 $(modal_stk.modalTab3, modal_stk.modalElement).click();
             });
-            $('.alerte').html('<strong>Aucun élément sélectionné</strong>');
+            $('.alerte', modal_stk.modalElement).html('<strong>Aucun élément sélectionné</strong>');
 
             $('.composer_item').click(function () {
                 modifierImpl($(this).parents('.portlet'));
@@ -464,7 +489,7 @@ var OffrePage = function () {
                 $('.datatable_ajax', $(this).parents('.portlet')).DataTable().ajax.reload();
             });
 
-            $('.group-checkboxes-form').change(function () { //check and uncheck
+            $('.form-element .group-checkboxes-form').change(function () { //check and uncheck
                 var checked = $(this).prop("checked");
                 var set = $('.input-group-addon input[type="checkbox"]');
                 $(set).each(function () {
@@ -472,18 +497,23 @@ var OffrePage = function () {
                 });
                 var p = $(this).parents()[2]; //form
                 if(this.checked) {
+                    $('input[type="submit"]', p).attr('disabled',false);
                     $('input[type="text"]', p).attr('readonly', false);
                     $('select, textarea', p).attr('disabled', false);
                     $('.code', p).attr('readonly', true);
+                    if(isEditMode) $('.form-group .copier', p).attr('disabled', false);
                 }else{
+                    $('input[type="submit"]', p).attr('disabled',true);
                     $('input[type="text"]', p).attr('readonly', true);
                     $('select, textarea', p).attr('disabled', true);
+                    if(isEditMode) $('.form-group .copier', p).attr('disabled', true);
                 }
             });
 
             $('.input-group-addon input[type="checkbox"]').change(function () { //individual check and enabling text input
-                var p = $(this).parents()[1];// form-group
+                var p = $(this).parents()[1];// input-group
                 if(this.checked) {
+                    if(isEditMode) $('input[type="submit"]', p[2]).attr('disabled',false);
                     $('input[type="text"]', p).attr('readonly', false);
                     $('select, textarea', p).attr('disabled', false);
                     $('.code', p).attr('readonly', true);
@@ -492,16 +522,23 @@ var OffrePage = function () {
                     $('input[type="text"]', p).attr('readonly', true);
                     $('select, textarea', p).attr('disabled', true);
                     $(this).attr("checked", false);
+                    if(isEditMode) $('input[type="submit"]', p[2]).attr('disabled',true);
                 }
+            });
+
+            $('.form-element .copier').click(function () {
+                  $('.alerte', '#modal-confirm').html('Vous êtes sur le point de cloner une offre. Il est conseillé de modifier quelque propriétée pour les différencier! <br/> Voulez-vous continuer ?');
+                    var btn = this;
+                $('#action-confirm').click(function () { ///créer la modal
+                        var p = $(btn).parents;
+                        $('.code', p[1]).val('clonage...');
+                        $('.id', p[1]).val('');
+                    });
             });
 
             $('input[type="submit"]').click(function (e) {
                 e.returnValue = false;
-                if (e.preventDefault) {
-                    e.preventDefault();
-                }
-                /*tester si le mode modal est activé*/
-                             
+                if(e.preventDefault()) e.preventDefault();
                 ajaxForm(this.parentNode);
             });
         }
