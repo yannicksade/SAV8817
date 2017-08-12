@@ -185,9 +185,10 @@
                 <div class="col-lg-3 hidden form-element thumbnail form1">
                     {{ form_start(form, {"attr":{"enctype":"multipart/form-data", "method":"post"}}) }}
                     <div class="form-group">
-                        <h3 class="inline"> Cliquez ici pour créer une offre </h3>
+                        <h3 class="inline"> Créer une offre </h3>
                         <input type="checkbox" class="group-checkboxes-form"/>
-                        <button disabled class="copier pull-right" data-toggle="modal" href="#modal-confirm">copier</button>
+                        <button disabled class="copier pull-right" data-toggle="modal" href="#modal-confirm">copier
+                        </button>
                     </div>
                     <div class="form-group">
                         {{ form_widget(form.id, {'attr':{'name':'id'}}) }}
@@ -247,7 +248,7 @@
                         {{ form_label(form.unite, 'Unité de mesure:', {'attr':{'class':'control-label'}}) }}
                         <div class="input-group">
                             <span class="input-group-addon"><input type="checkbox"></span>
-                        {{ form_widget(form.unite, {'attr':{'name':'unite' ,'readonly':'true'}}) }}
+                            {{ form_widget(form.unite, {'attr':{'name':'unite' ,'readonly':'true'}}) }}
                         </div>
                     </div>
                     <div class="form-group">
@@ -307,12 +308,15 @@
                         </div>
                     </div>
                     <div class="form-group">
+                        {{ form_widget(form.imageFile, {'attr':{'name':'image',  'value': 'charger une image pour l\'offre'}}) }}
+                    </div>
+                    <div class="form-group">
                         {{ form_errors(form.description) }}
                         {{ form_label(form.description, 'Description:', {'attr':{'class':'control-label'}}) }}
                         <span class="input-group-addon"><input type="checkbox"></span>
                         {{ form_widget(form.description, {'attr':{'name':'description', 'disabled':'true'}, "placeholder": "décrivez le produit ici..."}) }}
                     </div>
-                    <input type="submit" value="Soumettre" disabled/>
+                    <input href="index" type="submit" value="Soumettre" disabled/>
                     <input type="reset" value="Effacer"/>
                     <input data-target="#m-ajax" data-toggle="modal" class="charger-image" type="button"
                            value="cliquez ici pour charger une image"/>
@@ -469,37 +473,24 @@
                 <div class="tab-pane data-content hidden" id="modal-tab_2">
                     <div class="modal-header">
                         <h4 class="modal-title">Images de l'offre</h4>
+                        <input type="hidden" class="url-dir" value="{{ asset( url_image) }}"/>
                         {% for i in 1..4 %}
                             <div class="thumbnail inline-block margin-right-10">
-                                <a href="#image_{{ i }}" data-toggle="tab">
-                                    <img width="50px" height="50px"
-                                         src="{{ asset('dashboard/assets/entity/images/yann.jpg') }}" alt=""
-                                         class="image-preview img-responsive"/>
-                                </a>
+                                <a href="#image_{{ i }}" data-toggle="tab"></a>
                                 <div class="caption"><strong>#image{{ i }}</strong></div>
                             </div>
                         {% endfor %}
                     </div>
                     <div class="modal-body tab-content">
-                        <div class="tab-pane" id='image_1'>
-                            <img src="{{ asset('dashboard/assets/entity/images/yann1.jpg') }}"
-                                 alt="" class="image-preview img-responsive"/>
-                        </div>
-                        <div class="tab-pane" id='image_2'>
-                            <img src="{{ asset('dashboard/assets/entity/images/yann2.jpg') }}"
-                                 alt="" class="image-preview img-responsive"/>
-                        </div>
-                        <div class="tab-pane" id='image_3'>
-                            <img src="{{ asset('dashboard/assets/entity/images/yann3.png') }}"
-                                 alt="" class="image-preview img-responsive"/>
-                        </div>
-                        <div class="tab-pane" id='image_4'>
-                            <img src="{{ asset('dashboard/assets/entity/images/yann2.jpg') }}"
-                                 alt="" class="image-preview img-responsive"/>
-                        </div>
+                        {% for i in 1..4 %}
+                            <div class="tab-pane" id='image_{{ i }}'>
+                                <img src="" alt="aucune image"
+                                     class="image-preview img-responsive image"/>
+                            </div>
+                        {% endfor %}
                     </div>
                     <div class="modal-footer">
-                        <a class="btn green pull-left modal-action-terminated" data-dismiss="modal"> OK </a>
+                        <a class="btn green pull-left modal-action-terminated" data-dismiss="modal"> Close </a>
                         <a class="btn btn-outline red btn-sm red delete_item" data-toggle="modal" href="#modal-confirm"><i
                                     class="fa fa-trash-o"></i> Supprimer </a>
                         <button class="btn btn-default mt-ladda-btn ladda-button modal-spinner hidden"
@@ -510,45 +501,24 @@
                 </div>
                 <div class="tab-pane data-content hidden" id="modal-tab_3">
                     <div class="modal-header">
-                        <h4 class="modal-title"> Charger les images et photos relatives à l'offre</h4></div>
-                    <div class="modal-body">
-                        <div class="">
-                            <img src="{{ asset('dashboard/assets/entity/images/yann4.jpg') }}" alt=""
-                                 id="demo3"/>
-                        </div>
-                        <div id="preview-pane">
-                            <div class="preview-container">
-                                <img src="{{ asset('dashboard/assets/entity/images/yann4.jpg') }}"
-                                     alt=""
-                                     class="jcrop-preview"/>
-                            </div>
-                        </div>
-                        <input type="hidden" id="crop_x" name="x"/>
-                        <input type="hidden" id="crop_y" name="y"/>
-                        <input type="hidden" id="crop_w" name="w"/>
-                        <input type="hidden" id="crop_h" name="h"/>
-                    </div>
-                    <div class="modal-footer">
-                        <div class="form">
-                            <input type="file" value="choisir le fichier">
-                            <div class="pull-right">
-                                <input type="submit" value="Crop Image" class="btn btn-sm green"/>
-                                <input type="reset" value="Reset" class="btn btn-sm gray"/>
-                            </div>
-                        </div>
+                        <h4 class="modal-title"> Charger les images et photos relatives à l'offre</h4>
                         <button class="btn btn-default mt-ladda-btn ladda-button modal-spinner hidden"
                                 data-style="zoom-in" data-spinner-color="#333" tabindex="-1">
                             <span class="ladda-label">traitement en cours ...</span>
                         </button>
-                        {# {{ form_start(image_form) }}
-                         {{ form_errors(image_form.imageFile) }}
-                         {{ form_label(image_form.imageFile, '', {'attr':{'class':'control-label'}}) }}
-                         {{ form_widget(image_form.imageFile, {'attr':{'name':'image',  'value': 'choisir le fichier'}}) }}
-                         <div class="pull-right">
-                             <input type="submit" value="Crop Image" class="btn btn-sm green"/>
-                             <input type="reset" value="Reset" class="btn btn-sm gray"/>
-                         </div>
-                         {{ form_end(image_form) }}#}
+                    </div>
+                    <div class="modal-footer">
+                        <form class="form1" enctype="multipart/form-data" method="POST">
+                            <input type="hidden" id="crop_x" name="x"/>
+                            <input type="hidden" id="crop_y" name="y"/>
+                            <input type="hidden" id="crop_w" name="w"/>
+                            <input type="hidden" id="crop_h" name="h"/>
+                            <input type="file" class="inline-block" value="choisir le fichier" name="myFile"/>
+                            <div class="inline-block">
+                                <input id='crop' type="submit" value="Crop Image" class="btn btn-sm green"/>
+                                <input type="reset" value="Reset" class="btn btn-sm gray reset-image reset-modal"/>
+                            </div>
+                        </form>
                     </div>
                 </div>
                 <div class="tab-pane data-content hidden" id="modal-tab_4">
@@ -612,8 +582,10 @@
                         <p class="alerte"></p>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" data-dismiss="modal" class="btn dark btn-outline action-cancel">Annuler</button>
-                        <button type="button" data-dismiss="modal" class="btn green" id="action-confirm">Continuer</button>
+                        <button type="button" data-dismiss="modal" class="btn dark btn-outline action-cancel">Annuler
+                        </button>
+                        <button type="button" data-dismiss="modal" class="btn green" id="action-confirm">Continuer
+                        </button>
                     </div>
                 </div>
             </div>
@@ -621,12 +593,11 @@
         <!-- END MODAL-->
     </div>
     <!-- END SAMPLE TABLE PORTLET-->
-
 {% endblock content_body %}
     {% block javascripts %}
         {% javascripts "dashboard/assets/vente/offrePage.js"
-        'dashboard/assets/global/plugins/jcrop/js/jquery.Jcrop.js'
-        'dashboard/assets/pages/scripts/form-image-crop.js' %}
+        "dashboard/assets/global/plugins/jcrop/js/jquery.Jcrop.js"
+        "dashboard/assets/pages/scripts/form-image-crop.js" %}
         <script src="{{ asset_url }}" type="text/javascript"></script>
         {% endjavascripts %}
     {% endblock javascripts %}

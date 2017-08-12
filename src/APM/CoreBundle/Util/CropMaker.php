@@ -69,11 +69,9 @@ class CropMaker implements ContainerAwareInterface
             $cacheManager->store($filteredBinary, $path, $this->filter); //stock l'image
             if ($cacheManager->isStored($path, $this->filter)) { // Test whether the image is really stored
                 $session = $this->container->get('session');
-                $session->getFlashBag()->add('success', 'Image recadrée: ' . '<strong>' . $_w_ . '</strong>x<strong>' . $_h_ . '</strong>px.<br> Opération effectuée avec succès');
-
+                $session->getFlashBag()->add('success', 'Image traitée <br/> Résolution:' . '<strong>' . $_w_ . 'x' . $_h_ . '</strong>px.<br> Opération effectuée avec succès');
                 if ($object) { // suppression de l'image vich d'origine
                     /** @var FileSystemStorage $storage */
-                    $mapping = "entity_images";
                     $storage = $this->container->get('vich_uploader.storage');
                     /** @var PropertyMappingFactory $propertyMappingFactory */
                     $propertyMappingFactory = $this->container->get('vich_uploader.property_mapping_factory');

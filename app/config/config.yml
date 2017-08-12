@@ -14,7 +14,6 @@ parameters:
     resolve_images_url: 'http://localhost/SAV8817.git/web/app_dev.php/media/cache/resolve/basic_filter600x600/%images_url%'
     basic_filter: "basic_filter600x600"
 
-
 framework:
     validation:  { enable_annotations: true }
 

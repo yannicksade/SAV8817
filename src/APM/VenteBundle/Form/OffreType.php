@@ -169,11 +169,10 @@ class OffreType extends AbstractType
                 ]
 
             )
-           /* ->add('imageFile', VichImageType::class, [
+            ->add('imageFile', VichImageType::class, [
                 'required' => false,
                 'allow_delete' => true,
-                'attr' => ['class' => 'form-control image']
-            ])*/
+            ])
         ;
     }
 

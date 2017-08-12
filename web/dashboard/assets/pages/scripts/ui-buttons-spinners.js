@@ -10,7 +10,7 @@ var UIButtons = function () {
         });
 
         Ladda.bind('.mt-ladda-btn');
-        Ladda.bind('.mt-ladda-btn.mt-progress-demo ', {
+        Ladda.bind('.mt-ladda-btn.mt-progress-demo', {
             callback: function (instance) {
                 var progress = 0;
                 var interval = setInterval(function () {

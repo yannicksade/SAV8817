@@ -7,16 +7,16 @@ var FormImageCrop = function () {
             boundx,
             boundy,
             // Grab some information about the preview pane
-            $preview = $('#preview-pane'),
-            $pcnt = $('#preview-pane .preview-container'),
-            $pimg = $('#preview-pane .preview-container img'),
+            $preview = $('.preview-pane'),
+            $pcnt = $('.preview-pane .preview-container'),
+            $pimg = $('.preview-pane .preview-container img'),
 
             xsize = $pcnt.width(),
             ysize = $pcnt.height();
 
         console.log('init', [xsize, ysize]);
 
-        $('#demo3').Jcrop({
+        $('.crop-image').Jcrop({
             onChange: updatePreview,
             onSelect: updatePreview,
             aspectRatio: xsize / ysize
@@ -32,7 +32,6 @@ var FormImageCrop = function () {
         });
 
         function updatePreview(c) {
-
             if (parseInt(c.w) > 0) {
                 $('#crop_x').val(c.x);
                 $('#crop_y').val(c.y);
@@ -85,6 +84,7 @@ var FormImageCrop = function () {
 
 }();
 
+/*
 jQuery(document).ready(function () {
     FormImageCrop.init();
-});
+});*/

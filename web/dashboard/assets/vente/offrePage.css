@@ -11,8 +11,12 @@
     left: 40%;
     top:40%;
     width: auto;
-    height: 150px;
+    height: 25%;
     border: black 4px;
     opacity: 0.4;
     background-color: #95a5a6;
+}
+
+.mt-progress-demo {
+
 }
