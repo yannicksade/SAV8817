@@ -14,9 +14,10 @@
     height: 25%;
     border: black 4px;
     opacity: 0.4;
-    background-color: #95a5a6;
+    /*background-color: #95a5a6;*/
 }
 
-.mt-progress-demo {
-
+.modal-header .modal-spinner {
+    position: relative;
+    height: 40%;
 }

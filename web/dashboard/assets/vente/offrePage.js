@@ -75,7 +75,7 @@ var OffrePage = function () {
                 FormImageCrop.init();
                 nbProcessusEnCours -= 1;
                 labelProcess.html(nbProcessusEnCours + ' traitement(s) en cours...');
-                if (nbProcessusEnCours === 0) $('.content-spinner').click();
+                if (nbProcessusEnCours === 0) $('#ct-sp').click();
                 $('.modal-spinner', container.parentNode).click();
             }
             if (reader.readyState === reader.LOADING) { //1
@@ -87,7 +87,7 @@ var OffrePage = function () {
                 alert('aucun fichier chargé');
                 nbProcessusEnCours -= 1;
                 labelProcess.html(nbProcessusEnCours + ' traitement(s) en cours...');
-                if (nbProcessusEnCours === 0) $('.content-spinner').click();
+                if (nbProcessusEnCours === 0) $('#ct-sp').click();
                 $('.modal-spinner', container.parentNode).click();
             }
         };
@@ -108,7 +108,7 @@ var OffrePage = function () {
                     //$(parent).modalmanager('loading');
                     nbProcessusEnCours += 1;
                     labelProcess.html(nbProcessusEnCours + ' traitement(s) en cours...');
-                    if (nbProcessusEnCours === 1) $('.content-spinner').click();
+                    if (nbProcessusEnCours === 1) $('#ct-sp').click();
                     $('.modal-spinner', parent.parentNode).click();
                     readFile(files[0], parent);
                 } else {
@@ -249,12 +249,13 @@ var OffrePage = function () {
             if (raz.hasClass('reset-modal')) {
                 p = raz.parents('.tab-pane');
                 if (raz.hasClass('reset-image')) {
-                    var parent = this.parentNode.parentNode.parentNode;
+                    var parent = this.parentNode.parentNode.parentNode;//modal-Footer
                     var bv = parent.querySelector('.big-view');
                     bv.parentNode.removeChild(bv);
                     var prev = parent.querySelector('.preview-pane');
                     prev.parentNode.removeChild(prev);
                 }
+           $('.modal-spinner', p).addClass('hidden');
             } else {
                 p = raz.parent();
                 $('input[type="text"]', p).val(''); // in a case where p = form, rinitialize the form
@@ -443,10 +444,9 @@ var OffrePage = function () {
                 $(btn).attr('href', 'image?id=' + id);
             } else uploadedFile = null;
             //if (isEditMode) $('input[type="submit"]', p[2]).attr('disabled', true); désactiver les boutton soubmit lors d'un traitement
-            ajaxForm(this.parentNode.parentNode.parentNode, $(this).attr("href"), uploadedFile); //troixième parent du boutton submit: portlet ou modal-footer
+            ajaxForm(this.parentNode, $(this).attr("href"), uploadedFile); //troixième parent du boutton submit: portlet ou modal-footer
         });
     };
-
     var deleteElement = function (elements, parent, fromParent) {
         fromParent = $(fromParent);
         var items = JSON.stringify(elements);
@@ -462,7 +462,7 @@ var OffrePage = function () {
                 if (fromParent.hasClass('modal-footer')) {
                     $('.modal-spinner', fromParent).click();
                 }
-                if (nbProcessusEnCours === 0) $('.content-spinner').click();
+                if (nbProcessusEnCours === 0) $('#ct-sp').click();
                 App.alert({
                     type: 'danger', // alert's type
                     icon: 'warning',
@@ -483,7 +483,7 @@ var OffrePage = function () {
                 if (fromParent.hasClass('modal-footer')) {
                     $('.modal-spinner', fromParent).click();
                 }
-                if (nbProcessusEnCours === 1) $('.content-spinner').click();
+                if (nbProcessusEnCours === 1) $('#ct-sp').click();
             },
             complete: function () {
                 nbProcessusEnCours -= 1;
@@ -496,7 +496,7 @@ var OffrePage = function () {
                         ;
                     }, 200);
                 }
-                if (nbProcessusEnCours === 0) $('.content-spinner').click();
+                if (nbProcessusEnCours === 0) $('#ct-sp').click();
                 notifAlert.click();
             },
             success: function (json) {
@@ -517,11 +517,13 @@ var OffrePage = function () {
             }
         });
     };
-    var ajaxForm = function (parent, url, file) { // create and update a form from either the modal or anywhere in the body
+    var ajaxForm = function (p, url, file) { // create and update a form from either the modal or anywhere in the body
         //if (parent === undefined || !$(parent).parent().hasClass('parent1') && !$(parent).parent().hasClass('parent2')) return; //les parentulaires doivente être encapsulés dans parent1 ou parent2 uniquement
         /*if (formData['offre'] === null) return;*/
+        var parent = p.parentNode.parentNode, //a form or a container of a form (ex:modal-footer)
+            pTab;
         var form, isaModal = false;
-        if ($(parent).hasClass('modal-footer')) isaModal = true;
+        if ($(parent).hasClass('modal-footer')) {isaModal = true; pTab = $(parent).parents('.tab-pane');}
         form = parent.querySelector('form');
         var formData = new FormData(form);
         if (file !== null) formData.append('file', file);
@@ -536,8 +538,7 @@ var OffrePage = function () {
                 nbProcessusEnCours -= 1;
                 form.querySelector('input[type="reset"]').click(); //reinitialize the form
                 $('input[type="submit"]', parent).removeClass('disabled');
-                if (isaModal) $('.modal-spinner', parent).click();
-                if (nbProcessusEnCours === 0) $('.content-spinner').click();
+                if (nbProcessusEnCours === 0) $('#ct-sp').click();
                 App.alert({
                     type: 'danger', // alert's type
                     icon: 'warning',
@@ -554,17 +555,17 @@ var OffrePage = function () {
             beforeSend: function () {
                 nbProcessusEnCours += 1;
                 labelProcess.html(nbProcessusEnCours + ' traitement(s) en cours...');
-                if (isaModal) $('.modal-spinner', parent).click();// form here is a modal's footer
+                if (isaModal) $('.modal-spinner', pTab).click();
                 $('input[type="submit"]', parent).addClass('disabled');
-                if (nbProcessusEnCours === 1) $('.content-spinner').click();
+                if (nbProcessusEnCours === 1) $('#ct-sp').click();
             },
             complete: function () {
                 form.querySelector('input[type="reset"]').click(); //reinitialize the form
                 $('input[type="submit"]', parent).removeClass('disabled');
                 nbProcessusEnCours -= 1;
                 labelProcess.html(nbProcessusEnCours + ' traitement(s) en cours...');
-                if (isaModal) $('.modal-spinner', parent).click();
-                if (nbProcessusEnCours === 0) $('.content-spinner').click();
+                if (isaModal) $('.modal-spinner', pTab).click();
+                if (nbProcessusEnCours === 0) $('#ct-sp').click();
                 notifAlert.click();
             },
             success: function (json) {
@@ -630,7 +631,7 @@ var OffrePage = function () {
             $('.composer_item').click(function () {
                 modifierImpl($(this).parents('.portlet'));
             });
-            $('.content-spinner').click(function () {
+            $('#ct-sp').click(function () {
                 $(this).toggleClass('hidden');
             });
             $('.modal-spinner').click(function () {
@@ -640,7 +641,6 @@ var OffrePage = function () {
             $('.tab-reload').click(function () {
                 $('.datatable_ajax', $(this).parents('.portlet')).DataTable().ajax.reload();
             });
-
 
         }
     };

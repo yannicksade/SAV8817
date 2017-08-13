@@ -65,7 +65,7 @@ class OffreController extends Controller
 
     public function ImageLoaderAction(Request $request)
     {
-        if ($request->isXmlHttpRequest()) {
+        if ($request->isXmlHttpRequest() && $request->getMethod() === "POST") {
             $this->listAndShowSecurity();
             $session = $this->get('session');
             //$data = $request->request->get('images');
@@ -78,9 +78,19 @@ class OffreController extends Controller
                 /** @var Offre $offre */
                 //reception du fichier sur le serveur et stockage via vich
                 try {
+                    $user = $this->getUser();
+                    $gerant = null;
+                    $proprietaire = null;
+                    $boutique = $offre->getBoutique();
+                    if (null !== $boutique) {
+                        $gerant = $boutique->getGerant();
+                        $proprietaire = $boutique->getProprietaire();
+                    }
+                    $vendeur = $offre->getVendeur();
+                    $this->editAndDeleteSecurity($user, $gerant, $proprietaire, $vendeur);
                     /*tester et stocker le fichier reçu sur le serveur*/
                     if (isset($_FILES["myFile"])) $file = $_FILES["myFile"]; else {
-                        $session->getFlashBag()->add('danger', "<strong>Aucun fichier détecté.</strong><br> Veuillez réessayez l'opération!");
+                        $session->getFlashBag()->add('danger', "<strong>Aucun fichier chargé.</strong><br> Veuillez réessayez l'opération avec un fichier valide");
                         return $this->json(json_encode(["item" => null]));
                     }
                     //test de validité du type de fichier
@@ -96,10 +106,10 @@ class OffreController extends Controller
                     }
                     $file = new File($path);
                     $fileName = md5(uniqid()).'.'.$file->guessExtension();
-                    $file->move($this->getParameter('images_url'), $fileName); // move
+                    $file->move($this->getParameter('images_url'), $fileName); // renomer le fichier
                     $offre->setImage($fileName);
                     $em->flush();
-                    $session->getFlashBag()->add('success', "Image mise à jour :<strong>" . $offre->getCode() . "</strong><br>");
+                    $session->getFlashBag()->add('success', "Image mise à jour de l\'offre :<strong>" . $offre->getCode() . "</strong><br>");
                     //traitement du fichier puis stockage
                     $this->get('apm_core.crop_image')->setCropParameters(intval($_POST['x']), intval($_POST['y']), intval($_POST['w']), intval($_POST['h']), $offre->getImage(), $offre);
                     $json["item"] = array(//permet au client de différencier les nouveaux éléments des élements juste modifiés
@@ -107,9 +117,9 @@ class OffreController extends Controller
                         "isImage" => true,
                         "id" => $offre->getId(),
                     );
-                    $this->get('apm_core.crop_image')->liipImageResolver($offre->getImage());//resouds tout en créant l'images
-                    return $this->json(json_encode($json));
+                    $this->get('apm_core.crop_image')->liipImageResolver($offre->getImage());//resolution et deplacement de l'images dans media/
 
+                    return $this->json(json_encode($json));
                 } catch (ConstraintViolationException $e) {
                     $session->getFlashBag()->add('danger', "<strong> Echec de la suppression </strong><br>La suppression a échouée due à une contrainte de données!");
                     return $this->json(json_encode(["item" => null]));
@@ -192,7 +202,7 @@ class OffreController extends Controller
                     $typeOffre = "undefined";
                     $unite = "undefined";
                     $catID = null;
-                    if ($user === $gerant || $user === $proprietaire || $user === $vendeur) {
+                    if ($user === $gerant || $user === $proprietaire || $user === $vendeur) { //permettra de scinder les traitements et mises à jour des attributs selon les ayant-droits
 
                         if (isset($data['etat'])) {
                             $e = $data['etat'];

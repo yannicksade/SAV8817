@@ -31,7 +31,7 @@
                         <span class="caption-subject bold uppercase"> Table des offres <i
                                     class="icon-settings font-dark"></i></span>
                         <button autofocus class="btn btn-default mt-ladda-btn ladda-button content-spinner hidden"
-                                data-style="expand-left" data-spinner-color="#333" tabindex="-1">
+                                data-style="expand-left" data-spinner-color="#333" tabindex="-1" id="ct-sp">
                             <span class="ladda-label" id="ajax-label-process"></span>
                         </button>
                     </div>
@@ -508,7 +508,7 @@
                         </button>
                     </div>
                     <div class="modal-footer">
-                        <form class="form1" enctype="multipart/form-data" method="POST">
+                        <form class="form1" enctype="multipart/form-data" method="POST" name="image">
                             <input type="hidden" id="crop_x" name="x"/>
                             <input type="hidden" id="crop_y" name="y"/>
                             <input type="hidden" id="crop_w" name="w"/>
