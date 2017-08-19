@@ -1,27 +1,119 @@
-    <h1>Connectez-vous </h1>
-    {% trans_default_domain 'FOSUserBundle' %}
-{% if error %}
-    <div>{{ error.messageKey|trans(error.messageData, 'security') }}</div>
-{% endif %}
+{% extends "@FOSUser/Security/login-extend.html.twig" %}
 
-    <form action="{{ path("fos_user_security_check") }}" method="post">
-        {% if csrf_token %}
-            <input type="hidden" name="_csrf_token" value="{{ csrf_token }}"/>
-        {% endif %}
+ {% block custom_stylesheets %}
+     {% stylesheets "dashboard/assets/global/plugins/select2/css/select2.min.css"
+     "dashboard/assets/global/plugins/select2/css/select2-bootstrap.min.css"
+     "dashboard/assets/pages/css/login-5.min.css" filter='cssrewrite' %}
+     <link href="{{ asset_url }}" rel="stylesheet" type="text/css"/>
+     {% endstylesheets %}
+ {% endblock custom_stylesheets %}
 
-        <label for="username">{{ 'security.login.username'|trans }}</label>
-        <input type="text" id="username" name="_username" value="{{ last_username }}" required="required"/>
+{%- block title -%} {{ parent()}}| Login {%- endblock title -%}
 
-        <label for="password">{{ 'security.login.password'|trans }}</label>
-        <input type="password" id="password" name="_password" required="required"/>
+{% block body_login %}
+    <!-- BEGIN : LOGIN PAGE 5-2 -->
+    <div class="user-login-5">
+        <div class="row bs-reset">
+            <div class="col-md-6 login-container bs-reset">
+                <img class="login-logo login-6" src="{{ asset('dashboard/assets/layouts/layout/img/logo.png') }}" />
+                <div class="login-content">
+                    {% trans_default_domain 'FOSUserBundle' %}
+                    {% if error %}
+                        <div>{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+                    {% endif %}
+                    <h1>We-Trade Login</h1>
+                    <p> Lorem ipsum dolor sit amet, coectetuer adipiscing elit sed diam nonummy et nibh euismod aliquam erat volutpat. Lorem ipsum dolor sit amet, coectetuer adipiscing.  Lorem ipsum dolor sit amet, coectetuer adipiscing. </p>
+                    <form action="{{ path("fos_user_security_check") }}" class="login-form" method="post">
+                            <input type="hidden" name="_csrf_token" value="{{ csrf_token }}"/>
+                        <div class="alert alert-danger display-hide">
+                            <button class="close" data-close="alert"></button>
+                            <span>Enter any username and password. </span>
+                        </div>
+                        <div class="row">
+                            <div class="col-xs-6">
+                                <input class="form-control form-control-solid placeholder-no-fix form-group" type="text" autocomplete="off" placeholder="Username or WTE-mail" name="_username" required id="username" /> </div>
+                            <div class="col-xs-6">
+                                <input class="form-control form-control-solid placeholder-no-fix form-group" id="password" type="password" autocomplete="off" placeholder="Password" name="_password" required/> </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-4">
+                                <label class="rememberme mt-checkbox mt-checkbox-outline">
+                                    <input type="checkbox" name="_remember_me" value="on" /> Toujours me garder connecté!
+                                    <span></span>
+                                </label>
+                            </div>
+                            <div class="col-sm-8 text-right">
+                                <div class="forgot-password">
+                                    <a href="javascript:;" id="forget-password" class="forget-password">Forgot Password?</a>
+                                </div>
+                                <button id="_submit" name="_submit" class="btn blue" type="submit">Sign In</button>
+                            </div>
+                        </div>
+                    </form>
+                    <!-- BEGIN FORGOT PASSWORD FORM -->
+                    <form class="forget-form" action="{{ path('fos_user_resetting_send_email') }}" method="post">
+                        <h3>Forgot Password ?</h3>
+                        <p> Enter your e-mail address below to reset your password. </p>
+                        <div class="form-group">
+                            <input class="form-control placeholder-no-fix" type="text" autocomplete="off" placeholder="username or Email" id="username" name="username" /> </div>
+                        <div class="form-actions">
+                            <button type="button" id="back-btn" class="btn blue btn-outline">Back</button>
+                            <button type="submit" class="btn blue uppercase pull-right">Submit</button>
+                        </div>
+                    </form>
+                    <!-- END FORGOT PASSWORD FORM -->
+                </div>
+                <div class="login-footer">
+                    <div class="row bs-reset">
+                        <div class="col-xs-5 bs-reset">
+                            <ul class="login-social">
+                                <li>
+                                    <a href="javascript:;">
+                                        <i class="icon-social-facebook"></i>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="javascript:;">
+                                        <i class="icon-social-twitter"></i>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="javascript:;">
+                                        <i class="icon-social-dribbble"></i>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="col-xs-7 bs-reset">
+                            <div class="login-copyright text-right">
+                                <p>Copyright &copy; HiT-Tel 2017</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 bs-reset">
+                <div class="login-bg"></div>
+            </div>
+        </div>
+    </div>
+    <!-- END : LOGIN PAGE 5-2 -->
+    <input type="hidden" id="bg-1" value="{{ asset("dashboard/assets/pages/img/login/1.jpg") }}"/>
+    <input type="hidden" id="bg-2" value="{{ asset("dashboard/assets/pages/img/login/bg2.jpg") }}"/>
+    <input type="hidden" id="bg-3" value="{{ asset("dashboard/assets/pages/img/login/9.jpg") }}"/>
+    <input type="hidden" id="bg-4" value="{{ asset("dashboard/assets/pages/img/login/10.jpg") }}"/>
+    <input type="hidden" id="bg-5" value="{{ asset("dashboard/assets/pages/img/login/43.jpg") }}"/>
+    <input type="hidden" id="bg-6" value="{{ asset("dashboard/assets/pages/img/login/8.jpg") }}"/>
+{% endblock body_login %}
 
-        <input type="checkbox" id="remember_me" name="_remember_me" value="on"/>
-        <label for="remember_me">{{ 'security.login.remember_me'|trans }}</label>
-
-        <input type="submit" id="_submit" name="_submit" value="{{ 'security.login.submit'|trans }}"/>
-    </form>
-
-    <p>
-        <a href="{{ path('apm_core_main_show') }}">Retour sur la plateforme</a>
-    </p>
-
+{% block javascripts %}
+    <!-- BEGIN PAGE LEVEL SCRIPTS -->
+    {% javascripts "dashboard/assets/global/plugins/jquery-validation/js/jquery.validate.min.js"
+    "dashboard/assets/global/plugins/jquery-validation/js/additional-methods.min.js"
+    "dashboard/assets/global/plugins/select2/js/select2.full.min.js"
+    "dashboard/assets/global/plugins/backstretch/jquery.backstretch.min.js"
+    "dashboard/assets/pages/scripts/login-5.js" %}
+    <script src="{{ asset_url }}" type="text/javascript"></script>
+    {% endjavascripts %}
+    <!-- END PAGE LEVEL SCRIPTS -->
+{% endblock javascripts %}

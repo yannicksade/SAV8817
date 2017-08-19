@@ -84,7 +84,6 @@ var FormImageCrop = function () {
 
 }();
 
-/*
 jQuery(document).ready(function () {
     FormImageCrop.init();
-});*/
+});

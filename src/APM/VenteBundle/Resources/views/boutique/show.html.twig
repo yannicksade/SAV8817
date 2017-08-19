@@ -49,7 +49,7 @@
             {% for offre in boutique.offres %}
                  {% if offre.categorie == null %}
                      <td>
-                         <a href="{{ path('apm_vente_offre_show', { 'id': offre.id }) }}">{{ offre.designation }}</a>|
+                        {# <a href="{{ path('apm_vente_offre_show', { 'id': offre.id }) }}">{{ offre.designation }}</a>#}|
                      </td>
                  {% endif %}
             {% endfor %}
@@ -128,8 +128,8 @@
                 commissionnements accordées par la boutique</a>
         </li>
         <li>
-            <a href="{{ path('apm_achat_service_apres_vente_boutique_index', {'id':boutique.id}) }}">Liste les SAV
-                enregistrées sur les produits de cette boutique</a>
+            {#<a href="{{ path('apm_achat_service_apres_vente_boutique_index', {'id':boutique.id}) }}">Liste les SAV
+                enregistrées sur les produits de cette boutique</a>#}
         </li>
         {% if delete_form %}
         <li>

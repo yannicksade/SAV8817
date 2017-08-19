@@ -3,7 +3,7 @@
 
 {% block custom_stylesheets %}
     {% stylesheets "dashboard/assets/global/plugins/jcrop/css/jquery.Jcrop.min.css"
-    "dashboard/assets/pages/css/image-crop.min.css" filter='cssrewrite' %}
+    "dashboard/assets/pages/css/image-crop.css" filter='cssrewrite' %}
     <link href="{{ asset_url }}" rel="stylesheet" type="text/css"/>
     {% endstylesheets %}
 {% endblock custom_stylesheets %}
@@ -12,10 +12,10 @@
     <h1>Recadrement de l'image</h1>
     <div class="row">
         <div class="responsive-1024">
-            <img src="{{ asset(vich_uploader_asset(user, 'imageFile')) }}" alt="{{ user.username }}" id="demo3"/>
+            <img src="{{ asset(vich_uploader_asset(user, 'imageFile')) }}" alt="{{ user.username }}" class="crop-image"/>
         </div>
         <div class="responsive-1024">
-            <div id="preview-pane">
+            <div class="preview-pane">
                 <div class="preview-container">
                     <img src="{{ asset(vich_uploader_asset(user, 'imageFile')) }}"
                          alt="{{ user.username }}"

@@ -4,6 +4,9 @@ apm_core_homepage:
     path:     / #masque fos_user.registration_register et redirige vers la plateforme
     defaults: { _controller: APMCoreBundle:Default:index }
 
+apm_core_locked-screen:
+    path:     /locked-screen
+    defaults: { _controller: APMCoreBundle:LockedScreen:index }
 #--------------------- pages utilisateur ----------------------------------------------
 apm_core_user-registration:
     resource: "@APMCoreBundle/Resources/config/user/registration.yml"

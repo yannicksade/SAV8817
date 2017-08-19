@@ -51,7 +51,7 @@ var Login = function () {
         });
 
         $('.login-form input').keypress(function (e) {
-            if (e.which == 13) {
+            if (e.which === 13) {
                 if ($('.login-form').validate().form()) {
                     $('.login-form').submit(); //form validation success, call ajax form submit
                 }
@@ -60,7 +60,7 @@ var Login = function () {
         });
 
         $('.forget-form input').keypress(function (e) {
-            if (e.which == 13) {
+            if (e.which === 13) {
                 if ($('.forget-form').validate().form()) {
                     $('.forget-form').submit();
                 }
@@ -77,7 +77,7 @@ var Login = function () {
             $('.login-form').show();
             $('.forget-form').hide();
         });
-    }
+    };
 
 
     return {
@@ -88,9 +88,12 @@ var Login = function () {
 
             // init background slide images
             $('.login-bg').backstretch([
-                    "../assets/pages/img/login/bg1.jpg",
-                    "../assets/pages/img/login/bg2.jpg",
-                    "../assets/pages/img/login/bg3.jpg"
+                    $('#bg-1').val(),
+                    $('#bg-2').val(),
+                    $('#bg-3').val(),
+                    $('#bg-4').val(),
+                    $('#bg-5').val(),
+                    $('#bg-6').val()
                 ], {
                     fade: 1000,
                     duration: 8000

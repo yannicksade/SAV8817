@@ -19,7 +19,7 @@ class MainSiteController extends Controller
     public function showAction(Request $request)
     {
 
-        return new Response('Hello!: Main site');
+        return new Response('Hello: Plateforme! Main site');
     }
 
 }

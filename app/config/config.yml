@@ -85,7 +85,7 @@ fos_user:
     service:
         user_manager: pugx_user_manager
         mailer: fos_user.mailer.twig_swift
-    use_username_form_type: false
+    use_username_form_type: true
     from_email:
         address:           webmaster@esay-trade.com
         sender_name:       webmaster

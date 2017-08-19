@@ -8,6 +8,6 @@ class DefaultController extends Controller
 {
     public function indexAction()
     {
-        return $this->redirectToRoute("apm_core_main_show");
+        return $this->redirectToRoute("apm_core_user-dashboard_index");
     }
 }

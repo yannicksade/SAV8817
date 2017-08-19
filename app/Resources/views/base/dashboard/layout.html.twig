@@ -569,11 +569,11 @@ License: You must have a valid license purchased only from themeforest(the above
                                 </li>
                                 <li class="divider"></li>
                                 <li>
-                                    <a href="{{ path('fos_user_security_logout') }}">
+                                    <a href="{{ path('apm_core_locked-screen') }}">
                                         <i class="icon-lock"></i> Lock Screen </a>
                                 </li>
                                 <li>
-                                    <a href="#">
+                                    <a href="{{ path('fos_user_security_logout') }}">
                                         <i class="icon-key"></i> Log Out </a>
                                 </li>
                             </ul>
@@ -2401,6 +2401,8 @@ License: You must have a valid license purchased only from themeforest(the above
     <script src="{{ asset_url }}" type="text/javascript"></script>
     {% endjavascripts %}
     <!-- END THEME LAYOUT SCRIPTS -->
+    {% block javascripts %}
+    {% endblock javascripts %}
     <script>
         $(document).ready(function () {
             $('#clickmewow').click(function () {
@@ -2408,8 +2410,6 @@ License: You must have a valid license purchased only from themeforest(the above
             });
         })
     </script>
-    {% block javascripts %}
-    {% endblock javascripts %}
 {% endif %}
 <!-- BEGIN NOTIFIC8 ALERT -->
 <!-- END NOTIFIC8 ALERT -->

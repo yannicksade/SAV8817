@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<!--
+Template Name: Metronic - Responsive Admin Dashboard Template build with Twitter Bootstrap 3.3.7
+Version: 4.7.5
+Author: KeenThemes
+Website: http://www.keenthemes.com/
+Contact: support@keenthemes.com
+Follow: www.twitter.com/keenthemes
+Dribbble: www.dribbble.com/keenthemes
+Like: www.facebook.com/keenthemes
+Purchase: http://themeforest.net/item/metronic-responsive-admin-dashboard-template/4021469?ref=keenthemes
+Renew Support: http://themeforest.net/item/metronic-responsive-admin-dashboard-template/4021469?ref=keenthemes
+License: You must have a valid license purchased only from themeforest(the above link) in order to legally use the theme for your project.
+-->
+<!--[if IE 8]>
+<html lang="en" class="ie8 no-js"> <![endif]-->
+<!--[if IE 9]>
+<html lang="en" class="ie9 no-js"> <![endif]-->
+<!--[if !IE]><!-->
+<html lang="en">
+<!--<![endif]-->
+<!-- BEGIN HEAD -->
+
+<head>
+    <meta charset="UTF-8"/>
+    <title> {%- block title -%} We-Trade {% endblock %}</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta content="width=device-width, initial-scale=1" name="viewport"/>
+    <meta content="Panel d'administration individuel Easy-Trade" name="description"/>
+    <meta content="" name="Yannick SADE"/>
+    <!-- BEGIN GLOBAL MANDATORY STYLES -->
+    <link href="http://fonts.googleapis.com/css?family=Open+Sans:400,300,600,700&subset=all" rel="stylesheet" type="text/css" />
+    {% stylesheets "dashboard/assets/global/plugins/font-awesome/css/font-awesome.min.css"
+    "dashboard/assets/global/plugins/simple-line-icons/simple-line-icons.min.css"
+    "dashboard/assets/global/plugins/bootstrap/css/bootstrap.min.css"
+    "dashboard/assets/global/plugins/bootstrap-switch/css/bootstrap-switch.min.css" filter='cssrewrite' %}
+    <link rel="stylesheet" href="{{ asset_url }}" type="text/css">
+    {% endstylesheets %}
+    <!-- END GLOBAL MANDATORY STYLES -->
+
+    <!-- BEGIN THEME GLOBAL STYLES -->
+    {% stylesheets "dashboard/assets/global/css/components.min.css"
+    "dashboard/assets/global/css/plugins.min.css" filter='cssrewrite' %}
+    <link href="{{ asset_url }}" rel="stylesheet" id="style_components" type="text/css">
+    {% endstylesheets %}
+    <!-- END THEME GLOBAL STYLES -->
+
+    <!-- BEGIN THEME LAYOUT STYLES -->
+    {% block custom_stylesheets %}
+    {% endblock custom_stylesheets %}
+
+    <!-- END THEME LAYOUT STYLES -->
+    <link rel="shortcut icon" type="image/x-icon" href="{{ asset("dashboard/assets/apps/img/favicon.ico") }}"/>
+</head>
+<!-- END HEAD -->
+<body class="login">
+{% block body_login %}
+<!-- END NOTIFIC8 ALERT -->
+{% endblock body_login %}
+
+<!--[if lt IE 9]>
+{% javascripts 'dashboard/assets/global/plugins/respond.min.js'
+'dashboard/assets/global/plugins/excanvas.min.js'
+'dashboard/assets/global/plugins/ie8.fix.min.js'%}
+<script src="{{ asset_url }}" type="text/javascript"></script>
+{% endjavascripts %}
+<![endif]-->
+<!-- BEGIN CORE PLUGINS -->
+{% javascripts 'dashboard/assets/global/plugins/jquery.min.js'
+'dashboard/assets/global/plugins/bootstrap/js/bootstrap.min.js'
+'dashboard/assets/global/plugins/js.cookie.min.js'
+'dashboard/assets/global/plugins/jquery-slimscroll/jquery.slimscroll.min.js'
+'dashboard/assets/global/plugins/jquery.blockui.min.js'
+'dashboard/assets/global/plugins/bootstrap-switch/js/bootstrap-switch.min.js' %}
+<script src="{{ asset_url }}" type="text/javascript"></script>
+{% endjavascripts %}
+<!-- END CORE PLUGINS -->
+
+{% javascripts 'dashboard/assets/global/scripts/app.min.js' %}
+<script src="{{ asset_url }}" type="text/javascript"></script>
+{% endjavascripts %}
+<!-- END THEME GLOBAL SCRIPTS -->
+{% block javascripts %}
+{% endblock javascripts %}
+<script>
+    $(document).ready(function()
+    {
+        $('#clickmewow').click(function()
+        {
+            $('#radio1003').attr('checked', 'checked');
+        });
+    })
+</script>
+</body>
+</html>

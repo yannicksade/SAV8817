@@ -35,6 +35,15 @@ security:
             security: false
 
         main:
+            #remember_me:
+                #secret:   '%secret%'
+                #lifetime: 100 # 1 week in seconds
+                #path:     /
+
+                        # by default, the feature is enabled by checking a
+                        # checkbox in the login form (see below), uncomment the
+                        # following line to always enable it.
+                #always_remember_me: true
             pattern: ^/
             form_login:
                 provider: fos_userbundle
@@ -42,13 +51,6 @@ security:
             logout:       true
             anonymous:    true
 
-#        sheild:
-#            pattern: ^/
-#            form_login:
-#                provider: fos_userbundle
-#                csrf_token_generator: security.csrf.token_manager
-#            logout:       true
-#            anonymous:    false
 
     access_control:
 

@@ -17,7 +17,7 @@ class UserDashboardController extends Controller
 
     public function indexAction()
     {
-        return $this->render(':client/dashboard:index_old.html.twig', [
+        return $this->render(':base/dashboard:layout.html.twig', [
             'url_image' => $this->get('apm_core.packages_maker')->getPackages()->getUrl('/', 'resolve_img'),
         ]);
     }
