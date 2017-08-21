@@ -2,9 +2,7 @@
 {%- block title -%} {{ parent() }} | Mes offres {% endblock %}
 
 {% block custom_stylesheets %}
-    {% stylesheets "dashboard/assets/global/plugins/jcrop/css/jquery.Jcrop.css"
-    "dashboard/assets/pages/css/image-crop.css"
-    "dashboard/assets/vente/offrePage.css" filter='cssrewrite' %}
+    {% stylesheets "dashboard/assets/vente/offrePage.css" filter='cssrewrite' %}
     <link href="{{ asset_url }}" rel="stylesheet" type="text/css"/>
     {% endstylesheets %}
 {% endblock custom_stylesheets %}
@@ -595,9 +593,7 @@
     <!-- END SAMPLE TABLE PORTLET-->
 {% endblock content_body %}
     {% block javascripts %}
-        {% javascripts "dashboard/assets/vente/offrePage.js"
-        "dashboard/assets/global/plugins/jcrop/js/jquery.Jcrop.js"
-        "dashboard/assets/pages/scripts/form-image-crop.js" %}
+        {% javascripts "dashboard/assets/vente/offrePage.js" %}
         <script src="{{ asset_url }}" type="text/javascript"></script>
         {% endjavascripts %}
     {% endblock javascripts %}

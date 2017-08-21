@@ -10,7 +10,7 @@ var FormWizard = function () {
 
             function format(state) {
                 if (!state.id) return state.text; // optgroup
-                return "<img class='flag' src='../../assets/global/img/flags/" + state.id.toLowerCase() + ".png'/>&nbsp;&nbsp;" + state.text;
+                return "<img class='flag' src='" +$('#w-flag').val()+ state.id.toLowerCase() + ".png'/>&nbsp;&nbsp;" + state.text;
             }
 
             $("#country_list").select2({
@@ -49,26 +49,20 @@ var FormWizard = function () {
                         equalTo: "#submit_form_password"
                     },
                     //profile
-                    fullname: {
+                    nom: {
                         required: true
                     },
-                    email: {
-                        required: true,
-                        email: true
-                    },
-                    phone: {
+
+                    telephone: {
                         required: true
                     },
-                    gender: {
+                    genre: {
                         required: true
                     },
-                    address: {
+                    addresse: {
                         required: true
                     },
-                    city: {
-                        required: true
-                    },
-                    country: {
+                    pays: {
                         required: true
                     },
                     //payment
@@ -76,8 +70,8 @@ var FormWizard = function () {
                         required: true
                     },
                     card_number: {
-                        minlength: 16,
-                        maxlength: 16,
+                        minlength: 15,
+                        maxlength: 17,
                         required: true
                     },
                     card_cvc: {
@@ -169,7 +163,7 @@ var FormWizard = function () {
                         $(this).html(payment.join("<br>"));
                     }
                 });
-            }
+            };
 
             var handleTitle = function (tab, navigation, index) {
                 var total = navigation.find('li').length;
@@ -198,7 +192,7 @@ var FormWizard = function () {
                     $('#form_wizard_1').find('.button-submit').hide();
                 }
                 App.scrollTo($('.page-title'));
-            }
+            };
 
             // default form wizard
             $('#form_wizard_1').bootstrapWizard({
@@ -242,9 +236,7 @@ var FormWizard = function () {
             });
 
             $('#form_wizard_1').find('.button-previous').hide();
-            $('#form_wizard_1 .button-submit').click(function () {
-                alert('Finished! Hope you like it :)');
-            }).hide();
+            $('#form_wizard_1 .button-submit').hide();
 
             //apply validation on select2 dropdown value change, this only needed for chosen dropdown integration.
             $('#country_list', form).change(function () {

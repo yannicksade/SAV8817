@@ -29,35 +29,47 @@ License: You must have a valid license purchased only from themeforest(the above
     <meta content="Panel d'administration individuel Easy-Trade" name="description"/>
     <meta content="" name="Yannick SADE"/>
     <!-- BEGIN GLOBAL MANDATORY STYLES -->
-    <link href="http://fonts.googleapis.com/css?family=Open+Sans:400,300,600,700&subset=all" rel="stylesheet" type="text/css" />
-    {% stylesheets "dashboard/assets/global/plugins/font-awesome/css/font-awesome.min.css"
-    "dashboard/assets/global/plugins/simple-line-icons/simple-line-icons.min.css"
-    "dashboard/assets/global/plugins/bootstrap/css/bootstrap.min.css"
-    "dashboard/assets/global/plugins/bootstrap-switch/css/bootstrap-switch.min.css" filter='cssrewrite' %}
-    <link rel="stylesheet" href="{{ asset_url }}" type="text/css">
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,300,600,700&subset=all' rel='stylesheet' type='text/css'/>
+    {% stylesheets 'dashboard/assets/global/plugins/font-awesome/css/font-awesome.min.css'
+    'dashboard/assets/global/plugins/simple-line-icons/simple-line-icons.min.css'
+    'dashboard/assets/global/plugins/bootstrap/css/bootstrap.min.css'
+    'dashboard/assets/global/plugins/bootstrap-switch/css/bootstrap-switch.min.css' filter='cssrewrite' %}
+    <link rel='stylesheet' href="{{ asset_url }}" type="text/css">
     {% endstylesheets %}
     <!-- END GLOBAL MANDATORY STYLES -->
-
+    <!-- BEGIN PAGE LEVEL SCRIPTS -->
+    {% stylesheets  'dashboard/assets/pages/css/image-crop.css' filter='cssrewrite' %}
+    <link href="{{ asset_url }}" rel="stylesheet" type="text/css">
+    {% endstylesheets %}
+    <!-- END PAGE LEVEL SCRIPTS -->
+    <!-- BEGIN THEME LAYOUT STYLES -->
+    {% stylesheets 'dashboard/assets/global/plugins/select2/css/select2.min.css'
+    'dashboard/assets/global/plugins/select2/css/select2-bootstrap.min.css'
+    'dashboard/assets/global/plugins/bootstrap-datetimepicker/css/bootstrap-datetimepicker.min.css'
+    'dashboard/assets/global/plugins/bootstrap-datepicker/css/bootstrap-datepicker3.min.css'
+    'dashboard/assets/global/plugins/jcrop/css/jquery.Jcrop.css' filter='cssrewrite' %}
+    <link href="{{ asset_url }}" rel="stylesheet" type="text/css">
+    {% endstylesheets %}
+    <!-- END THEME LAYOUT STYLES -->
+    {% block stylesheets %}
+    {% endblock stylesheets %}
     <!-- BEGIN THEME GLOBAL STYLES -->
-    {% stylesheets "dashboard/assets/global/css/components.min.css"
-    "dashboard/assets/global/css/plugins.min.css" filter='cssrewrite' %}
-    <link href="{{ asset_url }}" rel="stylesheet" id="style_components" type="text/css">
+    {% stylesheets 'dashboard/assets/global/css/components.min.css' filter='cssrewrite' %}
+    <link href='{{ asset_url }}' rel="stylesheet" id="style_components" type="text/css">
+    {% endstylesheets %}
+
+    {% stylesheets 'dashboard/assets/global/css/plugins.min.css' filter='cssrewrite' %}
+    <link href="{{ asset_url }}" rel="stylesheet" type="text/css">
     {% endstylesheets %}
     <!-- END THEME GLOBAL STYLES -->
-
-    <!-- BEGIN THEME LAYOUT STYLES -->
-    {% block custom_stylesheets %}
-    {% endblock custom_stylesheets %}
-
-    <!-- END THEME LAYOUT STYLES -->
     <link rel="shortcut icon" type="image/x-icon" href="{{ asset("dashboard/assets/apps/img/favicon.ico") }}"/>
 </head>
 <!-- END HEAD -->
-<body class="login">
-{% block body_login %}
+<body>
+{% block body_content %}
 <!-- END NOTIFIC8 ALERT -->
-{% endblock body_login %}
-
+{% endblock body_content %}
+<input id="w-flag" type="hidden" value="{{ asset('dashboard/assets/global/img/flags/') }}"/>
 <!--[if lt IE 9]>
 {% javascripts 'dashboard/assets/global/plugins/respond.min.js'
 'dashboard/assets/global/plugins/excanvas.min.js'
@@ -71,17 +83,45 @@ License: You must have a valid license purchased only from themeforest(the above
 'dashboard/assets/global/plugins/js.cookie.min.js'
 'dashboard/assets/global/plugins/jquery-slimscroll/jquery.slimscroll.min.js'
 'dashboard/assets/global/plugins/jquery.blockui.min.js'
-'dashboard/assets/global/plugins/bootstrap-switch/js/bootstrap-switch.min.js' %}
+'dashboard/assets/global/plugins/bootstrap-switch/js/bootstrap-switch.min.js'%}
 <script src="{{ asset_url }}" type="text/javascript"></script>
 {% endjavascripts %}
 <!-- END CORE PLUGINS -->
+<!-- BEGIN PAGE LEVEL PLUGINS BEFORE APP-->
+{% javascripts  'dashboard/assets/global/plugins/jquery-ui/jquery-ui.min.js'
+'dashboard/assets/global/plugins/select2/js/select2.full.min.js'
+'dashboard/assets/global/plugins/jquery-validation/js/jquery.validate.min.js'
+'dashboard/assets/global/plugins/jquery-validation/js/additional-methods.min.js'
+'dashboard/assets/global/plugins/bootstrap-wizard/jquery.bootstrap.wizard.min.js'%}
+<script src="{{ asset_url }}" type="text/javascript"></script>
+{% endjavascripts %}
+<!-- APP PAGE LEVEL PLUGINS BEFORE APP-->
 
-{% javascripts 'dashboard/assets/global/scripts/app.min.js' %}
+<!-- BEGIN THEME GLOBAL SCRIPTS -->
+{% javascripts 'dashboard/assets/global/scripts/app.min.js'%}
 <script src="{{ asset_url }}" type="text/javascript"></script>
 {% endjavascripts %}
 <!-- END THEME GLOBAL SCRIPTS -->
-{% block javascripts %}
-{% endblock javascripts %}
+<!-- BEGIN PAGE LEVEL PLUGINS -->
+{% javascripts 'dashboard/assets/global/plugins/jcrop/js/jquery.Jcrop.js'
+'dashboard/assets/global/plugins/backstretch/jquery.backstretch.min.js'
+'dashboard/assets/global/plugins/bootstrap-datetimepicker/js/bootstrap-datetimepicker.min.js'
+'dashboard/assets/global/plugins/bootstrap-datepicker/js/bootstrap-datepicker.min.js' %}
+<script src="{{ asset_url }}" type="text/javascript"></script>
+{% endjavascripts %}
+<!-- END PAGE LEVEL PLUGINS -->
+
+<!-- BEGIN PAGE LEVEL SCRIPTS -->
+{% javascripts 'dashboard/assets/pages/scripts/components-date-time-pickers.min.js'
+'dashboard/assets/pages/scripts/form-image-crop.js'
+'dashboard/assets/pages/scripts/components-select2.js'
+'dashboard/assets/pages/scripts/form-wizard.js'%}
+<script src="{{ asset_url }}" type="text/javascript"></script>
+{% endjavascripts %}
+<!-- END PAGE LEVEL SCRIPTS -->
+
+<!-- BEGIN PAGE LEVEL PLUGINS -->
+<!-- END THEME GLOBAL SCRIPTS -->
 <script>
     $(document).ready(function()
     {
@@ -91,5 +131,7 @@ License: You must have a valid license purchased only from themeforest(the above
         });
     })
 </script>
+{% block js %}
+{% endblock js %}
 </body>
 </html>

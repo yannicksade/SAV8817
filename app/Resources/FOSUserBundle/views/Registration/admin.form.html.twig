@@ -1,5 +1,8 @@
+{% extends "@FOSUser/Security/login-extend.html.twig" %}
 
-{% block fos_user_content %}
+{%- block title -%} {{ parent()}}| Staff Account {%- endblock title -%}
+
+{% block body_content %}
     {% trans_default_domain 'FOSUserBundle' %}
     <h1>Création d'un compte Staff AVM</h1>
         {{ form_start(form) }}
@@ -8,4 +11,4 @@
             <input type="submit" value="{{ 'registration.submit'|trans }}" />
         </div>
         {{ form_end(form) }}
-{% endblock fos_user_content %}
+{% endblock body_content %}

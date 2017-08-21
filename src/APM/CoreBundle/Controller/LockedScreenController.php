@@ -32,6 +32,7 @@ class LockedScreenController extends Controller implements RememberMeServicesInt
         $session = $request->getSession();
         $session->set('username', $user->getUsername());
         $session->set('image', $user->getImage());
+        $session->set('email', $user->getEmail());
         $authErrorKey = Security::AUTHENTICATION_ERROR;
         // get the error if any (works with forward and redirect -- see below)
         if ($request->attributes->has($authErrorKey)) {
@@ -52,6 +53,7 @@ class LockedScreenController extends Controller implements RememberMeServicesInt
         if(null !== $session){
            $lastUsername = $session->get('username');
             $image = $session->get('image');
+            $email = $session->get('email');
         }else{
             $lastUsername ='';
             $image = '';
@@ -65,6 +67,7 @@ class LockedScreenController extends Controller implements RememberMeServicesInt
         return $this->render('@FOSUser/Security/locked-screen.html.twig', array(
             'last_username' => $lastUsername,
             'image' => $image,
+            'email' => $email,
             'error' => $error,
             'csrf_token' => $csrfToken,
             'url_image' => $this->get('apm_core.packages_maker')->getPackages()->getUrl('/', 'resolve_img'),

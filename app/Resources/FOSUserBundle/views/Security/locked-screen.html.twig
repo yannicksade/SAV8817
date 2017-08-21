@@ -1,58 +1,59 @@
 {% extends "@FOSUser/Security/login-extend.html.twig" %}
 
-{% block custom_stylesheets %}
-    {% stylesheets "dashboard/assets/pages/css/lock.min.css" filter='cssrewrite' %}
+{% block stylesheets %}
+    {% stylesheets "dashboard/assets/pages/css/lock-2.min.css" filter='cssrewrite' %}
     <link href="{{ asset_url }}" rel="stylesheet" type="text/css"/>
     {% endstylesheets %}
-{% endblock custom_stylesheets %}
+{% endblock stylesheets %}
 
 {%- block title -%} {{ parent() }}| Lock Screen {%- endblock title -%}
 
-{% block body_login %}
+{% block body_content %}
     <div class="page-lock">
         <div class="page-logo">
             <a class="brand" href="#">
                 <img src="{{ asset('dashboard/assets/layouts/layout/img/logo.png') }}" alt="logo"/> </a>
         </div>
         <div class="page-body">
-            <div class="lock-head"> Locked</div>
-            <div class="lock-body">
-                <div class="lock-cont">
-                    {% if error %}
-                        <div>{{ error.messageKey|trans(error.messageData, 'security') }}</div>
-                    {% endif %}
-                    <div class="lock-item">
-                        <div class="pull-left lock-avatar-block">
-                            <img src="{{ asset( url_image ~ image) }}" class="lock-avatar"></div>
+            {% if error %}
+                <div>{{ error.messageKey|trans(error.messageData, 'security') }}</div>{% endif %}
+            <img class="page-lock-img" src="{{ asset( url_image ~ image) }}" alt=""/>
+            <div class="page-lock-info">
+                <h1>{{ last_username }}</h1>
+                <span class="email"> {{ email }} </span>
+                <span class="locked"> Locked </span>
+                <form class="form-inline" action="{{ path("fos_user_security_check") }}" method="post">
+                    <input type="hidden" name="_csrf_token" value="{{ csrf_token }}"/>
+                    <input type="hidden" autocomplete="off" name="_username" id="username" value="{{ last_username }}"/>
+                    <div class="input-group input-medium">
+                        <input type="password" autocomplete="off" class="form-control" placeholder="Password"
+                               id="password" name="_password"/>
+                        <span class="input-group-btn">
+                                <button type="submit" class="btn green icn-only">
+                                    <i class="m-icon-swapright m-icon-white"></i>
+                                </button>
+                            </span>
                     </div>
-                    <div class="lock-item lock-item-full">
-                        <form class="lock-form pull-left" action="{{ path("fos_user_security_check") }}" method="post">
-                            <input type="hidden" name="_csrf_token" value="{{ csrf_token }}"/>
-                            <h4>{{ last_username }}</h4>
-                            <label for="username"></label>
-                            <input type="hidden" autocomplete="off" name="_username" id="username"
-                                   value="{{ last_username }}"/>
-                            <div class="form-group">
-                                <input class="form-control placeholder-no-fix" id="password" type="password"
-                                       autocomplete="off" placeholder="Password" name="_password"/>
-                            </div>
-                            <div class="form-actions">
-                                <button type="submit" class="btn red uppercase">Login</button>
-                            </div>
-                        </form>
+                    <!-- /input-group -->
+                    <div class="relogin">
+                        <a href="{{ path('fos_user_security_logout') }}"> Not {{ last_username }} ? </a>
                     </div>
-                </div>
-            </div>
-            <div class="lock-bottom">
-                <a href="{{ path('fos_user_security_logout') }}">Not {{ last_username}} ?</a>
+                </form>
             </div>
         </div>
-        <div class="page-footer-custom"> 2017 &copy; HiT-Tel. We-Trade Dashboard.</div>
+        <div class="page-footer-custom"> 2017 &copy; HiT-Tel. We-Trade Dashboard.
+            <input type="hidden" id="bg-1" value="{{ asset("dashboard/assets/pages/media/bg/1.jpg") }}"/>
+            <input type="hidden" id="bg-2" value="{{ asset("dashboard/assets/pages/media/bg/2.jpg") }}"/>
+            <input type="hidden" id="bg-3" value="{{ asset("dashboard/assets/pages/media/bg/3.jpg") }}"/>
+            <input type="hidden" id="bg-4" value="{{ asset("dashboard/assets/pages/media/bg/4.jpg") }}"/>
+            <input type="hidden" id="bg-5" value="{{ asset("dashboard/assets/pages/media/bg/5.jpg") }}"/>
+            <input type="hidden" id="bg-6" value="{{ asset("dashboard/assets/pages/media/bg/6.jpg") }}"/>
+        </div>
     </div>
-{% endblock body_login %}
+{% endblock body_content %}
 
-{% block javascripts %}
-    {% javascripts "dashboard/assets/pages/scripts/lock.min.js" %}
+{% block js %}
+    {% javascripts "dashboard/assets/pages/scripts/lock-2.js" %}
     <script src="{{ asset_url }}" type="text/javascript"></script>
     {% endjavascripts %}
-{% endblock javascripts %}
+{% endblock js %}

@@ -1,16 +1,14 @@
 {% extends "@FOSUser/Security/login-extend.html.twig" %}
 
- {% block custom_stylesheets %}
-     {% stylesheets "dashboard/assets/global/plugins/select2/css/select2.min.css"
-     "dashboard/assets/global/plugins/select2/css/select2-bootstrap.min.css"
-     "dashboard/assets/pages/css/login-5.min.css" filter='cssrewrite' %}
+ {% block stylesheets %}
+     {% stylesheets "dashboard/assets/pages/css/login-5.min.css" filter='cssrewrite' %}
      <link href="{{ asset_url }}" rel="stylesheet" type="text/css"/>
      {% endstylesheets %}
- {% endblock custom_stylesheets %}
+ {% endblock stylesheets %}
 
 {%- block title -%} {{ parent()}}| Login {%- endblock title -%}
 
-{% block body_login %}
+{% block body_content %}
     <!-- BEGIN : LOGIN PAGE 5-2 -->
     <div class="user-login-5">
         <div class="row bs-reset">
@@ -104,16 +102,10 @@
     <input type="hidden" id="bg-4" value="{{ asset("dashboard/assets/pages/img/login/10.jpg") }}"/>
     <input type="hidden" id="bg-5" value="{{ asset("dashboard/assets/pages/img/login/43.jpg") }}"/>
     <input type="hidden" id="bg-6" value="{{ asset("dashboard/assets/pages/img/login/8.jpg") }}"/>
-{% endblock body_login %}
+{% endblock body_content %}
 
-{% block javascripts %}
-    <!-- BEGIN PAGE LEVEL SCRIPTS -->
-    {% javascripts "dashboard/assets/global/plugins/jquery-validation/js/jquery.validate.min.js"
-    "dashboard/assets/global/plugins/jquery-validation/js/additional-methods.min.js"
-    "dashboard/assets/global/plugins/select2/js/select2.full.min.js"
-    "dashboard/assets/global/plugins/backstretch/jquery.backstretch.min.js"
-    "dashboard/assets/pages/scripts/login-5.js" %}
+{% block js %}
+    {% javascripts "dashboard/assets/pages/scripts/login-5.js" %}
     <script src="{{ asset_url }}" type="text/javascript"></script>
     {% endjavascripts %}
-    <!-- END PAGE LEVEL SCRIPTS -->
-{% endblock javascripts %}
+{% endblock js %}

@@ -54,9 +54,8 @@ abstract class Utilisateur extends BaseUser
      */
     protected $prenom;
     /**
-     * @var Date
-     * @Assert\Date
-     * @ORM\Column(name="dateNaissance", type="date", nullable=true)
+     * @var String
+     * @ORM\Column(name="dateNaissance", type="string", nullable=true)
      */
     protected $dateNaissance;
     /**
@@ -65,9 +64,8 @@ abstract class Utilisateur extends BaseUser
      */
     protected $pays;
     /**
-     * @var integer
-     * @Assert\Choice({0,1})
-     * @ORM\Column(name="genre", type="integer", nullable=true)
+     * @var string
+     * @ORM\Column(name="genre", type="string", nullable=true)
      */
     protected $genre;
     /**
@@ -186,7 +184,7 @@ abstract class Utilisateur extends BaseUser
     /**
      * Get dateNaissance
      *
-     * @return Date
+     * @return string
      */
     public function getDateNaissance()
     {
@@ -196,7 +194,7 @@ abstract class Utilisateur extends BaseUser
     /**
      * Set dateNaissance
      *
-     * @param \DateTime $dateNaissance
+     * @param string $dateNaissance
      *
      * @return Utilisateur
      */
