@@ -1,9 +1,9 @@
 {% extends "@FOSUser/Security/login-extend.html.twig" %}
 
-{%- block title -%} {{ parent() }}| User Account {%- endblock title -%}
+{%- block title -%} {{ parent() }}| new account {%- endblock title -%}
 
 {% block body_content %}
-    <div class="portlet light bordered" id="form_wizard_1">
+    <div class="portlet light bordered" id="form_wizard">
         <div class="portlet-title">
             <div class="caption">
                 <i class=" icon-layers font-red"></i>
@@ -15,7 +15,7 @@
 
         <div class="portlet-body form">
             {% trans_default_domain 'FOSUserBundle' %}
-            {{ form_start(form, {'attr':{'class':'form-horizontal', 'id':'submit_form'}}) }}
+            {{ form_start(form, {'attr':{'class':'submit_form form-horizontal'}}) }}
             <div class="form-wizard">
                 <div class="form-body">
                     <ul class="nav nav-pills nav-justified steps">
@@ -63,13 +63,14 @@
                         <div class="tab-pane active" id="tab1">
                             <h3 class="block">Provide your account details</h3>
                             <div class="form-group">
-                                <label class="control-label col-md-3">User name
+                                <label class="control-label col-md-3">Username
                                     <span class="required"> * </span>
                                 </label>
                                 <div class="col-md-4">
                                     {{ form_errors(form.username,  {'attr':{'class':'form-error'}}) }}
-                                    {{ form_widget(form.username, {'attr':{'class':'form-control', 'name':'username'}}) }}
-                                    <span class="help-block"> Provide your username </span>
+                                    {{ form_widget(form.username, {'attr':{'class':'form-control un'}}) }}
+                                    <span class="help-block"> Provide your name </span>
+
                                 </div>
                             </div>
                             <div class="form-group">
@@ -78,7 +79,7 @@
                                 </label>
                                 <div class="col-md-4">
                                     {{ form_errors(form.plainPassword.first, {'attr':{'class':'form-error'}}) }}
-                                    {{ form_widget(form.plainPassword.first, {'attr':{'name':'password', 'id':'submit_form_password'}}) }}
+                                    {{ form_widget(form.plainPassword.first, {'attr':{'class':'form-control submit_form_password'}}) }}
                                     <span class="help-block"> Provide your password </span>
                                 </div>
                             </div>
@@ -87,7 +88,7 @@
                                     <span class="required"> * </span>
                                 </label>
                                 <div class="col-md-4">
-                                    {{ form_widget(form.plainPassword.second, {'attr':{'name':'rpassword'}}) }}
+                                    {{ form_widget(form.plainPassword.second, {'attr':{'class':'form-control'}}) }}
                                     <span class="help-block"> Confirm your password </span>
                                     <span class="help-block help-block-error"> your password must contain at least 5 caractares and ..numbers </span>
                                 </div>
@@ -98,7 +99,7 @@
                                 </label>
                                 <div class="col-md-4">
                                     {{ form_errors(form.email) }}
-                                    {{ form_widget(form.email, {'attr':{'class':'form-control', 'name':'email'}}) }}
+                                    {{ form_widget(form.email, {'attr':{'class':'form-control'}}) }}
                                     <span class="help-block"> provide your email </span>
                                     <span class="help-block help-block-error"> your email must be a type of the avm.com domain </span>
                                 </div>
@@ -128,48 +129,53 @@
                                 </label>
                                 <div class="col-md-4">
                                     {{ form_errors(form.nom) }}
-                                    {{ form_widget(form.nom, {'attr':{'class':'form-control', 'name':'nom'}}) }}
+                                    {{ form_widget(form.nom, {'attr':{'class':'form-control'}}) }}
                                     <span class="help-block"> Provide your last name </span>
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label class="control-label col-md-3">Surname
+                                <label class="control-label col-md-3">First name
                                     <span class="required"> * </span>
                                 </label>
                                 <div class="col-md-4">
                                     {{ form_errors(form.prenom) }}
-                                    {{ form_widget(form.prenom, {'attr':{'class':'form-control', 'name':'prenom'}}) }}
+                                    {{ form_widget(form.prenom, {'attr':{'class':'form-control'}}) }}
                                     <span class="help-block"> Provide your first name </span>
                                 </div>
                             </div>
                             <div class="form-group">
-                                {{ form_errors(form.profession) }}
-                                <label class="control-label col-md-3">Job
-                                    <span class="required"> * </span>
-                                </label>
-                                <div class="col-md-4">
-                                    {{ form_widget(form.profession, {'attr':{'class':'form-control', 'name':'profession'}}) }}
-                                    <span class="help-block"> Provide your occupation </span>
-                                    <span class="help-block help-block-error"> your occupation is incorrect</span>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                {{ form_errors(form.genre) }}
                                 <label class="control-label col-md-3">Gender
                                     <span class="required"> * </span>
                                 </label>
                                 <div class="col-md-4">
-                                    {{ form_widget(form.genre, {'attr': {'class':'radio-list mt-radio-outline', 'name':'genre'}}) }}
-                                    <div id="form_gender_error"></div>
+                                    <div class="mt-radio-list">
+                                        {{ form_widget(form.genre) }}
+                                        <span class="help-block"> Provide your gender </span>
+                                        <div id="form_gender_error"> </div>
+                                    </div>
                                 </div>
                             </div>
+
+                            <div class="form-group">
+                                {{ form_errors(form.profession) }}
+                                <label class="control-label col-md-3">Occupation
+                                    <span class="required"> * </span>
+                                </label>
+                                <div class="col-md-4">
+                                    {{ form_widget(form.profession, {'attr':{'class':'form-control'}}) }}
+                                    <span class="help-block"> Provide your occupation (or Job) </span>
+                                    <span class="help-block help-block-error"> your occupation (or Job) is incorrect</span>
+                                </div>
+                            </div>
+
                             <div class="form-group">
                                 {{ form_errors(form.adresse) }}
                                 <label class="control-label col-md-3">Address
                                     <span class="required"> * </span>
                                 </label>
                                 <div class="col-md-4">
-                                    {{ form_widget(form.adresse, {'attr':{'class':'form-control', 'name':'adresse'}}) }}
+                                    {{ form_errors(form.adresse) }}
+                                    {{ form_widget(form.adresse, {'attr':{'class':'form-control'}}) }}
                                     <span class="help-block"> Provide your street and city address </span>
                                 </div>
                             </div>
@@ -179,7 +185,8 @@
                                     <span class="required"> * </span>
                                 </label>
                                 <div class="col-md-4">
-                                    {{ form_widget(form.telephone, {'attr':{'class':'form-control', 'name':'telephone'}}) }}
+                                    {{ form_errors(form.telephone) }}
+                                    {{ form_widget(form.telephone, {'attr':{'class':'form-control'}}) }}
                                     <span class="help-block"> Provide your phone number</span>
                                 </div>
                             </div>
@@ -189,7 +196,8 @@
                                     <span class="required"> * </span>
                                 </label>
                                 <div class="col-md-4">
-                                    {{ form_widget(form.pays, {'attr':{'class':'form-control', 'name':'pays', 'id':"country_list"}}) }}
+                                    {{ form_errors(form.pays) }}
+                                    {{ form_widget(form.pays, {'attr':{'class':'form-control country_list'}}) }}
                                     <span class="help-block"> Provide your country </span>
                                 </div>
                             </div>
@@ -199,6 +207,7 @@
                                     <span class="required"> * </span>
                                 </label>
                                 <div class="col-md-4">
+                                    {{ form_errors(form.imageFile) }}
                                     {{ form_widget(form.imageFile, {'name':'imageFile'}) }}
                                 </div>
                             </div>
@@ -446,7 +455,7 @@
                             <h3 class="block">Provide your billing and credit card details</h3>
                             <div class="form-group">
                                 <label class="control-label col-md-3">Card Holder Name
-                                    <span class="required"> * </span>
+                                    <span class="required">  </span>
                                 </label>
                                 <div class="col-md-4">
                                     <input type="text" class="form-control" name="card_name"/>
@@ -464,11 +473,11 @@
                             </div>
                             <div class="form-group">
                                 <label class="control-label col-md-3">CVC
-                                    <span class="required"> * </span>
+                                    <span class="required"> </span>
                                 </label>
                                 <div class="col-md-4">
                                     <input type="text" placeholder="" class="form-control" name="card_cvc"/>
-                                    <span class="help-block"> </span>
+                                    <span class="help-block">  </span>
                                 </div>
                             </div>
                             <div class="form-group">
@@ -504,64 +513,64 @@
                             <h3 class="block">Confirm your account</h3>
                             <h4 class="form-section">Account</h4>
                             <div class="form-group">
-                                <label class="control-label col-md-3">Username:</label>
+                                <label class="control-label col-md-3">User name:</label>
                                 <div class="col-md-4">
-                                    <p class="form-control-static" data-display="username"></p>
+                                    <p class="form-control-static" data-display="apm_utilisateur_avm_registration[username]"></p>
                                 </div>
                             </div>
                             <div class="form-group">
                                 <label class="control-label col-md-3">Email:</label>
                                 <div class="col-md-4">
-                                    <p class="form-control-static" data-display="email"></p>
+                                    <p class="form-control-static" data-display="apm_utilisateur_avm_registration[email]"></p>
                                 </div>
                             </div>
                             <h4 class="form-section">Profile</h4>
                             <div class="form-group">
-                                <label class="control-label col-md-3">First name:</label>
-                                <div class="col-md-4">
-                                    <p class="form-control-static" data-display="nom"></p>
-                                </div>
-                            </div>
-                            <div class="form-group">
                                 <label class="control-label col-md-3">Last name:</label>
                                 <div class="col-md-4">
-                                    <p class="form-control-static" data-display="prenom"></p>
+                                    <p class="form-control-static" data-display="apm_utilisateur_avm_registration[nom]"></p>
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label class="control-label col-md-3">Genre:</label>
+                                <label class="control-label col-md-3">First name:</label>
                                 <div class="col-md-4">
-                                    <p class="form-control-static" data-display="genre"></p>
+                                    <p class="form-control-static" data-display="apm_utilisateur_avm_registration[prenom]"></p>
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label class="control-label col-md-3">Téléphone:</label>
+                                <label class="control-label col-md-3">Gender:</label>
                                 <div class="col-md-4">
-                                    <p class="form-control-static" data-display="telephone"></p>
+                                    <p class="form-control-static" data-display="apm_utilisateur_avm_registration[genre]"></p>
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label class="control-label col-md-3">Addresse Complète:</label>
+                                <label class="control-label col-md-3">Phone:</label>
                                 <div class="col-md-4">
-                                    <p class="form-control-static" data-display="addresse"></p>
+                                    <p class="form-control-static" data-display="apm_utilisateur_avm_registration[telephone]"></p>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-md-3">Full address:</label>
+                                <div class="col-md-4">
+                                    <p class="form-control-static" data-display="apm_utilisateur_avm_registration[adresse]"></p>
                                 </div>
                             </div>
                             <div class="form-group">
                                 <label class="control-label col-md-3">Occupation:</label>
                                 <div class="col-md-4">
-                                    <p class="form-control-static" data-display="occupation"></p>
+                                    <p class="form-control-static" data-display="apm_utilisateur_avm_registration[profession]"></p>
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label class="control-label col-md-3">pays:</label>
+                                <label class="control-label col-md-3">Country:</label>
                                 <div class="col-md-4">
-                                    <p class="form-control-static" data-display="pays"></p>
+                                    <p class="form-control-static" data-display="apm_utilisateur_avm_registration[pays]"></p>
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label class="control-label col-md-3">date de naissance:</label>
+                                <label class="control-label col-md-3">Date of birth:</label>
                                 <div class="col-md-4">
-                                    <p class="form-control-static" data-display="dateDeNaissance"></p>
+                                    <p class="form-control-static" data-display="apm_utilisateur_avm_registration[dateNaissance]"></p>
                                 </div>
                             </div>
                             <h4 class="form-section">Billing</h4>

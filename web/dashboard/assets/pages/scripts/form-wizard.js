@@ -1,6 +1,8 @@
 var FormWizard = function () {
 
 
+
+
     return {
         //main function to initiate the module
         init: function () {
@@ -13,7 +15,7 @@ var FormWizard = function () {
                 return "<img class='flag' src='" +$('#w-flag').val()+ state.id.toLowerCase() + ".png'/>&nbsp;&nbsp;" + state.text;
             }
 
-            $("#country_list").select2({
+            $(".country_list").select2({
                 placeholder: "Select",
                 allowClear: true,
                 formatResult: format,
@@ -23,11 +25,10 @@ var FormWizard = function () {
                     return m;
                 }
             });
-
-            var form = $('#submit_form');
+            var formWizard = $('#form_wizard');
+            var form = $('form.submit_form', formWizard);
             var error = $('.alert-danger', form);
             var success = $('.alert-success', form);
-
             form.validate({
                 doNotHideMessage: true, //this option enables to show the error/success messages on tab switch.
                 errorElement: 'span', //default input error message container
@@ -35,35 +36,45 @@ var FormWizard = function () {
                 focusInvalid: false, // do not focus the last invalid input
                 rules: {
                     //account
-                    username: {
-                        minlength: 5,
-                        required: true
-                    },
-                    password: {
-                        minlength: 5,
-                        required: true
-                    },
-                    rpassword: {
-                        minlength: 5,
-                        required: true,
-                        equalTo: "#submit_form_password"
-                    },
-                    //profile
-                    nom: {
-                        required: true
+                    "apm_utilisateur_avm_registration[username]" :{
+                        minlength: 15
                     },
 
-                    telephone: {
-                        required: true
+                    "apm_utilisateur_avm_registration[plainPassword][first]": {//password
+                        minlength: 5
+
                     },
-                    genre: {
-                        required: true
+                    "apm_utilisateur_avm_registration[plainPassword][second]": {
+                        minlength: 5,
+                        equalTo: ".submit_form_password"
                     },
-                    addresse: {
-                        required: true
+                    "apm_utilisateur_avm_registration[email]":{
+                        minlength: 5,
+                        maxlength: 10
                     },
-                    pays: {
-                        required: true
+                    //profile
+                    "apm_utilisateur_avm_registration[nom]" :{
+                        minlength: 5,
+                        maxlength: 10
+                    },
+
+                   "apm_utilisateur_avm_registration[telephone]": {
+                       minlength: 5,
+                       maxlength: 10
+                    },
+
+                    "apm_utilisateur_avm_registration[genre]": {
+                        minlength: 5,
+                        maxlength: 10
+                    },
+
+                    "apm_utilisateur_avm_registration[adresse]": {
+                        minlength: 5,
+                        maxlength: 10
+                    },
+                    "apm_utilisateur_avm_registration[pays]": {
+                        minlength: 5,
+                        maxlength: 10
                     },
                     //payment
                     card_name: {
@@ -87,7 +98,7 @@ var FormWizard = function () {
                         required: true,
                         minlength: 1
                     }
-                },
+                }, //rules not need when on symfony
 
                 messages: { // custom messages for radio buttons and checkboxes
                     'payment[]': {
@@ -97,16 +108,16 @@ var FormWizard = function () {
                 },
 
                 errorPlacement: function (error, element) { // render error placement for each input type
-                    if (element.attr("name") == "gender") { // for uniform radio buttons, insert the after the given container
+                    if (element.attr("name") === "genre") { // for uniform radio buttons, insert the after the given container
                         error.insertAfter("#form_gender_error");
-                    } else if (element.attr("name") == "payment[]") { // for uniform checkboxes, insert the after the given container
+                    } else if (element.attr("name") === "payment[]") { // for uniform checkboxes, insert the after the given container
                         error.insertAfter("#form_payment_error");
                     } else {
                         error.insertAfter(element); // for other inputs, just perform default behavior
                     }
                 },
 
-                invalidHandler: function (event, validator) { //display error alert on form submit   
+                invalidHandler: function (event, validator) { //display error alert on form submit
                     success.hide();
                     error.show();
                     App.scrollTo(error, -200);
@@ -123,7 +134,7 @@ var FormWizard = function () {
                 },
 
                 success: function (label) {
-                    if (label.attr("for") == "gender" || label.attr("for") == "payment[]") { // for checkboxes and radio buttons, no need to show OK icon
+                    if (label.attr("for") === "gender" || label.attr("for") === "payment[]") { // for checkboxes and radio buttons, no need to show OK icon
                         label
                             .closest('.form-group').removeClass('has-error').addClass('has-success');
                         label.remove(); // remove error label here
@@ -155,7 +166,7 @@ var FormWizard = function () {
                         $(this).html(input.find('option:selected').text());
                     } else if (input.is(":radio") && input.is(":checked")) {
                         $(this).html(input.attr("data-title"));
-                    } else if ($(this).attr("data-display") == 'payment[]') {
+                    } else if ($(this).attr("data-display") === 'payment[]') {
                         var payment = [];
                         $('[name="payment[]"]:checked', form).each(function () {
                             payment.push($(this).attr('data-title'));
@@ -169,41 +180,40 @@ var FormWizard = function () {
                 var total = navigation.find('li').length;
                 var current = index + 1;
                 // set wizard title
-                $('.step-title', $('#form_wizard_1')).text('Step ' + (index + 1) + ' of ' + total);
+                $('.step-title', formWizard).text('Step ' + (index + 1) + ' of ' + total);
                 // set done steps
-                jQuery('li', $('#form_wizard_1')).removeClass("done");
+                jQuery('li', formWizard).removeClass("done");
                 var li_list = navigation.find('li');
                 for (var i = 0; i < index; i++) {
                     jQuery(li_list[i]).addClass("done");
                 }
 
-                if (current == 1) {
-                    $('#form_wizard_1').find('.button-previous').hide();
+                if (current === 1) {
+                    formWizard.find('.button-previous').hide();
                 } else {
-                    $('#form_wizard_1').find('.button-previous').show();
+                    formWizard.find('.button-previous').show();
                 }
 
                 if (current >= total) {
-                    $('#form_wizard_1').find('.button-next').hide();
-                    $('#form_wizard_1').find('.button-submit').show();
+                    formWizard.find('.button-next').hide();
+                    formWizard.find('.button-submit').show();
                     displayConfirm();
                 } else {
-                    $('#form_wizard_1').find('.button-next').show();
-                    $('#form_wizard_1').find('.button-submit').hide();
+                    formWizard.find('.button-next').show();
+                    formWizard.find('.button-submit').hide();
                 }
                 App.scrollTo($('.page-title'));
             };
 
             // default form wizard
-            $('#form_wizard_1').bootstrapWizard({
+            formWizard.bootstrapWizard({
                 'nextSelector': '.button-next',
                 'previousSelector': '.button-previous',
                 onTabClick: function (tab, navigation, index, clickedIndex) {
-                    return false;
 
                     success.hide();
                     error.hide();
-                    if (form.valid() == false) {
+                    if (form.valid() === false) {
                         return false;
                     }
 
@@ -213,7 +223,7 @@ var FormWizard = function () {
                     success.hide();
                     error.hide();
 
-                    if (form.valid() == false) {
+                    if (form.valid() === false) {
                         return false;
                     }
 
@@ -229,19 +239,20 @@ var FormWizard = function () {
                     var total = navigation.find('li').length;
                     var current = index + 1;
                     var $percent = (current / total) * 100;
-                    $('#form_wizard_1').find('.progress-bar').css({
+                    formWizard.find('.progress-bar').css({
                         width: $percent + '%'
                     });
                 }
             });
 
-            $('#form_wizard_1').find('.button-previous').hide();
-            $('#form_wizard_1 .button-submit').hide();
+            formWizard.find('.button-previous').hide();
+            $('.button-submit', formWizard).hide();
 
             //apply validation on select2 dropdown value change, this only needed for chosen dropdown integration.
-            $('#country_list', form).change(function () {
+            $('.country_list', form).change(function () {
                 form.validate().element($(this)); //revalidate the chosen dropdown value and show error or success message for the input
             });
+
         }
 
     };

@@ -21,29 +21,35 @@ class RegistrationType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('nom')
+            ->add('email', TextType::class)
+            ->add('nom', TextType::class)
             ->add('prenom')
-           ->add('plainPassword', RepeatedType::class, array(
-               'type' => PasswordType::class,
-               'invalid_message' => 'fos_user.password.mismatch',
-               'options' => array('attr' => array('class' => 'form-control')),
-               'required' => true,
-           ))
-            ->add('dateNaissance', TextType::class , array(
-                'attr' => ['class'=>'form-control']
+            ->add('plainPassword', RepeatedType::class, array(
+                'type' => PasswordType::class,
+                'options' => array('attr' => array('class' => 'form-control')),
+                'required' => true,
             ))
-
+            ->add('dateNaissance', TextType::class, array(
+                'attr' => ['class' => 'form-control', 'name' => 'dateNaissance'],
+                'required' => false,
+            ))
             ->add('pays', CountryType::class, [
                 'required' => false,
             ])
-
             ->add('genre', ChoiceType::class, array(
                 'expanded' => true,
                 'choices' => [
-                    'male' => '1',
-                    'female' =>'0',
+                    'M' => '1',
+                    'F' => '0',
                 ],
-                'required' => true
+                'choice_label' => function ($val, $key, $index) {
+                    if ($val) return 'Masculin'; else return 'Feminin';
+                },
+                'choice_attr' => function ($val, $key, $index) {
+                     return ($val)?['data-title' =>'Masculin'] : ['data-title' =>'Feminin'];
+                }
+                /*'empty_value'=> 1,
+                 'empty_data'=> null*/
             ))
             ->add('telephone', NumberType::class)
             ->add('adresse', TextType::class)
@@ -69,6 +75,6 @@ class RegistrationType extends AbstractType
 
     public function getBlockPrefix()
     {
-        return 'app_utilisateur_registration';
+        return 'apm_utilisateur_registration';
     }
 }
