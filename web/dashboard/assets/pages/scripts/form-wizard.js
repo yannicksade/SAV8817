@@ -29,6 +29,7 @@ var FormWizard = function () {
             var form = $('form.submit_form', formWizard);
             var error = $('.alert-danger', form);
             var success = $('.alert-success', form);
+
             form.validate({
                 doNotHideMessage: true, //this option enables to show the error/success messages on tab switch.
                 errorElement: 'span', //default input error message container
@@ -37,7 +38,7 @@ var FormWizard = function () {
                 rules: {
                     //account
                     "apm_utilisateur_avm_registration[username]" :{
-                        minlength: 15
+                        minlength: 4
                     },
 
                     "apm_utilisateur_avm_registration[plainPassword][first]": {//password
@@ -49,23 +50,21 @@ var FormWizard = function () {
                         equalTo: ".submit_form_password"
                     },
                     "apm_utilisateur_avm_registration[email]":{
-                        minlength: 5,
-                        maxlength: 10
+                        email:true
                     },
                     //profile
                     "apm_utilisateur_avm_registration[nom]" :{
                         minlength: 5,
-                        maxlength: 10
+                        maxlength: 255
                     },
 
                    "apm_utilisateur_avm_registration[telephone]": {
+                       digits: true,
                        minlength: 5,
                        maxlength: 10
                     },
 
                     "apm_utilisateur_avm_registration[genre]": {
-                        minlength: 5,
-                        maxlength: 10
                     },
 
                     "apm_utilisateur_avm_registration[adresse]": {
@@ -73,8 +72,6 @@ var FormWizard = function () {
                         maxlength: 10
                     },
                     "apm_utilisateur_avm_registration[pays]": {
-                        minlength: 5,
-                        maxlength: 10
                     },
                     //payment
                     card_name: {

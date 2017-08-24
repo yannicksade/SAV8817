@@ -29,7 +29,8 @@ License: You must have a valid license purchased only from themeforest(the above
     <meta content="Panel d'administration individuel Easy-Trade" name="description"/>
     <meta content="" name="Yannick SADE"/>
     <!-- BEGIN GLOBAL MANDATORY STYLES -->
-    <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,300,600,700&subset=all' rel='stylesheet' type='text/css'/>
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,300,600,700&subset=all' rel='stylesheet'
+          type='text/css'/>
     {% stylesheets 'dashboard/assets/global/plugins/font-awesome/css/font-awesome.min.css'
     'dashboard/assets/global/plugins/simple-line-icons/simple-line-icons.min.css'
     'dashboard/assets/global/plugins/bootstrap/css/bootstrap.min.css'
@@ -42,17 +43,32 @@ License: You must have a valid license purchased only from themeforest(the above
     <link href="{{ asset_url }}" rel="stylesheet" type="text/css">
     {% endstylesheets %}
     <!-- END PAGE LEVEL SCRIPTS -->
+
+    <!-- BEGIN PAGE LEVEL PLUGINS -->
+    {% stylesheets "dashboard/assets/global/plugins/ladda/ladda-themeless.min.css"  filter='cssrewrite' %}
+    <link href="{{ asset_url }}" rel="stylesheet" type="text/css">
+    {% endstylesheets %}
+    <!-- END PAGE LEVEL PLUGINS -->
+
     <!-- BEGIN THEME LAYOUT STYLES -->
     {% stylesheets 'dashboard/assets/global/plugins/select2/css/select2.min.css'
     'dashboard/assets/global/plugins/select2/css/select2-bootstrap.min.css'
     'dashboard/assets/global/plugins/bootstrap-datetimepicker/css/bootstrap-datetimepicker.min.css'
     'dashboard/assets/global/plugins/bootstrap-datepicker/css/bootstrap-datepicker3.min.css'
-    'dashboard/assets/global/plugins/jcrop/css/jquery.Jcrop.css' filter='cssrewrite' %}
+    'dashboard/assets/global/plugins/jcrop/css/jquery.Jcrop.css'
+    "dashboard/assets/global/plugins/ladda/ladda-themeless.min.css" filter='cssrewrite' %}
     <link href="{{ asset_url }}" rel="stylesheet" type="text/css">
     {% endstylesheets %}
     <!-- END THEME LAYOUT STYLES -->
+    <!-- BEGIN PAGE LEVEL CUSTOM-->
+    {% block custom_page_css %}
+        {% stylesheets 'dashboard/assets/pages/css/custom.css' filter='cssrewrite' %}
+        <link href="{{ asset_url }}" rel="stylesheet" type="text/css">
+        {% endstylesheets %}
+    {% endblock custom_page_css %}
     {% block stylesheets %}
     {% endblock stylesheets %}
+    <!-- END PAGE LEVEL CUSTOM-->
     <!-- BEGIN THEME GLOBAL STYLES -->
     {% stylesheets 'dashboard/assets/global/css/components.min.css' filter='cssrewrite' %}
     <link href='{{ asset_url }}' rel="stylesheet" id="style_components" type="text/css">
@@ -62,12 +78,14 @@ License: You must have a valid license purchased only from themeforest(the above
     <link href="{{ asset_url }}" rel="stylesheet" type="text/css">
     {% endstylesheets %}
     <!-- END THEME GLOBAL STYLES -->
+
     <link rel="shortcut icon" type="image/x-icon" href="{{ asset("dashboard/assets/apps/img/favicon.ico") }}"/>
 </head>
 <!-- END HEAD -->
 <body>
+
 {% block body_content %}
-<!-- END NOTIFIC8 ALERT -->
+    <!-- END NOTIFIC8 ALERT -->
 {% endblock body_content %}
 
 <input id="w-flag" type="hidden" value="{{ asset('dashboard/assets/global/img/flags/') }}"/>
@@ -84,7 +102,7 @@ License: You must have a valid license purchased only from themeforest(the above
 'dashboard/assets/global/plugins/js.cookie.min.js'
 'dashboard/assets/global/plugins/jquery-slimscroll/jquery.slimscroll.min.js'
 'dashboard/assets/global/plugins/jquery.blockui.min.js'
-'dashboard/assets/global/plugins/bootstrap-switch/js/bootstrap-switch.min.js'%}
+'dashboard/assets/global/plugins/bootstrap-switch/js/bootstrap-switch.min.js' %}
 <script src="{{ asset_url }}" type="text/javascript"></script>
 {% endjavascripts %}
 <!-- END CORE PLUGINS -->
@@ -93,13 +111,13 @@ License: You must have a valid license purchased only from themeforest(the above
 'dashboard/assets/global/plugins/select2/js/select2.full.min.js'
 'dashboard/assets/global/plugins/jquery-validation/js/jquery.validate.min.js'
 'dashboard/assets/global/plugins/jquery-validation/js/additional-methods.min.js'
-'dashboard/assets/global/plugins/bootstrap-wizard/jquery.bootstrap.wizard.min.js'%}
+'dashboard/assets/global/plugins/bootstrap-wizard/jquery.bootstrap.wizard.min.js' %}
 <script src="{{ asset_url }}" type="text/javascript"></script>
 {% endjavascripts %}
 <!-- APP PAGE LEVEL PLUGINS BEFORE APP-->
 
 <!-- BEGIN THEME GLOBAL SCRIPTS -->
-{% javascripts 'dashboard/assets/global/scripts/app.min.js'%}
+{% javascripts 'dashboard/assets/global/scripts/app.min.js' %}
 <script src="{{ asset_url }}" type="text/javascript"></script>
 {% endjavascripts %}
 <!-- END THEME GLOBAL SCRIPTS -->
@@ -107,7 +125,9 @@ License: You must have a valid license purchased only from themeforest(the above
 {% javascripts 'dashboard/assets/global/plugins/jcrop/js/jquery.Jcrop.js'
 'dashboard/assets/global/plugins/backstretch/jquery.backstretch.min.js'
 'dashboard/assets/global/plugins/bootstrap-datetimepicker/js/bootstrap-datetimepicker.min.js'
-'dashboard/assets/global/plugins/bootstrap-datepicker/js/bootstrap-datepicker.min.js' %}
+'dashboard/assets/global/plugins/bootstrap-datepicker/js/bootstrap-datepicker.min.js'
+'dashboard/assets/global/plugins/ladda/spin.min.js'
+'dashboard/assets/global/plugins/ladda/ladda.min.js'%}
 <script src="{{ asset_url }}" type="text/javascript"></script>
 {% endjavascripts %}
 <!-- END PAGE LEVEL PLUGINS -->
@@ -116,23 +136,29 @@ License: You must have a valid license purchased only from themeforest(the above
 {% javascripts 'dashboard/assets/pages/scripts/components-date-time-pickers.min.js'
 'dashboard/assets/pages/scripts/form-image-crop.js'
 'dashboard/assets/pages/scripts/components-select2.js'
-'dashboard/assets/pages/scripts/form-wizard.js'%}
+'dashboard/assets/pages/scripts/form-wizard.js'
+'dashboard/assets/pages/scripts/ui-buttons-spinners.js'%}
 <script src="{{ asset_url }}" type="text/javascript"></script>
 {% endjavascripts %}
 <!-- END PAGE LEVEL SCRIPTS -->
 
-<!-- BEGIN PAGE LEVEL PLUGINS -->
 <!-- END THEME GLOBAL SCRIPTS -->
 <script>
-    $(document).ready(function()
-    {
-        $('#clickmewow').click(function()
-        {
+    $(document).ready(function () {
+        $('#clickmewow').click(function () {
             $('#radio1003').attr('checked', 'checked');
         });
     })
 </script>
+{% block custom_page_js %}
+    {% javascripts 'dashboard/assets/pages/scripts/custom.js' %}
+    <script src="{{ asset_url }}" type="text/javascript"></script>
+    {% endjavascripts %}
+{% endblock custom_page_js %}
+<!-- BEGIN PAGE LEVEL CUSTOM-->
 {% block js %}
 {% endblock js %}
+
+<!-- END PAGE LEVEL CUSTOM-->
 </body>
 </html>

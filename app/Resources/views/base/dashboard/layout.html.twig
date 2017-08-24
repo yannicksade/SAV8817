@@ -8,16 +8,18 @@
     <link href="{{ asset('dashboard/assets/global/plugins/pace/themes/pace-theme-flash.css') }}" rel="stylesheet"
           type="text/css"/>
     <!-- END PAGE TOP STYLES -->
+    <!-- BEGIN PAGE LEVEL SCRIPTS -->
+
+    <!-- END PAGE LEVEL SCRIPTS -->
+
     <!-- BEGIN PAGE LEVEL PLUGINS -->
     {% stylesheets "dashboard/assets/global/plugins/bootstrap-modal/css/bootstrap-modal-bs3patch.css"
     "dashboard/assets/global/plugins/bootstrap-modal/css/bootstrap-modal.css"
     "dashboard/assets/global/plugins/datatables/datatables.min.css"
     "dashboard/assets/global/plugins/datatables/plugins/bootstrap/datatables.bootstrap.css"
-    "dashboard/assets/global/plugins/jquery-notific8/jquery.notific8.min.css"
-    "dashboard/assets/global/plugins/ladda/ladda-themeless.min.css" filter='cssrewrite' %}
+    "dashboard/assets/global/plugins/jquery-notific8/jquery.notific8.min.css" filter='cssrewrite' %}
     <link rel="stylesheet" href="{{ asset_url }}" type="text/css">
     {% endstylesheets %}
-
     <!-- END PAGE LEVEL PLUGINS -->
 
     <!-- BEGIN THEME LAYOUT STYLES -->
@@ -32,6 +34,7 @@
     <!-- END THEME LAYOUT STYLES -->
     <link rel="shortcut icon" type="image/x-icon" href="{{ asset("dashboard/assets/apps/img/favicon.ico") }}"/>
 {% endblock stylesheets %}
+
 {% block body_content %}
     <div class="page-header-fixed page-sidebar-closed-hide-logo page-content-white page-sidebar-closed">
         {% if is_granted("IS_AUTHENTICATED_REMEMBERED") %}
@@ -2342,14 +2345,12 @@
         <!-- END NOTIFIC8 ALERT -->
     </div>
 {% endblock body_content %}
+
 {% block js %}
     <!-- BEGIN PAGE LEVEL PLUGINS -->
     {% javascripts "dashboard/assets/global/plugins/bootstrap-modal/js/bootstrap-modalmanager.js"
     "dashboard/assets/global/plugins/bootstrap-modal/js/bootstrap-modal.js"
-    'dashboard/assets/global/plugins/jquery-notific8/jquery.notific8.min.js'
-    'dashboard/assets/global/plugins/bootstrap-growl/jquery.bootstrap-growl.min.js'
-    'dashboard/assets/global/plugins/ladda/spin.min.js'
-    'dashboard/assets/global/plugins/ladda/ladda.min.js' %}
+    'dashboard/assets/global/plugins/bootstrap-growl/jquery.bootstrap-growl.min.js'%}
     <script src="{{ asset_url }}" type="text/javascript"></script>
     {% endjavascripts %}
     <!-- END PAGE LEVEL PLUGINS -->
@@ -2360,13 +2361,11 @@
     <script src="{{ asset_url }}" type="text/javascript"></script>
     {% endjavascripts %}
 
-    {#'dashboard/assets/pages/scripts/ui-extended-modals.js'#}
     <!-- BEGIN PAGE LEVEL SCRIPTS -->
     {% javascripts 'dashboard/assets/pages/scripts/ui-extended-modals.js'
     'dashboard/assets/pages/scripts/table-datatables-ajax.js'
     'dashboard/assets/pages/scripts/ui-notific8.js'
-    'dashboard/assets/pages/scripts/ui-extended-modals.js'
-    'dashboard/assets/pages/scripts/ui-buttons-spinners.js' %}
+    'dashboard/assets/pages/scripts/ui-extended-modals.js' %}
     <script src="{{ asset_url }}" type="text/javascript"></script>
     {% endjavascripts %}
     <!-- END PAGE LEVEL SCRIPTS -->

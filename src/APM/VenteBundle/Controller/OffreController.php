@@ -68,7 +68,6 @@ class OffreController extends Controller
         if ($request->isXmlHttpRequest() && $request->getMethod() === "POST") {
             $this->listAndShowSecurity();
             $session = $this->get('session');
-            //$data = $request->request->get('images');
             $id = intval($request->query->get('id'));
             $em = $this->getDoctrine()->getManager();
             $offre = null;

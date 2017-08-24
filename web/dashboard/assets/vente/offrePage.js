@@ -4,6 +4,8 @@
 var OffrePage = function () {
     //global variables
     //----pages
+    var nbProcessusEnCours = 0;
+    var notifAlert = document.querySelector("#notif-active");
     var actionConfirm;
     var modalConfirm = $('#modal-confirm');
     var tabElement_1 = $('#tab_1'),
@@ -11,6 +13,8 @@ var OffrePage = function () {
         tab1 = document.querySelector('#tab1'),
         tab2 = document.querySelector('#tab2');
     var uploadedFile;
+        var labelProcess = $('#ajax-label-process');
+    var isEditMode = false;
     //----- modal
     var modal_stk = {
         'modalElement': "#m-ajax", //identité de la modal
@@ -43,82 +47,6 @@ var OffrePage = function () {
      xhr.send(fd);
      };*/
 
-    var readFile = function (file, container) {
-        var reader = new FileReader();
-        reader.onload = function (evt) {
-            if (reader.readyState === 2) {//2
-                uploadedFile = evt.target.result;
-                var element;
-                element = document.createElement('img');
-                element.style.maxWidth = "830px";
-                element.style.maxHeight = "622px";
-                element.src = this.result;
-                element.className = "crop-image";
-                var divElement = document.createElement('div');
-                divElement.className = "big-view";
-                divElement.appendChild(element);
-                var oldView = container.querySelector('.big-view');
-                if (oldView === null) container.appendChild(divElement); else container.replaceChild(divElement, oldView);
-
-                element = element.cloneNode(false);
-                //document.querySelector('a[href="#image_1"] '+modal_stk.modalElement);
-                //$('.url-dir').val() + '1_' + $('.images', parent).text();
-                element.className = "jcrop-preview";
-                divElement = divElement.cloneNode(false);
-                divElement.className = "preview-container";
-                divElement.appendChild(element);
-                var ppane = divElement.cloneNode(false);
-                ppane.className = "preview-pane";
-                ppane.appendChild(divElement);
-                var oldPrev = container.querySelector('.preview-pane');
-                if (oldPrev === null) container.appendChild(ppane); else container.replaceChild(ppane, oldPrev);
-                FormImageCrop.init();
-                nbProcessusEnCours -= 1;
-                labelProcess.html(nbProcessusEnCours + ' traitement(s) en cours...');
-                if (nbProcessusEnCours === 0) $('#ct-sp').click();
-                $('.modal-spinner', container.parentNode).click();
-            }
-            if (reader.readyState === reader.LOADING) { //1
-
-            }
-
-            if (reader.readyState === reader.EMPTY) { //0
-                //aucune donnée chargée!
-                alert('aucun fichier chargé');
-                nbProcessusEnCours -= 1;
-                labelProcess.html(nbProcessusEnCours + ' traitement(s) en cours...');
-                if (nbProcessusEnCours === 0) $('#ct-sp').click();
-                $('.modal-spinner', container.parentNode).click();
-            }
-        };
-        reader.readAsDataURL(file);
-    };
-    var loadFile = function () {
-        var allowfileTypes = ["jpg", "png", "gif", "jpeg"];
-        $('input[type="file"]').change(function () {
-            var parent;
-            var files = [];
-            files = this.files;
-            var fileLength = files.length;
-            for (var i = 0; i < fileLength; i++) { //vérification du type de fichier lu
-                var fileType = files[0].name.split('.');
-                fileType = fileType[fileType.length - 1].toLowerCase();// éviter les extensions en majuscule
-                if (allowfileTypes.indexOf(fileType) !== -1) {
-                    parent = this.parentNode.parentNode; // modalFooter
-                    //$(parent).modalmanager('loading');
-                    nbProcessusEnCours += 1;
-                    labelProcess.html(nbProcessusEnCours + ' traitement(s) en cours...');
-                    if (nbProcessusEnCours === 1) $('#ct-sp').click();
-                    $('.modal-spinner', parent.parentNode).click();
-                    readFile(files[0], parent);
-                } else {
-                    //modalNotification('images non valide');
-                    alert('Fichier non valide');
-                }
-            }
-        });
-    };
-
     var modalNotification = function (message) {
         var tmpl = [
             // tabindex is required for focus
@@ -138,23 +66,19 @@ var OffrePage = function () {
 
         $(tmpl).modal('modal');
     };
-    var nbProcessusEnCours = 0,
-        labelProcess = $('#ajax-label-process');
-    var isEditMode = false;
     //---- notification
-    var notifAlert = document.querySelector("#notif-active");
-    //---------------------- modifier --------------------
+
+
     var uncheckBoxes = function (parent) {
         $('input[type="checkbox"]:checked', parent).attr('checked', false);
     };
     var reinitializeModal = function () {
         $('.data-content', modal_stk.modalElement).addClass("hidden");
         $('.alerte', modal_stk.modalElement).removeClass("hidden");
-
         $('.id', modal_stk.modalElement).val('');
         $('td', modal_stk.modalElement).text('');
         //réinitialisation de la tab
-        $(modal_stk.modalTab1, modal_stk.modalElement).click();
+        $(modal_stk.modalTab1, modal_stk.modalElement).click(); //cback to the first tab
     };
     var getCheckedBoxes = function (parent) { //:nth-child(1)
         return $('.checkboxes:checked', parent);
@@ -241,33 +165,7 @@ var OffrePage = function () {
         $('.type', form).val($('.typeID', parent).text());
         $('.remise', form).val($('.remise', parent).text());
     };
-    var reset = function () {
-        //------------------------- reinitialize chekboxes of a form after a reset click -----------------
-        $('input[type="reset"]').click(function () {
-            var p;
-            var raz = $(this);
-            if (raz.hasClass('reset-modal')) {
-                p = raz.parents('.tab-pane');
-                if (raz.hasClass('reset-image')) {
-                    var parent = this.parentNode.parentNode.parentNode;//modal-Footer
-                    var bv = parent.querySelector('.big-view');
-                    bv.parentNode.removeChild(bv);
-                    var prev = parent.querySelector('.preview-pane');
-                    prev.parentNode.removeChild(prev);
-                }
-           $('.modal-spinner', p).addClass('hidden');
-            } else {
-                p = raz.parent();
-                $('input[type="text"]', p).val(''); // in a case where p = form, rinitialize the form
-                $('input[type="text"]', p).attr('readonly', true);
-                $('select, textarea', p).attr('disabled', true);
-                uncheckBoxes(p);
-                $('input[type="submit"]', p).attr('disabled', true);
-                $('.form-group .copier', p).attr('disabled', true);
-                isEditMode = false;
-            }
-        });
-    };
+
     var afficherImpl = function (parent) {
         //parent is a row here
         $('.alerte', modal_stk.modalElement).addClass("hidden");
@@ -320,16 +218,16 @@ var OffrePage = function () {
     var modifier = function () {
         $('.edit_item').click(function () {
             var p = $(this).parents();
-            var ptl = p[5];// portlet
+            var parent = p[5];// portlet
             if (!$(p[0]).hasClass('modal-footer')) { //chargement du formulaire partant du tableau
-                modifierImpl(ptl);
-                var cboxes = getCheckedBoxes($('tbody', ptl));
+                modifierImpl(parent);
+                var cboxes = $('.checkboxes:checked', parent)
                 var nb = cboxes.length;
                 for (var i = 0; i < nb; i++) {
                     var elt = cboxes[i];
                     setTimeout(function () {
                         var p = $(elt).parents();
-                        tableToFormLoad(p[2], ptl);// 1- a row of the table 2- portlet, parent of the form
+                        tableToFormLoad(p[2], parent);// 1- a row of the table 2- portlet, parent of the form
                         uncheckBoxes(p[1]); //td cell
                     });
                 }
@@ -348,9 +246,11 @@ var OffrePage = function () {
     };
     var supprimer = function () {
         $('.delete_item').click(function () {
-            //alt.removeEventListener('click',null, false);
             var elt, elements = [];
-            var p = $(this).parents();
+            var child = this;
+            var table = $('.data-content .datatable_ajax');
+            //alt.removeEventListener('click',null, false);
+            var p = $(child).parents();
             if ($(p[0]).hasClass('modal-footer')) {//suppression à partir de la modal
                 elements[0] = $('.id', p[1]).val();
                 $('.alerte', modalConfirm).html('Vous êtes sur le point de supprimer définitivement l\'offre de référence:<strong>' + $('.code', p[1]).text() + '</strong><br/> Voulez-vous continuer?');
@@ -370,7 +270,7 @@ var OffrePage = function () {
 
             modalConfirm.on('click', '#action-confirm', function () {
                 if (actionConfirm !== 1) return;
-                if (elements.length > 0) deleteElement(elements, p[5], p[0]);
+                if (elements.length > 0) GlobalPageCustomScript.anActionForm(child, elements, table);
                 elements = [];
             });
             modalConfirm.on('click', '.action-cancel', function () {
@@ -381,7 +281,6 @@ var OffrePage = function () {
         });
     };
     var formManager = function () {
-
         //control des boutons collectifs
         $('.form-element .group-checkboxes-form').change(function () { //check and uncheck
             var checked = $(this).prop("checked");
@@ -405,7 +304,7 @@ var OffrePage = function () {
         });
 
         //control des boutons individuels
-        $('.input-group-addon input[type="checkbox"]').change(function () { //individual check and enabling text input
+        $('input[type="checkbox"].input-group-addon').change(function () { //individual check and enabling text input
             var p = $(this).parents()[1];// input-group
             if (this.checked) {
                 $('input[type="text"]', p).attr('readonly', false);
@@ -418,6 +317,7 @@ var OffrePage = function () {
                 $('select, textarea', p).attr('disabled', true);
                 $(this).attr("checked", false);
                 if (isEditMode) $('input[type="submit"]', p[2]).attr('disabled', true);
+                alert('2');
             }
         });
 
@@ -436,156 +336,18 @@ var OffrePage = function () {
 
         //handle submitted buttons
         $('input[type="submit"]').click(function (e) {
-            e.returnValue = false;
-            if (e.preventDefault()) e.preventDefault();
+            e.preventDefault();
             var btn = this;
             if (btn.id === "crop") {
                 var id = $('.id', modal_stk.modalElement).val();
                 $(btn).attr('href', 'image?id=' + id);
-            } else uploadedFile = null;
-            //if (isEditMode) $('input[type="submit"]', p[2]).attr('disabled', true); désactiver les boutton soubmit lors d'un traitement
-            ajaxForm(this.parentNode, $(this).attr("href"), uploadedFile); //troixième parent du boutton submit: portlet ou modal-footer
+            } else uploadedFile = null; //<-- add condition here
+            GlobalPageCustomScript.ajaxForm(this, uploadedFile);
         });
     };
-    var deleteElement = function (elements, parent, fromParent) {
-        fromParent = $(fromParent);
-        var items = JSON.stringify(elements);
-        return $.ajax({
-            url: "delete",
-            type: "post",
-            dataType: 'json',
-            data: 'items=' + items,
-            error: function () {
-                nbProcessusEnCours -= 1;
-                labelProcess.html(nbProcessusEnCours + ' traitement(s) en cours...');
-                $('input[type="submit"]', fromParent).removeClass('disabled');
-                if (fromParent.hasClass('modal-footer')) {
-                    $('.modal-spinner', fromParent).click();
-                }
-                if (nbProcessusEnCours === 0) $('#ct-sp').click();
-                App.alert({
-                    type: 'danger', // alert's type
-                    icon: 'warning',
-                    message: 'Un problème est survenu. Veuillez vérifier vos données et réessayez! si le problème persiste, réactualisez la page, svp!',  // alert's message
-                    container: document.querySelector('.ajax-pane-notif'),  // alerts parent container(by default placed after the page breadcrumbs)
-                    place: 'prepend', // "append" or "prepend" in container
-                    closeInSeconds: 20 // auto close after defined seconds
-                    /*close: true, // make alert closable
-                     reset: true, // close all previouse alerts first
-                     focus: true, // auto scroll to the alert after shown
-                     */
-                });
-            },
-            beforeSend: function () {
-                nbProcessusEnCours += 1;
-                labelProcess.html(nbProcessusEnCours + ' traitement(s) en cours...');
-                $('input[type="submit"]', fromParent).addClass('disabled');
-                if (fromParent.hasClass('modal-footer')) {
-                    $('.modal-spinner', fromParent).click();
-                }
-                if (nbProcessusEnCours === 1) $('#ct-sp').click();
-            },
-            complete: function () {
-                nbProcessusEnCours -= 1;
-                labelProcess.html(nbProcessusEnCours + ' traitement(s) en cours...');
-                $('input[type="submit"]', fromParent).removeClass('disabled');
-                if (fromParent.hasClass('modal-footer')) {
-                    $('.modal-spinner', fromParent).click();
-                    setTimeout(function () {
-                        $('.modal-action-terminated').click()
-                        ;
-                    }, 200);
-                }
-                if (nbProcessusEnCours === 0) $('#ct-sp').click();
-                notifAlert.click();
-            },
-            success: function (json) {
-                json = JSON.parse(json);
-                var data = json.ids;
-                if (data !== null && data !== undefined) {
-                    var length = data.length;
-                    for (var i = 0; i < length; i++) {
-                        (function (i) {
-                            setTimeout(function () {
-                                var table = $('.datatable_ajax', parent).dataTable();
-                                var tr = table.find('input[name="id_' + data[i] + '"]', 'tbody').parents('tr')[0];
-                                table.api().row(tr).remove().draw();
-                            }, 100 + 50 * i);
-                        })(i);
-                    }
-                }
-            }
-        });
-    };
-    var ajaxForm = function (p, url, file) { // create and update a form from either the modal or anywhere in the body
-        //if (parent === undefined || !$(parent).parent().hasClass('parent1') && !$(parent).parent().hasClass('parent2')) return; //les parentulaires doivente être encapsulés dans parent1 ou parent2 uniquement
-        /*if (formData['offre'] === null) return;*/
-        var parent = p.parentNode.parentNode, //a form or a container of a form (ex:modal-footer)
-            pTab;
-        var form, isaModal = false;
-        if ($(parent).hasClass('modal-footer')) {isaModal = true; pTab = $(parent).parents('.tab-pane');}
-        form = parent.querySelector('form');
-        var formData = new FormData(form);
-        if (file !== null) formData.append('file', file);
-        return $.ajax({
-            url: url,
-            type: "post",
-            dataType: 'json',
-            data: formData,
-            processData: false,  // tell jQuery not to process the data
-            contentType: false,   // tell jQuery not to set contentType
-            error: function () {
-                nbProcessusEnCours -= 1;
-                form.querySelector('input[type="reset"]').click(); //reinitialize the form
-                $('input[type="submit"]', parent).removeClass('disabled');
-                if (nbProcessusEnCours === 0) $('#ct-sp').click();
-                App.alert({
-                    type: 'danger', // alert's type
-                    icon: 'warning',
-                    message: 'Un problème est survenu. Veuillez vérifier vos données et si le problème persiste, réassayez plutard, svp!',  // alert's message
-                    container: document.querySelector('.ajax-pane-notif'),  // alerts parent container(by default placed after the page breadcrumbs)
-                    place: 'prepend', // "append" or "prepend" in container
-                    closeInSeconds: 20 // auto close after defined seconds
-                    /*close: true, // make alert closable
-                     reset: true, // close all previouse alerts first
-                     focus: true, // auto scroll to the alert after shown
-                     closeInSeconds: 0, // auto close after defined seconds*/
-                });
-            },
-            beforeSend: function () {
-                nbProcessusEnCours += 1;
-                labelProcess.html(nbProcessusEnCours + ' traitement(s) en cours...');
-                if (isaModal) $('.modal-spinner', pTab).click();
-                $('input[type="submit"]', parent).addClass('disabled');
-                if (nbProcessusEnCours === 1) $('#ct-sp').click();
-            },
-            complete: function () {
-                form.querySelector('input[type="reset"]').click(); //reinitialize the form
-                $('input[type="submit"]', parent).removeClass('disabled');
-                nbProcessusEnCours -= 1;
-                labelProcess.html(nbProcessusEnCours + ' traitement(s) en cours...');
-                if (isaModal) $('.modal-spinner', pTab).click();
-                if (nbProcessusEnCours === 0) $('#ct-sp').click();
-                notifAlert.click();
-            },
-            success: function (json) {
-                json = JSON.parse(json);
-                var data = json.item;
-                var table = $('.datatable_ajax', parent).dataTable();
-                if (data !== null && data.id !== null && data.isNew === true) { //ici, on traitera l'affichage des lignes nouvellement créées avec un style différent
-                    setTimeout(function () { //on create, clear and reload the table
-                        $('.filter-cancel', parent).click();
-                        //var tr = table.find('input[name="id_' + data.id + '"]', 'tbody').parents('tr')[0];
-                    }, 50);
-                } else if (data !== null && data.id !== null && data.isNew === false) {//Update the table
-                    if ($(form).parent().hasClass('form1')) {//ici, on traitera l'affichage des lignes modifiées avec un style différent
-                        table.api().ajax.reload();
-                        //var tr = table.find('input[name="id_' + data.id + '"]', 'tbody').parents('tr')[0];
-                    }
-                }
-            }
-        })
-    };
+
+
+
     var pageForm = function () {
         //----------------- compression et extension de la page -------------------------
         //parent = parent.parents('.portlet');
@@ -604,15 +366,12 @@ var OffrePage = function () {
             $('.compress-item', parent).removeClass('hidden');
         });
     };
-
     return {
         init: function () {
-            reset();
             modifier();
             supprimer();
             pageForm();
             afficher();
-            loadFile();
             formManager();
 
             tab1.onclick = function () { //gestion des affichages avec  deux modal
@@ -631,17 +390,12 @@ var OffrePage = function () {
             $('.composer_item').click(function () {
                 modifierImpl($(this).parents('.portlet'));
             });
-            $('#ct-sp').click(function () {
-                $(this).toggleClass('hidden');
-            });
-            $('.modal-spinner').click(function () {
-                $(this).toggleClass('hidden');
-            });
 
             $('.tab-reload').click(function () {
                 $('.datatable_ajax', $(this).parents('.portlet')).DataTable().ajax.reload();
             });
 
+            //document.querySelector('#tab_1 .submit_form').removeEventListener('submit',null,  false);
         }
     };
 }();

@@ -1,0 +1,16 @@
+.modal-spinner {
+    position: absolute;
+    z-index: 2000;
+    left: 40%;
+    top:40%;
+    width: auto;
+    height: 25%;
+    border: black 4px;
+    opacity: 0.4;
+    /*background-color: #95a5a6;*/
+}
+
+.modal .modal-spinner {
+    position: relative;
+    height: 100%;
+}
