@@ -300,10 +300,9 @@ class OffreController extends Controller
                     }
                     //----------------------------------------------------------------------------------------
                     //-------- prepareration de la reponse du vendeur----
-
                     $json["item"] = array(//permet au client de différencier les mises a jour des nouveaux éléments
-                        "isNew" => false,
-                        "id" => $offre->getId(),
+                        "action" => 1,
+                        "id" => $id,
                     );
                     // préparation de la notification du client
                     if ($publiable === "undefined" || $designation !== "undefined" || $description !== "undefined" || $etat !== "undefined" || $garantie !== "undefined" || $dateExpiration !== "undefined" || $typeOffre !== "undefined"
@@ -366,8 +365,8 @@ class OffreController extends Controller
                         $em->persist($offre);
                         $em->flush();
                         $json["item"] = array(//permet au client de différencier les nouveaux éléments des élements juste modifiés
-                            "isNew" => true,
-                            "id" => $offre->getId(),
+                            "action" => 0,
+                            "id" => null, //it is null because the table will be reload automatically
                         );
                         $session->getFlashBag()->add('success', "<strong> Création de l'Offre. réf:" . $offre->getCode() . "</strong><br> Opération effectuée avec succès!");
                         return $this->json(json_encode($json));
@@ -546,12 +545,12 @@ class OffreController extends Controller
                         }
                         $this->editAndDeleteSecurity($this->getUser(), $gerant, $proprietaire, $offre->getVendeur());
                         $em->remove($offre);
+                        $em->flush();
                         $json[] = $id;
                         $j++;
                     }
                 }
-                $em->flush();
-                $json = json_encode(['ids' => $json]);
+                $json = json_encode(['ids' => $json, 'action'=>3]);
                 $session->getFlashBag()->add('danger', "<strong>" . $j . "</strong> Element(s) supprimé(s)<br> Opération effectuée avec succès!");
                 return $this->json($json);
             } catch (AccessDeniedException $ads) {
@@ -561,7 +560,7 @@ class OffreController extends Controller
                 $session->getFlashBag()->add('danger', "<strong>Echec de la suppression </strong><br>Une erreur systeme s'est produite. bien vouloir réessayer plutard, svp!");
                 return $this->json(json_encode(["item" => null]));
             } catch (ConstraintViolationException $cve) {
-                $session->getFlashBag()->add('danger', "<strong>Echec de la suppression</strong><br> La suppression a échouée, il se peut que la ressource soit utilisée ailleurs!");
+                $session->getFlashBag()->add('danger', "<strong>Echec de la suppression Total</strong><br> pour  <b>" . $count . "</b>elements,<b>" . ($count - $j) . "</b> n'ont pas pu être supprimé, il se peut qu'elle soit utilisée");
                 return $this->json(json_encode(["item" => null]));
             }
         }

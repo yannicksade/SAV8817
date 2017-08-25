@@ -83,11 +83,17 @@ License: You must have a valid license purchased only from themeforest(the above
 </head>
 <!-- END HEAD -->
 <body>
-
 {% block body_content %}
     <!-- END NOTIFIC8 ALERT -->
 {% endblock body_content %}
-
+{% block footer_content %}
+    <nav class="navbar navbar-fixed-top">
+        <button class="btn btn-default mt-ladda-btn ladda-button content-spinner hidden"
+                data-style="expand-left" data-spinner-color="#333" tabindex="-1" id="ct-sp">
+            <span class="ladda-label" id="ajax-label-process"></span>
+        </button>
+    </nav>
+{% endblock footer_content %}
 <input id="w-flag" type="hidden" value="{{ asset('dashboard/assets/global/img/flags/') }}"/>
 <!--[if lt IE 9]>
 {% javascripts 'dashboard/assets/global/plugins/respond.min.js'
@@ -127,7 +133,7 @@ License: You must have a valid license purchased only from themeforest(the above
 'dashboard/assets/global/plugins/bootstrap-datetimepicker/js/bootstrap-datetimepicker.min.js'
 'dashboard/assets/global/plugins/bootstrap-datepicker/js/bootstrap-datepicker.min.js'
 'dashboard/assets/global/plugins/ladda/spin.min.js'
-'dashboard/assets/global/plugins/ladda/ladda.min.js'%}
+'dashboard/assets/global/plugins/ladda/ladda.min.js' %}
 <script src="{{ asset_url }}" type="text/javascript"></script>
 {% endjavascripts %}
 <!-- END PAGE LEVEL PLUGINS -->
@@ -137,7 +143,7 @@ License: You must have a valid license purchased only from themeforest(the above
 'dashboard/assets/pages/scripts/form-image-crop.js'
 'dashboard/assets/pages/scripts/components-select2.js'
 'dashboard/assets/pages/scripts/form-wizard.js'
-'dashboard/assets/pages/scripts/ui-buttons-spinners.js'%}
+'dashboard/assets/pages/scripts/ui-buttons-spinners.js' %}
 <script src="{{ asset_url }}" type="text/javascript"></script>
 {% endjavascripts %}
 <!-- END PAGE LEVEL SCRIPTS -->

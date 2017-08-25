@@ -513,7 +513,6 @@ var Layout = function () {
 
     // Hanlde 100% height elements(block, portlet, etc)
     var handle100HeightContent = function () {
-
         $('.full-height-content').each(function () {
             var target = $(this);
             var height;

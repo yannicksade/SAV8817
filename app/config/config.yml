@@ -91,7 +91,7 @@ fos_user:
         sender_name:       webmaster
     registration:
         confirmation:
-            enabled: false
+            enabled: true
             from_email:
                 address:     registration@esay-trade.com
                 sender_name: Easy Trade Team

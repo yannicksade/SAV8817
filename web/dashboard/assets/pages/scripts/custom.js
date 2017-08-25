@@ -6,8 +6,8 @@
 
 
 var GlobalPageCustomScript = function () {
-    var nbProcessusEnCours = 0;
     var notifAlert;
+    var nbProcessusEnCours = 0;
     var labelProcess = $('#ajax-label-process');
     var readFile = function (file, parent) {
         var reader = new FileReader();
@@ -148,22 +148,18 @@ var GlobalPageCustomScript = function () {
             },
             success: function (json) {
                 json = JSON.parse(json);
-                var data = json.item;
-                var table = $('.datatable_ajax', parent);
-                if (table) table.dataTable();
-                if (table) {
-                    if (data !== null && data.id !== null && data.isNew === true) { //ici, on traitera l'affichage des lignes nouvellement créées avec un style différent
+                    var data = json.item;
+                    if (data && data.id !== null && data.action === 0) { //For Create; update the table ici, on traitera l'affichage des lignes nouvellement créées avec un style différent
                         setTimeout(function () { //on create, clear and reload the table
                             $('.filter-cancel', parent).click();
                             //var tr = table.find('input[name="id_' + data.id + '"]', 'tbody').parents('tr')[0];
                         }, 50);
-                    } else if (data !== null && data.id !== null && data.isNew === false) {//Update the table
-                        if ($(form).parent().hasClass('form1')) {//ici, on traitera l'affichage des lignes modifiées avec un style différent
-                            table.api().ajax.reload();
-                            //var tr = table.find('input[name="id_' + data.id + '"]', 'tbody').parents('tr')[0];
-                        }
+                    } else if (data && data.id !== null && data.action === 1) {//For Update, update
+                        var table = $('.datatable_ajax', parent);
+                        table.dataTable();
+                        table.api().ajax.reload();
+                        //var tr = table.find('input[name="id_' + data.id + '"]', 'tbody').parents('tr')[0];
                     }
-                }
             }
         })
     };
@@ -219,14 +215,11 @@ var GlobalPageCustomScript = function () {
             },
             success: function (json) {
                 json = JSON.parse(json);
-                var data = json.ids;
-                alert(data);
-                if (data) {
-                    var length = data.length;
+                var ids = json.ids;
+                if (ids !== null && json.action === 3) {
                     var table = $('.datatable_ajax', parent);
-                    if (table) table = option;
+                    if (!table) table = option;
                     table.DataTable().ajax.reload();
-                    alert('fin');
                 }
             }
         });
@@ -275,6 +268,7 @@ var GlobalPageCustomScript = function () {
 
         }
     };
+
 
 }();
 

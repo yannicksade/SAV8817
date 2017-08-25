@@ -4,7 +4,6 @@
 var OffrePage = function () {
     //global variables
     //----pages
-    var nbProcessusEnCours = 0;
     var notifAlert = document.querySelector("#notif-active");
     var actionConfirm;
     var modalConfirm = $('#modal-confirm');
@@ -165,7 +164,6 @@ var OffrePage = function () {
         $('.type', form).val($('.typeID', parent).text());
         $('.remise', form).val($('.remise', parent).text());
     };
-
     var afficherImpl = function (parent) {
         //parent is a row here
         $('.alerte', modal_stk.modalElement).addClass("hidden");
@@ -345,9 +343,6 @@ var OffrePage = function () {
             GlobalPageCustomScript.ajaxForm(this, uploadedFile);
         });
     };
-
-
-
     var pageForm = function () {
         //----------------- compression et extension de la page -------------------------
         //parent = parent.parents('.portlet');
