@@ -555,13 +555,13 @@ class OffreController extends Controller
                 return $this->json($json);
             } catch (AccessDeniedException $ads) {
                 $session->getFlashBag()->add('danger', "<strong>Action interdite!</strong><br/>Pour jouir de ce service, veuillez consulter nos administrateurs.");
-                return $this->json($records);
+                return $this->json(json_encode(["ids" => null]));
             } catch (RuntimeException $rte) {
                 $session->getFlashBag()->add('danger', "<strong>Echec de la suppression </strong><br>Une erreur systeme s'est produite. bien vouloir réessayer plutard, svp!");
-                return $this->json(json_encode(["item" => null]));
+                return $this->json(json_encode(["ids" => null]));
             } catch (ConstraintViolationException $cve) {
-                $session->getFlashBag()->add('danger', "<strong>Echec de la suppression Total</strong><br> pour  <b>" . $count . "</b>elements,<b>" . ($count - $j) . "</b> n'ont pas pu être supprimé, il se peut qu'elle soit utilisée");
-                return $this->json(json_encode(["item" => null]));
+                $session->getFlashBag()->add('danger', "<strong>Echec de la suppression</strong><br> <b>" . ($j) . " element(s) supprimé(s); ". ($count - $j) . " échoué(s) </b>, il se peut qu'une d'elle soit utilisée par d'autre ressource");
+                return $this->json(json_encode(['ids' => $json, 'action'=>3]));
             }
         }
         return new JsonResponse();

@@ -23,7 +23,7 @@
     <!-- END PAGE LEVEL PLUGINS -->
 
     <!-- BEGIN THEME LAYOUT STYLES -->
-    {% stylesheets "dashboard/assets/layouts/layout/css/layout.css"
+    {% stylesheets "dashboard/assets/layouts/layout/css/layout.min.css"
     "dashboard/assets/layouts/layout/css/custom.css" filter='cssrewrite' %}
     <link href="{{ asset_url }}" rel="stylesheet" type="text/css"/>
     {% endstylesheets %}
@@ -36,14 +36,8 @@
     <link rel="shortcut icon" type="image/x-icon" href="{{ asset("dashboard/assets/apps/img/favicon.ico") }}"/>
 {% endblock stylesheets %}
 
-   {% block spinner %}
-       <button class="btn btn-default mt-ladda-btn ladda-button modal-spinner hidden"
-               data-style="zoom-in" data-spinner-color="#333" tabindex="-1">
-           <span class="ladda-label">traitement en cours ...</span>
-       </button>
-   {% endblock spinner %}
-{% block body_content %}
-    <div class="page-content-white page-sidebar-closed">
+{% block body_container %}
+    <div class="page-header-fixed page-sidebar-closed-hide-logo page-content-white page-sidebar-closed">
         {% if is_granted("IS_AUTHENTICATED_REMEMBERED") %}
             <div class="page-wrapper">
                 <!-- BEGIN HEADER -->
@@ -664,7 +658,7 @@
                                             <a href="{{ path('apm_achat_service_apres_vente_index') }}"
                                                class="nav-link ">
                                                 <i class="icon-bulb"></i>
-                                                <span class="title">Service après vente</span>
+                                                <span class="title">Service aprÃ¨s vente</span>
                                                 <span class="badge badge-success">1</span>
                                             </a>
                                         </li>
@@ -694,7 +688,7 @@
                                         </li>
                                         <li class="nav-item  ">
                                             <a href="#" class="nav-link ">
-                                                <span class="title">Catégorisation</span>
+                                                <span class="title">CatÃ©gorisation</span>
                                             </a>
                                         </li>
                                         <li class="nav-item  ">
@@ -704,7 +698,7 @@
                                         </li>
                                         <li class="nav-item  ">
                                             <a href="#" class="nav-link ">
-                                                <span class="title">Rémise</span>
+                                                <span class="title">RÃ©mise</span>
                                             </a>
                                         </li>
                                         <li class="nav-item  ">
@@ -2294,63 +2288,78 @@
                     <!-- END QUICK SIDEBAR -->
                 </div>
                 <!-- END CONTAINER -->
+                <!-- BEGIN FOOTER -->
+                <!-- END FOOTER -->
             </div>
+            {% block footer_content %}
+                <nav class="navbar-fixed-bottom footer-navbar">
+                    <div class="">
+                        <div class="block">
+                            <a class="">Shift on the marcket place?</a>
+                            My dashboard
+                            <button autofocus
+                                    class="btn btn-default mt-ladda-btn ladda-button content-spinner hidden"
+                                    data-style="expand-left" data-spinner-color="#333" tabindex="-1" id="ct-sp">
+                                <span class="ladda-label" id="ajax-label-process"></span>
+                            </button>
+                        </div>
+                        <div class="block">
+                            2017 &copy; Easy Trade By
+                        </div>
+                        <div class="col-md-6">
+                        </div>
+                        <div class="col-md-3 pull-right">
+                        </div>
+                    </div>
+                    <div class="scroll-to-top">
+                        <i class="icon-arrow-up"></i>
+                    </div>
+                </nav>
+            {% endblock footer_content %}
             <!-- BEGIN QUICK NAV -->
+            <nav class="quick-nav">
+                <a class="quick-nav-trigger" href="#">
+                    <span aria-hidden="true"></span>
+                </a>
+                <ul>
+                    <li>
+                        <a href="https://themeforest.net/item/metronic-responsive-admin-dashboard-template/4021469?ref=keenthemes"
+                           target="_blank" class="active">
+                            <span>Purchase Metronic</span>
+                            <i class="icon-basket"></i>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://themeforest.net/item/metronic-responsive-admin-dashboard-template/reviews/4021469?ref=keenthemes"
+                           target="_blank">
+                            <span>Customer Reviews</span>
+                            <i class="icon-users"></i>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://keenthemes.com/showcast/" target="_blank">
+                            <span>Showcase</span>
+                            <i class="icon-user"></i>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://keenthemes.com/metronic-theme/changelog/" target="_blank">
+                            <span>Changelog</span>
+                            <i class="icon-graph"></i>
+                        </a>
+                    </li>
+                </ul>
+                <span aria-hidden="true" class="quick-nav-bg"></span>
+            </nav>
+            <div class="quick-nav-overlay"></div>
+            <input type="button" id="notif-active" style="display: none"/>
             <!-- END QUICK NAV -->
         {% endif %}
         <!-- BEGIN NOTIFIC8 ALERT -->
         <!-- END NOTIFIC8 ALERT -->
     </div>
-{% endblock body_content %}
-{% block footer_content %}
-    <nav class="footer-navbar navbar-fixed-bottom">
-        My Dashbord
-        <button class="btn btn-default mt-ladda-btn ladda-button content-spinner hidden"
-                data-style="expand-left" data-spinner-color="#333" tabindex="-1" id="ct-sp">
-            <span class="ladda-label" id="ajax-label-process"></span>
-        </button>
-        <div class="page-footer-inner"> 2017 &copy; Easy Trade By
-            <a title="About us" target="_blank" href="#">HIT-TEL</a> &nbsp;|&nbsp;
-            <a href="#"> Go on the market? </a>
-        </div>
+{% endblock body_container %}
 
-        <div class="quick-nav">
-            <a class="quick-nav-trigger" href="#">
-                <span aria-hidden="true"></span>
-            </a>
-            <ul>
-                <li>
-                    <a href="#"
-                       class="active">
-                        <span>Purchase Metronic</span>
-                        <i class="icon-basket"></i>
-                    </a>
-                </li>
-                <li>
-                    <a href="#">
-                        <span>Customer Reviews</span>
-                        <i class="icon-users"></i>
-                    </a>
-                </li>
-                <li>
-                    <a href="#">
-                        <span>Showcase</span>
-                        <i class="icon-user"></i>
-                    </a>
-                </li>
-                <li>
-                    <a href="#">
-                        <span>Changelog</span>
-                        <i class="icon-graph"></i>
-                    </a>
-                </li>
-            </ul>
-            <span aria-hidden="true" class="quick-nav-bg"></span>
-        </div>
-    </nav>
-    <div class="quick-nav-overlay"></div>
-    <input type="button" id="notif-active" style="display: none"/>
-{% endblock footer_content %}
 {% block js %}
     <!-- BEGIN PAGE LEVEL PLUGINS -->
     {% javascripts "dashboard/assets/global/plugins/bootstrap-modal/js/bootstrap-modalmanager.js"
@@ -2375,7 +2384,8 @@
     {% endjavascripts %}
     <!-- END PAGE LEVEL SCRIPTS -->
     <!-- BEGIN THEME LAYOUT SCRIPTS -->
-    {% javascripts 'dashboard/assets/layouts/layout/scripts/layout.js'
+    {% javascripts 'dashboard/assets/layouts/layout/scripts/layout.min.js'
+        'dashboard/assets/layouts/layout/scripts/custom.js'
     'dashboard/assets/layouts/layout/scripts/demo.min.js'
     'dashboard/assets/layouts/global/scripts/quick-sidebar.min.js'
     'dashboard/assets/layouts/global/scripts/quick-nav.min.js' %}

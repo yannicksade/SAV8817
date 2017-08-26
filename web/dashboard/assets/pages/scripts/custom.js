@@ -149,12 +149,12 @@ var GlobalPageCustomScript = function () {
             success: function (json) {
                 json = JSON.parse(json);
                     var data = json.item;
-                    if (data && data.id !== null && data.action === 0) { //For Create; update the table ici, on traitera l'affichage des lignes nouvellement créées avec un style différent
+                    if (data && !data.id && data.action == 0) { //For Create; update the table ici, on traitera l'affichage des lignes nouvellement créées avec un style différent
                         setTimeout(function () { //on create, clear and reload the table
                             $('.filter-cancel', parent).click();
                             //var tr = table.find('input[name="id_' + data.id + '"]', 'tbody').parents('tr')[0];
                         }, 50);
-                    } else if (data && data.id !== null && data.action === 1) {//For Update, update
+                    } else if (data && data.id && data.action == 1) {//For Update, update
                         var table = $('.datatable_ajax', parent);
                         table.dataTable();
                         table.api().ajax.reload();
@@ -216,7 +216,7 @@ var GlobalPageCustomScript = function () {
             success: function (json) {
                 json = JSON.parse(json);
                 var ids = json.ids;
-                if (ids !== null && json.action === 3) {
+                if (ids && json.action == 3) {
                     var table = $('.datatable_ajax', parent);
                     if (!table) table = option;
                     table.DataTable().ajax.reload();

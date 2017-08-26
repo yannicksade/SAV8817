@@ -15,6 +15,11 @@
     height: 100%;
 }
 
+footer{
+
+}
 .footer-navbar {
     background-color: #95a5a6;
+    opacity: 0.9;
+    padding: 10px 10px 51px;
 }

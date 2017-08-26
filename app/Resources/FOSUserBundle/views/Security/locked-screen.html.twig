@@ -8,7 +8,7 @@
 
 {%- block title -%} {{ parent() }}| Lock Screen {%- endblock title -%}
 
-{% block body_content %}
+{% block body_container %}
     <div class="page-lock">
         <div class="page-logo">
             <a class="brand" href="#">
@@ -50,7 +50,7 @@
             <input type="hidden" id="bg-6" value="{{ asset("dashboard/assets/pages/media/bg/6.jpg") }}"/>
         </div>
     </div>
-{% endblock body_content %}
+{% endblock body_container %}
 
 {% block js %}
     {% javascripts "dashboard/assets/pages/scripts/lock-2.js" %}

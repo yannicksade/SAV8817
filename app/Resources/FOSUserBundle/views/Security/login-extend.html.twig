@@ -83,17 +83,11 @@ License: You must have a valid license purchased only from themeforest(the above
 </head>
 <!-- END HEAD -->
 <body>
-{% block body_content %}
+
+{% block body_container %}
     <!-- END NOTIFIC8 ALERT -->
-{% endblock body_content %}
-{% block footer_content %}
-    <nav class="navbar navbar-fixed-top">
-        <button class="btn btn-default mt-ladda-btn ladda-button content-spinner hidden"
-                data-style="expand-left" data-spinner-color="#333" tabindex="-1" id="ct-sp">
-            <span class="ladda-label" id="ajax-label-process"></span>
-        </button>
-    </nav>
-{% endblock footer_content %}
+{% endblock body_container %}
+
 <input id="w-flag" type="hidden" value="{{ asset('dashboard/assets/global/img/flags/') }}"/>
 <!--[if lt IE 9]>
 {% javascripts 'dashboard/assets/global/plugins/respond.min.js'
@@ -167,4 +161,5 @@ License: You must have a valid license purchased only from themeforest(the above
 
 <!-- END PAGE LEVEL CUSTOM-->
 </body>
+
 </html>

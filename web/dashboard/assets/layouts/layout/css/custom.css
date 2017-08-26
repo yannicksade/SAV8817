@@ -1,15 +1,63 @@
 /* here you can put your own css to customize and override the theme */
 
 /*
+/*
 
 .quick-nav-trigger{
     position: relative;
     width: auto;
     height: auto;
-}*/
+}*!
 
 .quick-nav {
-    position: relative;
-    margin-top: auto;
+    position: fixed;
+    z-index: 10103;
+    top:auto;
+    bottom: 10%;
+    right: 10px;
+    pointer-events: none;
 }
 
+.quick-nav-overlay {
+    display: none;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    position: fixed;
+    z-index: 10101;
+    background: transparent;
+}
+
+.quick-nav ul {
+    position: relative;
+    z-index: 10103;
+    padding: 60px 0 0;
+    visibility: hidden;
+    webkit-transition: visibility 0.3s;
+    -moz-transition: visibility 0.3s;
+    -ms-transition: visibility 0.3s;
+    -o-transition: visibility 0.3s;
+    transition: visibility 0.3s;
+    text-align: inherit;
+    list-style: none;
+}
+
+.quick-nav ul > li a {
+    position: relative;
+    display: block;
+    height: 50px;
+    line-height: 50px;
+    padding: 0 calc(1em + 60px) 0 1em;
+    font-size: 1.4rem;
+    webkit-transition: color 0.2s;
+    -moz-transition: color 0.2s;
+    -ms-transition: color 0.2s;
+    -o-transition: color 0.2s;
+    transition: color 0.2s;
+}*/
+
+
+.page-content{
+    margin-bottom: 100px;
+}

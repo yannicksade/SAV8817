@@ -344,7 +344,10 @@
             <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
             <div class="tab-content">
                 <div class="tab-pane data-content hidden active" id="modal-tab_1">
-                    {{ block('spinner') }}
+                    <button class="btn btn-default mt-ladda-btn ladda-button modal-spinner hidden"
+                            data-style="zoom-in" data-spinner-color="#333" tabindex="-1">
+                        <span class="ladda-label">traitement en cours ...</span>
+                    </button>
                     <div class="modal-header">
                         <h4 class="modal-title"> Aperçu de la sélection </h4>
                     </div>
@@ -461,7 +464,10 @@
                     </div>
                 </div>
                 <div class="tab-pane data-content hidden" id="modal-tab_2">
-                    {{  block('spinner') }}
+                    <button class="btn btn-default mt-ladda-btn ladda-button modal-spinner hidden"
+                            data-style="zoom-in" data-spinner-color="#333" tabindex="-1">
+                        <span class="ladda-label">traitement en cours ...</span>
+                    </button>
                     <div class="modal-header">
                         <h4 class="modal-title">Images de l'offre</h4>
                         <input type="hidden" class="url-dir" value="{{ asset( url_image) }}"/>
@@ -487,7 +493,10 @@
                     </div>
                 </div>
                 <div class="tab-pane data-content hidden" id="modal-tab_3">
-                    {{  block('spinner') }}
+                    <button class="btn btn-default mt-ladda-btn ladda-button modal-spinner hidden"
+                            data-style="zoom-in" data-spinner-color="#333" tabindex="-1">
+                        <span class="ladda-label">traitement en cours ...</span>
+                    </button>
                     <form enctype="multipart/form-data" method="POST" class="in-modal" name="image">
                         <div class="modal-header">
                             <h4 class="modal-title"> Charger les images et photos relatives à l'offre</h4>
@@ -510,7 +519,10 @@
                     </form>
                 </div>
                 <div class="tab-pane data-content hidden" id="modal-tab_4">
-                    {{ block('spinner')  }}
+                    <button class="btn btn-default mt-ladda-btn ladda-button modal-spinner hidden"
+                            data-style="zoom-in" data-spinner-color="#333" tabindex="-1">
+                        <span class="ladda-label">traitement en cours ...</span>
+                    </button>
                     <div class="modal-header">
                         <h4 class="modal-title"> Charger les documents relatifs à l'offre</h4>
                     </div>
@@ -527,7 +539,10 @@
                     </div>
                 </div>
                 <div class="tab-pane data-content hidden" id="modal-tab_5">
-                    {{ block('spinner')  }}
+                    <button class="btn btn-default mt-ladda-btn ladda-button modal-spinner hidden"
+                            data-style="zoom-in" data-spinner-color="#333" tabindex="-1">
+                        <span class="ladda-label">traitement en cours ...</span>
+                    </button>
                     <div class="modal-header">
                         <h4 class="modal-title"> Informations sécurisées relatives à l'offre</h4>
                     </div>
@@ -550,7 +565,6 @@
                 </div>
             </div>
         </div>
-
         <!--Confirm modal-->
         <div id="modal-confirm" class="modal fade draggable-modal" tabindex="-1" data-backdrop="static"
              data-keyboard="false">
