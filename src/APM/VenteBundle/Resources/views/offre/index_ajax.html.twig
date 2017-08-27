@@ -30,14 +30,14 @@
                                     class="icon-settings font-dark"></i></span>
                     </div>
                     <div class="tools pull-right">
-                        <a class="fa fa-compress compress-item"> </a>
-                        <a class="fa fa-expand hidden expand-item"> </a>
+                        <a class="fa fa-compress hidden compress-item"> </a>
+                        <a class="fa fa-expand expand-item"> </a>
                         <a href="javascript:;" class="collapse"> </a>
                         <a class="config"></a>
                         <a class="fa fa-refresh tab-reload"> </a>
                     </div>
                 </div>
-                <div class="portlet-body">
+                <div class="portlet-body tab-element col-lg-9 col-md-6 col-xs-12">
                     <div class="table-toolbar">
                         <div class="row">
                             <div class="col-md-9">
@@ -106,7 +106,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="tab-element">
+                    <div class="">
                         <table class="table table-hover table-striped table-bordered table-checkable datatable_ajax">
                             <thead>
                             <tr role="row" class="heading">
@@ -176,7 +176,7 @@
                         </table>
                     </div>
                 </div>
-                <div class="col-lg-3 hidden form-element thumbnail form1">
+                <div class="col-lg-3 form-element thumbnail form1">
                     {{ form_start(form, {"attr":{"class":"data-form", "enctype":"multipart/form-data", "method":"post"}}) }}
                     <div class="form-group">
                         <h3 class="inline"> Créer une offre </h3>
@@ -319,7 +319,6 @@
             </div>
             <div class="tab-pane data-content" id="tab_2">
             </div>
-
         </div>
         <!-- BEGIN MODAL -->
         <div id="m-ajax" class="modal fade draggable-modal" tabindex="-1">

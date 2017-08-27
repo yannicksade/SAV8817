@@ -1,10 +1,12 @@
 {% extends ":base/dashboard:layout.html.twig" %}
 
 {% block content_body %}
-    {{ form_start(filter) }}
-    {{ form_widget(filter) }}
-    <input type="submit" value="Go"/>
-    {{ form_end(filter) }}
+    {% if filter is defined %}
+        {{ form_start(filter) }}
+        {{ form_widget(filter) }}
+        <input type="submit" value="Go"/>
+        {{ form_end(filter) }}
+    {% endif %}
     <p>----------------------------------------------------------------</p>
 
     <h1> Mes Offres {% if boutique -%} - <a
@@ -58,18 +60,18 @@
                 <a href="{{ path('apm_vente_offre_new') }}">Créer une nouvelle offre</a>
             </li>
             {% if boutique %}
-            <li>
-                <a href="{{ path('apm_vente_categorie_new', {'id': boutique.id}) }}"> Créer une nouvelle catégorie
-                    dans
-                    la boutique </a>
-            </li>
+                <li>
+                    <a href="{{ path('apm_vente_categorie_new', {'id': boutique.id}) }}"> Créer une nouvelle catégorie
+                        dans
+                        la boutique </a>
+                </li>
                 <li>
                     <a href="{{ path('apm_vente_boutique_show', {'id': boutique.id}) }}"> Afficher la boutique</a>
                 </li>
             {% else %}
                 <li>
                     <a href="{{ path('apm_vente_boutique_index') }}"> Liste les boutiques</a>
-            </li>
+                </li>
             {% endif %}
         {% endif %}
         <li>

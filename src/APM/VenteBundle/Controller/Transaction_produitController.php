@@ -121,23 +121,34 @@ class Transaction_produitController extends Controller
     public function listeOffresAction(Transaction $transaction)
     {
 
-        $transaction_produits = $transaction->getTransactionProduits();
-        $offres = null;
+
+        $offres = array();
         $categorie = null;
         $vendeur = null;
-        /** @var Transaction_produit $transaction_produit */
-        foreach ($transaction_produits as $transaction_produit) {
-            $offres [] = $transaction_produit->getProduit();
+        $boutique = null;
+        $count = 0;
+        $transaction_produits = $transaction->getTransactionProduits();
+        if(null !== $transaction_produits) {
+            /** @var Transaction_produit $transaction_produit */
+            foreach ($transaction_produits as $transaction_produit) {
+                $count = array_push($offres, $transaction_produit->getProduit());
+            }
+
+            if (0 !== $count) {
+                $anOffer = $offres[0];
+                if ($anOffer) {
+                    $vendeur = $anOffer->getVendeur();
+                    $boutique = $anOffer->getBoutique();
+                    }
+            }
+
         }
-        if ($offres) $anOffer = $offres[0];
-        if ($anOffer) $vendeur = $anOffer->getVendeur();
-        $boutique = $transaction->getBoutique();
-        return $this->render('APMVenteBundle:offre:index_old.html.twig', array(
+        return $this->render('APMVenteBundle:offre:index.html.twig', array(
             'offres' => $offres,
             'boutique' => $boutique,
-            'categorie' => $categorie,
-            'vendeur' => $vendeur,
-            'transaction' => $transaction,
+           'categorie' => $categorie,
+             'vendeur' => $vendeur,
+           'transaction' => $transaction,
         ));
     }
 

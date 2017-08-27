@@ -59,14 +59,14 @@ class TransactionController extends Controller
         $beneficiaire = null;
         $vendeur = null;
         $user = $this->getUser();
-        if ($boutique) {//autoriser un ayant droit à consulter de droit ses transactions
+        if ($boutique) {//autoriser un ayant droit à consulter ses transactions de droit
             $gerant = $boutique->getGerant();
             $proprietaire = $boutique->getProprietaire();
-            $beneficiaire = $transaction->getBeneficiaire();
+            if($beneficiaire)$beneficiaire = $transaction->getBeneficiaire();
         } else {
-            if ($transaction) {//s'il ne s'agit pas de la boutique, il peut s'agit de l'auteur ou du bénéficiaire qui veut avoir des informations
+            if (null !== $transaction) {//s'il ne s'agit pas de la boutique, il peut s'agit de l'auteur ou du bénéficiaire qui veut avoir des informations
                 $auteur = $transaction->getAuteur();
-                $beneficiaire = $transaction->getBeneficiaire();
+                if($beneficiaire)$beneficiaire = $transaction->getBeneficiaire();
             } else {
                 $vendeur = $user; //autoriser l'utilisateur AVM si l'objet ne porte pas sur ressource dédiée: boutique
             }

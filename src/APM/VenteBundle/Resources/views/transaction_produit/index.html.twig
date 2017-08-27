@@ -7,9 +7,9 @@
         <tr>
             <th>Code</th>
             {% if boutique %}
-                <th>Boutique Emettrice</th>{% endif %}
+                <th>BoutiqueEmettrice</th>{% endif %}
             {% if boutique %}
-                <th>Boutique Bénéficiaire</th>{% endif %}
+                <th>BoutiqueBénéficiaire</th>{% endif %}
             <th>Reférence</th>
             <th>Désignation</th>
             <th>Actions</th>
@@ -24,8 +24,7 @@
                 <tr>
                     <td>
                         <a href="{{ path('apm_vente_transaction_produit_show', { 'id': transaction_produit.id }) }}">{{ transaction_produit.transaction.code }}</a>
-                        {% if boutique %}
-                    <td>{{ boutique }}</td>{% endif %}
+                        {% if boutique %}<td>{{ boutique }}</td>{% endif %}
                     {% if transaction_produit.transaction.boutiqueBeneficiaire %}
                         <td>{{ transaction_produit.transaction.boutiqueBeneficiaire }}</td>{% endif %}
                     <td>{{ transaction_produit.reference }}</td>
