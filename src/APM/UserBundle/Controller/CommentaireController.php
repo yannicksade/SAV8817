@@ -19,7 +19,7 @@ class CommentaireController extends Controller
     /**
      * Liste les commentaires faits sur une offre
      * un commentaire sur une offre pourrait être publié ou non
-     * Tant q'un commentaire n'est pas publié, il n'est accessible qu'à celui qui l'a poster et aux ayants droits de l'offre
+     * Tant q'un commentaire n'est pas publié, il n'est accessible qu'à celui qui l'a poster et au propriétaire(et gerant) de l'offre
      *
      * @param Offre $offre
      * @return \Symfony\Component\HttpFoundation\Response
@@ -49,7 +49,7 @@ class CommentaireController extends Controller
             }
         }
 
-        return $this->render('APMUserBundle:commentaire:index_old.html.twig', array(
+        return $this->render('APMUserBundle:commentaire:index.html.twig', array(
             'commentaires' => $commentaires,
             'offre' => $offre,
         ));

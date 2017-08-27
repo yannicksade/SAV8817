@@ -1,0 +1,47 @@
+{% extends 'APMAdminBundle:_Main:layout.html.twig' %}
+
+{% block body %}
+    <h1>Détail du Service après vente</h1>
+
+    <table>
+        <tbody>
+        <tr>
+            <th>Code SAV</th>
+            <td>{{ service_apres_vente.code }}</td>
+        </tr>
+        <tr>
+            <th>Date</th>
+            <td>{% if service_apres_vente.dateDue %}{{ service_apres_vente.dateDue|date('Y-m-d H:i:s') }}{% endif %}</td>
+        </tr>
+        <tr>
+            <th>Descriptionpanne</th>
+            <td>{{ service_apres_vente.descriptionPanne }}</td>
+        </tr>
+        <tr>
+            <th>Etat</th>
+            <td>{{ service_apres_vente.etat }}</td>
+        </tr>
+        <tr>
+            <th>Client</th>
+            <td>{{ service_apres_vente.client }}</td>
+        </tr>
+        </tbody>
+    </table>
+
+    <ul>
+        <li>
+            <a href="{{ path('apm_achat_service_apres_vente_index') }}">Retour à la liste de mes SAV</a>
+        </li>
+        <li>
+            <a href="{{ path('apm_achat_service_apres_vente_edit', { 'id': service_apres_vente.id }) }}">Modifier</a>
+        </li>
+        <li>
+            <a href="{{ path('apm_achat_service_apres_vente_new') }}">Créer une nouvelle SAV</a>
+        </li>
+        <li>
+            {{ form_start(delete_form) }}
+            <input type="submit" value="Delete">
+            {{ form_end(delete_form) }}
+        </li>
+    </ul>
+{% endblock %}

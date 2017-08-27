@@ -15,6 +15,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use SebastianBergmann\CodeCoverage\RuntimeException;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 
 /**
  * Service_apres_vente controller.
@@ -22,12 +23,241 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
  */
 class Service_apres_venteController extends Controller
 {
+
+    /**
+     * @ParamConverter("offre", options={"mapping": {"offre_id":"id"}})
+     * liste les SAV du clients
+     * @param Boutique $boutique
+     * @param Offre $offre
+     * @return \Symfony\Component\HttpFoundation\Response Liste tous les SAV d'un client
+     *
+     * Liste tous les SAV enregistrés entant que client et les SAV receptionné en tant que boutique ou les SAV d'une offre
+     */
+    public function indexAction(Boutique $boutique = null, Offre $offre = null)
+    {
+        if($boutique){
+            $this->listAndShowSecurity($boutique, null);
+            $offres = $boutique->getOffres();
+            /** @var Offre $offre */
+            foreach ($offres as $offre){
+                $service_apres_ventes [] = array(
+                    'offre' => $offre,
+                    'services'=>$offre->getServiceApresVentes(),
+                );
+            }
+
+        }elseif ($offre){
+            $this->listAndShowSecurity(null, $offre);
+            $service_apres_ventes [] = array(
+                'offre' => $offre,
+                'services'=>$offre->getServiceApresVentes(),
+            );
+        }else {
+            $this->listAndShowSecurity();
+            /** @var Utilisateur_avm $user */
+            $user = $this->getUser();
+            $service_apres_ventes = null;
+            $services = $user->getServicesApresVentes();
+            /** @var Service_apres_vente $service_apres_vente */
+            foreach ($services as $service_apres_vente){
+                $service_apres_ventes [] = array(
+                    'offre' => $service_apres_vente->getOffre(),
+                    'services' => [$service_apres_vente],
+                );
+            }
+
+        }
+        return $this->render('APMAchatBundle:service_apres_vente:index.html.twig', array(
+            'service_apres_ventes' => $service_apres_ventes,
+        ));
+    }
+
+    /**
+     * @param Request $request
+     * @param Offre $offre
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     */
+    public function newAction(Request $request, Offre $offre = null)
+    {
+        $this->createSecurity($offre);
+
+        /** @var Service_apres_vente $service_apres_vente */
+        $service_apres_vente = TradeFactory::getTradeProvider("service_apres_vente");
+        if($offre)$service_apres_vente->setOffre($offre);
+        $form = $this->createForm('APM\AchatBundle\Form\Service_apres_venteType', $service_apres_vente);
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $this->createSecurity($offre);
+            $service_apres_vente->setClient($this->getUser());
+            $em = $this->getDoctrine()->getManager();
+            $em->persist($service_apres_vente);
+            $em->flush();
+
+            return $this->redirectToRoute('apm_achat_service_apres_vente_show', array('id' => $service_apres_vente->getId()));
+        }
+
+        return $this->render('APMAchatBundle:service_apres_vente:new.html.twig', array(
+            'service_apres_vente' => $service_apres_vente,
+            'form' => $form->createView(),
+        ));
+    }
+
+    /**
+     * Finds and displays a Service_apres_vente entity.
+     * @param Service_apres_vente $service_apres_vente
+     * @return \Symfony\Component\HttpFoundation\Response
+     *
+     * Afficher ls détails d'une SAV
+     */
+    public function showAction(Service_apres_vente $service_apres_vente)
+    {
+        $this->listAndShowSecurity();
+
+        $deleteForm = $this->createDeleteForm($service_apres_vente);
+
+        return $this->render('APMAchatBundle:service_apres_vente:show.html.twig', array(
+            'service_apres_vente' => $service_apres_vente,
+            'delete_form' => $deleteForm->createView(),
+        ));
+    }
+
+    /**
+     * Creates a form to delete a Service_apres_vente entity.
+     *
+     * @param Service_apres_vente $service_apres_vente The Service_apres_vente entity
+     *
+     * @return \Symfony\Component\Form\Form The form
+     */
+    private function createDeleteForm(Service_apres_vente $service_apres_vente)
+    {
+        return $this->createFormBuilder()
+            ->setAction($this->generateUrl('apm_achat_service_apres_vente_delete', array('id' => $service_apres_vente->getId())))
+            ->setMethod('DELETE')
+            ->getForm();
+    }
+
+    /**
+     * Displays a form to edit an existing Service_apres_vente entity.
+     * @param Request $request
+     * @param Service_apres_vente $service_apres_vente
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     */
+    public function editAction(Request $request, Service_apres_vente $service_apres_vente)
+    {
+        $this->editAndDeleteSecurity($service_apres_vente);
+        $deleteForm = $this->createDeleteForm($service_apres_vente);
+        $editForm = $this->createForm('APM\AchatBundle\Form\Service_apres_venteType', $service_apres_vente);
+        $editForm->handleRequest($request);
+
+        if ($editForm->isSubmitted() && $editForm->isValid()) {
+            $this->editAndDeleteSecurity($service_apres_vente);
+            $em = $this->getDoctrine()->getManager();
+            $em->persist($service_apres_vente);
+            $em->flush();
+
+            return $this->redirectToRoute('apm_achat_service_apres_vente_show', array('id' => $service_apres_vente->getId()));
+        }
+
+        return $this->render('APMAchatBundle:service_apres_vente:edit.html.twig', array(
+            'service_apres_vente' => $service_apres_vente,
+            'edit_form' => $editForm->createView(),
+            'delete_form' => $deleteForm->createView(),
+        ));
+    }
+
+    /**
+     * Deletes a Service_apres_vente entity.
+     * @param Request $request
+     * @param Service_apres_vente $service_apres_vente
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse
+     */
+    public function deleteAction(Request $request, Service_apres_vente $service_apres_vente)
+    {
+        $this->editAndDeleteSecurity($service_apres_vente);
+
+        $form = $this->createDeleteForm($service_apres_vente);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $this->editAndDeleteSecurity($service_apres_vente);
+            $em = $this->getDoctrine()->getManager();
+            $em->remove($service_apres_vente);
+            $em->flush();
+        }
+
+        return $this->redirectToRoute('apm_achat_service_apres_vente_index');
+    }
+
+    public function deleteFromListAction(Service_apres_vente $service_apres_vente)
+    {
+        $this->editAndDeleteSecurity($service_apres_vente);
+
+        $em = $this->getDoctrine()->getManager();
+        $em->remove($object);
+        $em->flush();
+
+        return $this->redirectToRoute('apm_achat_service_apres_vente_index');
+    }
+
+    /**
+     * @param Boutique |null $boutique
+     * @param Offre |null $offre
+     */
+    private function listAndShowSecurity($boutique = null, $offre = null){
+        //-----------------------------------security-------------------------------------------
+        $this->denyAccessUnlessGranted('ROLE_USERAVM', null, 'Unable to access this page!');
+        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
+            throw $this->createAccessDeniedException();
+        }
+        $user = $this->getUser();
+        if($boutique){
+            $gerant = $boutique->getGerant();
+            $proprietaire = $boutique->getProprietaire();
+            if($user !== $gerant && $user !== $proprietaire)throw $this->createAccessDeniedException();
+        }
+        if($offre){
+            $vendeur = $offre->getVendeur();
+            $boutique = $offre->getBoutique();
+            $gerant = null;
+            $proprietaire = null;
+            if($boutique){
+                $gerant = $boutique->getGerant();
+                $proprietaire = $boutique->getProprietaire();
+            }
+            if($user !== $vendeur && $user !== $gerant && $user !== $proprietaire)throw $this->createAccessDeniedException();
+        }
+
+        //-----------------------------------------------------------------------------------------
+    }
+
+
+    /**
+     * @param Service_apres_vente $service_apres_vente
+     */
+    private function editAndDeleteSecurity($service_apres_vente){
+        //---------------------------------security-----------------------------------------------
+        // Unable to access the controller unless you have a USERAVM role
+        $this->denyAccessUnlessGranted('ROLE_USERAVM', null, 'Unable to access this page!');
+
+        /* ensure that the user is logged in  # granted even through remembering cookies
+        *  and that the one is the owner
+        */
+        $client = $service_apres_vente->getClient();
+        $user = $this->getUser();
+        if ((!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY')) || ($client!== $user)) {
+            throw $this->createAccessDeniedException();
+        }
+        //----------------------------------------------------------------------------------------
+    }
+
+
+    /*************************************************** AJAX REQUETS ************************************************/
     /**
      * Liste tous les SAV enregistrés entant que client et les SAV receptionné en tant que boutique ou les SAV d'une offre
      * @param Request $request
      * @return \Symfony\Component\HttpFoundation\Response | JsonResponse
      */
-    public function indexAction(Request $request)
+    public function indexAjaxAction(Request $request)
     {
         //---------------------------post------------------------
         if ($request->isXmlHttpRequest() && $request->getMethod() === "POST") {
@@ -138,7 +368,7 @@ class Service_apres_venteController extends Controller
         //------------------ Form---------------
         $form = $this->createForm('APM\AchatBundle\Form\Service_apres_venteType');
         $form2 = $this->createForm('APM\AchatBundle\Form\Service_apres_venteType');
-        return $this->render('APMAchatBundle:service_apres_vente:index.html.twig', array(
+        return $this->render('APMAchatBundle:service_apres_vente:index_ajax.html.twig', array(
             'form' => $form->createView(),
             'form2' => $form2->createView(),
             'url_image' => $this->get('apm_core.packages_maker')->getPackages()->getUrl('/', 'resolve_img'),
@@ -348,7 +578,7 @@ class Service_apres_venteController extends Controller
     }
 
 
-    public function deleteAction(Request $request)
+    public function deleteAjaxAction(Request $request)
     {
         if ($request->isXmlHttpRequest() && $request->getMethod() === "POST") {
 
@@ -422,16 +652,6 @@ class Service_apres_venteController extends Controller
         //----------------------------------------------------------------------------------------
     }
 
-    private function listAndShowSecurity()
-    {
-        //---------------------------------security-----------------------------------------------
-        // Unable to access the controller unless you have a USERAVM role
-        $this->denyAccessUnlessGranted('ROLE_USERAVM', null, 'Unable to access this page!');
-        if (!($this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_REMEMBERED'))) {
-            throw $this->createAccessDeniedException();
-        }
-        //----------------------------------------------------------------------------------------
-    }
 
     /**
      * @param Service_apres_vente $service_apres_vente

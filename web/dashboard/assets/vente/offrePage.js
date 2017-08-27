@@ -335,12 +335,11 @@ var OffrePage = function () {
         //handle submitted buttons
         $('input[type="submit"]').click(function (e) {
             e.preventDefault();
-            var btn = this;
+            var btn = e.target;
             if (btn.id === "crop") {
-                var id = $('.id', modal_stk.modalElement).val();
-                $(btn).attr('href', 'image?id=' + id);
+              $(btn).attr('data-href', 'image');
             } else uploadedFile = null; //<-- add condition here
-            GlobalPageCustomScript.ajaxForm(this, uploadedFile);
+            GlobalPageCustomScript.ajaxForm(this, uploadedFile, $('.id', modal_stk.modalElement).val());
         });
     };
     var pageForm = function () {

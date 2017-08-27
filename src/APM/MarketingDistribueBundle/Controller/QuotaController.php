@@ -26,7 +26,7 @@ class QuotaController extends Controller
     {
         $this->listAndShowSecurity($boutique);
         $quotas = $boutique->getCommissionnements();
-        return $this->render('APMMarketingDistribueBundle:quota:index_old.html.twig', array(
+        return $this->render('APMMarketingDistribueBundle:quota:index.html.twig', array(
             'quotas' => $quotas,
             'boutique' => $boutique,
         ));

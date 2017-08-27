@@ -215,7 +215,7 @@ var GroupeOffrePage = function () {
         var formData = new FormData(form);
         if (formData['service_apres_vente'] === null) return;
         return $.ajax({
-            url: "index",
+            url: "index-ajax",
             type: "post",
             dataType: 'json',
             data: formData,

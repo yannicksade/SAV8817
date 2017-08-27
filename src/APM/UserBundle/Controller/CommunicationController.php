@@ -15,7 +15,7 @@ use Symfony\Component\HttpFoundation\Request;
 class CommunicationController extends Controller
 {
     /**
-     * Lister les communication reçues et envoyées
+     * Lister les communication reçues et envoyées par un utilisateur
      *
      */
     public function indexAction()
@@ -25,7 +25,7 @@ class CommunicationController extends Controller
         $user = $this->getUser();
         $communicationsSent = $user->getEmetteurCommunications();
         $communicationsReceived = $user->getRecepteurCommunications();
-        return $this->render('APMUserBundle:communication:index_old.html.twig', array(
+        return $this->render('APMUserBundle:communication:index.html.twig', array(
             'communicationsSent' => $communicationsSent,
             'communicationsReceived' => $communicationsReceived,
         ));

@@ -36,7 +36,7 @@ class LivraisonController extends Controller
             $user = $this->getUser();
             $livraisons = $user->getLivraisons();
         }
-        return $this->render('APMTransportBundle:livraison:index_old.html.twig', array(
+        return $this->render('APMTransportBundle:livraison:index.html.twig', array(
             'livraisons' => $livraisons,
             'boutique' => $boutique,
         ));

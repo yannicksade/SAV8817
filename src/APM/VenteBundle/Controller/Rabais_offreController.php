@@ -31,7 +31,7 @@ class Rabais_offreController extends Controller
         if ($offre) $rabais_offres = $offre->getRabais();
         $rabais_recus = $user->getRabaisRecus();
         $rabais_accordes = $user->getRabaisAccordes();
-        return $this->render('APMVenteBundle:rabais_offre:index_old.html.twig', array(
+        return $this->render('APMVenteBundle:rabais_offre:index.html.twig', array(
             'rabais_offres' => $rabais_offres,
             'rabais_recus' => $rabais_recus,
             'rabais_accordes' => $rabais_accordes,

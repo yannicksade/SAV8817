@@ -5,7 +5,12 @@ apm_vente_boutique_index:
     methods:  GET
 
 apm_vente_boutique_search:
-    path:     /search-byCriterias/{name}/{value}
+    path:     / #=index liste toutes les boutiques
+    defaults: { _controller: "APMVenteBundle:Boutique:search" }
+    methods:  GET
+
+apm_vente_boutique_search_creteria_by:
+    path:     /{name}:{value} #=index liste par critère
     defaults: { _controller: "APMVenteBundle:Boutique:search" }
     methods:  GET
 

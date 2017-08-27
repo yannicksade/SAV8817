@@ -90,7 +90,7 @@ var GlobalPageCustomScript = function () {
             }
         });
     };
-    var ajaxForm = function (element, file) {
+    var ajaxForm = function (element, file, oData) {
         var item_sp, parent;
         // data-content; where the data of the form is located
         /*--------  seek the form -------------*/
@@ -102,9 +102,10 @@ var GlobalPageCustomScript = function () {
         parent = $(form).parents('.data-content');
         if (form === null) return;
         var formData = new FormData(form);
-        if (file !== null) formData.append('file', file);
+        if (file) formData.append('file', file);
+        if(oData)formData.append('oData', oData);
         return $.ajax({
-            url: $(element).attr('href'),
+            url: $(element).attr('data-href'),
             type: "post",
             dataType: 'json',
             data: formData,
@@ -168,7 +169,7 @@ var GlobalPageCustomScript = function () {
         var items = JSON.stringify(elements);
         var item_sp;
         return $.ajax({
-            url: "delete",
+            url: $(child).attr('data-href'),
             type: "post",
             dataType: 'json',
             data: 'items=' + items,

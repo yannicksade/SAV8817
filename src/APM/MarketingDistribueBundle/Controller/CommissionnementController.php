@@ -19,7 +19,7 @@ use Symfony\Component\HttpFoundation\Request;
 class CommissionnementController extends Controller
 {
     /**
-     * Liste les commissionnements d'un conseiller
+     * Liste les commissionnements d'un conseiller ou d'une boutique pour jouir il faut avoir definir son profile conseiller
      * @param Boutique $boutique
      * @return \Symfony\Component\HttpFoundation\Response
      */
@@ -60,7 +60,7 @@ class CommissionnementController extends Controller
             }
         }
 
-        return $this->render('APMMarketingDistribueBundle:commissionnement:index_old.html.twig', array(
+        return $this->render('APMMarketingDistribueBundle:commissionnement:index.html.twig', array(
             'boutiques_commissionnements' => $boutiques_commissionnements,
         ));
     }

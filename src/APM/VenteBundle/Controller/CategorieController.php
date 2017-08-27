@@ -26,7 +26,7 @@ class CategorieController extends Controller
         $this->listAndShowSecurity($boutique);
         $categories = $boutique->getCategories();
 
-        return $this->render('APMVenteBundle:categorie:index_old.html.twig', array(
+        return $this->render('APMVenteBundle:categorie:index.html.twig', array(
             'categories' => $categories,
             'boutique' => $boutique
         ));

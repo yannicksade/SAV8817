@@ -30,7 +30,7 @@ class Profile_transporteurController extends Controller
             $profile_transporteurs = $em->getRepository('APMTransportBundle:Profile_transporteur')->findAll();
         }
 
-        return $this->render('APMTransportBundle:profile_transporteur:index_old.html.twig', array(
+        return $this->render('APMTransportBundle:profile_transporteur:index.html.twig', array(
             'profile_transporteurs' => $profile_transporteurs,
             'zone' => null,
         ));

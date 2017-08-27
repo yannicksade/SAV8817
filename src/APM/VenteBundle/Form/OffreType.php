@@ -49,10 +49,12 @@ class OffreType extends AbstractType
             ->add('id', TextType::class, [
                 'mapped' => false,
                 'attr' => ['class' => 'id hidden'],
+                'required'=>false,
             ])
             ->add('code', TextType::class, [
                 'mapped' => false,
                 'attr' => ['class' => 'form-control code'],
+                'required'=>false,
             ])
             ->add('designation', TextType::class, [
                 'required' => true,

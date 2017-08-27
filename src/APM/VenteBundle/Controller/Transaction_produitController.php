@@ -63,7 +63,7 @@ class Transaction_produitController extends Controller
                 );
             }
         }
-        return $this->render('APMVenteBundle:transaction_produit:index_old.html.twig', array(
+        return $this->render('APMVenteBundle:transaction_produit:index.html.twig', array(
             'transactionsEffectues' => $transactionsEffectues,
             'transactionsRecues' => $transactionsRecues,
             'boutique' => $boutique,

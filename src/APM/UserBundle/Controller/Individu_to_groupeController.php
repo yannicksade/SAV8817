@@ -45,14 +45,14 @@ class Individu_to_groupeController extends Controller
             foreach ($individu_groupes as $individu_groupe) {
                 /** @var Groupe_relationnel $groupe_relationnel */
                 $groupe_relationnel = $individu_groupe->getGroupeRelationnel();
-                if ($groupe_relationnel->isConversationalGroup() && $user != $groupe_relationnel->getProprietaire())
+                if ($groupe_relationnel->isConversationalGroup() && $user !== $groupe_relationnel->getProprietaire())
                     $individu_to_groupes [] = array(
                         'groupe' => $groupe_relationnel,
                         'personnes' => $individu_groupe);
             }
             //---------------------------------------------------------------------------------------------------------
         }
-        return $this->render('APMUserBundle:individu_to_groupe:index_old.html.twig', [
+        return $this->render('APMUserBundle:individu_to_groupe:index.html.twig', [
             'individu_to_groupes' => $individu_to_groupes,
                 'groupe' => $groupe_relationnel,
 
@@ -99,7 +99,7 @@ class Individu_to_groupeController extends Controller
         foreach ($individu_to_groupes as $individu_to_groupe) {
             $users [] = $individu_to_groupe->getIndividu();
         }
-        return $this->render('APMUserBundle:Utilisateur_avm:index_old.html.twig', array(
+        return $this->render('APMUserBundle:utilisateur_avm:index.html.twig', array(
             'users' => $users,
             'groupe' => $groupe_relationnel,
         ));
@@ -118,7 +118,7 @@ class Individu_to_groupeController extends Controller
                     'groupe' => $individu_groupe->getGroupeRelationnel(),
                     'personnes' => $individu_groupe);
         }
-        return $this->render('APMUserBundle:individu_to_groupe:index_old.html.twig',
+        return $this->render('APMUserBundle:individu_to_groupe:index.html.twig',
             ['individu_to_groupes' => $individu_to_groupes]
         );
     }
@@ -178,10 +178,11 @@ class Individu_to_groupeController extends Controller
                 /** @var Individu_to_groupe $oldIndividu */
                 $oldIndividu = $em->getRepository('APMUserBundle:Individu_to_groupe')
                     ->findOneBy(['individu' => $individu]);
-                $oldGroupe = $oldIndividu->getGroupeRelationnel();
-
-                if ($user !== $groupe->getProprietaire() || null !== $oldIndividu && $groupe === $oldGroupe) {
-                    throw $this->createAccessDeniedException();
+                if(null !== $oldIndividu) {
+                    $oldGroupe = $oldIndividu->getGroupeRelationnel();
+                    if ($user !== $groupe->getProprietaire() || $groupe === $oldGroupe) {
+                        throw $this->createAccessDeniedException();
+                    }
                 }
             }
         }

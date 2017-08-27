@@ -14,7 +14,6 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class BoutiqueController extends Controller
 {
-
     /**
      * Liste les boutiques de l'utilisateur
      *
@@ -47,8 +46,9 @@ class BoutiqueController extends Controller
     //---------------------------------------------------------
 
     /**
-     * @param string|null $name
-     * @param null $value
+     * cette fonction recherche les boutique en fonction de leurs attribut ou propriété
+     * @param $name designation de la propriété
+     * @param $value valeur ou designation de la propriété
      * @return \Symfony\Component\HttpFoundation\Response
      */
     public function searchAction($name = null, $value = null)
@@ -56,7 +56,7 @@ class BoutiqueController extends Controller
         $this->listAndShowSecurity();
         $em = $this->getDoctrine()->getManager();
         if ($name && $value) {
-            $boutiques = $em->getRepository('APMVenteBundle:Boutique')->findBy([$name => $value], ['OrderBy' => 'DESC']);
+            $boutiques = $em->getRepository('APMVenteBundle:Boutique')->findBy([$name => $value]);
         } else {
             $boutiques = $em->getRepository('APMVenteBundle:Boutique')->findAll();
         }

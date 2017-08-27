@@ -1,0 +1,20 @@
+{% extends ":base/dashboard:layout.html.twig" %}
+
+{% block content_body %}
+    <div class="row">
+        <h1>Création d'une offre</h1>
+        <div class="col-lg-4 thumbnail">
+            <h2>Enregistrement des propriétés</h2>
+            {{ form_start(form) }}
+            {{ form_errors(form) }}
+            {{ form_widget(form) }}
+            <input type="submit" value="Create"/>
+            {{ form_end(form) }}
+            <ul>
+                <li>
+                    <a href="{{ path('apm_vente_offre_index') }}">Abandonner !</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+{% endblock content_body %}

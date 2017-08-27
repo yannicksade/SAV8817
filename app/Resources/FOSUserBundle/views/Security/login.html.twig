@@ -8,7 +8,7 @@
 
 {%- block title -%} {{ parent()}}| Login {%- endblock title -%}
 
-{% block body_content %}
+{% block body_container %}
     <!-- BEGIN : LOGIN PAGE 5-2 -->
     <div class="user-login-5">
         <div class="row bs-reset">
@@ -102,7 +102,7 @@
     <input type="hidden" id="bg-4" value="{{ asset("dashboard/assets/pages/img/login/10.jpg") }}"/>
     <input type="hidden" id="bg-5" value="{{ asset("dashboard/assets/pages/img/login/43.jpg") }}"/>
     <input type="hidden" id="bg-6" value="{{ asset("dashboard/assets/pages/img/login/8.jpg") }}"/>
-{% endblock body_content %}
+{% endblock body_container %}
 
 {% block js %}
     {% javascripts "dashboard/assets/pages/scripts/login-5.js" %}

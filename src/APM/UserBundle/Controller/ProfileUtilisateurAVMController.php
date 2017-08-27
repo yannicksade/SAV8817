@@ -13,7 +13,7 @@ use Symfony\Component\HttpFoundation\Request;
 
 class ProfileUtilisateurAVMController extends Controller
 {
-    public function editAction(Request $request)
+    public function editAction()
     {
         $this->security();
         return $this->get('pugx_multi_user.profile_manager')

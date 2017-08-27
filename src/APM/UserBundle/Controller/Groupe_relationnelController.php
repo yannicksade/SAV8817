@@ -15,7 +15,7 @@ use Symfony\Component\HttpFoundation\Request;
 class Groupe_relationnelController extends Controller
 {
     /**
-     * Liste tous les groupe relationnel crée par l'utilisateur
+     * Liste tous les groupes relationnels crées par l'utilisateur
      *
      */
     public function indexAction()
@@ -24,7 +24,7 @@ class Groupe_relationnelController extends Controller
         /** @var Utilisateur_avm $user */
         $user = $this->getUser();
         $groupes = $user->getGroupesProprietaire();
-        return $this->render('APMUserBundle:groupe_relationnel:index_old.html.twig', array(
+        return $this->render('APMUserBundle:groupe_relationnel:index.html.twig', array(
             'groupe_relationnels' => $groupes,
             'url_image' => $this->get('apm_core.packages_maker')->getPackages()->getUrl('/', 'resolve_img'),
         ));

@@ -37,7 +37,7 @@ class Conseiller_boutiqueController extends Controller
             foreach ($conseiller_boutiques as $conseiller_boutique) {
                 $boutiques [] = $conseiller_boutique->getBoutique();
             }
-            return $this->render('APMVenteBundle:boutique:index_old.html.twig', array(
+            return $this->render('APMVenteBundle:boutique:index.html.twig', array(
                 'boutiquesProprietaire' => $boutiques,
                 'boutiquesGerant' => null,
             ));

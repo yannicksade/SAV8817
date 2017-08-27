@@ -44,7 +44,7 @@ class RemiseController extends Controller
         }
         $boutique = null;
 
-        return $this->render('APMVenteBundle:remise:index_old.html.twig', [
+        return $this->render('APMVenteBundle:remise:index.html.twig', [
                 "offre_remises" => $offre_remises,
                 "offre" => $offre,
                 "boutique" => $boutique,

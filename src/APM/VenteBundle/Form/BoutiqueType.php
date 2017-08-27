@@ -26,7 +26,7 @@ class BoutiqueType extends AbstractType
                 'placeholder' => 'choisir un pays>>'
             ])
             ->add('designation', TextType::class)
-            ->add('raisonSociale', TextType::class, ['required' => false])
+      /*      ->add('raisonSociale', TextType::class, ['required' => false])*/
             ->add('statutSocial', ChoiceType::class, array(
                 'choices' => [
                     'S.N.C' => 0,
