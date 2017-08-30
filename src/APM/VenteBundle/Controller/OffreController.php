@@ -38,7 +38,7 @@ class OffreController extends Controller
     public function indexAction(Request $request, Boutique $boutique = null, Categorie $categorie = null)
     {
         $vendeur = null;
-        if (isset($boutique)) {
+        if (null !== $boutique) {
             $this->listAndShowSecurity($boutique);
             if ($categorie) {
                 $offres = $categorie->getOffres();

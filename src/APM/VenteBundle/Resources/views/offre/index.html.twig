@@ -1,6 +1,8 @@
-{% extends ":base/dashboard:layout.html.twig" %}
+{#{% extends ":base/dashboard:layout.html.twig" %}#}
+{% extends "APMAdminBundle:_Main:layout.html.twig" %}
 
-{% block content_body %}
+{#{% block content_body %}#}
+{% block body %}
     {% if filter is defined %}
         {{ form_start(filter) }}
         {{ form_widget(filter) }}
@@ -8,8 +10,8 @@
         {{ form_end(filter) }}
     {% endif %}
     <p>----------------------------------------------------------------</p>
-
-    <h1> Mes Offres {% if boutique -%} - <a
+    Boutique: <strong>SIMINTA</strong>
+    <h1> Offres {% if boutique -%} - <a
             href="{{ path('apm_vente_boutique_show', { 'id': boutique.id }) }}">{{ boutique }}
             {% if categorie %}- <a
                 href="{{ path('apm_vente_categorie_show', { 'id': categorie.id }) }}">{{ categorie }}</a>{% endif %}
@@ -78,4 +80,4 @@
             <a href="{{ path('apm_core_user-dashboard_index') }}"> Retour à l'accueil</a>
         </li>
     </ul>
-{% endblock content_body %}
+{% endblock  %}

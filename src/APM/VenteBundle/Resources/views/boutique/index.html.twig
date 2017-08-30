@@ -1,6 +1,8 @@
-{% extends ":base/dashboard:layout.html.twig" %}
+{#{% extends ":base/dashboard:layout.html.twig" %}#}
+{% extends "APMAdminBundle:_Main:layout.html.twig" %}
 
-{% block content_body %}
+{#{% block content_body %}#}
+{% block body %}
     <table>
         <thead>
         <tr>---------------------------- Boutiques -------------------------------</tr>
@@ -83,4 +85,4 @@
     </table>
     {% endif %}
     <p><a href="{{ path('apm_core_user-dashboard_index') }}"> Retour à l'accueil</a></p>
-{% endblock content_body %}
+{% endblock %}

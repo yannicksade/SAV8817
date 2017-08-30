@@ -4,7 +4,6 @@
 var OffrePage = function () {
     //global variables
     //----pages
-    var notifAlert = document.querySelector("#notif-active");
     var actionConfirm;
     var modalConfirm = $('#modal-confirm');
     var tabElement_1 = $('#tab_1'),
@@ -12,7 +11,6 @@ var OffrePage = function () {
         tab1 = document.querySelector('#tab1'),
         tab2 = document.querySelector('#tab2');
     var uploadedFile;
-        var labelProcess = $('#ajax-label-process');
     var isEditMode = false;
     //----- modal
     var modal_stk = {
@@ -46,7 +44,7 @@ var OffrePage = function () {
      xhr.send(fd);
      };*/
 
-    var modalNotification = function (message) {
+    /*var modalNotification = function (message) {
         var tmpl = [
             // tabindex is required for focus
             '<div class="modal hide fade" tabindex="-1">',
@@ -64,7 +62,7 @@ var OffrePage = function () {
         ].join('');
 
         $(tmpl).modal('modal');
-    };
+    };*/
     //---- notification
 
 
@@ -219,7 +217,7 @@ var OffrePage = function () {
             var parent = p[5];// portlet
             if (!$(p[0]).hasClass('modal-footer')) { //chargement du formulaire partant du tableau
                 modifierImpl(parent);
-                var cboxes = $('.checkboxes:checked', parent)
+                var cboxes = $('.checkboxes:checked', parent);
                 var nb = cboxes.length;
                 for (var i = 0; i < nb; i++) {
                     var elt = cboxes[i];
@@ -382,11 +380,11 @@ var OffrePage = function () {
             $('.alerte', modal_stk.modalElement).html('<strong>Aucun élément sélectionné</strong>');
 
             $('.composer_item').click(function () {
-                modifierImpl($(this).parents('.portlet'));
+                modifierImpl($(this).parents('.data-content'));
             });
 
             $('.tab-reload').click(function () {
-                $('.datatable_ajax', $(this).parents('.portlet')).DataTable().ajax.reload();
+                $('.datatable_ajax', $(this).parents('.data-content')).DataTable().ajax.reload();
             });
 
             //document.querySelector('#tab_1 .submit_form').removeEventListener('submit',null,  false);
