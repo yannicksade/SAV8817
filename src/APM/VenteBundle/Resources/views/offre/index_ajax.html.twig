@@ -117,7 +117,6 @@
                                         <span></span>
                                     </label>
                                 </th>
-                                <th width="2%">Records&nbsp;#</th>
                                 <th> Code</th>
                                 <th> Désignation</th>
                                 <th> Boutique</th>
@@ -126,9 +125,6 @@
                             </tr>
                             <tr role="row" class="filter">
                                 <td></td>
-                                <td><strong>save state:</strong>
-                                    <input type="checkbox" class="form-filter" name="record_filter"
-                                           placeholder="reference:"></td>
                                 <td>
                                     <input type="text" class="form-control form-filter input-sm"
                                            name="code_filter"></td>
@@ -176,7 +172,7 @@
                         </table>
                     </div>
                 </div>
-                <div class="col-lg-3 form-element thumbnail form1">
+                <div class="col-lg-3 form-element thumbnail">
                     {{ form_start(form, {"attr":{"class":"data-form", "enctype":"multipart/form-data", "method":"post"}}) }}
                     <div class="form-group">
                         <h3 class="inline"> Créer une offre </h3>
@@ -187,14 +183,14 @@
                     <div class="form-group">
                         {{ form_widget(form.id) }}
                         {{ form_label(form.code, 'Code:', {'attr':{'class':'control-label'}}) }}
-                        {{ form_widget(form.code, {'attr':{'name':'code', 'value':'automatique' ,'readonly':'true'}}) }}
+                        {{ form_widget(form.code, {'attr':{'value':'automatique' ,'readonly':'true'}}) }}
                     </div>
                     <div class="form-group">
                         {{ form_errors(form.categorie) }}
                         {{ form_label(form.categorie, 'Catégorie:', {'attr':{'class':'control-label'}}) }}
                         <div class="input-group">
                             <span class="input-group-addon"><input type="checkbox"></span>
-                            {{ form_widget(form.categorie, {'attr':{'name':'categorie', 'disabled':'true'},'placeholder': 'selectionnez la catégorie de l\'offre ici...'}) }}
+                            {{ form_widget(form.categorie, {'attr':{'disabled':'true'},'placeholder': 'selectionnez la catégorie de l\'offre ici...'}) }}
                         </div>
                     </div>
                     <div class="form-group">
@@ -202,7 +198,7 @@
                         {{ form_label(form.boutique, 'Boutique:', {'attr':{'class':'control-label'}}) }}
                         <div class="input-group">
                             <span class="input-group-addon"><input type="checkbox"></span>
-                            {{ form_widget(form.boutique, {'attr':{'name':'boutique', 'disabled':'true'},'placeholder': 'selectionnez la boutique ici...'}) }}
+                            {{ form_widget(form.boutique, {'attr':{'disabled':'true'},'placeholder': 'selectionnez la boutique ici...'}) }}
                         </div>
                     </div>
                     <div class="form-group">
@@ -210,7 +206,7 @@
                         {{ form_label(form.etat, 'Etat:', {'attr':{'class':'control-label'}}) }}
                         <div class="input-group">
                             <span class="input-group-addon"><input type="checkbox"></span>
-                            {{ form_widget(form.etat, {'attr':{'name':'etat', 'disabled':'true'}}) }}
+                            {{ form_widget(form.etat, {'attr':{'disabled':'true'}}) }}
                         </div>
                     </div>
                     <div class="form-group">
@@ -218,7 +214,7 @@
                         {{ form_label(form.designation, 'Désignation:', {'attr':{'class':'control-label'}}) }}
                         <div class="input-group">
                             <span class="input-group-addon"><input type="checkbox"></span>
-                            {{ form_widget(form.designation, {'attr':{'name':'desigantion', 'readonly':"true"}}) }}
+                            {{ form_widget(form.designation, {'attr':{'readonly':"true"}}) }}
                         </div>
                     </div>
                     <div class="form-group">
@@ -226,7 +222,7 @@
                         {{ form_label(form.prixUnitaire, 'Prix de l\'unité:', {'attr':{'class':'control-label'}}) }}
                         <div class="input-group">
                             <span class="input-group-addon"><input type="checkbox"></span>
-                            {{ form_widget(form.prixUnitaire, {'attr':{'name':'prixUnitaire', 'readonly':"true"}}) }}
+                            {{ form_widget(form.prixUnitaire, {'attr':{'readonly':"true"}}) }}
                         </div>
                     </div>
                     <div class="form-group">
@@ -234,7 +230,7 @@
                         {{ form_label(form.quantite, 'Quantite:', {'attr':{'class':'control-label'}}) }}
                         <div class="input-group">
                             <span class="input-group-addon"><input type="checkbox"></span>
-                            {{ form_widget(form.quantite, {'attr':{'name':'quantite', 'readonly':"true"}}) }}
+                            {{ form_widget(form.quantite, {'attr':{'readonly':"true"}}) }}
                         </div>
                     </div>
                     <div class="form-group">
@@ -242,7 +238,7 @@
                         {{ form_label(form.unite, 'Unité de mesure:', {'attr':{'class':'control-label'}}) }}
                         <div class="input-group">
                             <span class="input-group-addon"><input type="checkbox"></span>
-                            {{ form_widget(form.unite, {'attr':{'name':'unite' ,'readonly':'true'}}) }}
+                            {{ form_widget(form.unite, {'attr':{'readonly':'true'}}) }}
                         </div>
                     </div>
                     <div class="form-group">
@@ -250,7 +246,7 @@
                         {{ form_label(form.remiseProduit, 'remise à l\'offre:', {'attr':{'class':'control-label'}}) }}
                         <div class="input-group">
                             <span class="input-group-addon"><input type="checkbox"></span>
-                            {{ form_widget(form.remiseProduit, {'attr':{'name':'remiseProduit', 'readonly':"true"}}) }}
+                            {{ form_widget(form.remiseProduit, {'attr':{'readonly':"true"}}) }}
                         </div>
                     </div>
                     <div class="form-group">
@@ -258,7 +254,7 @@
                         {{ form_label(form.publiable, 'A publier?:', {'attr':{'class':'control-label'}}) }}
                         <div class="input-group">
                             <span class="input-group-addon"><input type="checkbox"></span>
-                            {{ form_widget(form.publiable, {'attr':{'name':'publiable', 'disabled':'true'}}) }}
+                            {{ form_widget(form.publiable, {'attr':{'disabled':'true'}}) }}
                         </div>
                     </div>
                     <div class="form-group">
@@ -266,7 +262,7 @@
                         {{ form_label(form.apparenceNeuf, 'Apparence:', {'attr':{'class':'control-label'}}) }}
                         <div class="input-group">
                             <span class="input-group-addon"><input type="checkbox"></span>
-                            {{ form_widget(form.apparenceNeuf, {'attr':{'name':'apparenceNeuf', 'disabled':'true'}}) }}
+                            {{ form_widget(form.apparenceNeuf, {'attr':{'disabled':'true'}}) }}
                         </div>
                     </div>
                     <div class="form-group">
@@ -274,7 +270,7 @@
                         {{ form_label(form.dureeGarantie, 'Durée de la Garantie(en mois):', {'attr':{'class':'control-label'}}) }}
                         <div class="input-group">
                             <span class="input-group-addon"><input type="checkbox"></span>
-                            {{ form_widget(form.dureeGarantie, {'attr':{'name':'dureeGarantie', 'readonly':"true"}}) }}
+                            {{ form_widget(form.dureeGarantie, {'attr':{'readonly':"true"}}) }}
                         </div>
                     </div>
                     <div class="form-group">
@@ -282,7 +278,7 @@
                         {{ form_label(form.modeVente, 'Mode de vente:', {'attr':{'class':'control-label'}}) }}
                         <div class="input-group">
                             <span class="input-group-addon"><input type="checkbox"></span>
-                            {{ form_widget(form.modeVente, {'attr':{'name':'modeVente', 'disabled':'true'}}) }}
+                            {{ form_widget(form.modeVente, {'attr':{'disabled':'true'}}) }}
                         </div>
                     </div>
                     <div class="form-group">
@@ -290,7 +286,7 @@
                         {{ form_label(form.modelDeSerie, 'Modèle de l\'offre:', {'attr':{'class':'control-label'}}) }}
                         <div class="input-group">
                             <span class="input-group-addon"><input type="checkbox"></span>
-                            {{ form_widget(form.modelDeSerie, {'attr':{'name':'modelDeSerie', 'readonly':"true"}}) }}
+                            {{ form_widget(form.modelDeSerie, {'attr':{'readonly':"true"}}) }}
                         </div>
                     </div>
                     <div class="form-group">
@@ -298,17 +294,17 @@
                         {{ form_label(form.typeOffre, 'Type de l\'offre:', {'attr':{'class':'control-label'}}) }}
                         <div class="input-group">
                             <span class="input-group-addon"><input type="checkbox"></span>
-                            {{ form_widget(form.typeOffre, {'attr':{'name':'typeOffre', 'disabled':'true'}}) }}
+                            {{ form_widget(form.typeOffre, {'attr':{'disabled':'true'}}) }}
                         </div>
                     </div>
                     <div class="form-group">
-                        {{ form_widget(form.imageFile, {'attr':{'name':'image',  'value': 'charger une image pour l\'offre'}}) }}
+                        {{ form_widget(form.imageFile, {'attr':{'value': 'charger une image pour l\'offre'}}) }}
                     </div>
                     <div class="form-group">
                         {{ form_errors(form.description) }}
                         {{ form_label(form.description, 'Description:', {'attr':{'class':'control-label'}}) }}
                         <span class="input-group-addon"><input type="checkbox"></span>
-                        {{ form_widget(form.description, {'attr':{'name':'description', 'disabled':'true'}, "placeholder": "décrivez le produit ici..."}) }}
+                        {{ form_widget(form.description, {'attr':{'disabled':'true'}, "placeholder": "décrivez le produit ici..."}) }}
                     </div>
                     <input data-href="index-ajax" type="submit" value="Soumettre" disabled/>
                     <input type="reset" value="Effacer"/>
@@ -353,103 +349,97 @@
                     <div class="modal-body">
                         <table>
                             <tbody>
-                            <tr>
-                                <th><input type="hidden" class="id"/>Code</th>
-                                <td class="code"></td>
+                            <tr style="border: inset">
+                                <th><input type="hidden" name="_id"/>Code</th>
+                                <td class="display-control-static" data-display="_code"></td>
                             </tr>
-                            <tr>
-                                <th>Offre publié?</th>
-                                <td class="publiable"></td>
-                            </tr>
-                            <tr>
-                                <th>Vendeur</th>
-                                <td class="hidden vendeurID"></td>
-                                <td class="vendeur"></td>
-                            </tr>
-
-                            <tr>
+                            <tr style="border: inset">
                                 <th>Catégorie</th>
-                                <td class="hidden categorieID"></td>
-                                <td class="categorie"></td>
+                                <td class="display-control-static" data-display="_categorie"></td>
                             </tr>
-                            <tr>
+                            <tr style="border: inset">
                                 <th>Boutique</th>
-                                <td class="hidden boutiqueID"></td>
-                                <td class="boutique"></td>
+                                <td class="display-control-static" data-display="_boutique"></td>
                             </tr>
-                            <tr>
+                            <tr style="border: inset">
                                 <th>Date de mise à jour</th>
-                                <td class="updatedAt"></td>
-                            </tr>
-                            <tr>
-                                <th>Date de création</th>
-                                <td class="dateCreation"></td>
-                            </tr>
-                            <tr>
-                                <th>Date d'expiration</th>
-                                <td class="dateExpiration"></td>
-                            </tr>
-                            <tr>
-                                <th>Durée de la Garantie(mois)</th>
-                                <td class="dureeGarantie"></td>
-                            </tr>
-                            <tr>
-                                <th>Designation</th>
-                                <td class="designation"></td>
-                            </tr>
-                            <tr>
-                                <th>Apparence</th>
-                                <td class="apparence"></td>
-                                <td class="hidden apparenceID"></td>
-                            </tr>
-                            <tr>
-                                <th>Retourne?</th>
-                                <td class="hidden retourneID"></td>
-                                <td class="retourne"></td>
-                            </tr>
-                            <tr>
-                                <th>Etat</th>
-                                <td class="hidden etatID"></td>
-                                <td class="etat"></td>
-                            </tr>
-                            <tr>
-                                <th>Rémise</th>
-                                <td class="remise"></td>
-                            </tr>
-                            <tr>
-                                <th>Mode de vente</th>
-                                <td class="hidden modeVenteID"></td>
-                                <td class="modeVente"></td>
-                            </tr>
-                            <tr>
-                                <th>Modèle de fabrication</th>
-                                <td class="modelDeSerie"></td>
+                                <td class="display-control-static" data-display="_updatedAt"></td>
                             </tr>
 
-                            <tr>
+
+                            <tr style="border: inset">
+                                <th>Date de création</th>
+                                <td class="display-control-static" data-display="_dateCreation"></td>
+                            </tr>
+                            <tr style="border: inset">
+                                <th>Vendeur</th>
+                                <td class="display-control-static" data-display="_vendeur"></td>
+                            </tr>
+                            <tr style="border: inset">
+                                <th>Date d'expiration</th>
+                                <td class="display-control-static" data-display="_dateExpiration"></td>
+                            </tr>
+                            <tr style="border: inset">
+                                <th>Durée de la Garantie(mois)</th>
+                                <td class="display-control-static" data-display="_dureeGarantie"></td>
+                            </tr>
+                            <tr style="border: inset">
+                                <th>Designation</th>
+                                <td class="display-control-static" data-display="_designation"></td>
+                            </tr>
+
+                            <tr style="border: inset">
+                                <th>Apparence</th>
+                                <td class="display-control-static" data-display="_apparence"></td>
+                            </tr>
+                            <tr style="border: inset">
+                                <th>Retourne?</th>
+                                <td class="display-control-static" data-display="_retourne"></td>
+                            </tr>
+                            <tr style="border: inset">
+                                <th>Etat</th>
+                                <td class="display-control-static" data-display="_etat"></td>
+                            </tr>
+                            <tr style="border: inset">
+                                <th>Rémise</th>
+                                <td class="display-control-static" data-display="_remise"></td>
+                            </tr>
+                            <tr style="border: inset">
+                                <th>Mode de vente</th>
+                                <td class="display-control-static" data-display="_modeVente"></td>
+                            </tr>
+                            <tr style="border: inset">
+                                <th>Modèle de fabrication</th>
+                                <td class="display-control-static" data-display="_modelDeSerie"></td>
+                            </tr>
+
+                            <tr style="border: inset">
                                 <th>Prix de l'unité</th>
-                                <td class="prix"></td>
+                                <td class="display-control-static" data-display="_prixUnitaire"></td>
                             </tr>
-                            <tr>
+                            <tr style="border: inset">
                                 <th>Quantite</th>
-                                <td class="quantite"></td>
+                                <td class="display-control-static" data-display="_quantite"></td>
                             </tr>
-                            <tr>
+                            <tr style="border: inset">
                                 <th>Unité de mesure</th>
-                                <td class="unite"></td>
+                                <td class="display-control-static" data-display="_unite"></td>
                             </tr>
-                            <tr>
+                            <tr style="border: inset">
                                 <th>Evaluation</th>
-                                <td class="rate"></td>
+                                <td class="display-control-static" data-display="_rate"></td>
                             </tr>
-                            <tr>
+                            <tr style="border: inset">
                                 <th>Typeoffre</th>
-                                <td class="hidden typeID"></td>
-                                <td class="type"></td>
+                                <td class="display-control-static" data-display="_type"></td>
                             </tr>
-                            <tr>
+                            <tr style="border: inset">
                                 <th>Description</th>
-                                <td class="desc"></td>
+                                <td class="display-control-static" data-display="_description"></td>
+                            </tr>
+                            <tr style="border: inset">
+                                <th>Offre publié?</th>
+                                <td class="display-control-static" data-display="_publiable"></td>
                             </tr>
                             </tbody>
                         </table>
@@ -458,7 +448,8 @@
                         <a class="btn green pull-left modal-action-terminated" data-dismiss="modal"> OK </a>
                         <a class="btn btn-outline blue btn-sm blue edit_item" data-dismiss="modal"><i
                                     class="fa fa-edit"></i> Modifier </a>
-                        <a data-href="delete-ajax" class="btn btn-outline red btn-sm red delete_item" data-toggle="modal" href="#modal-confirm"><i
+                        <a data-href="delete-ajax" class="btn btn-outline red btn-sm red delete_item"
+                           data-toggle="modal" href="#modal-confirm"><i
                                     class="fa fa-trash-o"></i> Supprimer </a>
                     </div>
                 </div>
@@ -487,7 +478,8 @@
                     </div>
                     <div class="modal-footer">
                         <a class="btn green pull-left modal-action-terminated" data-dismiss="modal"> Close </a>
-                        <a data-href="delete-ajax" class="btn btn-outline red btn-sm red delete_item" data-toggle="modal" href="#modal-confirm"><i
+                        <a data-href="delete-ajax" class="btn btn-outline red btn-sm red delete_item"
+                           data-toggle="modal" href="#modal-confirm"><i
                                     class="fa fa-trash-o"></i> Supprimer </a>
                     </div>
                 </div>

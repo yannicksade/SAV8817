@@ -97,8 +97,8 @@ class Offre extends TradeFactory
     private $etat;
 
     /**
-     * @var string
-     * @ORM\Column(name="apparenceNeuf", type="string", nullable=true)
+     * @var integer
+     * @ORM\Column(name="apparenceNeuf", type="integer", nullable=true)
      */
     private $apparenceNeuf;
 
@@ -1160,7 +1160,7 @@ class Offre extends TradeFactory
     }
 
     /**
-     * @param string $apparenceNeuf
+     * @param integer $apparenceNeuf
      *  @return Offre
      */
     public function setApparenceNeuf($apparenceNeuf)
@@ -1174,7 +1174,7 @@ class Offre extends TradeFactory
     /**
      * Get apparenceNeuf
      *
-     * @return string
+     * @return integer
      */
     public function getApparenceNeuf()
     {

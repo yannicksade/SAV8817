@@ -686,33 +686,26 @@ class OffreController extends Controller
                 foreach ($offres as $offre) {
                     $id += 1;
                     $etat = $offre->getEtat();
-                    $dateExp = null;
-                    $dateCreate = $offre->getDateCreation();
+                    $dateCreate = $offre->getDateCreation()?$offre->getDateCreation()->format("d/m/Y - H:i"):'';
                     $dureeGarantie = $offre->getDureeGarantie();
-                    $categorieID = null;
-                    $boutiqueID = null;
-                    $categorie = $offre->getCategorie();
-                    if ($categorie) $categorieID = $offre->getCategorie()->getId();
-                    $boutique = $offre->getBoutique();
-                    if ($boutique) $boutiqueID = $offre->getBoutique()->getId(); else $boutique = "<i>free lance</i>";
-                    if (null !== $offre->getDateExpiration()) $dateExp = $offre->getDateExpiration()->format("d/m/Y - H:i");
-                    $dateCreate = $dateCreate->format("d/m/Y - H:i");
+                    $categorie = null !== $offre->getCategorie()?$offre->getCategorie():'';
+                    $boutique = $offre->getBoutique()?$offre->getBoutique():"<i>free lance</i>";
+                    $dateExp = $offre->getDateExpiration()? $offre->getDateExpiration()->format("d/m/Y - H:i"):'';
                     $retourne = $offre->getRetourne() ? "OUI" : "NON";
                     $publier = $offre->getPubliable() ? "OUI" : "NON";
-                    $apparence = $offre->getApparenceNeuf();
-                    if ($apparence === 1) $apparence = "NEUF"; elseif ($apparence === 0) $apparence = "OCCASION";
+                     $apparence = $offre->getApparenceNeuf()?"NEUF": "OCCASION";
+                    $updatedAt = $offre->getUpdatedAt()->format("d/m/Y - H:i");
                     $records['data'][] = array(
-                        '<label class="mt-checkbox mt-checkbox-single mt-checkbox-outline"><input name="id_' . $offre->getId() . '" type="checkbox" class="checkboxes"/><span></span><i class="hidden categorie">' . $categorie . '</i><i class="hidden categorieID">' . $categorieID . '</i><i class="hidden boutiqueID">' . $boutiqueID . '</i>
-                        <i class="hidden desc">' . $offre->getDescription() . '</i><i class="hidden vendeur">' . $offre->getVendeur()->getUsername() . '</i><i class="hidden vendeurID">' . $offre->getVendeur()->getId() . '</i><i class="hidden credit">' . $offre->getCredit() . '</i><i class="hidden image">' . $offre->getImage() . '</i>
-                        <i class="hidden dateExpiration">' . $dateExp . '</i><i class="hidden dateCreation">' . $dateCreate . '</i><i class="hidden dureeGarantie">' . $dureeGarantie . '</i><i class="hidden prix">' . $offre->getPrixUnitaire() . '</i>
-                        <i class="hidden publiable">' . $publier . '</i><i class="hidden publiableID">' . $offre->getPubliable() . '</i><i class="hidden retourne">' . $retourne . '</i><i class="hidden retourneID">' . $offre->getRetourne() . '</i><i class="hidden apparence">' . $apparence . '</i><i class="hidden apparenceID">' . $offre->getApparenceNeuf() . '</i><i class="hidden modeVenteID">' . $offre->getModeVente() . '</i><i class="hidden modeVente">' . $mode_vente[$offre->getModeVente()] . '</i>
-                        <i class="hidden modelDeSerie">' . $offre->getModelDeSerie() . '</i><i class="hidden unite">' . $offre->getUnite() . '</i><i class="hidden quantite">' . $offre->getQuantite() . '</i><i class="hidden remise">' . $offre->getRemiseProduit() . '</i><i class="hidden rate">' . $offre->getEvaluation() . '</i><i class="hidden type">' . $type_offre[$offre->getTypeOffre()] . '</i><i class="hidden typeID">' . $offre->getTypeOffre() . '</i><i class="hidden dataSheet">' . $offre->getDataSheet() . '</i></label>',
-                        '<span><i class="id hidden">' . $offre->getId() . '</i>' . $id . '</span>',
-                        '<span class="code">' . $offre->getCode() . '</span>',
-                        '<a href="#" class="designation">' . $offre . '</a>',
-                        '<a href="#" class="boutique">' . $boutique . '</a>',
-                        '<span class="updatedAt">' . $offre->getUpdatedAt()->format("d/m/Y - H:i") . '</span>',
-                        '<span class="etat label label-sm label-' . (key($status_list[$etat])) . '"><input type="hidden" value="' . $etat . '"/>' . (current($status_list[$etat])) . '</span>'
+                        '<label class="mt-checkbox mt-checkbox-single mt-checkbox-outline">' . $id . ' <input value="'.$offre->getId().'" name="_id[]" type="checkbox" class="checkboxes"/><span></span><input type="hidden" name="_categorie" value="' . $categorie . '">
+                        <input type="hidden" name="_description" value="' . $offre->getDescription() . '"/><input type="hidden" name="_vendeur" value="' . $offre->getVendeur()->getUsername() . '"><input type="hidden" name="_credit" value="' . $offre->getCredit() . '"/><input type="hidden" name="_image" value="' . $offre->getImage() . '"/>
+                        <input type="hidden" name="_dateExpiration" value="' . $dateExp . '"><input type="hidden" name="_dateCreation" value="' . $dateCreate . '"><input type="hidden" name="_dureeGarantie" value="' . $dureeGarantie . '"><input type="hidden" name="_prixUnitaire" value="' . $offre->getPrixUnitaire() . '">
+                        <input type="hidden" name="_publiable" value="' . $publier . '"><input type="hidden" value="'.$retourne.'"><input type="hidden" name="_apparence" value="' . $apparence . '"><input type="hidden" name="_modeVente" value="' . $mode_vente[$offre->getModeVente()] . '">
+                        <input type="hidden" name="_modelDeSerie" value="' . $offre->getModelDeSerie() . '"><input type="hidden" name="_unite" value="' . $offre->getUnite() . '"><input type="hidden" name="_quantite" value="' . $offre->getQuantite() . '"><input type="hidden" name="_remise" value="' . $offre->getRemiseProduit() . '"><input type="hidden" name="_rate" value="' . $offre->getEvaluation() . '"><input type="hidden" name="_type" value="' . $type_offre[$offre->getTypeOffre()] . '"><input type="hidden" name="_dataSheet" value="' . $offre->getDataSheet() . '"></label>',
+                        '<a name="_code">' . $offre->getCode() . '</a>',
+                        '<a href="' . $offre->getId() . '/show" name="_designation">' . $offre . '</a>',
+                        '<a href="../boutique/' . $boutique->getId() . '/show" name="_boutique">' . $boutique . '</a>',
+                        '<a name="_updatedAt">' . $updatedAt . '</a>',
+                        '<span class="label label-sm label-' . (key($status_list[$etat])) . '"><input name="_etat" type="hidden" value="' . (current($status_list[$etat]))  . '"/>' . (current($status_list[$etat])) . '</span>'
                     );
                 }
                 $records['draw'] = $sEcho;
