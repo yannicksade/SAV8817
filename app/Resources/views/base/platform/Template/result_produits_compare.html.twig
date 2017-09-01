@@ -1,0 +1,534 @@
+<div class="col-sm-12">
+    <div class="hide_loading">
+        <div class="content" style="width: 30%;height: 300%;margin-left: 32%;margin-top: 30%">
+            <center><img src="{{app.request.getSchemeAndHttpHost() ~ asset('plateform/img/loading.gif')}}" width="40%"></center>
+        </div>
+    </div>
+    <div class="row" id="result-produit">
+    </div>
+</div>
+<div id="modal_produits"  class="modal_items">
+    <div class="col-sm-12">
+        <div class="col-sm-6 content-modal-transport">
+            <button class="closed"  onclick="$('#modal_produits').hide()">x</button>
+            <div class="col-sm-12" id="conten-produits-modal">
+                <div class="content" style="width: 30%;height: 300%;margin-left: 32%;margin-top: 0%">
+                    <center><img src="{{app.request.getSchemeAndHttpHost() ~ asset('plateform/img/loading.gif')}}" width="40%"></center>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    $(document).ready(
+            function () {
+
+                var DATA_FULL = [{"nom": "Iphone", "face": "{{app.request.getSchemeAndHttpHost() ~ asset('plateform/demo/product/iphone.jpg')}}", "proil": "{{app.request.getSchemeAndHttpHost() ~ asset('plateform/demo/manufacturer/burgerking.png')}}", "new": true, "type": 3, "price": 1000, "solde": false, "code": "1000", "categorie": [{"nom": "Ordinateurs", "tag": "CAT1293", "flag": "machine"}, {"nom": "Téléphones", "tag": "CAT1393", "flag": "phone"}, {"nom": "Soprt et Divertissement", "tag": "CAT1193", "flag": "sport"}, {"nom": "Vetement", "tag": "CAT1193", "flag": "vetement"}], "like": 21, "share": 14, "sell": 53, "rate": 3, "visits": 34, "advisor": 14, "boutique": "1000"}, {"nom": "Macc", "face": "{{app.request.getSchemeAndHttpHost() ~ asset('plateform/demo/product/macbook.jpg')}}", "proil": "{{app.request.getSchemeAndHttpHost() ~ asset('plateform/demo/manufacturer/burgerking.png')}}", "new": false, "type": 2, "solde": true, "price": 145000, "code": "1001", "categorie": [{"nom": "Ordinateurs", "tag": "CAT1293", "flag": "machine"}, {"nom": "Téléphones", "tag": "CAT1393", "flag": "phone"}, {"nom": "Soprt et Divertissement", "tag": "CAT1193", "flag": "sport"}, {"nom": "Vetement", "tag": "CAT1193", "flag": "vetement"}], "like": 21, "share": 14, "sell": 53, "rate": 3, "visits": 34, "advisor": 14, "boutique": "1001"}, {"nom": "Samsung", "face": "{{app.request.getSchemeAndHttpHost() ~ asset('plateform/demo/product/samsungtab.jpg')}}", "proil": "{{app.request.getSchemeAndHttpHost() ~ asset('plateform/demo/manufacturer/burgerking.png')}}", "new": true, "solde": true, "type": 3, "price": 4000, "code": "1002", "categorie": [{"nom": "Ordinateurs", "tag": "CAT1293", "flag": "machine"}, {"nom": "Téléphones", "tag": "CAT1393", "flag": "phone"}, {"nom": "Soprt et Divertissement", "tag": "CAT1193", "flag": "sport"}, {"nom": "Vetement", "tag": "CAT1193", "flag": "vetement"}], "like": 21, "share": 14, "sell": 53, "rate": 3, "visits": 34, "advisor": 14, "boutique": "1002"}, {"nom": "Samsung tab", "face": "{{app.request.getSchemeAndHttpHost() ~ asset('plateform/demo/product/samsungtab.jpg')}}", "proil": "{{app.request.getSchemeAndHttpHost() ~ asset('plateform/demo/manufacturer/burgerking.png')}}", "new": true, "solde": false, "type": 3, "price": 145000, "code": "1003", "categorie": [{"nom": "Ordinateurs", "tag": "CAT1293", "flag": "machine"}, {"nom": "Téléphones", "tag": "CAT1393", "flag": "phone"}, {"nom": "Soprt et Divertissement", "tag": "CAT1193", "flag": "sport"}, {"nom": "Vetement", "tag": "CAT1193", "flag": "vetement"}], "like": 21, "share": 14, "sell": 53, "rate": 3, "visits": 34, "advisor": 14, "boutique": "1003"}, {"nom": "Sony vaio", "face": "{{app.request.getSchemeAndHttpHost() ~ asset('plateform/demo/sony_vaio_4.jpg')}}", "proil": "{{app.request.getSchemeAndHttpHost() ~ asset('plateform/demo/manufacturer/redbull.png')}}", "new": true, "solde": false, "type": 2, "price": 5000, "code": "1004", "categorie": [{"nom": "Ordinateurs", "tag": "CAT1293", "flag": "machine"}, {"nom": "Téléphones", "tag": "CAT1393", "flag": "phone"}, {"nom": "Soprt et Divertissement", "tag": "CAT1193", "flag": "sport"}, {"nom": "Vetement", "tag": "CAT1193", "flag": "vetement"}], "like": 21, "share": 14, "sell": 53, "rate": 3, "visits": 34, "advisor": 14, "boutique": "1004"}, {"nom": "Ipod", "face": "{{app.request.getSchemeAndHttpHost() ~ asset('plateform/demo/ipod_shuffle_1.jpg')}}", "proil": "{{app.request.getSchemeAndHttpHost() ~ asset('plateform/demo/manufacturer/redbull.png')}}", "new": true, "solde": false, "type": 1, "price": 145000, "code": "1005", "categorie": [{"nom": "Ordinateurs", "tag": "CAT1293", "flag": "machine"}, {"nom": "Téléphones", "tag": "CAT1393", "flag": "phone"}, {"nom": "Soprt et Divertissement", "tag": "CAT1193", "flag": "sport"}, {"nom": "Vetement", "tag": "CAT1193", "flag": "vetement"}], "like": 21, "share": 14, "sell": 53, "rate": 3, "visits": 34, "advisor": 14, "boutique": "1005"}, {"nom": "Samsung tab", "face": "{{app.request.getSchemeAndHttpHost() ~ asset('plateform/demo/samsung_tab_5.jpg')}}", "proil": "{{app.request.getSchemeAndHttpHost() ~ asset('plateform/demo/manufacturer/redbull.png')}}", "new": true, "solde": false, "type": 1, "price": 15000, "code": "1006", "categorie": [{"nom": "Ordinateurs", "tag": "CAT1293", "flag": "machine"}, {"nom": "Téléphones", "tag": "CAT1393", "flag": "phone"}, {"nom": "Soprt et Divertissement", "tag": "CAT1193", "flag": "sport"}, {"nom": "Vetement", "tag": "CAT1193", "flag": "vetement"}], "like": 21, "share": 14, "sell": 53, "rate": 3, "visits": 34, "advisor": 14, "boutique": "1006"}, {"nom": "Ipod touch", "face": "{{app.request.getSchemeAndHttpHost() ~ asset('plateform/demo/ipod_touch_1.jpg')}}", "proil": "{{app.request.getSchemeAndHttpHost() ~ asset('plateform/demo/manufacturer/redbull.png')}}", "new": true, "solde": false, "type": 2, "price": 145000, "code": "1007", "categorie": [{"nom": "Ordinateurs", "tag": "CAT1293", "flag": "machine"}, {"nom": "Téléphones", "tag": "CAT1393", "flag": "phone"}, {"nom": "Soprt et Divertissement", "tag": "CAT1193", "flag": "sport"}, {"nom": "Vetement", "tag": "CAT1193", "flag": "vetement"}], "like": 21, "share": 14, "sell": 53, "rate": 3, "visits": 34, "advisor": 14, "boutique": "1007"}, {"nom": "Ipod classic", "face": "{{app.request.getSchemeAndHttpHost() ~ asset('plateform/demo/ipod_classic_1.jpg')}}", "proil": "{{app.request.getSchemeAndHttpHost() ~ asset('plateform/demo/manufacturer/redbull.png')}}", "new": true, "solde": false, "type": 2, "price": 145000, "code": "1008", "categorie": [{"nom": "Ordinateurs", "tag": "CAT1293", "flag": "machine"}, {"nom": "Téléphones", "tag": "CAT1393", "flag": "phone"}, {"nom": "Soprt et Divertissement", "tag": "CAT1193", "flag": "sport"}, {"nom": "Vetement", "tag": "CAT1193", "flag": "vetement"}], "like": 21, "share": 14, "sell": 53, "rate": 3, "visits": 34, "advisor": 14, "boutique": "1008"}, {"nom": "Macc book 2", "face": "{{app.request.getSchemeAndHttpHost() ~ asset('plateform/demo/macbook_air_1.jpg')}}", "proil": "{{app.request.getSchemeAndHttpHost() ~ asset('plateform/demo/manufacturer/redbull.png')}}", "new": true, "solde": false, "type": 2, "price": 45000, "code": "1009", "categorie": [{"nom": "Ordinateurs", "tag": "CAT1293", "flag": "machine"}, {"nom": "Téléphones", "tag": "CAT1393", "flag": "phone"}, {"nom": "Soprt et Divertissement", "tag": "CAT1193", "flag": "sport"}, {"nom": "Vetement", "tag": "CAT1193", "flag": "vetement"}], "like": 21, "share": 14, "sell": 53, "rate": 3, "visits": 34, "advisor": 14, "boutique": "1009"}, {"nom": "zALANDO", "face": "{{app.request.getSchemeAndHttpHost() ~ asset('plateform/demo/compaq_presario.jpg')}}", "proil": "{{app.request.getSchemeAndHttpHost() ~ asset('plateform/demo/manufacturer/redbull.png')}}", "new": true, "solde": false, "type": 2, "price": 145000, "code": "10010", "categorie": [{"nom": "Ordinateurs", "tag": "CAT1293", "flag": "machine"}, {"nom": "Téléphones", "tag": "CAT1393", "flag": "phone"}, {"nom": "Soprt et Divertissement", "tag": "CAT1193", "flag": "sport"}, {"nom": "Vetement", "tag": "CAT1193", "flag": "vetement"}], "like": 21, "share": 14, "sell": 53, "rate": 3, "visits": 34, "advisor": 14, "boutique": "10010"}, {"nom": "Fatima prod", "face": "{{app.request.getSchemeAndHttpHost() ~ asset('plateform/demo/nikon_d300_4.jpg')}}", "proil": "{{app.request.getSchemeAndHttpHost() ~ asset('plateform/demo/manufacturer/redbull.png')}}", "new": true, "solde": false, "type": 2, "price": 145000, "code": "10011", "categorie": [{"nom": "Ordinateurs", "tag": "CAT1293", "flag": "machine"}, {"nom": "Téléphones", "tag": "CAT1393", "flag": "phone"}, {"nom": "Soprt et Divertissement", "tag": "CAT1193", "flag": "sport"}, {"nom": "Vetement", "tag": "CAT1193", "flag": "vetement"}], "like": 21, "share": 14, "sell": 53, "rate": 3, "visits": 34, "advisor": 14, "boutique": "10011"}, {"nom": "Screen Lock", "face": "{{app.request.getSchemeAndHttpHost() ~ asset('plateform/demo/nikon_d300_3.jpg')}}", "proil": "{{app.request.getSchemeAndHttpHost() ~ asset('plateform/demo/manufacturer/redbull.png')}}", "new": false, "solde": true, "type": 3, "price": 145000, "code": "10012", "categorie": [{"nom": "Voitures", "tag": "CAT1293", "flag": "machine"}, {"nom": "Téléphones", "tag": "CAT1393", "flag": "phone"}, {"nom": "Soprt et Divertissement", "tag": "CAT1193", "flag": "sport"}, {"nom": "Vetement", "tag": "CAT1193", "flag": "vetement"}], "like": 21, "share": 14, "sell": 53, "rate": 3, "visits": 34, "advisor": 14, "boutique": "1000"}];
+
+                var SELECTED = [];
+                var DATA = DATA_FULL;
+                var LIMIT_DATA = 16, LEVEL_DATA = 0, SOMME_MAX = 0, Y_MAX = 0, M_MAX = 0, S_MAX = 0;
+                {% if filter is defined %} LIMIT_DATA = 8{% endif %};
+                var N_PROD = Math.ceil(DATA.length / LIMIT_DATA);
+                var REGION = [];
+                var id_block = "#list_produits";
+                var contenu = $("#result-produit");
+                var modal_form = $('#modal_produits');
+                var modal_form_content = $("#conten-produits-modal");
+                var pagination_prod = $(id_block + " ul.pagination");
+                var lign_parging = $(id_block + " ul.pagination li");
+                var but_details = $(id_block + " .search-elt button");
+                var but_search = $(id_block + " input[name=search_query]");
+                var select_cat = $(id_block + " select[name=search_categories]");
+
+
+                /*
+                 * 
+                 * THE GENERIC SCRIPT OF FILTRING DATA
+                 * 
+                 */
+
+                function initPaging() {
+                    N_PROD = Math.ceil(DATA.length / LIMIT_DATA);
+                    pagination_prod.html("");
+                    var data, i;
+                    for (i = 1; i <= N_PROD; i++) {
+                        if (i == 1)
+                            data = "<li class='paginate_button active'>" +
+                                    "<a data-dt-idx='" + i + "' tabindex='" + i + "'>" + i + "</a>" +
+                                    "</li>";
+                        else
+                            data = "<li class='paginate_button'>" +
+                                    "<a  data-dt-idx='" + i + "' tabindex='" + i + "'>" + i + "</a>" +
+                                    "</li>";
+                        pagination_prod.append(data);
+                    }
+                    data = "<li class='paginate_button  previous disabled'>" +
+                            "<a data-dt-idx='-1' tabindex='" + i + "'>Prec</a>" +
+                            "</li>";
+                    pagination_prod.prepend(data);
+                    data = "<li class='paginate_button next disabled'>" +
+                            "<a data-dt-idx='-2' tabindex='" + i + "'>Suiv</a>" +
+                            "</li>";
+                    pagination_prod.append(data);
+                    $(id_block + " ul.pagination li").click(function () {
+                        makePagingClick(this);
+                    });
+                    $(id_block + " .search-elt button").click(function () {
+                        afficherModal(this);
+                    });
+                }
+                function makePagingClick(_this) {
+                    var index = $("a", _this).attr("data-dt-idx");
+                    if ($(_this).hasClass("disabled"))
+                        return;
+                    $(id_block + " ul.pagination li.active").removeClass("active");
+                    $(_this).addClass("active");
+                    LEVEL_DATA = index;
+                    afficherContenu();
+                }
+                function afficherContenu() {
+                    console.log("contenu du contenu de transport " + DATA.length);
+                    contenu.html("");
+                    DATA.forEach(
+                            function (item, index) {
+                                LEVEL_DATA = (LEVEL_DATA < 1) ? 1 : LEVEL_DATA;
+                                var min = (LEVEL_DATA - 1) * LIMIT_DATA;
+                                var max = min + LIMIT_DATA;
+                                if (index >= min && index < max) {
+                                    var parent = makeItemNode(item, index);
+                                    console.log("print products between " + min + " and " + max + " " + index);
+                                    contenu.append(parent);
+                                }
+                            }
+                    );
+
+                    but_details.click(function () {
+                        afficherModal(this);
+                    });
+    {#                    $(id_block+" .search-elt").click(function () {checkItem(this);});#}
+                        initAllEvent();
+                    }
+                    function searchSubString(_this) {
+                        var str = $(_this).val();
+    {#                    alert(str);#}
+                        if (str.length == 0) {
+                            DATA = DATA_FULL;
+                        } else {
+                            DATA = [];
+                            DATA_FULL.forEach(
+                                    function (item, index) {
+                                        if (node_sub_string_search(item, str, index)) {
+                                            DATA.push(item);
+                                        }
+                                    }
+                            );
+                        }
+                        initPaging();
+                        afficherContenu();
+                    }
+                    function afficherModal(_this) {
+                        var data = $(_this).attr("data").split(",");
+                        var code = data[0], prix = data[1], nom = data[2], logo = data[3];
+                        var Content_modal = "<div class='col-sm-8'>" +
+                                "<h3 style='font-size: 100%;'>" + nom + " <b>#" + code + "</b></h3>" +
+                                "<table>" +
+                                "<tr>" +
+                                "<td><b>Entreprise :</b> </td>" +
+                                "<td><a href='#' data-modal='entreprise'>" + nom + "</a></td>" +
+                                "</tr>" +
+                                "<tr>" +
+                                "<td><b>Prix :</b> </td>" +
+                                "<td><a data-modal='poids'>" + prix + "</a> cfa</td>" +
+                                "</tr>" +
+                                "<tr>" +
+                                "<td><b>Categories :</b></td>" +
+                                "<td data-modal='Vehicule'><span class='location' title='Vetements Feminins'>Vetements</span><span class='location' title='Electroniques'>Electronique</span><span class='location' title='Investissement'>Sport</span></td>" +
+                                "</tr>" +
+                                "<tr>" +
+                                "<td><b>Payement : </b></td>" +
+                                "<td><img src='{{app.request.getSchemeAndHttpHost() ~ asset('plateform/demo/payment/payment.png')}}' class='search-elt-img' style=' width: 100%;'></td>" +
+                                "</tr>" +
+                                "<tr>" +
+                                "<td>Notation :</td>" +
+                                "<td><i class=' fa fa-heart'>25</i><i class=' fa fa-share-square-o'>125</i><i class=' fa fa-ban'>15</i></td>" +
+                                "</tr>" +
+                                "<tr>" +
+                                "<td><button class='btn btn-secondary-2'>Contacter</button></td>" +
+                                "<td><button class='btn btn-secondary-2'>Ajouter aux Favoris</button></td>" +
+                                "</tr>" +
+                                "</table>" +
+                                "</div>" +
+                                "<div class='col-sm-4'>" +
+                                "<img src='" + logo + "' class='modal-elt-img'>" +
+                                "<hr>" +
+                                "<center>" +
+                                "<button class='btn btn-secondary-2' onclick='add_to_card(this);' data='#" + code + "," + prix + "," + nom + "," + logo + "'>Ajouter</button>" +
+                                "</center>" +
+                                "<div class='col-sm-12 description' style='text-align: justify;'>D'une premiere vue mon activite se refere a un simple transport de produits ... <a href=''>ma page</a></div>" +
+                                "</div>";
+                        modal_form_content.html(Content_modal);
+                        modal_form.show();
+                    }
+                    initPaging();
+                    but_search.change(function () {
+                        searchSubString(this);
+                    });
+                    but_details.click(function () {
+                        afficherModal(this);
+                    });
+                    afficherContenu();
+                    $(".result-part").hide();
+                    $(id_block + " .search-elt button.detail-prod").click(function () {
+                        afficherModal(this);
+                    });
+                    /*
+                     * 
+                     * THE SPECIFIC SCRIPT OF FILTRING DATA
+                     * 
+                     */
+
+                    function makeItemNode(item, index) {
+                        var ajout = "", type = "";
+                        if (item.new)
+                            ajout = "<img src='{{ app.request.getSchemeAndHttpHost() ~ asset('plateform/img/barre_new.png')}}' class='col_item_img'>";
+                        else if (item.solde)
+                            ajout = "<img src='{{ app.request.getSchemeAndHttpHost() ~ asset('plateform/img/barre_solde.png')}}' class='col_item_img'>";
+
+                        if (item.type == 1)
+                            type = "<img src='{{app.request.getSchemeAndHttpHost() ~ asset('plateform/demo/colors/bleu.png')}}' class='col_item_img col_item_img_tag'>";
+                        else if (item.type == 2)
+                            type = "<img src='{{app.request.getSchemeAndHttpHost() ~ asset('plateform/demo/colors/green.png')}}' class='col_item_img col_item_img_tag'>";
+                        else if (item.type == 3)
+                            type = "<img src='{{app.request.getSchemeAndHttpHost() ~ asset('plateform/demo/colors/red.png')}}' class='col_item_img col_item_img_tag'>";
+                        var isCheck = (SELECTED.indexOf("#" + item.code) >= 0) ? "check" : "";
+
+                        var parent = "<div class='col-sm-3 search-elt  col_item " + isCheck + "'>" +
+                                ajout +
+                                type +
+                                "<b><h4>" + item.nom + "</h4></b>" +
+                                "<img src='" + item.face + "' class='search-elt-img'>" +
+                                "<div class='search-desc'>" +
+                                "<div class='col-sm-12'>" +
+                                "<div class='col-sm-8' style='margin: 0;padding: 0;'>" +
+                                "<b>" + item.nom + "</b>" +
+                                "</div>" +
+                                "<div class='col-sm-4' style='padding: 0;position: absolute;top: -9px;right: -5px;'>" +
+                                "<img src='" + item.proil + "' class='search-elt-img' style='margin-top: 50%;'>" +
+                                "</div>" +
+                                "</div>" +
+                                "<div>" +
+                                "<div style='margin-left: 15px;margin-top: 30px;' class='Details'>" +
+                                "<table class='tab-int-detail'><tr>" +
+                                "<td>Code</td>" +
+                                "<td><b class='code'>#" + item.code + "</b></td>" +
+                                "</tr><tr>" +
+                                "<td>Price</td>" +
+                                "<td><b>" + item.price + " FCFA</></td>" +
+                                "</tr><tr>" +
+                                "<td>Cat (" + item.categorie.length + ") </td>" +
+                                "<td><b>" + item.categorie[0].nom + "</></td>" +
+                                "</tr><tr>" +
+                                "<td colspan='2'><i class=' fa fa-heart'>" + item.like + "</i><i class=' fa fa-share-square-o'>" + item.share + "</i><i class=' fa fa-ban'>" + item.sell + "</i> </td>" +
+                                "</tr></table>" +
+                                "</div>" +
+                                "</div>" +
+                                "<button class='btn btn-secondary-2 detail-prod' data=\"" + item.code + "," + item.price + "," + item.nom + "," + item.face + "\">Profil</button></center>" +
+                                "</div>" +
+                                "</div>";
+                        return parent;
+                    }
+                    function node_sub_string_search(item, str, index) {
+                        var str2 = str.toLowerCase();
+                        console.log(item.nom.toLowerCase() + " -- " + item.nom.toLowerCase().search(str2) + " -- " + str2 + " == " + index);
+                        if (item.nom.toLowerCase().search(str2) >= 0)
+                            return true;
+                        if (item.code.toLowerCase().search(str2) >= 0)
+                            return true;
+                        for (var i = 0; i < item.categorie.length; i++) {
+                            if (item.categorie[i].nom.toLowerCase().search(str2) >= 0)
+                                return true;
+                        }
+                        return false;
+                    }
+                    function initFilterPrice() {
+                        DATA.forEach(
+                                function (item, index) {
+    {#if (index >= LIMIT_DATA * LEVEL_DATA && index < LIMIT_DATA * (LEVEL_DATA + 1))
+        var parent = makeItemNode(item, index)
+    contenu.append(parent);#}
+                                    if (item.price > SOMME_MAX)
+                                        SOMME_MAX = item.price;
+                                }
+                        );
+                        select_cat.html("");
+                        var n_ = Math.ceil(SOMME_MAX / 4);
+                        for (var i = 1; i <= 4; i++)
+                            select_cat.append("<option value='" + n_ * i + "'> Inferieur a " + n_ * i + "</option>");
+                        select_cat.prepend("<option value='' selected='selected'> Tous les prix </option>");
+                    }
+                    function selectFilterPriceItem(_this) {
+                        var str = $(_this).val();
+                        var evol = 0;
+    {#                    alert(str);#}
+                        contenu.html("");
+                        if (str.length == 0) {
+                            DATA = DATA_FULL;
+                            afficherContenu();
+                            return;
+                        }
+                        str = parseInt(str);
+                        DATA.forEach(
+                                function (item, index) {
+                                    if (evol < LIMIT_DATA) {
+                                        if (item.price <= str || str == 0) {
+                                            var parent = makeItemNode(item, index)
+                                            contenu.append(parent);
+                                            evol++;
+                                        }
+                                    }
+                                }
+                        );
+                        initAllEvent();
+                    }
+                    initFilterPrice();
+                    select_cat.change(function () {
+                        selectFilterPriceItem(this);
+                    });
+
+
+                    /*
+                     * 
+                     * SCRIPT OF COMPARAISON OF PRODUCTS
+                     * 
+                     */
+
+                    var contenuResult = $("#returnProd");
+                    var select_nomber = $(id_block + " select[name=search_nomber]");
+                    var select_catego = $(id_block + " select[name=search_categorie]");
+                    var select_type_prod = $(id_block + " select[name=search_type_prod]");
+                    var select_prix_min = $(id_block + " input[name=search_prix_min]");
+                    var select_prix_max = $(id_block + " input[name=search_prix_max]");
+                    var select_new = $(id_block + " select[name=search_new]");
+                    var select_solde = $(id_block + " select[name=search_solde]");
+                    var CATEGORIES = [];
+                    
+                    function initCategories(){
+                        DATA_FULL.forEach(function(item,index){
+                            for(var i=0;i<item.categorie.length;i++){
+                                console.log(item.categorie[i].nom+"   "+CATEGORIES.indexOf(item.categorie[i].nom));
+                                if(CATEGORIES.indexOf(item.categorie[i].nom)<0){
+                                    CATEGORIES.push(item.categorie[i].nom);
+                                }
+                            }
+                        });
+                        console.log("CATEGORIES");
+                        console.log(CATEGORIES);
+                        for(var i=0;i<CATEGORIES.length;i++)
+                            select_catego.prepend("<option value='"+CATEGORIES[i]+"'>"+CATEGORIES[i]+"</option>");
+                    }
+                    function removeItemFromList(list, index) {
+                        if (i < 0)
+                            return;
+                        for (var i = index + 1; i < list.length; i++)
+                            list[i - 1] = list[i];
+                        list.pop();
+                    }
+                    function checkItem(_this) {
+                        console.log(SELECTED);
+                        var elt = $(_this);
+                        var code = $(".code", elt).html();
+                        var index = SELECTED.indexOf(code);
+                        if (elt.hasClass("check")) {
+                            elt.removeClass("check");
+                            removeItemFromList(SELECTED, index)
+                        } else {
+                            elt.addClass("check");
+                            SELECTED.push(code);
+                        }
+                        var n = $(id_block + " .search-elt.check").length;
+                        $("#nom_produits").html(n);
+                    }
+                    function initAllEvent() {
+                        but_details.click(function () {
+                            afficherModal(this);
+                        });
+                        $(id_block + " ul.pagination li").click(function () {
+                            makePagingClick(this);
+                        });
+                        $(id_block + " .search-elt button").click(function () {
+                            afficherModal(this);
+                        });
+                        $(id_block + " .search-elt button.detail-prod").click(function () {
+                            afficherModal(this);
+                        });
+                        select_cat.change(function () {
+                            selectFilterPriceItem(this);
+                        });
+                        $(id_block + " .search-elt").click(function () {
+                            checkItem(this);
+                        });
+                    }
+                    function getCategorie(value) {
+                        return "<span class='location' title='" + value + "'>" + value + "</span>";
+                    }
+                    function resultnodeTab(item, index) {
+                        var categories = 'Tout', type = 're', nouveau = '', solde = '';
+                        {#for (var i = 0; i < item.categorie.length && i < 1; i++)
+                            categories += getCategorie(item.categorie[i].nom);#}
+                        if(select_catego.val().length>2)
+                            categories = select_catego.val();
+                        console.log(categories + " " + index);
+                        if (item.type == 1)
+                            type = "Service";
+                        if (item.type == 2)
+                            type = "Produit";
+                        if (item.type == 3)
+                            type = "Article";
+                        nouveau = (item.new) ? "oui" : "non";
+                        solde = (item.solde) ? "oui" : "non";
+                        var colorPrice = (index < DATA.length/2)?"red":"green";
+                        var colorNew = (item.new)?"green":"red";
+                        var colorSolde = (item.solde)?"green":"red";
+                        var parent = "<tr style='border-bottom:1px solid black;' onclick=\"add_to_card(this);\" data=\"" + item.code + "," + item.price + "," + item.nom + "," + item.face + "\">" +
+                                "<td><img src='" + item.face + "' style='width: 140px;height: 85px;'/></td>" +
+                                "<td><b>" + item.nom + "</b></td>" +
+                                "<td>" + categories + "</td>" +
+                                "<td>" + type + "</td>" +
+                                "<td> <font color='"+colorPrice+"'>" + item.price + "</font></td>" +
+                                "<td> <font color='"+colorNew+"'>" + nouveau + "</font></td>" +
+                                "<td> <font color='"+colorSolde+"'>" + solde + "</font></td>" +
+                                "<td><a class='btn btn-secondary-2 detail-prod' onclick='add_to_card(this);' data=\"" + item.code + "," + item.price + "," + item.nom + "," + item.face + "\">Acherter</a></td>" +
+                                "<td> <button>X</button></td>" +
+                                "</tr>";
+                        return parent;
+                    }
+                    function quantityToCompare() {
+                        if (select_nomber.val() > 0) {
+                            var DATA_TMP = [];
+                            DATA.forEach(function (item, index) {
+                                if (SELECTED.indexOf("#" + item.code) >= 0) {
+                                    DATA_TMP.push(item);
+                                    console.log(item);
+                                }
+                            });
+                            DATA = DATA_TMP;
+                        }
+                    }
+                    function categorieToCompare() {
+                        var value = select_catego.val();
+                        console.log("categorie "+value);
+                        if (value.length > 1) {
+                            var DATA_TMP = [];
+                            DATA.forEach(function (item, index) {
+                                for(var i = 0;i<item.categorie.length;i++){
+                                    if (item.categorie[i].nom.search(value) >= 0) {
+                                        DATA_TMP.push(item);
+                                        console.log(item);
+                                    }
+                                }
+                            });
+                            DATA = DATA_TMP;
+                        }
+                    }
+                    function typeToCompare() {
+                        var value = select_type_prod.val();
+                        console.log("type " + value);
+                        if (value > 0) {
+                            console.log("type CHECK" + value);
+                            var DATA_TMP = [];
+                            DATA.forEach(function (item, index) {
+                                console.log("-" + item.type);
+                                if (item.type == value) {
+                                    DATA_TMP.push(item);
+                                }
+                            });
+                            DATA = DATA_TMP;
+                        }
+                    }
+                    function minPrixToCompare() {
+                        var value = select_prix_min.val();
+                        console.log("minimum " + value);
+                        if (value > 0) {
+                            var DATA_TMP = [];
+                            DATA.forEach(function (item, index) {
+                                if (item.price >= value) {
+                                    DATA_TMP.push(item);
+                                }
+                            });
+                            DATA = DATA_TMP;
+                        }
+                    }
+                    function maxPrixToCompare() {
+                        var value = select_prix_max.val();
+                        console.log("maximum " + value);
+                        if (value > 0) {
+                            var DATA_TMP = [];
+                            DATA.forEach(function (item, index) {
+                                if (item.price <= value) {
+                                    DATA_TMP.push(item);
+                                }
+                            });
+                            DATA = DATA_TMP;
+                        }
+                    }
+                    function newToCompare() {
+                        var value = select_new.val();
+                        console.log("nouveau " + value);
+                        if (value == 1) {
+                            var DATA_TMP = [];
+                            DATA.forEach(function (item, index) {
+                                if (item.new) {
+                                    DATA_TMP.push(item);
+                                }
+                            });
+                            DATA = DATA_TMP;
+                        }
+                    }
+                    function soldeToCompare() {
+                        var value = select_solde.val();
+                        console.log("solde " + value);
+                        if (value == 1) {
+                            var DATA_TMP = [];
+                            DATA.forEach(function (item, index) {
+                                if (item.solde) {
+                                    DATA_TMP.push(item);
+                                }
+                            });
+                            DATA = DATA_TMP;
+                        }
+                    }
+                    initCategories();
+                    $("#makeComapare").click(
+                            function () {
+                                $(".product-part").hide();
+                                $(".result-part").show();
+                                var tab_content = $("#table-result tbody");
+                                tab_content.html("");
+                                DATA = DATA_FULL;
+{#                                quantityToCompare();#}
+                                categorieToCompare();
+                                {#typeToCompare();
+                                minPrixToCompare();
+                                maxPrixToCompare();
+                                soldeToCompare();
+                                newToCompare();#}
+                                DATA.sort(function(a,b){return b.price - a.price;});
+                                DATA.forEach(function (item, index) {
+                                    tab_content.prepend(resultnodeTab(item, index));
+                                });
+                            }
+                    );
+                    $("#returnProd").click(
+                            function () {
+                                $(".product-part").show();
+                                $(".result-part").hide();
+                                var tab_content = $("#table-result tbody");
+                                DATA.forEach(function (item, index) {
+                                    tab_content.prepend(resultnodeTab(item, index));
+                                });
+                            }
+                    );
+                }
+        );
+</script>

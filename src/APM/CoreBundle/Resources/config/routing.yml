@@ -67,7 +67,7 @@ apm_core_transport:
     resource: "@APMCoreBundle/Resources/config/user/transport.yml"
     prefix:   /easy-trade/transport
 
-#---------------------------------------- gérer les Fonctions du systeme------------------------------------------------
+#---------------------------------------- gérer les Fonctionnalités du systeme------------------------------------------------
 apm_core_fonction_offre:
     resource: "@APMCoreBundle/Resources/config/fonctions/offre.yml"
     prefix:   /easy-trade/user/offre
@@ -75,3 +75,55 @@ apm_core_fonction_offre:
 apm_core_fonction_boutique:
     resource: "@APMCoreBundle/Resources/config/fonctions/boutique.yml"
     prefix:   /easy-trade/user/boutique
+
+#--------------------- public shop -------------------------------
+easy_t_shop_homepage:
+    path:     /easy-trade/costumer/shop
+    defaults: { _controller: APMCoreBundle:Shop/Home:index }
+
+easy_t_products:
+    resource: "@APMCoreBundle/Resources/config/shop/products.yml"
+    prefix:   /easy-trade/costumer/shop/products
+
+easy_t_shopping:
+    resource: "@APMCoreBundle/Resources/config/shop/shopping.yml"
+    prefix:   /easy-trade/costumer/shop/shopping
+
+easy_t_checkout:
+    resource: "@APMCoreBundle/Resources/config/shop/checkout.yml"
+    prefix:   /easy-trade/costumer/shop/checkout
+
+#--------------------------------- Public platform --------------------------------
+evm_homepage:
+    path:     /easy-trade/costumer/platform
+    defaults: { _controller: APMCoreBundle:Platform/Default:index }
+evm_homepage_empty:
+    path:     /easy-trade/costumer/platform/empty
+    defaults: { _controller: APMCoreBundle:Platform/Default:empty }
+evm_boutique:
+    prefix:   /easy-trade/costumer/platform/Boutique
+    resource: "@APMCoreBundle/Resources/config/platform/boutique.yml"
+evm_produit:
+    prefix:   /easy-trade/costumer/platform/Produit
+    resource: "@APMCoreBundle/Resources/config/platform/produit.yml"
+evm_transporteur:
+    prefix:   /easy-trade/costumer/platform/Transporteur
+    resource: "@APMCoreBundle/Resources/config/platform/transporteur.yml"
+evm_documentation:
+    prefix:   /easy-trade/costumer/platform/Documentation
+    resource: "@APMCoreBundle/Resources/config/platform/documentation.yml"
+evm_commission:
+    prefix:   /easy-trade/costumer/platform/Commission
+    resource: "@APMCoreBundle/Resources/config/platform/commission.yml"
+evm_conseille:
+    prefix:   /easy-trade/costumer/platform/Conseille
+    resource: "@APMCoreBundle/Resources/config/platform/conseille.yml"
+evm_region:
+    prefix:   /easy-trade/costumer/platform/Region
+    resource: "@APMCoreBundle/Resources/config/platform/region.yml"
+evm_categorie:
+    prefix:   /easy-trade/costumer/platform/Categorie
+    resource: "@APMCoreBundle/Resources/config/platform/categorie.yml"
+evm_login_util:
+    prefix:   /easy-trade/costumer/platform/Connexion
+    resource: "@APMCoreBundle/Resources/config/platform/connexion.yml"

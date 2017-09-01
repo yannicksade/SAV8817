@@ -1,0 +1,88 @@
+
+{% set evm_title = 'Resultats' %}
+{% set evm_cat_title = 'Type Resultat' %}
+
+{% extends "::base/platform/init.html.twig" %}
+{% block evm_body %}
+    <center class="item-html">
+        <p>
+            <i class="thin-icon-ambulance"></i>
+            <a href="">{{filter.region}} / {{filter.categorie}} / {{filter.recherche}}</a>
+        </p>
+    </center>
+
+    <div class=" " id="list_produits">
+        <div class=" ">
+            <div class="row" style="margin: 25px;background: white">   
+                <div class="col-sm-3" style="padding-right: 0">
+                    {% include "::base/platform/Template/left_menu_type.html.twig" %}
+                    <hr>
+                    {#{% include "::base/platform/Template:filtre_sup.html.twig" %}#}
+                </div>
+                <div class="col-sm-9"  style="padding-left: 0">
+                    <center><h2>Produits/Services</h2></center>
+                    <hr> 
+                    {% include "::base/platform/Template/filtre_prod.html.twig" %}
+                    <hr> <br>
+                    {% include "::base/platform/Template/result_produits.html.twig" %}
+                </div>   
+            </div>
+        </div>
+    </div>
+    <div id="list_boutiques">
+        <div class=" ">
+            <div class="row" style="margin: 25px;background: white">   
+                <div class="col-sm-3" style="padding-right: 0">
+                    {% include "::base/platform/Template/left_menu_type.html.twig" %}
+                    <hr>
+                    {#{% include "::base/platform/Template:filtre_sup.html.twig" %}#}
+                </div>
+                <div class="col-sm-9"  style="padding-left: 0">
+                    <center><h2>Boutiques</h2></center>
+                    <hr> 
+                    {% include "::base/platform/Template/filtre_prod.html.twig" %}
+                    <hr> <br>
+                    {% include "::base/platform/Template/result_boutique.html.twig" %}
+                </div>   
+            </div>
+        </div>
+    </div>
+
+    <div class=" " id="list_transporteurs">
+        <div class=" ">
+            <div class="row" style="margin: 25px;background: white">   
+                <div class="col-sm-3" style="padding-right: 0">
+                    {% include "::base/platform/Template/left_menu_type.html.twig" %}
+                    <hr>
+                    {#{% include "::base/platform/Template:filtre_sup.html.twig" %}#}
+                </div>
+                <div class="col-sm-9"  style="padding-left: 0">
+                    <center><h2>Transporteurs</h2></center>
+                    <hr> 
+                    {% include "::base/platform/Template/filtre_prod.html.twig" %}
+                    <hr> <br>
+                    {% include "::base/platform/Template/result_transport.html.twig" %}
+                </div>   
+            </div>
+        </div>
+    </div>
+    <div class=" " id="list_conseilles">
+        <div class=" ">
+            <div class="row" style="margin: 25px;background: white">   
+                <div class="col-sm-3" style="padding-right: 0">
+                    {% include "::base/platform/Template/left_menu_type.html.twig" %}
+                    <hr>
+                    {#{% include "::base/platform/Template:filtre_sup.html.twig" %}#}
+                </div>
+                <div class="col-sm-9"  style="padding-left: 0">
+                    <center><h2>Conseilles</h2></center>
+                    <hr> 
+                    {% include "::base/platform/Template/filtre_prod.html.twig" %}
+                    <hr> <br>
+                    {% include "::base/platform/Template/result_conseille.html.twig" %}
+                </div>   
+            </div>
+        </div>
+    </div>
+
+{% endblock evm_body %}

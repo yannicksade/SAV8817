@@ -1,0 +1,418 @@
+
+<div class="col-sm-12">
+    <div class="row" id="result-boutique">
+        <center><img src="{{app.request.getSchemeAndHttpHost() ~ asset('plateform/hitel/images/loading.gif') }}"></center>
+    </div>
+</div>
+<div id="modal_boutique" class="modal_items">
+    <div class="col-sm-12">
+        <div class="col-sm-6 content-modal-transport">
+            <button class="closed"  onclick="$('#modal_boutique').hide()">x</button>
+            <div class="col-sm-12" id="conten-boutique-modal">
+                <div class="content" style="width: 30%;height: 300%;margin-left: 32%;margin-top: 0%">
+                    <center><img src="{{app.request.getSchemeAndHttpHost() ~ asset('plateform/img/loading.gif')}}" width="40%"></center>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    $(document).ready(
+            function () {
+
+                var DATA_FULL ;
+                var DATA = DATA_FULL;
+                var LIMIT_DATA = 16, LEVEL_DATA = 0, SOMME_MAX = 0, Y_MAX = 0, M_MAX = 0, S_MAX = 0;
+                {% if filter is defined %} LIMIT_DATA = 8{% endif %};
+                var N_PROD;
+                var id_block = "#list_boutiques";
+                var contenu = $("#result-boutique");
+                var modal_form = $('#modal_boutique');
+                var modal_form_content = $("#conten-boutique-modal");
+                var pagination_prod = $(id_block+" ul.pagination");
+                var lign_parging = $(id_block+" ul.pagination li");
+                var but_details = $(id_block+" .search-elt button.detail-prod");
+                var but_search = $(id_block+" input[name=search_query]");
+                var select_cat = $(id_block+" select[name=search_categories]");
+                
+                function initPaging() {
+                    N_PROD = Math.ceil(DATA.length / LIMIT_DATA);
+                    pagination_prod.html("");
+                    var data, i;
+                    for (i = 1; i <= N_PROD; i++) {
+                        if (i == 1)
+                            data = "<li class='paginate_button active'>" +
+                                        "<a data-dt-idx='" + i + "' tabindex='" + i + "'>" + i + "</a>" +
+                                    "</li>";
+                        else
+                            data = "<li class='paginate_button'>" +
+                                        "<a  data-dt-idx='" + i + "' tabindex='" + i + "'>" + i + "</a>" +
+                                    "</li>";
+                        pagination_prod.append(data);
+                    }
+                    data = "<li class='paginate_button  previous disabled'>" +
+                            "<a data-dt-idx='-1' tabindex='" + i + "'>Prec</a>" +
+                            "</li>";
+                    pagination_prod.prepend(data);
+                    data = "<li class='paginate_button next disabled'>" +
+                            "<a data-dt-idx='-2' tabindex='" + i + "'>Suiv</a>" +
+                            "</li>";
+                    pagination_prod.append(data);
+                    $(id_block+" ul.pagination li").click(function () {makePagingClick(this);});
+                }
+                function makePagingClick(_this) {
+                    var index = $("a", _this).attr("data-dt-idx");
+                    if ($(_this).hasClass("disabled"))
+                        return;
+                    $(id_block+" ul.pagination li.active").removeClass("active");
+                    $(_this).addClass("active");
+                    LEVEL_DATA = index;
+                    afficherContenu();
+                }
+                function afficherContenu() {
+                    contenu.html("");
+                    DATA.forEach(
+                            function (item, index) {
+                                LEVEL_DATA = (LEVEL_DATA < 1) ? 1 : LEVEL_DATA;
+                                var min = (LEVEL_DATA - 1) * LIMIT_DATA;
+                                var max = min + LIMIT_DATA;
+                                if (index >= (LEVEL_DATA - 1) * LIMIT_DATA && index < LIMIT_DATA + (LEVEL_DATA - 1) * LIMIT_DATA) {
+                                    var parent = makeItemNode(item, index);
+                                    contenu.append(parent);
+                                }
+                            }
+                    );
+                    
+                    but_details.click(function () {
+                        afficherModal(this);
+                    });
+                }
+                function node_sub_string_search(item, str, index) {
+                    var str2 = str.toLowerCase();
+                    if (item.nom.toLowerCase().search(str2) >= 0)
+                        return true;
+
+                    if (item.code.toLowerCase().search(str2) >= 0)
+                        return true;
+                    for (var i = 0; i < item.categorie.length; i++) {
+                        if (item.categorie[i].nom.toLowerCase().search(str2) >= 0)
+                            return true;
+                    }
+                    return false;
+                }
+                function searchSubString(_this) {
+                    var str = $(_this).val();
+                    alert(str);
+                    if (str.length == 0) {
+                        DATA = DATA_FULL;
+                    } else {
+                        DATA = [];
+                        DATA_FULL.forEach(
+                                function (item, index) {
+                                    if (node_sub_string_search(item, str, index)) {
+                                        DATA.push(item);
+                                    }
+                                }
+                        );
+                    }
+                    initPaging();
+                    afficherContenu();
+                }
+                function makeItemNode(item, index) {
+                    var ajout = "";
+                    if (item.new)
+                        ajout = "<img src='{{ app.request.getSchemeAndHttpHost() ~ asset('plateform/img/barre_new.png')}}' class='col_item_img'>";
+                    var parent = "<div class='col-sm-3 search-elt  col_item'>" +
+                            ajout +
+                            "<b><h4>" + item.nom + "</h4></b>" +
+                            "<img src='" + item.logo + "' class='search-elt-img'>" +
+                            "<div class='search-desc'>" +
+                            "<div class='col-sm-12'>" +
+                            "<div class='col-sm-8' style='margin: 0;padding: 0;'>" +
+                            "<b>" + item.nom + "</b>" +
+                            "</div>" +
+                            "<div class='col-sm-4' style='padding: 0;position: absolute;top: -9px;right: -5px;'>" +
+                            "<img src='" + item.produit + "' class='search-elt-img' style='margin-top: 50%;'>" +
+                            "</div>" +
+                            "</div>" +
+                            "<div>" +
+                            "<div style='margin-left: 15px;margin-top: 30px;' class='Details'>" +
+                            "<i class='thin-icon-menu' >code: </i><b>" + item.code + "</b><br>" +
+                            "<i class='thin-icon-accessoire' > cat(" + item.categorie.length + ") </i>: <b>" + item.categorie[0].nom + "</b><br>" +
+                            "<i class='thin-icon-machine' > Conseille:<b> " + item.advisor + "</i></b><br>" +
+                            "</div>" +
+                            "<center>" +
+                            "<br> <a href=''>Details</a>" +
+                            "<br>" +
+                            "<i class=' fa fa-heart'>" + item.like + "</i><i class=' fa fa-share-square-o'>" + item.share + "</i><i class=' fa fa-ban'>" + item.sell + "</i>" +
+                            "<br>" +
+                            "</center>" +
+                            "</div>" +
+                            "<button class='btn btn-secondary-2 detail-prod'  data=\"#" + item.code + "," + item.logo + "," + item.nom + "," + item.produit + "\">Profil</button></center>" +
+                            "</div>" +
+                            "</div>";
+                    return parent;
+                }
+                function initFilterDate() {
+                    DATA.forEach(
+                            function (item, index) {
+                                if (index >= LIMIT_DATA * LEVEL_DATA && index < LIMIT_DATA * (LEVEL_DATA + 1)) {
+                                    var parent = makeItemNode(item, index)
+                                    contenu.append(parent);
+                                }
+                                if (item.price > SOMME_MAX)
+                                    SOMME_MAX = item.price;
+
+                                if (item.y > Y_MAX)
+                                    Y_MAX = item.y;
+
+                                if (item.m > M_MAX)
+                                    M_MAX = item.m;
+
+                                if (item.s > S_MAX)
+                                    S_MAX = item.s;
+                            }
+                    );
+                    select_cat.html("");
+                    var y_ = Math.ceil(Y_MAX / 3);
+                    var m_ = Math.ceil(M_MAX / 3);
+                    var s_ = Math.ceil(S_MAX / 3);
+                    for (var i = 1; i <= 3; i++)
+                        select_cat.append("<option value='" + s_ * i + " 0 0'>Boutiques créee il y a moins de  " + s_ * i + " semaine(s)</option>");
+                    for (var i = 1; i <= 3; i++)
+                        select_cat.append("<option  value='100 " + m_ * i + " 0'> Boutiques créee il y a moins de  " + m_ * i + " mois</option>");
+                    for (var i = 1; i <= 3; i++)
+                        select_cat.append("<option  value='100 100 " + y_ * i + "'> Boutiques créee il y a moins de  " + y_ * i + "anné(es) ans</option>");
+                    $("#list_boutiques select[name=search_categories]").prepend("<option value='100 100 100' selected='selected'> toutes les dates de creations </option>");
+                }
+                function afficherModal(_this) {
+                    console.log("View details of ");
+                    var data = $(_this).attr("data").split(",");
+                    var code = data[0], logo = data[1], nom = data[2], produit = data[3];
+                    $("#modal_boutique").css("backgroung-image", logo);
+                    var Content_modal = "<div class='col-sm-8'>" +
+                            "<h3 style='font-size: 100%;'>" + nom + " <b>#" + code + "</b></h3>" +
+                            "<table>" +
+                            "<tr>" +
+                            "<td><b>Entreprise :</b> </td>" +
+                            "<td><a href='#' data-modal='entreprise'>" + nom + "</a></td>" +
+                            "</tr>" +
+                            "<tr>" +
+                            "<td><b>Rang :</b> </td>" +
+                            "<td><a data-modal='poids'>43</a></td>" +
+                            "</tr>" +
+                            "<tr>" +
+                            "<td><b>Categories :</b></td>" +
+                            "<td data-modal='Vehicule'><span class='location' title='Vetements Feminins'>Vetements</span><span class='location' title='Electroniques'>Electronique</span><span class='location' title='Investissement'>Sport</span></td>" +
+                            "</tr>" +
+                            "<tr>" +
+                            "<td><b>Payement : </b></td>" +
+                            "<td><img src='{{app.request.getSchemeAndHttpHost() ~ asset('plateform/demo/payment/payment.png')}}' class='search-elt-img' style=' width: 100%;'></td>" +
+                            "</tr>" +
+                            "<tr>" +
+                            "<td>Notation :</td>" +
+                            "<td><i class=' fa fa-heart'>25</i><i class=' fa fa-share-square-o'>125</i><i class=' fa fa-ban'>15</i></td>" +
+                            "</tr>" +
+                            "<tr>" +
+                            "<td><button class='btn btn-secondary-2'>Contacter</button></td>" +
+                            "<td></td>" +
+                            "</tr>" +
+                            "</table>" +
+                            "</div>" +
+                            "<div class='col-sm-4'>" +
+                            "<img src='" + logo + "' class='modal-elt-img'>" +
+                            "<hr>" +
+                            "<center>" +
+                            "<button class='btn btn-secondary-2' onclick='confirm('Ajouter le transporteur a votre liste de contacts?');'>Ajouter</button>" +
+                            "</center>" +
+                            "<div class='col-sm-12 description' style='text-align: justify;'>D'une premiere vue mon activite se refere a un simple transport de produits ... <a href=''>ma page</a></div>" +
+                            "</div>";
+                    modal_form_content.html(Content_modal);
+                    modal_form.show();
+                }
+                function selectFilterDateItem(_this) {
+                    var str = $(_this).val();
+                    var list = str.split(" ");
+                    var evol = 0;
+                    contenu.html("");
+                    var y = list[2], s = list[0], m = list[1];
+                    console.log(list);
+
+                    DATA.forEach(
+                            function (item, index) {
+                                if (evol < LIMIT_DATA) {
+                                    console.log(item.s + " -- " + item.m + "  --  " + item.y);
+                                    console.log((item.y <= parseInt(list[2])) + " -- " + (item.m <= parseInt(list[1])) + "  --  " + (item.s <= parseInt(list[0])));
+                                    if (item.y <= parseInt(list[2]) && item.m <= parseInt(list[1]) && item.s <= parseInt(list[0])) {
+                                        var parent = makeItemNode(item, index)
+                                        contenu.append(parent);
+                                        evol++;
+                                    }
+                                }
+                            }
+                    );
+                }
+                
+                
+                /*
+                 * 
+                 * PART OF SUP FILTER FIELDS
+                 * 
+                 */
+                
+                var VILLE = [];
+                var PAYS = [];
+                var CONTINENT = [];
+                var select_ville = $(id_block+" select[name=search_ville]");
+                var select_pays = $(id_block+" select[name=search_pays]");
+                var select_continent = $(id_block+" select[name=search_continent]");
+                
+                function initFilterVille() {
+                    VILLE = [];
+                    DATA.forEach(
+                            function (item, index) {
+                                item.zone.forEach(
+                                    function(zone,loc){
+                                        if(VILLE.indexOf(zone.nom)==-1)
+                                            VILLE.push(zone.nom);
+                                    }
+                                );
+                            }
+                    );
+                    select_ville.html("");
+                    for (var i = 0; i < VILLE.length; i++)
+                        select_ville.append("<option value='" + VILLE[i] + "'>Transporteurs dans la ville de  ----"+ VILLE[i]   + "</option>");
+                    select_ville.prepend("<option value='' selected='selected'> toutes les villes </option>");
+                }
+                function selectFilterVille(_this) {
+                    var str = $(_this).val();
+                    var evol = 0;
+                    contenu.html("");
+                    DATA.forEach(
+                            function (item, index) {
+                                if (evol < LIMIT_DATA) {
+                                    item.zone.forEach(
+                                        function(zone,loc){
+                                            if(zone.nom.search(str)>=0){
+                                            console.log(zone.nom + " -- " + str + "  --  " + zone.nom.search(str));
+                                                var parent = makeItemNode(item, index)
+                                                contenu.append(parent);
+                                                evol++;
+                                            }
+                                        }
+                                    );
+                                }
+                            }
+                    );
+                }
+                
+                function initFilterPays() {
+                    PAYS = [];
+                    DATA.forEach(
+                            function (item, index) {
+                                item.zone.forEach(
+                                    function(zone,loc){
+                                        if(PAYS.indexOf(zone.pays)==-1)
+                                            PAYS.push(zone.pays);
+                                    }
+                                );
+                            }
+                    );
+                    select_pays.html("");
+                    for (var i = 0; i < PAYS.length; i++)
+                        select_pays.append("<option value='" + PAYS[i] + "'>Transporteurs au  ----"+ PAYS[i]   + "</option>");
+                    select_pays.prepend("<option value='' selected='selected'> Tous les Pays</option>");
+                }
+                function selectFilterPays(_this) {
+                    var str = $(_this).val();
+                    var evol = 0;
+                    contenu.html("");
+                    DATA.forEach(
+                            function (item, index) {
+                                if (evol < LIMIT_DATA) {
+                                    item.zone.forEach(
+                                        function(zone,loc){
+                                            if(zone.pays.search(str)>=0){
+                                            console.log(zone.pays + " -- " + str + "  --  " + zone.nom.search(str));
+                                                var parent = makeItemNode(item, index)
+                                                contenu.append(parent);
+                                                evol++;
+                                            }
+                                        }
+                                    );
+                                }
+                            }
+                    );
+                }
+                
+                
+                
+                function initFilterContinent() {
+                    CONTINENT = [];
+                    DATA.forEach(
+                            function (item, index) {
+                                item.zone.forEach(
+                                    function(zone,loc){
+                                        if(CONTINENT.indexOf(zone.continent)==-1)
+                                            CONTINENT.push(zone.continent);
+                                    }
+                                );
+                            }
+                    );
+                    select_continent.html("");
+                    for (var i = 0; i < CONTINENT.length; i++)
+                        select_continent.append("<option value='" + CONTINENT[i] + "'>Transporteurs en ----"+ CONTINENT[i]   + "</option>");
+                    select_continent.prepend("<option value='' selected='selected'> Tous les Continents</option>");
+                }
+                function selectFilterContinent(_this) {
+                    var str = $(_this).val();
+                    var evol = 0;
+                    contenu.html("");
+                    DATA.forEach(
+                            function (item, index) {
+                                if (evol < LIMIT_DATA) {
+                                    item.zone.forEach(
+                                        function(zone,loc){
+                                            if(zone.continent.search(str)>=0){
+                                            console.log(zone.continent + " -- " + str + "  --  " + zone.nom.search(str));
+                                                var parent = makeItemNode(item, index)
+                                                contenu.append(parent);
+                                                evol++;
+                                            }
+                                        }
+                                    );
+                                }
+                            }
+                    );
+                }
+                
+                $.ajax({
+                        url :"{{path('evm_boutique_get_all')}}",
+                        data:{},
+                        dataType:"json",
+                        success: function(data, status){
+                            contenu.html("");
+                            data.forEach(function(item,index){item.logo=LINK_FILE_ASSERT+item.logo;});
+                            data.forEach(function(item,index){item.produit=LINK_FILE_ASSERT+item.produit;});
+                            DATA_FULL = data;
+                            DATA = DATA_FULL;
+                            N_PROD = Math.ceil(DATA.length / LIMIT_DATA);
+                            
+                            initPaging();
+                            but_search.change(function () {searchSubString(this);});
+                            initFilterDate();
+                            select_cat.change(function () {selectFilterDateItem(this);});
+                            but_details.click(function () {afficherModal(this);});
+                            lign_parging.click(function () {makePagingClick(this);});
+                            $(id_block+" .search-elt button.detail-prod").click(function () {afficherModal(this);});
+                            initFilterVille();
+                            select_ville.change(function () {selectFilterZoneItem(this);});
+                            initFilterPays();
+                            select_pays.change(function () {selectFilterZoneItem(this);});
+                            initFilterContinent();
+                            select_continent.change(function () {selectFilterZoneItem(this);});
+                        }
+                    });
+            }
+    );
+</script>

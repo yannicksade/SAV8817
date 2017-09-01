@@ -1,0 +1,375 @@
+<div id="cover" style="position: fixed;top:0;left: 0;width: 100%;height: 100%;z-index: 700;background-color: white">
+    <div class="content" style="width: 30%;height: 300%;margin-left: 32%">
+        <center><img src="{{app.request.getSchemeAndHttpHost() ~ asset('plateform/img/logoApm.png')}}" width="80%"></center>
+        <br>
+        <center><img src="{{app.request.getSchemeAndHttpHost() ~ asset('plateform/img/loading.gif')}}" width="10%"></center>
+
+    </div>
+</div>
+<div id="page" class="">
+    <div class="header0-container">
+        <header id="header">
+            <div class="wrapper  container"  style="    padding-top: 0px">
+                <div class="row  align-center" style="    padding-top: 0px">
+                    <div class="col-xs-12   col-lg-2 ">
+                        <div id="header_logo">
+                            <a href="{{path('evm_homepage')}}" title="lOGO">
+                                <img class="logo img-responsive" src="{{app.request.getSchemeAndHttpHost() ~ asset('plateform/img/logoApm.png')}}" alt="LOGO" width="200" height="46">
+                            </a>
+                        </div>
+                    </div>
+                    <div class="col-xs-12   col-lg-8 ">
+                        <div class="module ">
+                            <div id="tmhtmlcontent_top">
+                                <ul class="tmhtmlcontent-top">
+                                    <li class="tmhtmlcontent-item-1 contact-info">
+                                        <div class="item-html">
+                                            <p>
+                                                <i class="thin-icon-ambulance"></i>
+                                                <a href="tel:0123-456-789">Afrique Centrale / Cameroun</a>
+                                            </p>
+                                            {#  <p><i class="fa fa-clock-o"></i> 7 Days a week from 9:00 am to 7:00 pm</p> #}
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="module static-search">
+                            <div id="tmsearch">
+                                <form class="tmsearchbox" method="post" action="{{path('evm_boutique_find')}}" region="{{path('evm_region_all')}}" categorie="{{path('evm_categorie_all')}}">
+                                    <div class="selector6" style="width:25%">
+                                        <select name="search_region" style="width: 100%" class="form-controlp search_region">
+                                        </select>
+                                    </div>
+                                    <div class="selector6" style="width: 30%">
+                                        <select name="search_categories" style="width: 100%" class="form-controlp search_categories">
+                                        </select>
+                                    </div>
+                                    <input class="tm_search_query form-control" type="text" id="tm_search_query" name="search_query" placeholder="Recherche" value="" style="padding-left: 10px">
+                                    <button type="submit" name="tm_submit_search" value="filter" class="button-search"></button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    <div class=" col-xs-12   col-lg-3 text-right notifications-up">
+                        <div class="module option" style="width: 32%;margin-top: 20px;padding-right: 10%;">
+                            <i title="Voir mon panier" rel="nofollow" class="thin-icon-activite">
+                                <i style="line-height: 2;font-size: small;text-align: center;">Comparer</i>
+                                <i class="num_prod">1</i>
+                            </i>
+                            <div class="first-level-menu" style="min-width: 250px;left: -130%;z-index: 560;font-size: 11px;width: 300px;">
+                                <div class="bique-view" style="border-right: none;overflow: hidden">
+                                    <ul class="menu_notification">
+                                        <li title="Appareils electromenagers no-pad">
+                                            <div class="col-sm-12 no-pad block-img">
+                                                <button class="close">x</button>
+                                                <div class="col-sm-2 no-pad">
+                                                    <img class="img-circle" src="{{app.request.getSchemeAndHttpHost() ~ asset('plateform/hitel/images/Leclerc-retourne.jpg')}}">
+                                                </div>
+                                                <div class="col-sm-8 no-pad">
+                                                    <center><a href="{{path('evm_produit_compare')}}"><b>COMPARER LES PRODUITS</b></a></center>
+                                                </div>
+                                                <div class="col-sm-2 no-pad">
+                                                    <img class="img-circle" src="{{app.request.getSchemeAndHttpHost() ~ asset('plateform/hitel/images/Leclerc-retourne.jpg')}}">
+                                                </div>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                    {#                                    <center><a href="">Voir tout.</a></center>#}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="module option" style="width: 32%;margin-top: 20px;padding-right: 10%;">
+                            <form method="post" action="">
+                                <i title="Voir mon panier" rel="nofollow" class="thin-icon-noti">
+                                    <i style="line-height: 2;font-size: small;text-align: center;">Notifications</i>
+                                    <i class="num_prod ">1</i>
+                                </i>
+                                <div class="first-level-menu" style="min-width: 250px;left: -150%;z-index: 560;font-size: 11px;width: 300px;">
+                                    <div class="bique-view" style="border-right: none;overflow: hidden">
+                                        <ul class="menu_notification">
+                                            <li title="Appareils electromenagers no-pad">
+                                                <div class="col-sm-12 no-pad block-img">
+                                                    <button class="close">x</button>
+                                                    <div class="col-sm-2 no-pad">
+                                                        <img class="img-circle" src="{{app.request.getSchemeAndHttpHost() ~ asset('plateform/hitel/images/Leclerc-retourne.jpg')}}">
+                                                    </div>
+                                                    <div class="col-sm-8 no-pad">
+                                                        <a href=""><b>Compte</b></a> Vous devez creer un compte
+                                                        <br> <i>Il y a 20 heures</i>
+                                                    </div>
+                                                    <div class="col-sm-2 no-pad">
+                                                        <img class="" src="{{app.request.getSchemeAndHttpHost() ~ asset('plateform/img/top-banner-2.jpg')}}">
+                                                    </div>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                        {#                                        <center><a href="">Voir tout.</a></center>#}
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="module option" style="width: 32%;margin-top: 20px;padding-right: 10%;">
+                            <i title="Voir mon panier" rel="nofollow" class="thin-icon-shopcard2">
+                                <i style="line-height: 2;font-size: small;text-align: center;">Panier</i>
+                                <i class="num_prod panier">25</i>
+                            </i>
+                            <div  class="first-level-menu" style="min-width: 250px;left: -220%;z-index: 560;font-size: 11px;width: 300px;">
+                                <div class="bique-view" style="border-right: none">
+                                    <ul class="menu_notification menu_panier">
+
+                                    </ul>
+                                    <br>
+                                    <div class="col-sm-12 no-pad block-img">
+                                        <div class="col-sm-6">
+                                            <a class="btn btn-primary" style="float: left;color:white !important;" href="{{path('evm_produit_check_out')}}">Acheter</a>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <a class="btn btn-primary" style="float: right;color:white !important;" href="{{path('evm_produit_check_out')}}">Details</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="stickUpTop" >
+                    <div class="stickUpHolder container">
+                        <div class="row  stick-up">
+                            <div class=" col-xs-12    text-center inline-menu">
+                                <div class="module ">
+                                    <div class="top_menu top-level tmmegamenu_item">
+                                        <div class="menu-title tmmegamenu_item">Catalogue</div>
+                                        <ul class="menu clearfix top-level-menu tmmegamenu_item sf-js-enabled sf-arrows">
+                                            <li class="simple top-level-menu-li tmmegamenu_item">
+                                                <a class=" top-level-menu-li-a tmmegamenu_item sf-with-ul" href="{{path('evm_homepage')}}">APM</a>
+                                            </li>
+                                            <li class="simple top-level-menu-li tmmegamenu_item add-fixed" style="
+                                                max-width: 510px;
+                                                margin-top: -12px;display: none;
+                                                ">
+                                                <div class="module static-search">
+                                                    <div id="tmsearch">
+                                                        <form class="tmsearchbox" method="post" action="">
+                                                            <div class="selector6" style="width:25%">
+                                                                <select name="search_region" style="width: 100%;border: 1px solid black" class="form-controlp search_region">
+                                                                </select>
+                                                            </div>
+                                                            <div class="selector6" style="width: 30%;border:">
+                                                                <select name="search_categories" style="width: 100%;border: 1px solid  black;border-right: none" class="form-controlp search_categories">
+                                                                </select>
+                                                            </div>
+                                                            <input class="tm_search_query form-control" type="text" id="tm_search_query" name="search_query" placeholder="Recherche" value="" style="padding-left: 10px;border: 1px solid black">
+                                                            <button type="submit" name="tm_submit_search"  value="filter" class="button-search" style="
+                                                                    background: black;
+                                                                    "></button>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                            <li class="simple top-level-menu-li tmmegamenu_item" id="menu-boutique">
+                                                <a class=" top-level-menu-li-a tmmegamenu_item sf-with-ul" >BOUTIQUES</a>
+                                            </li>
+                                            <li class=" top-level-menu-li tmmegamenu_item "><a class=" top-level-menu-li-a tmmegamenu_item" href="{{path('evm_transporteur_all')}}">TRANSPORT</a></li>
+                                            <li class="top-level-menu-li tmmegamenu_item move-fixed">
+                                                <a class="top-level-menu-li-a tmmegamenu_item sf-with-ul" href="{{path('evm_commission_all')}}">COMMISSION</a>
+                                            </li>
+                                            <li class=" top-level-menu-li tmmegamenu_item move-fixed"><a class="top-level-menu-li-a tmmegamenu_item" href="{{path('evm_documentation_all')}}">DOCUMENTATION</a></li>
+                                            <li class=" top-level-menu-li tmmegamenu_item move-fixed"><a class=" top-level-menu-li-a tmmegamenu_item" href="{{path('evm_conseille_all')}}">CONSEILLES</a></li>
+                                            <li class=" top-level-menu-li tmmegamenu_item move-fixed"><a class="top-level-menu-li-a tmmegamenu_item" href="{{path('evm_produit_all')}}">PRODUITS</a></li>
+                                            <li class="simple top-level-menu-li tmmegamenu_item add-fixed" style="display: none">
+                                                <div id="panier_menu" style="">
+                                                    <i title="Voir mon panier" rel="nofollow" class="thin-icon-shopcard">
+                                                        <b class="num_prod panier">25</b> 
+                                                    </i>  
+                                                    <div  class="first-level-menu" style="min-width: 300px;left: -420%;z-index: 560;font-size: 11px">
+                                                        <div class="bique-view" style="border-right: none">
+                                                            <ul class="menu_notification menu_panier">
+                                                            </ul>
+                                                            <div class="col-sm-12 no-pad block-img">
+                                                                <div class="col-sm-6">
+                                                                    <a class="btn btn-primary" style="float: left;color:white !important;" href="{{path('evm_produit_check_out')}}">Acheter</a>
+                                                                </div>
+                                                                <div class="col-sm-6">
+                                                                    <a class="btn btn-primary" style="float: right;color:white !important;" href="{{path('evm_produit_check_out')}}">Details</a>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+    </div>
+</div>
+<button style="position: fixed;top: 6px;right: 20px;background: rgb(255, 255, 255);border-radius: 100%;width: 40px;z-index: 549;height: 40px;color: #297890;font-weight: 800;transform: rotateZ(90deg);display: block;" id="hide_menu"><span style="">|</span><span>|</span><span>|</span></button>
+
+<div  class="second-level-menu" id="target-boutique">
+    <button class="close" onclick="$('#target-boutique').hide(500);">x</button>
+    <div class="col-sm-12">
+        <div class="col-sm-4" >
+            <div class="search" style="margin: 0">
+                <i class="fa fa-search icon-left" style="width: 35px;margin: 2px;top: 0px;color: black;background: rgb(36, 91, 110);height: 35px"></i>
+                <input type="text" id="seach_shop" placeholder="Rechercher..." style="height: 35px">
+            </div>
+            <ul class="currencies_ul toogle_content " style="">
+                <li class="category element-liste thin-icon-sport" data="automobile">
+                    <a title="Bath, Hair, Skin Care">AUTOMOBILE</a>
+                </li>
+                <li class="category element-liste thin-icon-phone"  data="electromenage phone computer ordinateur">
+                    <a title="Bath, Hair, Skin Care">ELECTRONIQUE</a>
+                </li>
+                <li class="category element-liste thin-icon-vetement"  data="vetement">
+                    <a title="Bath, Hair, Skin Care">VETEMENT</a>
+                </li>
+                <li class="category element-liste thin-icon-love"  data="nutrition">
+                    <a title="Bath, Hair, Skin Care">NUTRITION</a>
+                </li>
+                <li class="category element-liste thin-icon-sport"  data="sport">
+                    <a title="Bath, Hair, Skin Care">SPORT</a>
+                </li>
+                <li class="category element-liste thin-icon-accessoire"  data="divertissement">
+                    <a title="Bath, Hair, Skin Care">DIVERTISSEMENT</a>
+                </li>
+                <li class="category element-liste thin-icon-diamant"  data="ecole">
+                    <a title="Bath, Hair, Skin Care">SCOLARITE</a>
+                </li>
+                <li>
+                <center><a href="{{path('evm_boutique_all')}}">Toutes les <span class="nombre_boutiques"></span> boutiques</a></center>
+                </li>
+            </ul>
+        </div>
+        <div class="col-sm-8">
+            <div class="col-sm-12">
+                <div class="col-sm-6"> 
+                    <div class="title2">PLUS DE VENTE</div>
+                    <ul id="list-boutique-1" class="list-item">
+                        
+                    </ul>
+                </div>
+                <div class="col-sm-6">
+                    <div class="title2">PLUS DE POPULAIRE</div>
+                    <ul id="list-boutique-2" class="list-item">
+                        
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>                                                                                                                                                                                                        
+<div id="zone-notif" data='notif-item1 notif-item2 notif-item3 notif-item4 notif-item5 notif-item6'>
+    <div class="item bg-orange-notif" id="notif-item1" >
+        <button class="close-notif" onclick="closeNotif('#notif-item1');">x</button>
+        <div class="title-notif">Title Notification's</div>
+        <div class="body-notif">Body Notification's</div>
+    </div>
+    <div class="item bg-green-notif" id="notif-item2">
+        <button class="close-notif" onclick="closeNotif('#notif-item2');">x</button>
+        <div class="title-notif">Title Notification's</div>
+        <div class="body-notif">Body Notification's</div>
+    </div>  
+    <div class="item bg-red-notif" id="notif-item3">
+        <button class="close-notif" onclick="closeNotif('#notif-item3');">x</button>
+        <div class="title-notif">Title Notification's</div>
+        <div class="body-notif">Body Notification's</div>
+    </div>      
+    <div class="item bg-orange-notif" id="notif-item4" >
+        <button class="close-notif" onclick="closeNotif('#notif-item4');">x</button>
+        <div class="title-notif">Title Notification's</div>
+        <div class="body-notif">Body Notification's</div>
+    </div>
+    <div class="item bg-green-notif" id="notif-item5">
+        <button class="close-notif" onclick="closeNotif('#notif-item5');">x</button>
+        <div class="title-notif">Title Notification's</div>
+        <div class="body-notif">Body Notification's</div>
+    </div>  
+    <div class="item bg-red-notif" id="notif-item6">
+        <button class="close-notif" onclick="closeNotif('#notif-item6');">x</button>
+        <div class="title-notif">Title Notification's</div>
+        <div class="body-notif">Body Notification's</div>
+    </div>                                                         
+</div>
+<audio  style="opacity: 0;" id="son-notif" ><source src="{{app.request.getSchemeAndHttpHost() ~ asset('plateform/hitel/son/notif.mp3')}}" type='audio/mpeg'></audio>
+
+<script src="{{app.request.getSchemeAndHttpHost() ~ asset('plateform/hitel/js/header_menu_init.js')}}" type="text/javascript"></script>
+<script>
+    var LINK_FILE_ASSERT = "{{app.request.getSchemeAndHttpHost() ~ asset('')}}";
+    var LOGO_APM = " {{ app.request.getSchemeAndHttpHost() ~ asset('plateform/img/ico.ico')}}";
+    $(document).ready(
+            function () {
+                //L UTILISATEUR N A PAS ENCORE CREE DE COMPTE UTILISATEUR
+                setInterval("openNotif('Compte utilisateur','Vous n avez pas encore de compte veuillez Creer un compte</a>')", 50000);
+                $("#menu-boutique").click(function(){$('#target-boutique').show(500);});
+                function makeItem(item){
+                    var node = "<li class='item'>"+
+                            "<div class='col-sm-12 item-item-li'>"+
+                                "<div class='col-sm-6'>"+
+                                    "<img src='"+item.logo+"'/>"+
+                                "</div>"+
+                                "<div class='col-sm-6'>"+
+                                    "<p><a>"+item.nom+"</a></p>"+
+                                    "<p>"+item.code+"</p>"+
+                                "</div>"+
+                            "</div> "+
+                            "</li>";
+                    return node;
+                }
+                var DATA_FULLY = [{"nom":"Screen Lock","logo":"{{app.request.getSchemeAndHttpHost() ~ asset('plateform/demo/banners/home5/banner-53.jpg')}}","produit":"{{app.request.getSchemeAndHttpHost() ~ asset('plateform/demo/banners/home5/banner-53.jpg')}}","new":true,"code":"1000","y":2,"m":5,"s":2,"zone":[{"nom":"Yaounde","pays":"Cameroun","continent":"Afrique"},{"nom":"Maroua","pays":"Cameroun","continent":"Afrique"}],"categorie":[{"nom":"vetement","tag":"CAT1293","flag":"machine"},{"nom":"nutrition","tag":"CAT1393","flag":"phone"},{"nom":"Soprt et Divertissement","tag":"CAT1193","flag":"sport"},{"nom":"Vetement","tag":"CAT1193","flag":"vetement"}],"like":21,"share":14,"sell":53,"rate":3,"visits":34,"advisor":14},{"nom":"Cuuter","logo":"{{app.request.getSchemeAndHttpHost() ~ asset('plateform/demo/banners/home4/h4-img-7.jpg')}}","produit":"{{app.request.getSchemeAndHttpHost() ~ asset('plateform/demo/banners/home4/h4-img-7.jpg')}}","new":true,"code":"1001","y":6,"m":3,"s":2,"zone":[{"nom":"Yaounde","pays":"Cameroun","continent":"Afrique"},{"nom":"Maroua","pays":"Cameroun","continent":"Afrique"}],"categorie":[{"nom":"Ordinateurs","tag":"CAT1293","flag":"machine"},{"nom":"Téléphones","tag":"CAT1393","flag":"phone"},{"nom":"Soprt et Divertissement","tag":"CAT1193","flag":"sport"},{"nom":"Vetement","tag":"CAT1193","flag":"vetement"}],"like":21,"share":14,"sell":13,"rate":3,"visits":34,"advisor":14},{"nom":"Cuisino","logo":"{{app.request.getSchemeAndHttpHost() ~ asset('plateform/demo/banners/home3/h3-img-5.jpg')}}","produit":"{{app.request.getSchemeAndHttpHost() ~ asset('plateform/demo/banners/home3/h3-img-5.jpg')}}","new":true,"code":"1002","y":0,"m":0,"s":1,"zone":[{"nom":"Yaounde","pays":"Cameroun","continent":"Afrique"},{"nom":"Maroua","pays":"Cameroun","continent":"Afrique"}],"categorie":[{"nom":"Ordinateurs","tag":"CAT1293","flag":"machine"},{"nom":"Téléphones","tag":"CAT1393","flag":"phone"},{"nom":"Soprt et Divertissement","tag":"CAT1193","flag":"sport"},{"nom":"Vetement","tag":"CAT1193","flag":"vetement"}],"like":21,"share":14,"sell":153,"rate":3,"visits":34,"advisor":14},{"nom":"Cuisino","logo":"{{app.request.getSchemeAndHttpHost() ~ asset('plateform/demo/banners/home2/h2-img-2.jpg')}}","produit":"{{app.request.getSchemeAndHttpHost() ~ asset('plateform/demo/banners/home2/h2-img-2.jpg')}}","new":true,"code":"1003","y":0,"m":0,"s":4,"zone":[{"nom":"Yagoua","pays":"Cameroun","continent":"Afrique"},{"nom":"Maroua","pays":"Cameroun","continent":"Afrique"}],"categorie":[{"nom":"sport","tag":"CAT1293","flag":"machine"},{"nom":"Téléphones","tag":"CAT1393","flag":"phone"},{"nom":"Soprt et Divertissement","tag":"CAT1193","flag":"sport"},{"nom":"Vetement","tag":"CAT1193","flag":"vetement"}],"like":21,"share":14,"sell":53,"rate":3,"visits":34,"advisor":14},{"nom":"Screen Lock","logo":"{{app.request.getSchemeAndHttpHost() ~ asset('plateform/demo/banners/home2/h2-img-2.jpg')}}","produit":"{{app.request.getSchemeAndHttpHost() ~ asset('plateform/demo/banners/home2/h2-img-2.jpg')}}","new":true,"code":"1004","y":0,"m":4,"s":1,"zone":[{"nom":"Bertoua","pays":"Cameroun","continent":"Afrique"},{"nom":"Maroua","pays":"Cameroun","continent":"Afrique"}],"categorie":[{"nom":"Ordinateurs","tag":"CAT1293","flag":"machine"},{"nom":"Téléphones","tag":"CAT1393","flag":"phone"},{"nom":"Soprt et Divertissement","tag":"CAT1193","flag":"sport"},{"nom":"Vetement","tag":"CAT1193","flag":"vetement"}],"like":21,"share":14,"sell":53,"rate":3,"visits":34,"advisor":14},{"nom":"feav shop","logo":"{{app.request.getSchemeAndHttpHost() ~ asset('plateform/demo/blog/11.jpg')}}","produit":"{{app.request.getSchemeAndHttpHost() ~ asset('plateform/demo/blog/11.jpg')}}","new":true,"y":0,"m":10,"s":1,"zone":[{"nom":"Yaounde","pays":"Cameroun","continent":"Afrique"},{"nom":"Maroua","pays":"Cameroun","continent":"Afrique"}],"code":"1005","categorie":[{"nom":"Ordinateurs","tag":"CAT1293","flag":"machine"},{"nom":"Téléphones","tag":"CAT1393","flag":"phone"},{"nom":"Soprt et Divertissement","tag":"CAT1193","flag":"sport"},{"nom":"Vetement","tag":"CAT1193","flag":"vetement"}],"like":21,"share":14,"sell":593,"rate":3,"visits":34,"advisor":14},{"nom":"Pan Couture","logo":"{{app.request.getSchemeAndHttpHost() ~ asset('plateform/demo/menu/feature/home-1.jpg')}}","produit":"{{app.request.getSchemeAndHttpHost() ~ asset('plateform/demo/menu/feature/home-1.jpg')}}","new":true,"code":"1006","y":2,"m":0,"s":1,"zone":[{"nom":"Obala","pays":"Cameroun","continent":"Afrique"},{"nom":"Maroua","pays":"Cameroun","continent":"Afrique"}],"categorie":[{"nom":"Ordinateurs","tag":"CAT1293","flag":"machine"},{"nom":"Téléphones","tag":"CAT1393","flag":"phone"},{"nom":"Soprt et Divertissement","tag":"CAT1193","flag":"sport"},{"nom":"Vetement","tag":"CAT1193","flag":"vetement"}],"like":21,"share":14,"sell":53,"rate":3,"visits":34,"advisor":14},{"nom":"Pan Couture","logo":"{{app.request.getSchemeAndHttpHost() ~ asset('plateform/demo/menu/feature/home-2.jpg')}}","produit":"{{app.request.getSchemeAndHttpHost() ~ asset('plateform/demo/menu/feature/home-2.jpg')}}","new":true,"code":"1007","y":0,"m":4,"s":1,"zone":[{"nom":"Yaounde","pays":"Cameroun","continent":"Afrique"},{"nom":"Maroua","pays":"Cameroun","continent":"Afrique"}],"categorie":[{"nom":"Ordinateurs","tag":"CAT1293","flag":"machine"},{"nom":"Téléphones","tag":"CAT1393","flag":"phone"},{"nom":"Soprt et Divertissement","tag":"CAT1193","flag":"sport"},{"nom":"Vetement","tag":"CAT1193","flag":"vetement"}],"like":21,"share":14,"sell":23,"rate":3,"visits":34,"advisor":14},{"nom":"Pan Couture","logo":"{{app.request.getSchemeAndHttpHost() ~ asset('plateform/demo/menu/feature/home-3.jpg')}}","produit":"{{app.request.getSchemeAndHttpHost() ~ asset('plateform/demo/menu/feature/home-3.jpg')}}","new":true,"code":"1008","y":0,"m":11,"s":1,"zone":[{"nom":"Yaounde","pays":"Cameroun","continent":"Afrique"},{"nom":"Maroua","pays":"Cameroun","continent":"Afrique"}],"categorie":[{"nom":"Ordinateurs","tag":"CAT1293","flag":"machine"},{"nom":"Téléphones","tag":"CAT1393","flag":"phone"},{"nom":"Soprt et Divertissement","tag":"CAT1193","flag":"sport"},{"nom":"Vetement","tag":"CAT1193","flag":"vetement"}],"like":21,"share":14,"sell":523,"rate":3,"visits":34,"advisor":14},{"nom":"Pan Couture","logo":"{{app.request.getSchemeAndHttpHost() ~ asset('plateform/demo/menu/feature/home-4.jpg')}}","produit":"{{app.request.getSchemeAndHttpHost() ~ asset('plateform/demo/menu/feature/home-4.jpg')}}","new":true,"code":"1009","y":10,"m":0,"s":1,"zone":[{"nom":"Yaounde","pays":"Cameroun","continent":"Afrique"},{"nom":"Maroua","pays":"Cameroun","continent":"Afrique"}],"categorie":[{"nom":"Ordinateurs","tag":"CAT1293","flag":"machine"},{"nom":"Téléphones","tag":"CAT1393","flag":"phone"},{"nom":"Soprt et Divertissement","tag":"CAT1193","flag":"sport"},{"nom":"Vetement","tag":"CAT1193","flag":"vetement"}],"like":21,"share":14,"sell":53,"rate":3,"visits":34,"advisor":14},{"nom":"Pan Couture","logo":"{{app.request.getSchemeAndHttpHost() ~ asset('plateform/demo/menu/feature/home-5.jpg')}}","produit":"{{app.request.getSchemeAndHttpHost() ~ asset('plateform/demo/menu/feature/home-5.jpg')}}","new":true,"code":"10010","y":4,"m":0,"s":1,"zone":[{"nom":"Yaounde","pays":"Cameroun","continent":"Afrique"},{"nom":"Maroua","pays":"Cameroun","continent":"Afrique"}],"categorie":[{"nom":"Ordinateurs","tag":"CAT1293","flag":"machine"},{"nom":"Téléphones","tag":"CAT1393","flag":"phone"},{"nom":"Soprt et Divertissement","tag":"CAT1193","flag":"sport"},{"nom":"Vetement","tag":"CAT1193","flag":"vetement"}],"like":21,"share":14,"sell":53,"rate":3,"visits":34,"advisor":14},{"nom":"Pan Couture","logo":"{{app.request.getSchemeAndHttpHost() ~ asset('plateform/demo/menu/feature/home-6.jpg')}}","produit":"{{app.request.getSchemeAndHttpHost() ~ asset('plateform/demo/menu/feature/home-6.jpg')}}","new":true,"code":"10011","y":4,"m":0,"s":1,"zone":[{"nom":"Yaounde","pays":"Cameroun","continent":"Afrique"},{"nom":"Maroua","pays":"Cameroun","continent":"Afrique"}],"categorie":[{"nom":"Ordinateurs","tag":"CAT1293","flag":"machine"},{"nom":"Téléphones","tag":"CAT1393","flag":"phone"},{"nom":"Soprt et Divertissement","tag":"CAT1193","flag":"sport"},{"nom":"Vetement","tag":"CAT1193","flag":"vetement"}],"like":21,"share":14,"sell":53,"rate":3,"visits":34,"advisor":14},{"nom":"Pan Couture","logo":"{{app.request.getSchemeAndHttpHost() ~ asset('plateform/demo/menu/feature/home-7.jpg')}}","produit":"{{app.request.getSchemeAndHttpHost() ~ asset('plateform/demo/menu/feature/home-7.jpg')}}","new":true,"code":"10012","y":10,"m":2,"s":1,"zone":[{"nom":"Yaounde","pays":"Cameroun","continent":"Afrique"},{"nom":"Maroua","pays":"Cameroun","continent":"Afrique"}],"categorie":[{"nom":"Ordinateurs","tag":"CAT1293","flag":"machine"},{"nom":"Téléphones","tag":"CAT1393","flag":"phone"},{"nom":"Soprt et Divertissement","tag":"CAT1193","flag":"sport"},{"nom":"Vetement","tag":"CAT1193","flag":"vetement"}],"like":21,"share":14,"sell":53,"rate":3,"visits":34,"advisor":14},{"nom":"Pan Couture","logo":"{{app.request.getSchemeAndHttpHost() ~ asset('plateform/demo/banners/home7/1.png')}}","produit":"{{app.request.getSchemeAndHttpHost() ~ asset('plateform/demo/banners/home7/1.png')}}","new":true,"code":"10013","y":0,"m":0,"s":3,"zone":[{"nom":"Yaounde","pays":"Cameroun","continent":"Afrique"},{"nom":"Maroua","pays":"Cameroun","continent":"Afrique"}],"categorie":[{"nom":"Ordinateurs","tag":"CAT1293","flag":"machine"},{"nom":"Téléphones","tag":"CAT1393","flag":"phone"},{"nom":"Soprt et Divertissement","tag":"CAT1193","flag":"sport"},{"nom":"Vetement","tag":"CAT1193","flag":"vetement"}],"like":21,"share":14,"sell":53,"rate":3,"visits":34,"advisor":14},{"nom":"Pan Couture","logo":"{{app.request.getSchemeAndHttpHost() ~ asset('plateform/demo/menu/feature/home-3.jpg')}}","produit":"{{app.request.getSchemeAndHttpHost() ~ asset('plateform/demo/menu/feature/home-3.jpg')}}","new":true,"code":"10014","y":0,"m":11,"s":1,"zone":[{"nom":"Yaounde","pays":"Cameroun","continent":"Afrique"},{"nom":"Maroua","pays":"Cameroun","continent":"Afrique"}],"categorie":[{"nom":"Ordinateurs","tag":"CAT1293","flag":"machine"},{"nom":"Téléphones","tag":"CAT1393","flag":"phone"},{"nom":"Soprt et Divertissement","tag":"CAT1193","flag":"sport"},{"nom":"Vetement","tag":"CAT1193","flag":"vetement"}],"like":21,"share":14,"sell":153,"rate":3,"visits":34,"advisor":14},{"nom":"Pan Couture","logo":"{{app.request.getSchemeAndHttpHost() ~ asset('plateform/demo/menu/feature/home-4.jpg')}}","produit":"{{app.request.getSchemeAndHttpHost() ~ asset('plateform/demo/menu/feature/home-4.jpg')}}","new":true,"code":"10015","y":10,"m":0,"s":1,"zone":[{"nom":"Yaounde","pays":"Cameroun","continent":"Afrique"},{"nom":"Maroua","pays":"Cameroun","continent":"Afrique"}],"categorie":[{"nom":"Ordinateurs","tag":"CAT1293","flag":"machine"},{"nom":"Téléphones","tag":"CAT1393","flag":"phone"},{"nom":"Soprt et Divertissement","tag":"CAT1193","flag":"sport"},{"nom":"Vetement","tag":"CAT1193","flag":"vetement"}],"like":21,"share":14,"sell":53,"rate":3,"visits":34,"advisor":14},{"nom":"Pan Couture","logo":"{{app.request.getSchemeAndHttpHost() ~ asset('plateform/demo/menu/feature/home-5.jpg')}}","produit":"{{app.request.getSchemeAndHttpHost() ~ asset('plateform/demo/menu/feature/home-5.jpg')}}","new":true,"code":"10016","y":4,"m":0,"s":1,"zone":[{"nom":"Yaounde","pays":"Cameroun","continent":"Afrique"},{"nom":"Maroua","pays":"Cameroun","continent":"Afrique"}],"categorie":[{"nom":"Ordinateurs","tag":"CAT1293","flag":"machine"},{"nom":"Téléphones","tag":"CAT1393","flag":"phone"},{"nom":"Soprt et Divertissement","tag":"CAT1193","flag":"sport"},{"nom":"Vetement","tag":"CAT1193","flag":"vetement"}],"like":21,"share":14,"sell":53,"rate":3,"visits":34,"advisor":14},{"nom":"Pan Couture","logo":"{{app.request.getSchemeAndHttpHost() ~ asset('plateform/demo/menu/feature/home-6.jpg')}}","produit":"{{app.request.getSchemeAndHttpHost() ~ asset('plateform/demo/menu/feature/home-6.jpg')}}","new":true,"code":"10017","y":4,"m":0,"s":1,"zone":[{"nom":"Yaounde","pays":"Cameroun","continent":"Afrique"},{"nom":"Maroua","pays":"Cameroun","continent":"Afrique"}],"categorie":[{"nom":"Ordinateurs","tag":"CAT1293","flag":"machine"},{"nom":"Téléphones","tag":"CAT1393","flag":"phone"},{"nom":"Soprt et Divertissement","tag":"CAT1193","flag":"sport"},{"nom":"Vetement","tag":"CAT1193","flag":"vetement"}],"like":21,"share":14,"sell":53,"rate":3,"visits":34,"advisor":14},{"nom":"Pan Couture","logo":"{{app.request.getSchemeAndHttpHost() ~ asset('plateform/demo/menu/feature/home-7.jpg')}}","produit":"{{app.request.getSchemeAndHttpHost() ~ asset('plateform/demo/menu/feature/home-7.jpg')}}","new":true,"code":"10018","y":10,"m":2,"s":1,"zone":[{"nom":"Yaounde","pays":"Cameroun","continent":"Afrique"},{"nom":"Maroua","pays":"Cameroun","continent":"Afrique"}],"categorie":[{"nom":"Ordinateurs","tag":"CAT1293","flag":"machine"},{"nom":"Téléphones","tag":"CAT1393","flag":"phone"},{"nom":"Soprt et Divertissement","tag":"CAT1193","flag":"sport"},{"nom":"Vetement","tag":"CAT1193","flag":"vetement"}],"like":21,"share":14,"sell":453,"rate":3,"visits":34,"advisor":14},{"nom":"Pan Couture","logo":"{{app.request.getSchemeAndHttpHost() ~ asset('plateform/demo/banners/home7/1.png')}}","produit":"{{app.request.getSchemeAndHttpHost() ~ asset('plateform/demo/banners/home7/1.png')}}","new":true,"code":"10019","y":0,"m":0,"s":3,"zone":[{"nom":"Yaounde","pays":"Cameroun","continent":"Afrique"},{"nom":"Maroua","pays":"Cameroun","continent":"Afrique"}],"categorie":[{"nom":"Ordinateurs","tag":"CAT1293","flag":"machine"},{"nom":"Téléphones","tag":"CAT1393","flag":"phone"},{"nom":"Soprt et Divertissement","tag":"CAT1193","flag":"sport"},{"nom":"Vetement","tag":"CAT1193","flag":"vetement"}],"like":21,"share":14,"sell":3,"rate":3,"visits":34,"advisor":14}];
+                var DATA = DATA_FULLY;
+                
+                $(".nombre_boutiques").html(DATA_FULLY.length);
+                function initBoutiques(){
+                    var TRI_LIKE = DATA.sort(function(a,b){return a.like - b.like;});
+                    var TRI_SELL = DATA.sort(function(a,b){return a.sell - b.sell;});
+                    $("#list-boutique-1").html("");
+                    $("#list-boutique-2").html("");
+                    TRI_LIKE.forEach(function(item,index){
+                        if(index<6)
+                            $("#list-boutique-1").prepend(makeItem(item));
+                    });
+                    TRI_SELL.forEach(function(item,index){
+                        if(index<6)
+                            $("#list-boutique-2").prepend(makeItem(item));
+                    });
+                }
+                initBoutiques();
+                $("#seach_shop").change(function(){searchWord([$(this).val()]);});
+                function searchWord(words){
+                    console.log(words);
+                    DATA = [];
+                    DATA_FULLY.forEach(function(item,index){
+                        for(var i=0;i<words.length;i++){
+                            var word = words[i];
+                            if(node_sub_string_search_boutique(item,word)){
+                                DATA.push(item);
+                                return;
+                            }
+                        }
+                    });
+                    initBoutiques();
+                }
+                function node_sub_string_search_boutique(item, str) {
+                    var str2 = str.toLowerCase();
+                    if (item.nom.toLowerCase().search(str2) >= 0)
+                        return true;
+
+                    if (item.code.toLowerCase().search(str2) >= 0)
+                        return true;
+                    for (var i = 0; i < item.categorie.length; i++) {
+                        if (item.categorie[i].nom.toLowerCase().search(str2) >= 0)
+                            return true;
+                    }
+                    return false;
+                }
+                $(".currencies_ul li").click(function(){ searchWord( $(this).attr("data").split(" ") );});
+            }
+    );
+</script>

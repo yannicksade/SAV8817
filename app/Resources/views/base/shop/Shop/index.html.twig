@@ -1,0 +1,37 @@
+{% extends "::base/shop/layout.html.twig" %}
+
+{% block title %}
+  Accueil - {{ parent() }}
+{% endblock %}
+{% block classBody %}common-home{% endblock %}
+
+{% block bodyContent %}
+
+  {# nous pouvons aussi inclure ci dessous; une variable passée à l'aide de include passe directement à la page html alors que avec {{ render }}, elle passe par le controlleur.
+    {{ render(controller('EasyTShopBundle:Home:getBanniere')) }} #}
+    
+    {{ include ('::base/shop/Shop/Home/banniere.html.twig') }}
+    <div class="container page-builder-ltr">
+        <div class="row row_nfjd row-styl">
+          {{ include ('::base/shop/Shop/Home/featured_categories.html.twig') }}
+          {{include ('::base/shop/Shop/Home/today_deals.html.twig') }}
+          {{include ('::base/shop/Shop/Home/reduction.html.twig') }}
+          {{include ('::base/shop/Shop/Home/fashion.html.twig') }}
+          {{include ('::base/shop/Shop/Home/electronics.html.twig') }}
+          {{include ('::base/shop/Shop/Home/sport.html.twig') }}
+          {{include ('::base/shop/Shop/Home/banniere_bottom.html.twig') }}
+          {{include ('::base/shop/Shop/Home/weekly_featured.html.twig') }}
+        </div>
+    </br>
+  </div>
+
+<script type="text/javascript">
+  /*deja initialialisé dans le script du cart (cart.html) l'initialiser à nouveau ecrase ces valeurs. à default nous pouvons le reconstruire avec les donnees deja ajoutees au pannier*/ 
+
+</script>
+
+{% endblock %}
+
+{% block javascripts %}
+  {{ parent() }}
+{% endblock %}

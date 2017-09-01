@@ -1,9 +1,9 @@
 apm_core_super-admin_role-edit:
     path:     /role/
-    defaults: { _controller: "APMCoreBundle:UserRole:grantRole" }
+    defaults: { _controller: "APMCoreBundle:Staff/UserRole:grantRole" }
     methods:  [GET, POST]
 
 apm_core_super-admin_role-show:
     path:     /show/{id}
-    defaults: { _controller: "APMCoreBundle:UserRole:grantRoleShow" }
+    defaults: { _controller: "APMCoreBundle:Staff/UserRole:grantRoleShow" }
     methods:  GET

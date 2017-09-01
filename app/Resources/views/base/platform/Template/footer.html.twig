@@ -1,0 +1,322 @@
+ <div class="footer-container">
+         <footer id="footer">
+            <div class="row full-width gray-background offset-1 inset-1 ">
+               <div class="col-lg-12 container  bottom-title">
+                  <div class="module border-bottom">
+                     <div id="cmsinfo_block" class="row">
+                        <div class="col-xs-6 col-md-3">
+                           <div class="item">
+                               <h4 class="thin-icon-question"><a style="color:white !important;" href='mailto:feavfeav@gmai.com'>QUESTION?</a></h4>
+                              <p>Une question, contactez nous</p>
+                           </div>
+                        </div>
+                        <div class="col-xs-6 col-md-3">
+                           <div class="item">
+                               <h4 class="thin-icon-transport"><a style="color:white !important;"  href="{{path('evm_transporteur_all')}}">TRANSPORT</a></h4>
+                              <p>Nous agences de livraison</p>
+                           </div>
+                        </div>
+                        <div class="col-xs-6 col-md-3">
+                           <div class="item">
+                               <h4 class="thin-icon-shop"><a style="color:white !important;"  href="{{path('evm_boutique_all')}}">BOUTIQUE</a></h4>
+                              <p>OUvrez une boutique pour demarrer votre activite</p>
+                           </div>
+                        </div>
+                        <div class="col-xs-6 col-md-3">
+                           <div class="item">
+                               <h4 class="thin-icon-dash"><a  style="color:white !important;" >ADMINISTRATION</a></h4>
+                              <p>Mannagez your plaforme</p>
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+            </div>
+            <div class="wrapper gray-background">
+               <div class="row full-width">
+                  <div class="col-lg-12 container_">
+                     <div class="row">
+                        <div class="col-xs-12 col-sm-3   ">
+                           <div class="module ">
+                              {#  Block CMS module footer #}
+                              <section class="footer-block" id="block_various_links_footer">
+                                 <h4>Informations</h4>
+                                 <ul class="toggle-footer" style="">
+                                    <li class="item">
+                                       <a href="" title="Promotions">
+                                       Promotions
+                                       </a>
+                                    </li>
+                                    <li class="item">
+                                       <a href="" title="Nouveaux produits">
+                                       Nouveaux produits
+                                       </a>
+                                    </li>
+                                 </ul>
+                              </section>
+                              {#  /Block CMS module footer #}
+                           </div>
+                        </div>
+                        <div class="col-xs-12 col-sm-3   ">
+                           <div class="module ">
+                              {#  Block categories module #}
+                              <section class="blockcategories_footer footer-block">
+                                 <h4>Catégories</h4>
+                                 <div class="category_footer toggle-footer" style="">
+                                    <div class="list">
+                                       <ul class="tree dhtml">
+                                          <li>
+                                             <a href="">
+                                             Electronique
+                                             </a>
+                                          </li>
+                                          <li>
+                                             <a href="">
+                                             Santé
+                                             </a>
+                                          </li>
+                                       </ul>
+                                    </div>
+                                 </div>
+                                 {#  .category_footer #}
+                              </section>
+                              {#  /Block categories module #}
+                           </div>
+                        </div>
+                        <div class="col-xs-12 col-sm-3   ">
+                           <div class="module ">
+                              {#  Block myaccount module #}
+                              <section class="footer-block">
+                                 <h4>
+                                    <a href="" title="Gérer mon compte client" rel="nofollow">Mon compte</a>
+                                 </h4>
+                                 <div class="block_content toggle-footer" style="">
+                                    <ul class="bullet">
+                                       <li>
+                                          <a href="" title="Mes commandes" rel="nofollow">Mes commandes</a>
+                                       </li>
+                                       <li>
+                                          <a href="">Mes retours de marchandise</a>
+                                       </li>
+                                    </ul>
+                                 </div>
+                              </section>
+                              {#  /Block myaccount module #}
+                           </div>
+                        </div>
+                        <div class="col-xs-12 col-sm-3   ">
+                           <div class="module ">
+                              {#  MODULE Block contact infos #}
+                              <section id="block_contact_infos" class="footer-block">
+                                 <div>
+                                    <h4>APM</h4>
+                                    <ul class="toggle-footer" style="">
+                                       <li>
+                                          <i class="fa fa-map-marker"></i>
+                                          Hi Tel
+                                          , Maroua Cameroun
+                                       </li>
+                                       <li>
+                                          <i class="fa fa-phone"></i>
+                                          <span>
+                                          <a href="tel:0123-456-789">
+                                          0123-456-789
+                                          </a>
+                                          </span>
+                                       </li>
+                                       <li>
+                                          <i class="fa fa-envelope"></i>
+                                          <span><a href="mailto:">info@demolink.org</a></span>
+                                       </li>
+                                    </ul>
+                                 </div>
+                              </section>
+                              {#  /MODULE Block contact infos #}
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+               <div class="row full-width gray-background">
+                  <div class="col-lg-12 container_ text-center" style="background: #bdb8b8;color: white;line-height: 0">
+                     <div class="bottom-footer">
+                        <a class="_blank" href="" target="_blank"> © 2017 - Hi Tel™ </a>
+                        <br>
+                        <center>
+                           <img src="{{app.request.getSchemeAndHttpHost() ~ asset('plateform/demo/payment/payment.png')}}" class="search-elt-img" style="width: 25%;margin-top: 10px">
+                        </center>
+                     </div>
+                  </div>
+               </div>
+            </div>
+         </footer>
+      </div>
+
+
+
+      <script src="{{app.request.getSchemeAndHttpHost() ~ asset('plateform/js/bootstrap.min.js')}}" type="text/javascript"></script>
+      <script src="{{app.request.getSchemeAndHttpHost() ~ asset('plateform/js/jquery.bootstrap.wizard.js')}}" type="text/javascript"></script>
+      {#   Plugin for the Wizard #}
+      <script src="{{app.request.getSchemeAndHttpHost() ~ asset('plateform/js/paper-bootstrap-wizard.js')}}" type="text/javascript"></script>
+      {#   More information about jquery.validate here: http://jqueryvalidation.org/   #}
+      <script src="{{app.request.getSchemeAndHttpHost() ~ asset('plateform/js/jquery.validate.min.js')}}" type="text/javascript"></script>
+      <script src="{{app.request.getSchemeAndHttpHost() ~ asset('plateform/js/jquery.bxslider.js')}}"></script>
+      <script src="{{app.request.getSchemeAndHttpHost() ~ asset('plateform/hitel/js/foot_init.js')}}" type="text/javascript"></script>
+      <style type="text/css">
+         .num_prod {
+            background: #297890;
+            color: white !important;
+            border-radius: 100%;
+            height: 20px;
+            width: 20px;
+            line-height: 1.7;
+            position: absolute;
+            top: -15px;
+            right: 10px;
+            font-size: smaller;
+            padding: 0 6px 5px 0;
+            box-shadow: 0 0 0 black;
+            text-shadow: 1px 2px 1px #0a252d;
+            border: black;
+        }
+         .content_prod{
+         position: relative;
+         }
+         @media(max-width: 1213){
+         .num_prod{display: none;}
+         }
+         #index .button-sub{
+         height: 30px;width: 174px;
+         background-image:url('{{app.request.getSchemeAndHttpHost() ~ asset('plateform/img/barre.png')}}');
+         color: white;
+         position: fixed;
+         top: 45%;
+         right: -650px;
+         z-index: 503;
+         /*display: none;*/
+         background-repeat: no-repeat;
+         background-size: 100% 100%;
+         background-color: none;
+         cursor: pointer;
+         text-align: center;
+         line-height: 1.9;
+         font-weight: 800;
+         font-size: 15px;
+         text-shadow: 1px 1px 2px black;
+         }
+         #index .button-sub:hover{
+         height: 30px;width: 174px;
+         background-image:url('{{app.request.getSchemeAndHttpHost() ~ asset('plateform/img/barre2.png')}}');
+         color: black;
+         right: 0px;
+         text-shadow: 1px 1px 2px white;
+         }
+         header {
+         background: #ffffff;
+         color: #153f4c;
+         box-shadow: 0px 1px 8px 0px rgba(0, 0, 0, 0.51);
+         }
+         #header>.wrapper .static-search #tmsearchbox .button-search:hover {
+         background: #3d9eb5 !important;
+         }
+         div.best-head {
+         /*box-shadow: 0px 2px 14px 0px #284c54 !important;*/
+         }
+         .btn-primary:before ,#header>.wrapper .static-search #tmsearchbox .button-search,div.best-head ,.btn-primary{
+         background: #297890 !important;
+         }
+         #header>.wrapper .inline-menu>.module {
+         border-top: 1px solid #297890 !important;
+         }
+         .gray-background {
+         background: #e3e9ea !important;
+         }
+         #header>.wrapper .static-search #tmsearchbox #tm_search_query ,.selector6 select {
+         border: 1px solid #297890 !important;
+         }
+         .background-red {
+            background: #e8e9f3;
+         }
+         a {
+         color: #164654 !important;
+         }
+         select.search_region, select.search_categories {
+         border-bottom: 1px solid #297890 !important;
+         border-top: 1px solid #297890 !important;
+         border-left: 1px solid #297890 !important;
+         }
+         .btn-primary {             
+         border-color: #1c5c6f  !important;
+         }
+         ul.padding-ul{
+         margin-bottom: 6px;
+         }
+         .F{
+         display: none;
+         }
+         ul.partenaire-part  li > img{
+         height: 55px;
+         width: 100px !important;
+         }
+         ul.partenaire-part  li {
+         width: 110px !important;
+         }
+         #tm_manufacturers_block div.bx-wrapper{
+         background-color: none !important   ;
+         border:none;
+         }
+         #tm_manufacturers_block a.bx-prev,#tm_manufacturers_block a.bx-next{
+         border:2px solid white;
+         }
+   
+         #cover{
+            background-color: #f18a37 !important;
+            transition-duration: 1s;
+            transition-property: background-color;
+         }
+         #cover:hover{
+            background-color: #3f7354 !important;
+            transition-duration: 4s;
+            transition-property: background-color;
+         }
+         #cover div.content{
+            margin-top: 20%;
+            transition-duration: 2s;
+            transition-property: margin-top;
+         }
+         .multi-item-carousel{
+    .carousel-inner{
+        > .item{
+            transition: 500ms ease-in-out left;
+        }
+        .active{
+            &.left{
+                left:-33%;
+            }
+            &.right{
+                left:33%;
+            }
+        }
+        .next{
+            left: 33%;
+        }
+        .prev{
+            left: -33%;
+        }
+        @media all and (transform-3d), (-webkit-transform-3d) {
+            > .item{
+                // use your favourite prefixer here
+                transition: 500ms ease-in-out left;
+                transition: 500ms ease-in-out all;
+                backface-visibility: visible;
+                transform: none!important;
+            }
+        }
+    }
+    .carouse-control{
+        &.left, &.right{
+            background-image: none;
+        }
+    }
+}
+</style>

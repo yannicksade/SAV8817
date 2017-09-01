@@ -35,6 +35,11 @@
     <!-- END THEME LAYOUT STYLES -->
     <link rel="shortcut icon" type="image/x-icon" href="{{ asset("dashboard/assets/apps/img/favicon.ico") }}"/>
 {% endblock stylesheets %}
+{% block custom_page_css %}
+    {% stylesheets 'dashboard/assets/pages/css/custom.css' filter='cssrewrite' %}
+    <link href="{{ asset_url }}" rel="stylesheet" type="text/css">
+    {% endstylesheets %}
+{% endblock custom_page_css %}
 
 {% block body_container %}
     <div class="page-header-fixed page-sidebar-closed-hide-logo page-content-white page-sidebar-closed">
@@ -2359,6 +2364,12 @@
         <!-- END NOTIFIC8 ALERT -->
     </div>
 {% endblock body_container %}
+
+{% block custom_page_js %}
+    {% javascripts 'dashboard/assets/pages/scripts/custom.js' %}
+    <script src="{{ asset_url }}" type="text/javascript"></script>
+    {% endjavascripts %}
+{% endblock custom_page_js %}
 
 {% block js %}
     <!-- BEGIN PAGE LEVEL PLUGINS -->

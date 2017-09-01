@@ -1,0 +1,13 @@
+/*------------------------------------------------------------------------
+ * @package So Popular tags
+ * @version 1.0.0
+ * @license http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
+ * @copyright (c) 2012 YouTech Company. All Rights Reserved.
+ * @author YouTech Company http://www.smartaddons.com
+ *
+ *-------------------------------------------------------------------------*/
+
+.box-content{ background:#fff; border:#f5f5f5 1px solid; padding:20px;display:inline-block}
+.box-content a{ background:#f8f8f8; padding:5px; color:#459fd6; float:left; margin:5px;}
+.box-content a:hover{background:#07a989; color: #fff;}
+.box-content p{color:#f00;}

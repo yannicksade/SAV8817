@@ -1,4 +1,4 @@
 apm_core_auditeur_index:
     path:     /
-    defaults: { _controller: "APMCoreBundle:Auditeur:index" }
+    defaults: { _controller: "APMCoreBundle:Staff/Auditeur:index" }
     methods:  GET

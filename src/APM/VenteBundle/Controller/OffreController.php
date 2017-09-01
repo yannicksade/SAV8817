@@ -689,7 +689,9 @@ class OffreController extends Controller
                     $dateCreate = $offre->getDateCreation()?$offre->getDateCreation()->format("d/m/Y - H:i"):'';
                     $dureeGarantie = $offre->getDureeGarantie();
                     $categorie = null !== $offre->getCategorie()?$offre->getCategorie():'';
-                    $boutique = $offre->getBoutique()?$offre->getBoutique():"<i>free lance</i>";
+                    $boutique = $offre->getBoutique();
+                    $aboutiqueRoute = "<i>free lance</i>";
+                   if(null !== $boutique)$aboutiqueRoute = '<a href="../boutique/' . $boutique->getId() . '/show" name="_boutique">' . $boutique . '</a>';
                     $dateExp = $offre->getDateExpiration()? $offre->getDateExpiration()->format("d/m/Y - H:i"):'';
                     $retourne = $offre->getRetourne() ? "OUI" : "NON";
                     $publier = $offre->getPubliable() ? "OUI" : "NON";
@@ -703,7 +705,7 @@ class OffreController extends Controller
                         <input type="hidden" name="_modelDeSerie" value="' . $offre->getModelDeSerie() . '"><input type="hidden" name="_unite" value="' . $offre->getUnite() . '"><input type="hidden" name="_quantite" value="' . $offre->getQuantite() . '"><input type="hidden" name="_remise" value="' . $offre->getRemiseProduit() . '"><input type="hidden" name="_rate" value="' . $offre->getEvaluation() . '"><input type="hidden" name="_type" value="' . $type_offre[$offre->getTypeOffre()] . '"><input type="hidden" name="_dataSheet" value="' . $offre->getDataSheet() . '"></label>',
                         '<a name="_code">' . $offre->getCode() . '</a>',
                         '<a href="' . $offre->getId() . '/show" name="_designation">' . $offre . '</a>',
-                        '<a href="../boutique/' . $boutique->getId() . '/show" name="_boutique">' . $boutique . '</a>',
+                        $aboutiqueRoute,
                         '<a name="_updatedAt">' . $updatedAt . '</a>',
                         '<span class="label label-sm label-' . (key($status_list[$etat])) . '"><input name="_etat" type="hidden" value="' . (current($status_list[$etat]))  . '"/>' . (current($status_list[$etat])) . '</span>'
                     );

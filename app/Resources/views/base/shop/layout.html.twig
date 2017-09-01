@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="format-detection" content="telephone=no" />
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>{% block title %}Shop{% endblock %}</title>
+        {% block stylesheets %}
+            <link rel="stylesheet" href="{{ asset('Shop/catalog/view/javascript/bootstrap/css/bootstrap.min.css') }}">
+            <link rel="stylesheet" href="{{ asset('Shop/catalog/view/javascript/font-awesome/css/font-awesome.min.css') }}">
+            <link rel="stylesheet" href="{{ asset('Shop/catalog/view/javascript/soconfig/css/lib.css') }}">
+            <link rel="stylesheet" href="{{ asset('Shop/catalog/view/theme/so-revo/css/ie9-and-up.css') }}">
+            <link rel="stylesheet" href="{{ asset('Shop/catalog/view/javascript/so_home_slider/css/style.css') }}">
+            <link rel="stylesheet" href="{{ asset('Shop/catalog/view/javascript/so_home_slider/css/animate.css') }}">
+            <link rel="stylesheet" href="{{ asset('Shop/catalog/view/javascript/so_home_slider/css/owl.carousel.css') }}">   
+            <link rel="stylesheet" href="{{ asset('Shop/admin/controller/extension/module/so_page_builder/assets/css/shortcodes.css') }}">
+            <link rel="stylesheet" href="{{ asset('Shop/catalog/view/javascript/so_deals/css/style.css') }}">
+            <link rel="stylesheet" href="{{ asset('Shop/catalog/view/javascript/so_deals/css/css3.css') }}">
+            <link rel="stylesheet" href="{{ asset('Shop/catalog/view/javascript/so_extra_slider/css/style.css') }}">
+            <link rel="stylesheet" href="{{ asset('Shop/catalog/view/javascript/so_extra_slider/css/css3.css') }}">
+            <link rel="stylesheet" href="{{ asset('Shop/catalog/view/javascript/so_listing_tabs/css/so-listing-tabs.css') }}">
+            <link rel="stylesheet" href="{{ asset('Shop/catalog/view/javascript/so_latest_blog/css/style.css') }}">
+            <link rel="stylesheet" href="{{ asset('Shop/admin/controller/extension/module/so_page_builder/shortcodes/content_slider/css/content_slider.css') }}">
+            <link rel="stylesheet" href="{{ asset('Shop/catalog/view/javascript/so_page_builder/css/style_render_244.css') }}">
+            <link rel="stylesheet" href="{{ asset('Shop/catalog/view/javascript/so_page_builder/css/style.css') }}">
+            <link rel="stylesheet" href="{{ asset('Shop/catalog/view/javascript/so_newletter_custom_popup/css/style.css') }}">
+            <link rel="stylesheet" href="{{ asset('Shop/catalog/view/javascript/so_sociallogin/css/so_sociallogin.css') }}">
+            <link rel="stylesheet" href="{{ asset('Shop/catalog/view/javascript/so_searchpro/css/so_searchpro.css') }}">
+            <link rel="stylesheet" href="{{ asset('Shop/catalog/view/javascript/so_megamenu/so_megamenu.css') }}">
+            <link rel="stylesheet" href="{{ asset('Shop/catalog/view/javascript/so_megamenu/wide-grid.css') }}">
+
+            <link rel="stylesheet" href="{{ asset('Shop/catalog/view/theme/so-revo/css/layout1/blue.css') }}">
+
+            <link rel="stylesheet" href="{{ asset('Shop/catalog/view/theme/so-revo/css/header/header1.css') }}">
+            <link rel="stylesheet" href="{{ asset('Shop/catalog/view/theme/so-revo/css/footer/footer1.css') }}">
+            <link rel="stylesheet" href="{{ asset('Shop/catalog/view/theme/so-revo/css/responsive.css') }}">
+
+            <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,600,700" rel="stylesheet" type="text/css">    
+            <link href="https://fonts.googleapis.com/css?family=Raleway:600,700" rel="stylesheet" type="text/css">  
+            <!-- ces scripts seront utilisés par certaines pages avant la fin de leurs execution d'ou la necessité de les mettres dans l'entete  -->
+            <script src="{{ asset('Shop/catalog/view/javascript/jquery/jquery-2.1.1.min.js') }}"></script><!--
+<script src="{{ asset('Shop/jquery-2.0.0.min.js') }}"></script>
+-->
+    <!--<script src="https://code.jquery.com/jquery-2.2.0.min.js" type="text/javascript"></script>-->
+            <script src="{{ asset('Shop/catalog/view/javascript/bootstrap/js/bootstrap.min.js') }}"></script>
+            <script src="{{ asset('Shop/catalog/view/javascript/so_home_slider/js/owl.carousel.js') }}"></script>
+            <script src="{{ asset('Shop/catalog/view/theme/so-revo/js/so.custom.js') }}"></script>
+
+            <style type="text/css">
+                body{font-family:Open Sans, sans-serif;}
+                #product-add-alert{
+                    right: 0px;
+                    top: 0px;
+                    z-index: 9999;
+                    color: #333;
+                    position: fixed;
+                    display: none;
+                }
+                #product-add-alert .notification-content{
+                    background-color: #F1F1F1;
+                    text-align: left;
+                    border-radius: 3px;
+                    min-height: 40px;
+                    margin: 10px;
+                    box-shadow: 0px 1px 0px 0px rgba(0, 0, 0, 0.1), 0px 0px 0px 1px rgba(0, 0, 0, 0.08), 0px 1px 5px 0px rgba(0, 0, 0, 0.2);
+                    padding: 10px;
+                    width: 250px;
+                }
+                img.img-prod-add-alert{
+                    float: left;
+                }
+                img.img-prod-add-alert{
+                    max-width: 25%;
+                    height: 100%;
+                    max-height: 50px;
+                }
+            </style>
+
+            <link rel="icon" type="image/x-icon" href="{{ asset('Shop/image/catalog/cart.png') }}" /><!-- icone comme onglet du site -->
+        {% endblock %}
+    </head>
+
+    <body class="ltr res layout-1 {% block classBody %}{% endblock %}">
+
+        {% block body %}
+            <div id="wrapper" class="wrapper-full banners-effect-1"> 
+                <div id="product-add-alert" class="top-right add-alert">
+                    <!--<audio controls>
+                        <audio id="audioPlayer" src="{{ asset('Shop/sonBip/beep-beep-_3oy6k5si.mp3')}}" type="audio/mpeg"></audio>
+                    </audio>-->
+                    <div class="notification-content">
+
+                    </div>
+                </div>
+            
+                <div class="preloader_hitel"> </div>        
+
+                <script type="text/javascript">
+                    // 1.Double Bounce loader
+                    $output = '';
+                    $output += '<div class="so-pre-loader">';
+                    $output += '<div class="so-loader-center">';
+                    $output += '<div class="spinner-circle">';
+                        $output += '<div class="sk-circle1 sk-child"></div>';
+                        $output += '<div class="sk-circle2 sk-child"></div>'; 
+                        $output += '<div class="sk-circle3 sk-child"></div>'; 
+                        $output += '<div class="sk-circle4 sk-child"></div>'; 
+                        $output += '<div class="sk-circle5 sk-child"></div>'; 
+                        $output += '<div class="sk-circle6 sk-child"></div>'; 
+                        $output += '<div class="sk-circle7 sk-child"></div>'; 
+                        $output += '<div class="sk-circle8 sk-child"></div>'; 
+                        $output += '<div class="sk-circle9 sk-child"></div>'; 
+                        $output += '<div class="sk-circle10 sk-child"></div>'; 
+                        $output += '<div class="sk-circle11 sk-child"></div>'; 
+                        $output += '<div class="sk-circle12 sk-child"></div>'; 
+                    $output += '</div>'; 
+                    $output += '</div>'; 
+                    $('.preloader_hitel').append($output);
+                </script>
+
+                <header id="header" class=" variant typeheader-1">
+                    {% include "::base/shop/header/header-top.html.twig" %}
+                    {% include "::base/shop/header/header-center.html.twig" %}
+                    {% include "::base/shop/header/header-bottom.html.twig" %}
+                </header>
+
+                {% block bodyContent %} {% endblock %}
+
+                <footer class="footer-container typefooter-1">
+                    {# inclure les footer ici #}
+                    {% include "::base/shop/footer/footer-top.html.twig" %}
+                    {% include "::base/shop/footer/footer-center.html.twig" %}
+                    {% include "::base/shop/footer/footer-bottom.html.twig" %}
+                </footer>
+                <div class="back-to-top"><i class="fa fa-angle-up"></i></div>
+            </div>
+        {% endblock %}
+
+        {% block javascripts %}
+{#   start    block librairy       #}
+            <script src="{{ asset('Shop/plugin/animationCounter.min.js') }}"></script>
+            <script src="{{ asset('Shop/catalog/view/javascript/soconfig/js/libs.js') }}"></script>
+            <script src="{{ asset('Shop/catalog/view/javascript/soconfig/js/so.system.js') }}"></script>
+            <script src="{{ asset('Shop/catalog/view/theme/so-revo/js/jquery.easyembed.js') }}"></script>
+            <script src="{{ asset('Shop/catalog/view/theme/so-revo/js/common.js') }}"></script>
+            <script src="{{ asset('Shop/admin/controller/extension/module/so_page_builder/assets/js/shortcodes.js') }}"></script>
+            <script src="{{ asset('Shop/admin/controller/extension/module/so_page_builder/shortcodes/content_slider/js/content_slider.js') }}"></script>
+            <script src="{{ asset('Shop/catalog/view/javascript/so_page_builder/js/section.js') }}"></script>
+            <script src="{{ asset('Shop/catalog/view/javascript/so_page_builder/js/modernizr.video.js') }}"></script>
+            <script src="{{ asset('Shop/catalog/view/javascript/so_page_builder/js/swfobject.js') }}"></script>
+            <script src="{{ asset('Shop/catalog/view/javascript/so_page_builder/js/video_background.js') }}"></script>
+            <script src="{{ asset('Shop/catalog/view/javascript/so_megamenu/so_megamenu.js') }}"></script>
+            <script src="{{ asset('Shop/catalog/view/theme/so-revo/js/hitel/header/nav_fixed_scroll.js') }}"></script>
+
+{#   end    block librairy       #}
+
+
+{#   start    block panier and stockageCart in locage    cart.html.twig   #}
+            {% include '::base/shop/js/cart/produit.js.twig'%}
+            {% include '::base/shop/js/cart/panier.js.twig'%}
+            {% include '::base/shop/js/compare.js.twig'%}
+            {% include '::base/shop/js/cart/cartDOM.js.twig'%}
+                        
+        {% endblock %}
+    </body>
+</html>

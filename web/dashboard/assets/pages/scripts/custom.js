@@ -7,16 +7,17 @@
 var GlobalPageCustomScript = function () {
     var actionConfirm;
     var modalConfirm = $('#modal-confirm');
-    var tabElement_1 = $('#tab_1'),
-        tab1 = document.querySelector('#tab1');
+    var tab1 = document.querySelector('#tab1');
+    var tab2 = document.querySelector('#tab2');
     var uploadedFile;
-    var isEditMode = false;
     var notifAlert;
     var nbProcessusEnCours = 0;
     var labelProcess = $('#ajax-label-process');
 
     var uncheckBoxes = function (parent) {
-        $('input[type="checkbox"]:checked', parent).attr('checked', false);
+        $('input[type="checkbox"]:checked', parent).each(function () {
+            $(this).click();
+        });
     };
     var getCheckedBoxes = function (parent) { //:nth-child(1)
         return $('.checkboxes:checked', parent);
@@ -33,8 +34,7 @@ var GlobalPageCustomScript = function () {
         'tab3': '#modal-tab_3',
         'tab4': '#modal-tab_4',
         'tab5': '#modal-tab_5',
-        'contentTabActive': '#modal-tab_1',
-        'linkTabActive': 'a[href="#modal-tab_1"]'
+        'bodyContainer': '#tab_1'
     };
     var modifierImpl = function (parent) {
         //------ Compress the table 1 -----------------
@@ -46,30 +46,11 @@ var GlobalPageCustomScript = function () {
         //reinitialize the form
         $('input[type="reset"]', form).click();
     };
-    /*var modifier = function () {
-        $('.edit_item').click(function () {
-            var p = $(this).parents(); //dans le body
-            if (!$(p[0]).hasClass('modal-footer')) { //chargement du formulaire partant du tableau
-                //body data content
-                modifierImpl(p[5]);
-                 $('.checkboxes:checked', p[5]).each(function () {
-                        var p = $(this).parents();
-                        tableToFormLoad(p[2], parent);// 1- a row of the table 2- portlet, parent of the form
-                        uncheckBoxes(p[1]); //td cell
-                });
-            } else {
-                modifierImpl(modal_stk.bodyContainer);
-                modalToFormLoad(modal_stk.bodyContainer);
-            }
-            isEditMode = true;
-        });
-    };*/
     var supprimer = function () {
         $('.delete_item').click(function () {
             var elt, elements = [];
             var child = this;
             var table = $('.data-content .datatable_ajax');
-            //alt.removeEventListener('click',null, false);
             var p = $(child).parents();
             if ($(p[0]).hasClass('modal-footer')) {//suppression à partir de la modal
                 elements[0] = $('input[name="_id"]', p[1]).val();
@@ -87,7 +68,6 @@ var GlobalPageCustomScript = function () {
 
             }
             actionConfirm = 1; //s'assurer que l'action ne vient pas d'ailleurs
-
             modalConfirm.on('click', '#action-confirm', function () {
                 if (actionConfirm !== 1) return;
                 if (elements.length > 0) anActionForm(child, elements, table);
@@ -123,66 +103,52 @@ var GlobalPageCustomScript = function () {
             $(set).each(function () {
                 $(this).prop("checked", checked);
             });
-            var p = $(this).parents()[2]; //form
+            var p = $(this).parents('form'); //form
             if (this.checked) {
                 $('input[type="submit"]', p).attr('disabled', false);
-                $('input[type="text"]', p).attr('readonly', false);
-                $('select, textarea', p).attr('disabled', false);
+                $('input[type="text"], textarea', p).attr('readonly', false);
+                $('select', p).attr('disabled', false);
                 $('.code', p).attr('readonly', true);
-                if (isEditMode) $('.form-group .copier', p).attr('disabled', false);
             } else {
                 $('input[type="submit"]', p).attr('disabled', true);
-                $('input[type="text"]', p).attr('readonly', true);
-                $('select, textarea', p).attr('disabled', true);
-                if (isEditMode) $('.form-group .copier', p).attr('disabled', true);
+                $('input[type="text"], textarea', p).attr('readonly', true);
+                $('select', p).attr('disabled', true);
             }
         });
         //control des boutons individuels
-        $('input[type="checkbox"].input-group-addon').change(function () { //individual check and enabling text input
-            var p = $(this).parents()[1];// input-group
+        $('.input-group-addon input[type="checkbox"]').change(function () { //individual check and enabling text input
+            var p = $(this).parents('.form-group');//
             if (this.checked) {
-                $('input[type="text"]', p).attr('readonly', false);
-                $('select, textarea', p).attr('disabled', false);
+                $('input[type="text"], textarea', p).attr('readonly', false);
                 $('.code', p).attr('readonly', true);
                 $(this).attr("checked", true);
-                if (isEditMode) $('input[type="submit"]', p[2]).attr('disabled', false);
             } else {
-                $('input[type="text"]', p).attr('readonly', true);
-                $('select, textarea', p).attr('disabled', true);
+                $('input[type="text"], textarea', p).attr('readonly', true);
                 $(this).attr("checked", false);
-                if (isEditMode) $('input[type="submit"]', p[2]).attr('disabled', true);
-                alert('2');
             }
-        });
-        //---- cloner une entrée déjà existente --------
-        $('.form-element .copier').click(function () {
-            $('.alerte', modalConfirm).html('Vous êtes sur le point de cloner une offre. Il est conseillé de modifier quelque propriétée pour les différencier! <br/> Voulez-vous continuer ?');
-            var btn = this;
-            actionConfirm = 2;
-            modalConfirm.on('click', '#action-confirm', function () { ///créer la modal
-                if (actionConfirm !== 2) return;
-                var p = $(btn).parents;
-                $('.code', p[1]).val('mode clonage activé.');
-                $('.id', p[1]).val('');
-            });
         });
         //handle submitted buttons
         $('input[type="submit"]').click(function (e) {
             e.preventDefault();
             var btn = e.target;
+            var id = null;
             if (btn.id === "crop") {
+                id = $('input[name="_id"]', modal_stk.modalElement).val();
                 $(btn).attr('data-href', 'image');
             } else uploadedFile = null; //<-- add condition here
-            ajaxForm(this, uploadedFile, $('input[name="_id"]', modal_stk.modalElement).val());
+            ajaxForm(this, uploadedFile, id);
         });
+
         $('.charger-image').click(function () { //manager une image
             reinitializeModal();
             $('#modal-tab_3').removeClass('hidden');
             $(modal_stk.modalTab3, modal_stk.modalElement).parent().removeClass('hidden');
-            $(modal_stk.modalTab3, modal_stk.modalElement).parents('.data-content').find('.alerte').addClass('hidden');
-            $(modal_stk.modalTab3, modal_stk.modalElement).click();
+            $(modal_stk.modalTab3, modal_stk.modalElement).parents('.modal').find('.alerte').addClass('hidden');
+            $(modal_stk.modalTab3, modal_stk.modalElement).click(); // go to the third tab
         });
+
         $('.alerte', modal_stk.modalElement).html('<strong>Aucun élément sélectionné</strong>');
+
         $('.composer_item').click(function () {
             modifierImpl($(this).parents('.data-content'));
         });
@@ -272,14 +238,13 @@ var GlobalPageCustomScript = function () {
     };
     var ajaxForm = function (element, file, oData) {
         var item_sp, parent;
-        // data-content; where the data of the form is located
-        /*--------  seek the form -------------*/
+        /*--------  search for the form -------------*/
         var form = element.parentNode;
         var f_form = $(element).parents('form'); //target
         var form_name = f_form.attr('name');
         for (; $(form).attr('name') !== form_name && form !== null;) form = form.parentNode;
         //--------------------------------------
-        parent = $(form).parents('.data-content');
+        parent = $(form).parents('.data-content'); // data-content is where the data of the form is located
         if (form === null) return;
         var formData = new FormData(form);
         if (file) formData.append('file', file);
@@ -398,25 +363,19 @@ var GlobalPageCustomScript = function () {
                 json = JSON.parse(json);
                 var ids = json.ids;
                 if (ids && json.action == 3) {
-                  option.DataTable().ajax.reload();
+                    option.DataTable().ajax.reload();
                 }
             }
         });
     };
     var reset = function () {
         $('input[type="reset"], a[type="reset"]').click(function () {
-
             var p = $(this).parents('form');
-
             if (p.hasClass('data-form')) {//form on the direct body
-                $('input[type="text"]', p).attr('readonly', true);
-                $('select, textarea', p).attr('disabled', true);
+                $('input[type="text"], textarea', p).attr('readonly', true);
                 $('input[type="submit"]', p).attr('disabled', true);
-                $('.form-group .copier', p).attr('disabled', true);
-                $('input[type="text"]', p).val('');
-                //isEditMode = false;
+                uncheckBoxes(p);
             }
-
             if ($(this).hasClass('reset-image')) {
                 $('.big-view', p).remove();
                 $('.preview-pane', p).remove();
@@ -434,6 +393,7 @@ var GlobalPageCustomScript = function () {
     };
     var displayText = function (display, parent) { //display = where to display text; parent = where to retreive data from
         $('.alerte', display).addClass("hidden"); //cacher l'affichage
+        $('.data-content', modal_stk.modalElement).removeClass("hidden"); //afficher tous les tabs du modals
         $('.data-content .display-control-static', display).each(function () {
             var input = $('[name="' + $(this).attr("data-display") + '"]', parent);
             if (input.is('a')) {
@@ -445,37 +405,43 @@ var GlobalPageCustomScript = function () {
         });
         $('[name="_id"]', display).val($('[name="_id[]"]', parent).val());
     };
-    var play = function (parent) {
-        //var parent = $(e).parents('.portlet');
+    var play = function (elt) {
+        var p = $(elt).parents();
+        displayText(modal_stk.modalElement, p[2]); // tr line
+    };
+    var ready = function (parent) {
         reinitializeModal();
-        var cboxes = getCheckedBoxes($('tbody', parent));
-        var nb = cboxes.length;
-        if (cboxes === undefined || nb === 0)return;
-        for (var i = 0; i < nb; i++) {
-            var elt = cboxes[i];
-            setTimeout(function () {
-                var p = $(elt).parents();
-                displayText(modal_stk.modalElement, p[2]); // row line portlet. afficherImpl
-                uncheckBoxes(p[1]); //td cell
-            }, 100);
+        var cbs =[] ;
+        cbs= getCheckedBoxes($('tbody', parent));
+        var nb = cbs.length;
+        var elt;
+        if(nb > 0) {
+            elt = $(cbs).first();
+            play(elt);
         }
+        var i=1;
+        $('#play-next').click(function () {
+            nb--;
+            if(nb > 0){
+                elt = cbs[i];
+                play(elt);
+            }
+            i++;
+        });
     };
     var reinitializeModal = function () {
-        // $('.data-content', modal_stk.modalElement).addClass("hidden");
+        $('.data-content', modal_stk.modalElement).addClass("hidden");
         $('.alerte', modal_stk.modalElement).removeClass("hidden");
-        /*$('.id', modal_stk.modalElement).val('');
-         $('td', modal_stk.modalElement).text('');*/
-        //réinitialisation de la tab
-        $(modal_stk.modalTab1, modal_stk.modalElement).click(); //cback to the first tab
+        $('[name="_id"]', modal_stk.modalElement).val('');
+        $('td', modal_stk.modalElement).text('');
+        $(modal_stk.modalTab1, modal_stk.modalElement).click(); //go back to the first tab
     };
     var afficher = function () {
         //-------------------------- voir ---------------------
         $('.see_item').click(function () {
-            $('.data-content', modal_stk.modalElement).removeClass("hidden"); //actualiser les tabs du modals
-            play($(this).parents('.data-content')); // remplacer "this" par le "parent" pour une rotation des elements selections
+            ready($(this).parents('.data-content')); // remplacer "this" par le "parent" pour une rotation des elements selectionés
         });
     };
-
     return {
         ajaxForm: ajaxForm, //submit post form
         anActionForm: anActionForm, //submit delete form
@@ -494,7 +460,7 @@ var GlobalPageCustomScript = function () {
             });
             tab1.onclick = function () { //gestion des affichages avec  deux modal
                 modal_stk.modalElement = '#m-ajax';
-                modal_stk.bodyContainer = tabElement_1;
+                modal_stk.bodyContainer = '#tab_1';
             };
         }
     };

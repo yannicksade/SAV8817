@@ -1,0 +1,41 @@
+<div class="selector6" style="width: 30%;border:">
+    {% if sup_prod is defined %}
+        {% if sup_prod > 0 %}
+   <button class="indicatif-type"><img src="{{app.request.getSchemeAndHttpHost() ~ asset('plateform/demo/colors/red.jpg')}}" class="type-index type-prod"/> PRODUITS</button>
+   <button class="indicatif-type"><img src="{{app.request.getSchemeAndHttpHost() ~ asset('plateform/demo/colors/blue.jpg')}}" class="type-index type-prod"/> SERVICES</button>
+   <button class="indicatif-type"><img src="{{app.request.getSchemeAndHttpHost() ~ asset('plateform/demo/colors/green.jpg')}}" class="type-index type-prod"/> ARTICLES</button>
+   <select name="search_type_prod" style="width: 100%;border: 1px solid  black;border-right: none;height: 33px" class="form-controlp search_categories">
+               <option>Tous les types</option>
+               <option value="12">---PRODUITS</option>
+               <option value="12">---SERVICES</option>
+               <option value="12">---ARTICLES</option>
+   </select>
+        {% endif %}
+    {% endif %}
+    {% if sup_loc is defined %}
+        {% if sup_loc > 0 %}
+   <hr>
+    <select name="search_continent" style="width: 100%;border: 1px solid  black;border-right: none;height: 33px" class="form-controlp search_categories margin-bot-5">
+               <option>Tous les continents</option>
+               <option value="12">---Afriaue</option>
+               <option value="12">---Europe</option>
+               <option value="12">---Asie</option>
+               <option value="12">---Amerique</option>
+   </select>
+    <select name="search_pays" style="width: 100%;border: 1px solid  black;border-right: none;height: 33px" class="form-controlp search_categories margin-bot-5">
+               <option>Tous les Pays</option>
+               <option value="12">---Cameroun</option>
+               <option value="12">---Benin</option>
+               <option value="12">---Niger</option>
+               <option value="12">---Nigeria</option>
+   </select>
+    <select name="search_ville" style="width: 100%;border: 1px solid  black;border-right: none;height: 33px" class="form-controlp search_categories margin-bot-5">
+               <option>Toutes les Villes</option>
+               <option value="12">---Afriaue</option>
+               <option value="12">---Europe</option>
+               <option value="12">---Asie</option>
+               <option value="12">---Amerique</option>
+   </select>
+        {% endif %}
+    {% endif %}
+</div>

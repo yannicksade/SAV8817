@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="fr-fr" class="desktop portrait">
+   {% include "::base/platform/Template/init_header.html.twig" %}
+   <body id="index" class="index hide-left-column hide-right-column lang_fr  one-column">
+      
+      {% block bef_header %}{% endblock bef_header %}
+
+      {% include "::base/platform/Template/header.html.twig" %}
+
+      {% block evm_body %}{% endblock evm_body %}
+
+
+      {% include "::base/platform/Template/connexion_modal.html.twig" %}
+      <a href="#" id="ui-to-top" class="ui-to-top fa fa-angle-up active"></a>
+      <hr>
+      {% include "::base/platform/Template/partenaire.html.twig" %}
+      {% include "::base/platform/Template/footer.html.twig" %}
+
+
+   </body>
+</html>

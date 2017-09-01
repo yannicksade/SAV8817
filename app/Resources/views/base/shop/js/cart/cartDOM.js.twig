@@ -1,0 +1,103 @@
+
+<script type="text/javascript">
+//localStorage.clear();
+
+  showCart();
+  function addCart(id, qte){
+    if(qte != 1) // le produit demande à etre commandé en plusieurs qte
+      qte = $('#product input.form-control.qte').val();
+    var $a;
+    var alertAddProd = $('#product-add-alert .notification-content');
+    $.ajax({
+    type: 'GET',
+    url: "{{path('easy_t_product_ID')}}",
+    data:{id:id},  
+    //data:{id:id, qte:$qte},  
+    dataType:"json",/*
+    beforeSend: function() {
+    $('.button-group').on('click','button.addToCart', function(e){
+      e.preventDefault();
+      $a=$(this);
+      $a.button('loading'); 
+    });
+    },
+    complete: function() {
+    $a.button('reset');
+    },*/
+    success: function(data) {
+    addStorage(data, qte);
+    var path = "{{ asset('Shop/image/cache/catalog/demo/path')}}";
+    path = path.replace("path",data.path); 
+    $('#product-add-alert').fadeIn().delay(3000).fadeOut();
+    //$('#audioPlayer').play();
+    setTimeout(function(){ $('#product-add-alert .notification-content').html(""); }, 3100);
+    alertAddProd.append('<h5 style="font-weight:bold;">Product added to Cart</h5><img class="img-prod-add-alert" src="'+path+'"><p>'+data.model+' added to Shopping Cart</p>');
+    showCart(); // fonction qui affiche le panier de l'entete.
+    console.log(data);
+    },
+    error: function() {
+    alert('La requête n\'a pas abouti');
+    },
+    })
+  }
+
+  function addStorage(data, qte){
+    panier = new Panier();
+    panier.addProduit(new Produit(data.id, data.name, data.model, data.path, qte, data.priceUnit));
+    if (!localStorage['productCart']){  
+        var DATA = [];
+        DATA.push(panier.produits[0]);
+        localStorage['productCart'] = JSON.stringify(DATA);
+    }
+    else{
+        var LAST_DATA = JSON.parse(localStorage.getItem('productCart'));
+        LAST_DATA.forEach(
+            function(item,index){
+                panier.addProduit(new Produit(item.id, item.name, item.model, item.path, item.quantity, item.priceUnit));
+        });        
+        var NEW_DATA = panier.produits;
+        localStorage.setItem('productCart', JSON.stringify(NEW_DATA));
+        console.log(localStorage.getItem('productCart'));
+    }
+  }
+
+  function buildPanier(){
+    panier = new Panier();
+    var DATA_CART = JSON.parse(localStorage.getItem('productCart'));
+    DATA_CART.forEach(
+      function(item,index){
+        panier.addProduit(new Produit(item.id, item.name, item.model, item.path, item.quantity, item.priceUnit));
+      });
+    return panier;
+  }
+
+  /* cette fonction permet d'afficher ou de rafrechir du pannier de l'entete */
+  function showCart(){
+      panier  = new Panier();
+      panier = buildPanier();
+      $('#cart .shopcart span.items_cart').text(panier.getPoidPanier());
+      /*if(panier.produits.length == 0){
+         // $('.block-cart .shopping_cart #cart').html("<span style='text-align:center; font-size:15px; padding:10px;'>aucun produit commandé pour le moment</span>");
+      }*/
+      //else{
+          $('.block-cart .dropdown-menu table').find('tbody').html(""); //effacer le tableau pour un nouvel affichage
+          panier.produits.forEach(function(produit, index){
+          var path = "{{ asset('Shop/image/cache/catalog/demo/path')}}";
+          path = path.replace("path",produit.getPath()); 
+          $('.block-cart .dropdown-menu table').find('tbody').prepend('<tr><td class="text-center size-img-cart"><a href="{{ path('easy_t_product_detail', {'id_prod':'+produit.getId()+' }) }}"><img src="'+path+'" alt="'+produit.getName()+'" title="Palm Treo Pro" class="preview"></a></td><td class="text-left"><a class="cart_product_name" href="{{ path('easy_t_product_detail', {'id_prod': '+produit.getId()+'}) }}">'+produit.getModel()+'</a></td><td class="text-center"> X <span class="quantite">'+produit.getQuantity()+'</span> </td><td class="text-center">$'+(produit.getPriceUnit()*produit.getQuantity())+'</td><td class="text-right"><a onclick="removeCart('+produit.getId()+');" class="fa fa-trash-o" style="padding:3px;"></a></td></tr>');
+          });
+          $('.block-cart .dropdown-menu table').find('tbody').prepend('<tr style="font-size:15px;"><td colspan="5">'+panier.getPoidPanier()+' produits déjà ajoutés  ('+panier.produits.length+' type(s))<span class="pull-right"> Tolal: $'+panier.getPricePanier()+'</span></td></tr>');
+      //}
+  }
+
+  function removeCart(id){
+    panier = new Panier();
+    panier = buildPanier();
+    panier.removeProduit(id);
+    /* on met à jour le panier */
+    localStorage.setItem('productCart', JSON.stringify(panier.produits));
+    showCart();
+    showShop();
+   // show_resume(); 
+  }
+</script>

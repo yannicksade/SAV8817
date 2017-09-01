@@ -1,0 +1,53 @@
+<script type="text/javascript">
+
+function Produit(id, name, model, path, quantity, priceUnit) {
+/* path ici est juste le nom de l'image et non le chemin dans lequel elle se trouve */
+	this.id = id;
+	this.name = name;
+	this.model = model;
+	this.path = path;
+	this.quantity = quantity;
+	this.priceUnit = priceUnit;
+
+	this.getId = function(){
+		return this.id;
+	}
+	this.setId = function (id){
+		this.id = id;
+	}
+	this.getName = function() {
+		return this.name;
+	}
+	this.setName = function(name) {
+		this.name = name;
+	}
+
+	this.getModel = function() {
+		return this.model;
+	}
+	this.setModel = function(model) {
+		this.model = model;
+	}
+
+	this.getPath = function() {
+		return this.path;
+	}
+	this.setPath = function(path) {
+		this.path = path;
+	}
+	this.getQuantity = function() {
+		return this.quantity;
+	}
+	this.setQuantity = function(quantity) {
+		this.quantity = quantity;
+	}
+	this.setPriceUnit= function(priceUnit) {
+		this.priceUnit = priceUnit;
+	}
+	this.getPriceUnit = function() {
+		return this.priceUnit;
+	}
+}
+
+</script>
+			

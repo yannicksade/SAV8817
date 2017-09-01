@@ -1,0 +1,58 @@
+<div class="row-content">
+    {#  tangram:1764 begin #}
+    <div class="scc-category-unit scc-category-unit-index">
+        <div class="menu-category-view index-category indiv-category-view">
+            <h3 class="menu-button-title">
+                <i class="thin-icon-menu"> </i>
+                {% if evm_cat_title is defined %}  {{ evm_cat_title }} {% endif %} 
+            </h3>
+            <br>
+            <hr>
+            <h3  class="compare_title_item">Quantite de produits (<i id="nom_produits">0</i>)</h3>
+            <select name="search_nomber"  class="content-form-elmt form-controlp search_categories">
+                        <option value="0">Tous les produits</option>
+                        <option value="12">Seuls les produits selectionnés</option>
+            </select>
+            <hr>
+            <h3  class="compare_title_item">Categorie de produits (<i id="nom_categories">0</i>)</h3>
+            <select name="search_categorie"  class="content-form-elmt form-controlp search_categories">
+                        <option value="0">Toutes les categories</option>
+            </select>
+            <hr>
+            <h3 class="compare_title_item">Type de produit</h3>
+            <button class="indicatif-type"><img src="{{app.request.getSchemeAndHttpHost() ~ asset('plateform/demo/colors/red.jpg')}}" class="type-index type-prod"/> PRODUITS</button>
+            <button class="indicatif-type"><img src="{{app.request.getSchemeAndHttpHost() ~ asset('plateform/demo/colors/blue.jpg')}}" class="type-index type-prod"/> SERVICES</button>
+            <button class="indicatif-type"><img src="{{app.request.getSchemeAndHttpHost() ~ asset('plateform/demo/colors/green.jpg')}}" class="type-index type-prod"/> ARTICLES</button>
+            <select name="search_type_prod" class="content-form-elmt form-controlp search_categories">
+                        <option value="0">Tous les types</option>
+                        <option value="1">---SERVICES</option>
+                        <option value="2">---PRODUITS</option>
+                        <option value="3">---ARTICLES</option>
+            </select>
+            <hr>
+            <h3  class="compare_title_item">Prix du produit</h3>
+            <input name="search_prix_min" type="number"  placeholder="Prix minimum cfa" class="content-form-elmt form-controlp search_categories" >
+            <input name="search_prix_max" type="number"  placeholder="Prix maximum cfa" class="content-form-elmt form-controlp search_categories" >
+
+            <hr>
+            <h3  class="compare_title_item">Anciennete des produits </h3>
+            <select name="search_new"  class="content-form-elmt form-controlp search_categories">
+                        <option value="0">Tous les produits</option>
+                        <option value="1">Seuls les produits nouveaux</option>
+            </select>
+            
+            <hr>
+            <h3  class="compare_title_item">Solvabilité des produits </h3>
+            <select name="search_solde"  class="content-form-elmt form-controlp search_categories">
+                        <option value="0">Tous les produits</option>
+                        <option value="1">Seuls les produits en solde</option>
+            </select>
+            <hr>
+            <h3  class="compare_title_item">Proximité des produits </h3>
+            <select name="search_ville"  class="content-form-elmt form-controlp search_categories">
+                        <option value="0">Tous les villes</option>
+            </select>
+        </div>
+    </div>
+    {#  tangram:1764 end #}
+</div>

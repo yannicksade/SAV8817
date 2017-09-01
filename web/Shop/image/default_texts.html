@@ -1,0 +1,521 @@
+<!--some sql requests-->
+ALTER TABLE `oc_category_description` DROP COLUMN icon;
+ALTER TABLE `oc_product_description` DROP `video1`;
+ALTER TABLE `oc_product_description` DROP `video2`;
+ALTER TABLE `oc_product_description` DROP `html_product_top`;
+ALTER TABLE `oc_product_description` DROP `html_product_bottom`;
+ALTER TABLE `oc_product_description` DROP `html_product_tab`;
+ALTER TABLE `oc_product_description` DROP `tab_title`;
+
+INSERT INTO `oc_product_to_store` (`product_id`, `store_id`) VALUES ('30', '6');
+        30
+        42
+        50-68
+        73-91
+INSERT INTO `oc_category_to_store` (`category_id`, `store_id`) VALUES ('17', '5');
+        17-20
+        24-56
+        58-87
+(88-105)
+
+INSERT INTO `oc_information_to_store` VALUES ('3', '2');
+INSERT INTO `oc_blog_posts_to_store` (`blog_post_id`, `store_id`) VALUES ('1', '1');
+
+UPDATE `oc_product_description` SET `tab_title` = 'custom tab' WHERE `oc_product_description`.`product_id` = 77;
+UPDATE `oc_product_description` SET `html_product_tab` = 'Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident. Ad vegan excepteur butcher vice lomo. Leggings o' WHERE `product_id` = 77;
+
+INSERT INTO `oc_product_related` (`product_id`, `related_id`) VALUES ('50', '91');
+
+
+UPDATE TABLE `oc_category_description` SET `icon` = '&lt;span class=&quot;icon m-icon-dress&quot;&gt;&lt;/span&gt;' WHERE `category_id` = 26;
+UPDATE TABLE `oc_category_description` SET `icon` = '&lt;span class=&quot;icon m-icon-shirts&quot;&gt;&lt;/span&gt;' WHERE `category_id` = 27;
+
+UPDATE TABLE `oc_category_description` SET `icon` = '&lt;span class=&quot;icon m-icon-dress&quot;&gt;&lt;/span&gt;' WHERE `category_id` = 26;
+UPDATE TABLE `oc_category_description` SET `icon` = '&lt;span class=&quot;icon m-icon-shirts&quot;&gt;&lt;/span&gt;' WHERE `category_id` = 27;
+
+UPDATE TABLE `oc_category_description` SET `html_right` = '&lt;div class=&quot;img-fullheight&quot;&gt;&lt;img alt=&quot;&quot; class=&quot;img-responsive&quot; src=&quot;image/catalog/blocks/menu-img-right.png&quot; /&gt;&lt;/div&gt;\r\n' WHERE `category_id` = 20;
+UPDATE TABLE `oc_category_description` SET `html_right` = '&lt;div class=&quot;img-fullheight&quot;&gt;&lt;img alt=&quot;&quot; class=&quot;img-responsive&quot; src=&quot;image/catalog/blocks/man.png&quot; /&gt;&lt;/div&gt;\r\n' WHERE `category_id` = 25;
+
+
+UPDATE TABLE `oc_category_description` SET `html_bottom` = '&lt;span class=&quot;label label-mega&quot;&gt;-15%&lt;/span&gt;' WHERE `category_id` = 28;
+UPDATE TABLE `oc_category_description` SET `html_bottom` = '&lt;span class=&quot;label label-mega&quot;&gt;-15%&lt;/span&gt;' WHERE `category_id` = 29;
+UPDATE TABLE `oc_category_description` SET `html_bottom` = '&lt;span class=&quot;label label-mega&quot;&gt;-15%&lt;/span&gt;' WHERE `category_id` = 30;
+UPDATE TABLE `oc_category_description` SET `html_bottom` = '&lt;span class=&quot;label label-mega&quot;&gt;-15%&lt;/span&gt;' WHERE `category_id` = 31;
+UPDATE TABLE `oc_category_description` SET `html_bottom` = '&lt;ul class=&quot;exclusive html_block_category_top&quot;&gt;\r\n	&lt;li&gt;&lt;span class=&quot;icon icon-dropbox&quot;&gt;&amp;nbsp;&lt;/span&gt; &lt;a href=&quot;index.php&quot;&gt;Gifts exclusive&lt;/a&gt;&lt;/li&gt;\r\n	&lt;li&gt;&lt;span class=&quot;icon icon-coins&quot;&gt;&amp;nbsp;&lt;/span&gt; &lt;a href=&quot;index.php&quot;&gt;Offers&lt;/a&gt;&lt;/li&gt;\r\n&lt;/ul&gt;\r\n', '&lt;div class=&quot;img-fullheight&quot;&gt;&lt;img alt=&quot;&quot; class=&quot;img-responsive&quot; src=&quot;image/catalog/blocks/menu-img-right.png&quot; /&gt;&lt;/div&gt;\r\n', '&lt;ul class=&quot;exclusive html_block_category_bottom&quot;&gt;\r\n	&lt;li&gt;&lt;span class=&quot;icon icon-tag &quot;&gt;&amp;nbsp;&lt;/span&gt; &lt;a href=&quot;index.php&quot;&gt;SPECIAL OFFER&lt;/a&gt;&lt;/li&gt;\r\n	&lt;li&gt;&lt;span class=&quot;icon icon-sale&quot;&gt;&amp;nbsp;&lt;/span&gt; &lt;a href=&quot;index.php&quot;&gt;UP TO 50% OFF DISCOUNTS&lt;/a&gt;&lt;/li&gt;\r\n&lt;/ul&gt;\r\n' WHERE `category_id` = 20;
+UPDATE TABLE `oc_category_description` SET `html_bottom` = '&lt;ul class=&quot;exclusive html_block_category_top&quot;&gt;\r\n	&lt;li&gt;&lt;span class=&quot;icon icon-dropbox&quot;&gt;&amp;nbsp;&lt;/span&gt; &lt;a href=&quot;index.php&quot;&gt;Gifts exclusive&lt;/a&gt;&lt;/li&gt;\r\n	&lt;li&gt;&lt;span class=&quot;icon icon-coins&quot;&gt;&amp;nbsp;&lt;/span&gt; &lt;a href=&quot;index.php&quot;&gt;Offers&lt;/a&gt;&lt;/li&gt;\r\n&lt;/ul&gt;\r\n', '&lt;div class=&quot;img-fullheight&quot;&gt;&lt;img alt=&quot;&quot; class=&quot;img-responsive&quot; src=&quot;image/catalog/blocks/menu-img-right.png&quot; /&gt;&lt;/div&gt;\r\n', '&lt;ul class=&quot;exclusive html_block_category_bottom&quot;&gt;\r\n	&lt;li&gt;&lt;span class=&quot;icon icon-tag &quot;&gt;&amp;nbsp;&lt;/span&gt; &lt;a href=&quot;index.php&quot;&gt;SPECIAL OFFER&lt;/a&gt;&lt;/li&gt;\r\n	&lt;li&gt;&lt;span class=&quot;icon icon-sale&quot;&gt;&amp;nbsp;&lt;/span&gt; &lt;a href=&quot;index.php&quot;&gt;UP TO 50% OFF DISCOUNTS&lt;/a&gt;&lt;/li&gt;\r\n&lt;/ul&gt;\r\n' WHERE `category_id` = 25;
+
+<!--top menu blocks-->
+
+<!--promo-->
+<span class="label label-mega">-15%</span>
+
+<!--icons-->
+<span class="icon m-icon-dress"></span>
+<span class="icon m-icon-shirts"></span>
+<span class="icon m-icon-coats"></span>
+<span class="icon m-icon-jackets"></span>
+<span class="icon m-icon-shorts"></span>
+<span class="icon m-icon-jeans"></span>
+<span class="icon m-icon-skirts"></span>
+<span class="icon m-icon-lingerie"></span>
+
+<!--custom blocks in dropdown for main category:-->
+<!--top for main category-->
+<ul class="exclusive html_block_category_top">
+    <li><span class="icon icon-dropbox">&nbsp;</span> <a href="index.php">Gifts exclusive</a></li>
+    <li><span class="icon icon-coins">&nbsp;</span> <a href="index.php">Offers</a></li>
+</ul>
+
+<!--top for sub category-->
+<img src="image/catalog/blocks/category-image-01" class="img-responsive" alt="" />
+
+<img src="http://optimus.tonytemplates.com/image/catalog/blocks/category-image-01.jpg" class="img-responsive" alt="">
+<!--right woman-->
+<div class="img-fullheight">
+    <img class="img-responsive" src="image/catalog/blocks/menu-img-right.png" alt="">
+</div>
+<!--right men-->
+<div class="img-fullheight">
+    <img class="img-responsive" src="image/catalog/blocks/man.png" alt="">
+</div>
+
+<!--bottom for main category-->
+<ul class="exclusive html_block_category_bottom">
+    <li><span class="icon icon-tag ">&nbsp;</span> <a href="index.php">SPECIAL OFFER</a></li>
+    <li><span class="icon icon-sale">&nbsp;</span> <a href="index.php">UP TO 50% OFF DISCOUNTS</a></li>
+</ul>
+
+<!--bottom for subcategory-->
+This is a HTML block; you can create it via admin panel. There are many blocks like this on site.
+
+<!--buttons on Product Page-->
+<div class="share addthis_toolbox addthis_default_style ">
+    <div class="addthis_default_style">
+        <a class="addthis_button_compact">Share</a>
+        <a class="addthis_button_email"></a>
+        <a class="addthis_button_print"></a>
+        <a class="addthis_button_facebook"></a>
+        <a class="addthis_button_twitter"></a>
+    </div>
+    <script type="text/javascript" src="//s7.addthis.com/js/250/addthis_widget.js"></script>
+</div>
+<!--end buttons on Product Page-->
+
+<!--footer payments-->
+<ul class="payment-list pull-right">
+    <li><img src="image/catalog/blocks/icon-payment-01.png" width="36" height="22" alt=""></li>
+    <li><img src="image/catalog/blocks/icon-payment-02.png" width="36" height="22" alt=""></li>
+    <li><img src="image/catalog/blocks/icon-payment-03.png" width="36" height="22" alt=""></li>
+    <li><img src="image/catalog/blocks/icon-payment-04.png" width="36" height="22" alt=""></li>
+    <li><img src="image/catalog/blocks/icon-payment-05.png" width="36" height="22" alt=""></li>
+</ul>
+
+<!--copyright in footer-->
+&copy; 2014 <a href="index.php">Optimus</a>. All Rights Reserved.
+
+<!--custom html block in footer-->
+<ul class="menu">
+    <li><span class="icon icon-house">&nbsp;</span> 7563 St. Vincent Place, Glasgow</li>
+    <li><span class="icon icon-phone-4">&nbsp;</span> 321321321, 321321321</li>
+    <li><span class="icon icon-envelop">&nbsp;</span> <a href="mailto:info@mydomain.com">info@mydomain.com</a></li>
+    <li><span class="icon icon-skype-2">&nbsp;</span> <a href="index.php">shop.test</a></li>
+</ul>
+
+<!--footer social buttons-->
+    <ul class="find-us">
+        <li class="divider"><a href="//www.facebook.com/" target="_blank" class="animate-scale"><span class="icon icon-facebook-3"></span></a></li>
+        <li class="divider"><a href="//twitter.com" target="_blank" class="animate-scale"><span class="icon icon-twitter-3"></span></a></li>
+        <li class="divider"><a href="//www.linkedin.com" target="_blank" class="animate-scale"><span class="icon icon-linkedin-2"></span></a></li>
+        <li class="divider"><a href="//www.youtube.com" target="_blank" class="animate-scale"><span class="icon icon-youtube-3"></span></a></li>
+        <li class="divider"><a href="//www.pinterest.com/" target="_blank" class="animate-scale"><span class="icon icon-pinterest-2"></span></a></li>
+        <li class="divider"><a href="//plus.google.com" target="_blank" class="animate-scale"><span class="icon icon-googleplus-2"></span></a></li>
+    </ul>
+<!--end footer social buttons-->
+
+<!--google map-->
+<iframe style="width: 280px; height: 180px; margin: 0 5px; border: 0; overflow:hidden;" src="https://maps.google.com/maps?f=q&amp;source=s_q&amp;hl=en&amp;q=LA+Aurora&amp;aq=&amp;sll=39.762235,-104.98827&amp;sspn=0.092238,0.209255&amp;ie=UTF8&amp;t=m&amp;st=112334869561858955379&amp;rq=1&amp;ev=zi&amp;split=1&amp;hq=LA&amp;hnear=%D0%90%D0%B2%D1%80%D0%BE%D1%80%D0%B0,+%D0%90%D1%80%D0%B0%D0%BF%D0%B0%D1%85%D0%BE,+%D0%9A%D0%BE%D0%BB%D0%BE%D1%80%D0%B0%D0%B4%D0%BE&amp;fll=39.757286,-104.986639&amp;fspn=0.046122,0.104628&amp;ll=39.775957,-104.899006&amp;spn=0.046176,0.072956&amp;z=13&amp;output=embed"></iframe>
+<!--end google map-->
+
+<!--Top Slider full width-->
+    <ul>
+        <li>
+            <a href="index.php"><img src="image/catalog/TopSlider/slider-main-back-01.jpg" data-rw-slider="main: true; move: true;" alt="" /></a>
+            <a href="index.php" class="title-slide-01">
+                <span class="big">Sale</span>
+                <span class="middle">up to 40% OFF</span>
+            </a>
+        </li>
+        <li>
+            <a href="index.php"><img src="image/catalog/TopSlider/slider-main-back-02s.jpg" data-rw-slider="main: true; move: true;" alt="" /></a>
+            <a href="index.php" class="title-slide-02">
+                <span class="big">New</span>
+                <span class="small">collection</span>
+                <span class="middle">AUTUMN 2014</span>
+            </a>
+        </li>
+        <li>
+            <a href="index.php"><img src="image/catalog/TopSlider/slider-main-back-03.jpg" data-rw-slider="main: true; move: true;" alt="" /></a>
+            <a href="index.php" class="title-slide-03">
+                <span class="big">Special offer</span>
+                <span class="middle">Save money with Lingerie SALE</span>
+                <span class="small">Up to 50% OFF</span>
+            </a>
+        </li>
+    </ul>
+<a class="control prev animate-scale"><span class="icon-arrow-left-5">&nbsp;</span></a>
+<a class="control next animate-scale"><span class="icon-untitled">&nbsp;</span></a>
+<a class="scroll-down animate-move-down"><span class="icon icon-arrow-down">&nbsp;</span> scroll to view content </a>
+
+<!--// end Top Slider-->
+
+<!--Top Slider boxed width-->
+<ul>
+    <li data-masterspeed="300" data-slotamount="2" data-transition="fade">
+        <img alt="" src="image/catalog/TopSlider/home_boxed_slider1.jpg">
+        <div class="tp-caption sfr" data-easing="easeOutExpo" data-speed="700" data-start="600" data-x="830" data-y="80"><a href="index.html" class="title-slide-01"> <span class="big">Sale</span></a> </div>
+        <div class="tp-caption sfr" data-easing="easeOutExpo" data-speed="700" data-start="1000" data-x="830" data-y="185"><a href="index.html" class="title-slide-01"><span class="middle">up to 40% OFF</span> </a> </div>
+    </li>
+    <li data-masterspeed="300" data-slotamount="2" data-transition="fade">
+        <img alt="" src="image/catalog/TopSlider/home_boxed_slider2.jpg">
+        <div class="tp-caption sfl" data-easing="easeOutExpo" data-speed="700" data-start="600" data-x="50" data-y="90"><a href="index.html" class="title-slide-02"><span class="big">New</span> </a> </div>
+        <div class="tp-caption sfl" data-easing="easeOutExpo" data-speed="700" data-start="1000" data-x="50" data-y="170"><a href="index.html" class="title-slide-02"><span class="small">collection</span> </a> </div>
+        <div class="tp-caption sfl" data-easing="easeOutExpo" data-speed="700" data-start="1400" data-x="50" data-y="210"><a href="index.html" class="title-slide-02"> <span class="middle">AUTUMN 2014</span></a> </div>
+    </li>
+    <li data-masterspeed="300" data-slotamount="2" data-transition="fade">
+        <img alt="" src="image/catalog/TopSlider/home_boxed_slider3.jpg">
+        <div class="tp-caption sft" data-easing="easeOutExpo" data-speed="700" data-start="600" data-x="800" data-y="40"><a href="index.html" class="title-slide-03"><span class="big">Special<br>
+                offer</span> </a> </div>
+        <div class="tp-caption sfb" data-easing="easeOutExpo" data-speed="700" data-start="1000" data-x="800" data-y="160"><a href="index.html" class="title-slide-03"><span class="middle">Save money with <br>
+                Lingerie SALE</span></a> </div>
+        <div class="tp-caption sfb" data-easing="easeOutExpo" data-speed="700" data-start="1200" data-x="800" data-y="265"><a href="index.html" class="title-slide-03"><span class="small">UP TO 50% OFF</span></a> </div>
+    </li>
+</ul>
+<!--end Top Slider boxed width-->
+
+<!-- simple Top Slider-->
+            <div class="item">
+                <img src="image/catalog/TopSlider/home_boxed_slider1.jpg" alt="">
+                <a href="index.php" class="title-slide-01">
+                    <span class="big">Sale</span>
+                    <span class="middle">up to 40% OFF</span>
+                </a>
+            </div>
+            <div class="item">
+                <img src="image/catalog/TopSlider/home_boxed_slider2.jpg" alt="">
+                <a href="index.php" class="title-slide-02">
+                    <span class="big">New</span>
+                    <span class="small">collection</span>
+                    <span class="middle">AUTUMN 2014</span>
+                </a>
+            </div>
+            <div class="item">
+                <img src="image/catalog/TopSlider/home_boxed_slider3.jpg" alt="">
+                <a href="index.php" class="title-slide-03">
+                    <span class="big">Special offer</span>
+                    <span class="middle">Save money with Lingerie SALE</span>
+                    <span class="small">UP TO 50% OFF</span>
+                </a>
+            </div>
+<!--end simple Top Slider-->
+
+<!--Top Slider with banners-->
+<div class="owl-slider-outer">
+    <a class="owl-slider-prev"></a>
+    <a class="owl-slider-next"></a>
+    <div class="owl-slider">
+        <div class="item"><img src="image/catalog/TopSlider/home_boxed_slider1.jpg" alt="" /> <a href="index.php" class="title-slide-01"> <span class="big">Sale</span> <span class="middle">up to 40% OFF</span> </a></div>
+        <div class="item"><img src="image/catalog/TopSlider/home_boxed_slider2.jpg" alt="" /> <a href="index.php" class="title-slide-02"> <span class="big">New</span> <span class="small">collection</span> <span class="middle">AUTUMN 2014</span> </a> </div>
+        <div class="item"><img src="image/catalog/TopSlider/home_boxed_slider3.jpg" alt="" /> <a href="index.php" class="title-slide-03"> <span class="big">Special offer</span> <span class="middle">Save money with Lingerie SALE</span> </a></div>
+    </div>
+</div>
+<div class="banners-block">
+    <div class="item">
+        <a href="index.php">
+            <img src="image/catalog/TopSlider/banner1.jpg"  alt="" />
+            <div class="banner-text black">
+                100%<br>
+                RETINA READY
+            </div>
+        </a>
+    </div>
+    <div class="item">
+        <a href="index.php">
+            <img src="image/catalog/TopSlider/banner2.jpg"  alt="">
+            <div class="banner-text">
+                <div class="inside">RESPONSIVE<br>
+                    LAYOUT
+                </div>
+            </div>
+        </a>
+    </div>
+</div>
+<!--end Top Slider with banners-->
+
+<!-- Services -->
+<section class="services-block hidden-xs">
+    <h2 style="display:none">service block</h2>
+    <div class="container">
+        <div class="row">
+            <div class="col-xs-12 col-sm-4 col-lg-4 divider-right">
+                <a href="index.php" class="item">
+                    <span class="icon icon-airplane-2">&nbsp;</span>
+                    <span class="title">Free shipping</span>
+                    <span class="description">on orders over $200</span>
+                </a>
+            </div>
+            <div class="col-xs-12 col-sm-4 col-lg-4 divider-right"> <a href="index.php" class="item"> <span class="icon icon-clock">&nbsp;</span> <span class="title">30-day returns</span> <span class="description">moneyback guarantee</span> </a> </div>
+            <div class="col-xs-12 col-sm-4 col-lg-4"> <a href="index.php" class="item"> <span class="icon icon-umbrella ">&nbsp;</span> <span class="title">24/7 Support </span> <span class="description">online consultations</span> </a> </div>
+        </div>
+    </div>
+</section>
+<!-- //end Services -->
+
+<!--description block on Category page for Woman-->
+<section class="owl-slider-outer slider-listing hidden-xs">
+    <a class="owl-slider-prev"></a>
+    <a class="owl-slider-next"></a>
+    <div class="owl-slider">
+        <div class="item">
+            <img src="image/catalog/blocks/listing-image-01-1171x208.jpg" alt="">
+            <div class="listing-title women hidden-xs">
+                <h2>Women</h2>
+            </div>
+        </div>
+        <div class="item">
+            <img src="image/catalog/blocks/listing-image-02-1171x208.jpg" alt="">
+            <div class="listing-title women hidden-xs">
+                <h2>Women</h2>
+            </div>
+        </div>
+    </div>
+</section>
+<p>Vestibulum justo. Nulla mauris ipsum, convallis ut, vestibulum eu, tincidunt vel, nisi. Curabitur molestie euismod erat. Proin eros odio, mattis rutrum. et, egestas vitae, magna. Integer semper, velit ut interNam lectus nulla, bibendum pretium, dictum a, mattis nec, dolor. Nullam id justo sed diam aliquam tincidunt. Duis sollicitudin, dui ac commodo iaculis, mi risus sagittis odio, vel ultrices enim sem ut pede. Aenean quam. Nulla neque purus, ullamcorper nec, eleifend at, fermentum ut, turpis. Nullam id justo sed labore diam diam aliquam nonumy. Integer ligula magna, dictum et, pulvinar non, ultricies ac, nibh. Vivamus euismod nulla vel nunc. Fusce tincidunt, justo congue egestas molestie, tortor tortor blandit erat, et scelerisque metus metus at ipsum.</p>
+<!--end description block on Category page for Woman-->
+
+<!--description block on Category page for men-->
+<section class="owl-slider-outer slider-listing hidden-xs">
+    <a class="owl-slider-prev"></a>
+    <a class="owl-slider-next"></a>
+    <div class="owl-slider">
+        <div class="item">
+            <img src="image/catalog/blocks/slide_man_1.jpg" alt="">
+        </div>
+        <div class="item">
+            <img src="image/catalog/blocks/slide_man_2.jpg" alt="">
+        </div>
+    </div>
+</section>
+<p>Vestibulum justo. Nulla mauris ipsum, convallis ut, vestibulum eu, tincidunt vel, nisi. Curabitur molestie euismod erat. Proin eros odio, mattis rutrum. et, egestas vitae, magna. Integer semper, velit ut interNam lectus nulla, bibendum pretium, dictum a, mattis nec, dolor. Nullam id justo sed diam aliquam tincidunt. Duis sollicitudin, dui ac commodo iaculis, mi risus sagittis odio, vel ultrices enim sem ut pede. Aenean quam. Nulla neque purus, ullamcorper nec, eleifend at, fermentum ut, turpis. Nullam id justo sed labore diam diam aliquam nonumy. Integer ligula magna, dictum et, pulvinar non, ultricies ac, nibh. Vivamus euismod nulla vel nunc. Fusce tincidunt, justo congue egestas molestie, tortor tortor blandit erat, et scelerisque metus metus at ipsum.</p>
+<!--end description block on Category page for men-->
+
+<!-- product custom block bottom: Services -->
+<div class="services-block single small row">
+    <div class="col-xs-12 col-sm-6 col-md-3 col-lg-3 divider-right">
+        <a href="index.php" class="item">
+            <span class="icon icon-tags-2">&nbsp;</span>
+            <span class="text">
+                <span class="title">Special Offer 1+1=3</span>
+                <span class="description">Get a gift!</span>
+            </span>
+        </a>
+    </div>
+    <div class="col-xs-12 col-sm-6 col-md-3 col-lg-3 divider-right">
+        <a href="index.php" class="item">
+            <span class="icon icon-credit-card">&nbsp;</span>
+            <span class="text">
+                <span class="title">FREE REWARD CARD</span>
+                <span class="description">Worth 10$, 50$, 100$</span>
+            </span>
+        </a>
+    </div>
+    <div class="col-xs-12 col-sm-6 col-md-3 col-lg-3 divider-right">
+        <a href="index.php" class="item">
+            <span class="icon icon-users-2">&nbsp;</span>
+            <span class="text">
+                <span class="title">Join Our Club</span>
+            </span>
+        </a>
+    </div>
+    <div class="col-xs-12 col-sm-6 col-md-3 col-lg-3 divider-right">
+        <a href="index.php" class="item">
+            <span class="icon icon-truck">&nbsp;</span>
+            <span class="text">
+                <span class="title">Free Shipping</span>
+            </span>
+        </a>
+    </div>
+</div>
+<!-- end product page, bottom: Services -->
+
+<!-- product page, right custom block -->
+<h3>PRODUCT CUSTOM BLOCK </h3>
+You can add your content here, like promotions or some additional info
+<div class="services-block single small vertical">
+    <div class="col-xs-12 col-sm-6 col-md-12 col-lg-12">
+        <a href="index.php" class="item">
+            <span class="icon icon-tags-2">&nbsp;</span>
+            <span class="text">
+                <span class="title">Special Offer 1+1=3</span>
+                <span class="description">Get a gift!</span>
+            </span>
+        </a>
+    </div>
+    <div class="col-xs-12 col-sm-6 col-md-12 col-lg-12">
+        <a href="index.php" class="item">
+            <span class="icon icon-credit-card">&nbsp;</span>
+            <span class="text">
+                <span class="title">FREE REWARD CARD</span>
+                <span class="description">Worth 10$, 50$, 100$</span>
+            </span>
+        </a>
+    </div>
+    <div class="col-xs-12 col-sm-6 col-md-12 col-lg-12">
+        <a href="index.php" class="item">
+            <span class="icon icon-users-2">&nbsp;</span>
+            <span class="text">
+                <span class="title">Join Our Club</span>
+            </span>
+        </a>
+    </div>
+    <div class="col-xs-12 col-sm-6 col-md-12 col-lg-12">
+        <a href="index.php" class="item">
+            <span class="icon icon-truck">&nbsp;</span>
+            <span class="text">
+                <span class="title">Free Shipping</span>
+            </span>
+        </a>
+    </div>
+</div>
+
+<!-- end product page, right custom block -->
+
+<!-- product page, advanced right custom block -->
+        <div>
+            <div class="brands">
+                <div class="text-center"><img src="image/catalog/brands/brand-themeforest.png" alt=""></div>
+            </div>
+            <div class="services-block single small vertical">
+                <div class="col-xs-12 col-sm-6 col-md-12 col-lg-12">
+                    <a href="index.php" class="item">
+                        <span class="icon icon-tags-2">&nbsp;</span>
+            <span class="text">
+                <span class="title">Special Offer 1+1=3</span>
+                <span class="description">Get a gift!</span>
+            </span>
+                    </a>
+                </div>
+                <div class="col-xs-12 col-sm-6 col-md-12 col-lg-12">
+                    <a href="index.php" class="item">
+                        <span class="icon icon-credit-card">&nbsp;</span>
+            <span class="text">
+                <span class="title">FREE REWARD CARD</span>
+                <span class="description">Worth 10$, 50$, 100$</span>
+            </span>
+                    </a>
+                </div>
+                <div class="col-xs-12 col-sm-6 col-md-12 col-lg-12">
+                    <a href="index.php" class="item">
+                        <span class="icon icon-users-2">&nbsp;</span>
+            <span class="text">
+                <span class="title">Join Our Club</span>
+            </span>
+                    </a>
+                </div>
+                <div class="col-xs-12 col-sm-6 col-md-12 col-lg-12">
+                    <a href="index.php" class="item">
+                        <span class="icon icon-truck">&nbsp;</span>
+            <span class="text">
+                <span class="title">Free Shipping</span>
+            </span>
+                    </a>
+                </div>
+            </div>
+
+        </div>
+<!--end product page, advanced right custom block -->
+
+<!--youtube video in product page bottom -->
+<div id="video-container">
+    <iframe src="//www.youtube.com/embed/HhEPvNx0OYw" style="border:0; margin:0; padding:0" allowfullscreen></iframe>
+</div>
+<div class="line-divider"></div>
+
+<iframe src="//www.youtube.com/embed/Fl_QCu5IKdA" style="border:0; margin:0; padding:0" allowfullscreen=""></iframe>
+
+<!--youtube video in product page bottom -->
+
+<!--custom block in left column on Contacts page -->
+<ul class="simple-list compressed-list address">
+    <li><span class="icon icon-house"></span> 7563 St. Vincent Place, Glasgow</li>
+    <li><span class="icon icon-phone-4"></span> 321321321, 321321321</li>
+    <li><span class="icon icon-envelop"></span> <a href="#">info@mydomain.com</a></li>
+    <li><span class="icon icon-skype-2"></span> <a href="#">shop.test</a></li>
+</ul>
+
+<div class="map">
+    <iframe style="width:100%; height: 500px; margin: 0; border: 0; overflow:hidden;" src="https://maps.google.com/maps?f=q&amp;source=s_q&amp;hl=en&amp;q=LA+Aurora&amp;aq=&amp;sll=39.762235,-104.98827&amp;sspn=0.092238,0.209255&amp;ie=UTF8&amp;t=m&amp;st=112334869561858955379&amp;rq=1&amp;ev=zi&amp;split=1&amp;hq=LA&amp;hnear=%D0%90%D0%B2%D1%80%D0%BE%D1%80%D0%B0,+%D0%90%D1%80%D0%B0%D0%BF%D0%B0%D1%85%D0%BE,+%D0%9A%D0%BE%D0%BB%D0%BE%D1%80%D0%B0%D0%B4%D0%BE&amp;fll=39.757286,-104.986639&amp;fspn=0.046122,0.104628&amp;ll=39.775957,-104.899006&amp;spn=0.046176,0.072956&amp;z=13&amp;output=embed"></iframe>
+</div>
+
+<!--end custom block in left column on Contacts page -->
+
+<!--layouts to delete-->
+<li>
+    <span class="name"><span class="expander">-</span> <a>Layouts</a></span>
+    <ul>
+        <li><span class="name"><a href="http://optimus.tonytemplates.com/">Default</a> </span></li>
+        <li><span class="name"><a href="http://optimus-corporate.tonytemplates.com/">Corporate</a></span></li>
+
+        <li><span class="name"><a href="http://optimus-kids.tonytemplates.com">Kids</a></span></li>
+        <li><span class="name"><a href="http://optimus-electronic.tonytemplates.com">Electronic</a></span></li>
+        <li><span class="name"><a href="http://optimus-food.tonytemplates.com">Food</a></span></li>
+
+        <li><span class="name"><a href="http://optimus-background.tonytemplates.com">Background Isotope</a></span></li>
+        <li><span class="name"><a href="http://optimus-creative.tonytemplates.com">Creative</a></span></li>
+        <li><span class="name"><a href="http://optimus-leftcolumn.tonytemplates.com">Left Column</a></span></li>
+    </ul>
+</li>
+<!--end layouts to delete-->
+
+<!--layouts to delete-->
+<dt class="item">
+<ul class="sf-menu">
+    <li>
+        <a>Layouts</a>
+        <ul>
+            <li><a href="http://optimus.tonytemplates.com/">Default</a> </li>
+            <li><a href="http://optimus-corporate.tonytemplates.com/">Corporate</a></li>
+
+            <li><a href="http://optimus-kids.tonytemplates.com">Kids</a></li>
+            <li><a href="http://optimus-electronic.tonytemplates.com">Electronic</a></li>
+            <li><a href="http://optimus-food.tonytemplates.com">Food</a></li>
+
+
+
+            <li><a href="http://optimus-background.tonytemplates.com">Background Isotope</a></li>
+            <li><a href="http://optimus-creative.tonytemplates.com">Creative</a></li>
+            <li><a href="http://optimus-leftcolumn.tonytemplates.com">Left Column</a></li>
+        </ul>
+    </li>
+</ul>
+</dt>
+<dd></dd>
+<!--end layouts to delete-->
+
+
+
+        <!--usual menu-->
+<li>
+    <a>Layouts</a>
+    <ul>
+        <li><a href="http://optimus.tonytemplates.com/">Default</a></li>
+        <li><a href="http://optimus-corporate.tonytemplates.com/">Corporate</a></li>
+
+        <li><a href="http://optimus-kids.tonytemplates.com">Kids</a></li>
+        <li><a href="http://optimus-electronic.tonytemplates.com">Electronic</a></li>
+        <li><a href="http://optimus-food.tonytemplates.com">Food</a></li>
+
+        <li><a href="http://optimus-background.tonytemplates.com">Background Isotope</a></li>
+        <li><a href="http://optimus-creative.tonytemplates.com">Creative</a></li>
+        <li><a href="http://optimus-leftcolumn.tonytemplates.com">Left Column</a></li>
+    </ul>
+</li>

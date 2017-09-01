@@ -1,0 +1,138 @@
+         <div class="image-container"  >
+            <div class="">
+               <div class="">
+                  <div class="col-sm-12" style="padding: 0;margin: 0 0 0 1.8%;width: 96%">
+                     <div class="wizard-container"  style="padding-top: 0px">
+                        <div class="card wizard-card" data-color="green" id="wizard" style="height: 700px">
+                           <form action="" method="">
+                              <div class="wizard-navigation">
+                                 <div class="progress-with-circle">
+                                    <div class="progress-bar" role="progressbar" aria-valuenow="1" aria-valuemin="1" aria-valuemax="4" style="width: 15%"></div>
+                                 </div>
+                                 <ul>
+                                    <li>
+                                       <a href="#location" data-toggle="tab">
+                                          <div class="icon-circle">
+                                             <i class="ti-map"></i>
+                                          </div>
+                                          Tout En Video
+                                       </a>
+                                    </li>
+                                    <li>
+                                       <a href="#type" data-toggle="tab">
+                                          <div class="icon-circle">
+                                             <i class="ti-direction-alt"></i>
+                                          </div>
+                                          Type d'utilisateur
+                                       </a>
+                                    </li>
+                                    <li>
+                                       <a href="#facilities" data-toggle="tab">
+                                          <div class="icon-circle">
+                                             <i class="ti-panel"></i>
+                                          </div>
+                                          Agrandir votre reseau
+                                       </a>
+                                    </li>
+                                    <li>
+                                       <a href="#description" data-toggle="tab">
+                                          <div class="icon-circle">
+                                             <i class="ti-comments"></i>
+                                          </div>
+                                          Trouver les meilleurs offres
+                                       </a>
+                                    </li>
+                                 </ul>
+                              </div>
+                              <div class="tab-content">
+                                 <div class="tab-pane" id="location">
+                                    <div class="row">
+                                       <div class="col-sm-12">
+                                          <center>
+                                             <video style="width: 55%;height: 400px;margin: 5%;box-shadow: -1px 2px 6px 4px rgba(0, 0, 0, 0.62);border-radius: 10px" src="{{app.request.getSchemeAndHttpHost() ~ asset('plateform/hitel/vid/vid.mp4')}}" controls="controls"></video>
+                                          </center>
+                                       </div>
+                                    </div>
+                                 </div>
+                                 <div class="tab-pane" id="type">
+                                    <div class="row">
+                                       <div class="col-sm-12">
+                                          <div class="col-sm-3">
+                                             <div class="choice" data-toggle="wizard-checkbox">
+                                                <input type="checkbox" name="jobb" value="Design">
+                                                <div class="card card-checkboxes card-hover-effect">
+                                                   <i class="ti-home"></i>
+                                                   <p>Acheteur</p>
+                                                </div>
+                                             </div>
+                                          </div>
+                                          <div class="col-sm-3">
+                                             <div class="choice" data-toggle="wizard-checkbox">
+                                                <input type="checkbox" name="jobb" value="Design">
+                                                <div class="card card-checkboxes card-hover-effect">
+                                                   <i class="ti-package"></i>
+                                                   <p>Boutiquier</p>
+                                                </div>
+                                             </div>
+                                          </div>
+                                          <div class="col-sm-3">
+                                             <div class="choice" data-toggle="wizard-checkbox">
+                                                <input type="checkbox" name="jobb" value="Design">
+                                                <div class="card card-checkboxes card-hover-effect">
+                                                   <i class="ti-package"></i>
+                                                   <p>Transporteur</p>
+                                                </div>
+                                             </div>
+                                          </div>
+                                          <div class="col-sm-3">
+                                             <div class="choice" data-toggle="wizard-checkbox">
+                                                <input type="checkbox" name="jobb" value="Design">
+                                                <div class="card card-checkboxes card-hover-effect">
+                                                   <i class="ti-package"></i>
+                                                   <p>Conseille</p>
+                                                </div>
+                                             </div>
+                                          </div>
+                                       </div>
+                                    </div>
+                                    <h5 class="info-text">Choisir votre profil, l'utilisation que vous voulez faire de la plateforme </h5>
+                                 </div>
+                                 <div class="tab-pane" id="facilities">
+                                    <h5 class="info-text"> En publiant constament des annonces et faisant des soldes a vos produits</h5>
+                                 </div>
+                                 <div class="tab-pane" id="description">
+                                    <div class="row">
+                                       <h5 class="info-text"> Drop us a small description. </h5>
+                                       <div class="col-sm-6 col-sm-offset-1">
+                                          <div class="form-group">
+                                             <label>Place description</label>
+                                             <textarea class="form-control" placeholder="" rows="9"></textarea>
+                                          </div>
+                                       </div>
+                                       <div class="col-sm-4">
+                                          <div class="form-group">
+                                             <label>Zone de recherche du menu</label>
+                                             <p class="description">Vous pourvez faire des recherches plus avancees des produits sur notre plateform</p>
+                                          </div>
+                                       </div>
+                                    </div>
+                                 </div>
+                              </div>
+                              <div class="wizard-footer">
+                                 <hr>
+                                 <div class="pull-right">
+                                    <input type='button' class='btn btn-next btn-fill btn-success btn-wd' name='next' value='Suivant' />
+                                    <input type='button' class='btn btn-finish btn-fill btn-success btn-wd' name='finish' value='Fin du tutoriel' />
+                                 </div>
+                                 <div class="pull-left">
+                                    <input type='button' class='btn btn-previous btn-default btn-wd' name='previous' value='Precedent' />
+                                 </div>
+                                 <div class="clearfix"></div>
+                              </div>
+                           </form>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+            </div>
+         </div>

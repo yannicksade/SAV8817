@@ -1,0 +1,1016 @@
+{% extends "::base/shop/layout.html.twig" %}
+
+{% block title %}
+    Result-search - {{ parent() }}
+{% endblock %}
+
+{% block stylesheets %}
+  {{ parent() }}
+  <!--
+    <link href="{{ asset('Shop/x_fresh_bootstrap_table/assets/css/bootstrap.css')}}" rel="stylesheet" />
+    <link href="{{ asset('Shop/x_fresh_bootstrap_table/assets/css/fresh-bootstrap-table.css')}}" rel="stylesheet" />
+     
+         Fonts and icons     
+    <link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css')}}" rel="stylesheet">
+    <link href='http://fonts.googleapis.com/css?family=Roboto:400,700,300' rel='stylesheet' type='text/css'>
+    <script type="text/javascript" src="{{ asset('Shop/x_fresh_bootstrap_table/assets/js/jquery-1.11.2.min.js')}}"></script>
+    <script type="text/javascript" src="{{ asset('Shop/x_fresh_bootstrap_table/assets/js/bootstrap.js')}}"></script>
+    <script type="text/javascript" src="{{ asset('Shop/x_fresh_bootstrap_table/assets/js/bootstrap-table.js')}}"></script> -->
+
+  <style type="text/css">
+    .col_item{
+        height: 200px;
+        width: 180px;
+        position: relative;
+        border: 1px solid #d8d8d8;
+        margin: 5px;
+        box-shadow: 0px 2px 1px 0px rgba(0, 0, 0, 0.2);
+    }
+    .col_item img{
+        width: 100%;
+        height: 100%;
+        max-height: 150px;
+        /*border-bottom: 1px solid gray;*/
+    }
+    .pagination_search ul.pagination{
+      margin: 0px!important;
+    }
+    .description{
+      text-align: center;
+      border-top: 1px solid gray;
+    }
+    .col_item img.vue2{
+      display: none;
+    }
+    .bloc-compare table .block-img{
+        height: 80px;
+        width: 7.6667%;
+    }
+    .bloc-compare table .block-img img{
+        width: 100%;
+        height: 100%;
+        max-height: 80px;
+    }
+    .bloc-compare td.action{
+      width: 270px; 
+    }
+    .bloc-compare td, .bloc-compare th{
+      vertical-align: center;
+    }
+    .bloc-compare td.action button{
+      margin-left: 5px;
+      margin-top: 5px;
+      padding: 7px;
+    }
+    .bloc-compare td.action .glyphicon{
+      color: #fff;
+      padding-left: 12px;
+      text-align: center;
+    }
+    .bloc-compare td.action button.btn-add-cart{
+      background: #297890; 
+    }
+    .bloc-compare td.action button.btn-add-cart:hover{
+      background: #777; 
+    }
+    
+    .block_img_widget .button-group {
+      position: absolute;
+      font-size: 15px;
+      bottom: 20px;
+      right: 0;
+      left: 0;
+      z-index: 888;
+      display: none;
+    }
+    
+    .block_img_widget .button-group button {
+      bottom: -70px;
+      position: relative;
+      text-align: center; 
+      /*display: none;*/
+    }
+    
+    .block_img_widget .button-group button.addToCart{
+    padding: 0 10px;
+    color: #fff;
+    background: #297890; 
+    }
+    .return_to_filter{
+      padding:7px;
+      color: #fff;
+      background: #297890; 
+      padding-left: 20px;
+    }
+    .block_img_widget .button-group button{
+    background: #fff;
+    border: 1px solid #297890;
+    border-radius: 16px;
+    font-size: 16px;
+    margin-left: 5px;
+    }
+
+    .nbr_compar_inner{
+      border-radius: 100%;
+      background-color: #297890;
+      color: #fff;
+      text-align: center;
+      font-size: 15px;
+      padding: 5px;
+    }
+    .nbr_compar_top{
+      border-radius: 100%;
+      background-color: #fff;
+      color: #297890;
+      text-align: center;
+      font-size: 15px;
+      padding: 5px;
+    }
+
+    .block_img_widget .button-group button:hover {
+      background: #297890;
+      color: #fff !important; 
+    }
+
+    .block_img_widget .button-group button.wishlist {
+    color: #297890;
+    }
+    .block_img_widget .button-group button.compare {
+    color: #297890;
+    }
+    #page_navigation .pagination li{
+      font-size: 18px!important;
+    }
+
+    #result-produit button.return_to_filter{
+      display: none;
+    }
+
+  </style>
+
+{% endblock %}
+
+{% block bodyContent %}
+
+    <div class="container ">
+        <!-- BREADCRUMB -->
+        <ul class="breadcrumb">
+            <li><a href="{{ path('easy_t_shop_homepage')}}"><i class="fa fa-home"></i></a></li>
+        </ul>
+    </div>
+    <div id="result-produit" class="container">
+        <div class="row">
+          <div class="col-sm-12 filter_product">
+            <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
+              <div class="col-sm-6 col-xs-6"> 
+                <select id="cat_produit" name="search_categories" style="width: 100%;border: 1px solid  black;height: 33px" class="form-controlp search_categories"><option value="0" selected="selected"> Toutes les categories </option><option value="ordinateurs"> ordinateurs</option><option value="telephone"> telephone</option><option value="appareil photo"> Appareil photo</option><option value="sonore">sonore</option>
+                </select>
+              </div>
+              <div class="col-sm-6 col-xs-6" > 
+                <input id="find_elt" class="form-control" type="text" name="search_query" placeholder="Recherche..." value="" style="#cccccc;padding-left:10px; border:1px solid  black;">
+              </div>
+            </div>
+
+            <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12 pagination_search" style=" margin:0px;"> 
+              <div id="page_navigation">
+                <!--<button class="btn-compare">compar</button>-->
+              </div>
+            </div>
+
+            <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
+              <div class="col-sm-6 col-xs-6">
+                <select id="max_per_page" name="max_per_page" data-toggle="tooltip" title="Show Max elt" style="border: 1px solid  black;height: 33px;" class="form-controlp search_categories"><option value="6" selected="selected">6</option><option value="4"> 4</option><option value="5">5</option>
+                </select>
+                <!--<button class="btn return_to_filter" data-toggle="tooltip" title="retourner au resultat de filtre precedent"><span class="glyphicon glyphicon-share-alt"></span></button>-->
+              </div>
+              <div class="col-sm-6 col-xs-6 widget_compar"> 
+                <div class="btn-group">
+                  <button class="btn dropdown-toggle" data-toggle="dropdown">
+                    <span class="glyphicon glyphicon-retweet"></span>Comparaison&nbsp<span class="glyphicon glyphicon-menu-down"></span>&nbsp<span class="nbr_compar_top">0</span>
+                  </button>
+                  <ul class="dropdown-menu pull-right">
+                    <li><a id ="compar_filter" href="javascript: void(0);" data-toggle='tooltip' title='ici on compare les produits resultant de la recherche ou filtre'><span class="glyphicon glyphicon-filter">&nbsp&nbspResultat recherche</a></li>
+                    <li><a id ="compar_add" href="javascript: void(0);" data-toggle='tooltip' title='ici on compare uniquement les produits ajoutés à la comparaison'><span class="nbr_compar_inner">0</span>&nbsp&nbspArticles ajoutés</a></li>
+                    <li class="divider"></li>
+                    </ul>
+                </div>
+              </div>              
+            </div>
+
+          </div>
+          <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 bloc-filter">
+
+          </div>
+
+          <div class="col-sm-11 bloc-compare">
+             <!-- <div class="fresh-table full-color-orange">
+                  <div class="toolbar">
+                      <button id="alertBtn" class="btn btn-default">Alert</button>
+                  </div>
+                  <table id="fresh-table" class="table">
+                      <thead>
+                          <th data-field="rang">RANG</th>
+                        <th data-field="nom" data-sortable="true">NOM</th>
+                        <th data-field="image" data-sortable="true">IMAGE</th>
+                        <th data-field="modele" data-sortable="true">MODELE</th>
+                        <th data-field="prix" data-sortable="true">PRIX</th>
+                        <th data-field="poid" data-sortable="true">POID</th>
+                        <th data-field="actions" data-formatter="operateFormatter" data-events="operateEvents">Actions</th>
+                      </thead>
+                      <tbody>
+                      
+                      </tbody>
+                  </table>
+              </div>-->
+              <table class="table table-bordered table-striped">
+                  <thead>
+                      <th>Nom</th><th>Image</th><th>Model</th><th>Price</th><th>Poid</th><th>Action</th>
+                  </thead>
+                  <tbody>
+
+                  </tbody>
+              </table>   
+          </div>
+        </div>
+      </div>
+
+    <script type="text/javascript">
+      /*$(document).ready(
+          function () {*/
+          function show_widget_item_img(){
+            $('.search_prod.col_item').mouseenter(function(e){
+              e.preventDefault();
+              $(this).find('.block_img_widget .button-group').show();
+              $(this).find('.button-group').animate({ "bottom": "+=75px" }, "3500" );
+              $(this).find('.description').hide();
+            });
+            $('.search_prod.col_item').mouseleave(function(e){
+              e.preventDefault();
+              $(this).find('.block_img_widget .button-group').hide();
+              $(this).find('.button-group').animate({ "bottom": "-=75px" }, "3500" );
+              $(this).find('.description').show();
+            });      
+          }
+
+          $(document).ready(
+            function () {
+              show_widget_item_img();
+          })
+            var current_page = 0;
+            var MAX_PER_PAGE = 6;
+            $("#result-produit .nbr_compar_inner, #result-produit .nbr_compar_top").html(JSON.parse(localStorage.getItem('productCompare')).length);
+            var DATA = 
+            [
+              {
+                id:1,
+                nom: "Imac",
+                path: "{{ asset('Shop/image/cache/catalog/demo/imac_1-74x74.jpg')}}",
+                price:130000,
+                model:"macBook-m1",
+                categorie:[
+                   {
+                      nom:"ordinateurs",
+                      flag:"Electronique"
+                   }
+                ],
+              },
+
+              {
+                id:2,
+                nom: "Appel",
+                path: "{{ asset('Shop/image/cache/catalog/demo/macbook_5-90x90.jpg')}}",
+                price:230000,
+                model:"macBook-m2",
+                categorie:[
+                   {
+                      nom:"ordinateurs",
+                      flag:"Electronique"
+                   }
+                ],
+              },
+              {
+                id:3,
+                nom: "Iphone",
+                path: "{{ asset('Shop/image/cache/catalog/demo/iphone_6-90x90.jpg')}}",
+                price:11000,
+                model:"Iphone5S",
+                categorie:[
+                   {
+                      nom:"telephone",
+                      flag:"Electronique"
+                   }
+                ],
+              },
+              {
+                id:4,
+                nom: "Iphone",
+                path: "{{ asset('Shop/image/cache/catalog/demo/iphone_1-74x74.jpg')}}",
+                price:1000000,
+                model:"Iphone4S",
+                categorie:[
+                   {
+                      nom:"telephone",
+                      flag:"Electronique"
+                   }
+                ],
+              },
+              {
+                id:5,
+                nom:"appel",
+                path: "{{ asset('Shop/image/cache/catalog/demo/apple_cinema_30-90x90.jpg')}}",
+                price:305000,
+                model:"appel core-i7",
+                categorie:[
+                   {
+                      nom:"ordinateurs",
+                      flag:"Electronique"
+                   }
+                ],
+              },
+              {
+                id:6,
+                nom: "Iphone",
+                path: "{{ asset('Shop/image/cache/catalog/demo/iphone_4-1000x1000.jpg')}}",
+                price:204000,
+                model:"Iphone1S",
+                categorie:[
+                   {
+                      nom:"telephone",
+                      flag:"Electronique"
+                   }
+                ],
+              },
+
+              {
+                id:7,
+                nom: "iphone",
+                path: "{{ asset('Shop/image/cache/catalog/demo/iphone_1-74x74.jpg')}}",
+                price:425000,
+                model:"IphoneModel1",
+                categorie:[
+                   {
+                      nom:"telephone",
+                      flag:"machine"
+                   }
+                ],
+              },
+              {
+                id:8,
+                nom: "iphone",
+                path: "{{ asset('Shop/image/cache/catalog/demo/iphone_3-460x460.jpg')}}",
+                price:325000,
+                model:"Iphone8S",
+                categorie:[
+                   {
+                      nom:"telephone",
+                      flag:"Electronique"
+                   }
+                ],
+              },
+              {
+              id:9,
+              nom: "Acanon",
+                path: "{{ asset('Shop/image/cache/catalog/demo/canon_eos_5d_1-90x90.jpg')}}",
+              price:6000,
+              model:"canon_eos",
+              categorie:[
+                 {
+                    nom:"appareil photo",
+                    flag:"Electronique"
+                 }
+              ],
+              },
+              {
+                id:10,
+                nom: "canon",
+                path: "{{ asset('Shop/image/cache/catalog/demo/canon_eos_5d_1-90x90.jpg')}}",
+                price:54000,
+                model:"canon_eos",
+                categorie:[
+                   {
+                      nom:"appareil photo",
+                      flag:"Electronique"
+                   }
+                ],
+              },
+              {
+                id:11,
+                nom: "iphone",
+                path: "{{ asset('Shop/image/cache/catalog/demo/iphone_5-460x460.jpg')}}",
+                price:564000,
+                model:"Iphone3S",
+                categorie:[
+                   {
+                      nom:"telephone",
+                      flag:"Electronique"
+                   }
+                ],
+              },
+              {
+                id:12,
+                nom: "HTC",
+                path: "{{ asset('Shop/image/cache/catalog/demo/htc_touch_hd_1-74x74.jpg')}}",
+                price:215000,
+                model:"HTC_touch",
+                categorie:[
+                   {
+                      nom:"telephone",
+                      flag:"Electronique"
+                   }
+                ],
+              },
+              {
+                id:13,
+                nom: "dextop",
+                path: "{{ asset('Shop/image/cache/catalog/demo/compaq_presario-460x460.jpg')}}",
+                price:115000,
+                model:"Compaq",
+                categorie:[
+                   {
+                      nom:"ordinateurs",
+                      flag:"Electronique"
+                   }
+                ],
+              },
+              {
+                id:14,
+                nom: "canon",
+                path: "{{ asset('Shop/image/cache/catalog/demo/canon_logo-90x90.jpg')}}",
+                price:115000,
+                model:"canon 4d",
+                categorie:[
+                   {
+                      nom:"appareil photo",
+                      flag:"Electronique"
+                   }
+                ],
+              },
+              {
+                id:15,
+                nom: "ipod",
+                path: "{{ asset('Shop/image/cache/catalog/demo/ipod_classic_3-460x460.jpg')}}",
+                price:30000,
+                model:"ipod_classic",
+                categorie:[
+                   {
+                      nom:"sonore",
+                      flag:"Electronique"
+                   }
+                ],
+              },
+              {
+                id:16,
+                nom: "ipod",
+                path: "{{ asset('Shop/image/cache/catalog/demo/ipod_classic_4-90x90.jpg')}}",
+                price:20000,
+                model:"ipod_d2",
+                categorie:[
+                   {
+                      nom:"sonore",
+                      flag:"Electronique"
+                   }
+                ],
+              },
+              {
+                id:17,
+                nom: "ipod",
+                path: "{{ asset('Shop/image/cache/catalog/demo/ipod_shuffle_1-90x90.jpg')}}",
+                price:40000,
+                model:"ipod_shuffle",
+                categorie:[
+                   {
+                      nom:"sonore",
+                      flag:"Electronique"
+                   }
+                ],
+              },
+              {
+                id:18,
+                nom: "ipod",
+                path: "{{ asset('Shop/image/cache/catalog/demo/ipod_touch_1-90x90.jpg')}}",
+                price:45000,
+                model:"ipod_touch",
+                categorie:[
+                   {
+                      nom:"sonore",
+                      flag:"Electronique"
+                   }
+                ],
+              },
+              {
+                id:19,
+                nom: "sony",
+                path: "{{ asset('Shop/image/cache/catalog/demo/sony_vaio_5-180x180.jpg')}}",
+                price:445000,
+                model:"sony_vaio",
+                categorie:[
+                   {
+                      nom:"ordinateurs",
+                      flag:"Electronique"
+                   }
+                ],
+              },
+              {
+                id:20,
+                nom: "samsung",
+                path: "{{ asset('Shop/image/cache/catalog/demo/samsung_tab_1-100x100.jpg')}}",
+                price:545000,
+                model:"samsung_tab",
+                categorie:[
+                   {
+                      nom:"ordinateurs",
+                      flag:"Electronique"
+                   }
+                ],
+              },
+              {
+                id:21,
+                nom: "nikon",
+                path: "{{ asset('Shop/image/cache/catalog/demo/nikon_d300_3-100x100.jpg')}}",
+                price:45000,
+                model:"nikon_d3",
+                categorie:[
+                   {
+                      nom:"appareil photo",
+                      flag:"Electronique"
+                   }
+                ],
+              },/******************************************************************/
+              {
+              id:22,
+              nom: "ipod",
+              path: "{{ asset('Shop/image/cache/catalog/demo/ipod_classic_4-90x90.jpg')}}",
+              price:1056100,
+              model:"ipod_classic",
+              categorie:[
+                 {
+                    nom:"sonore",
+                    flag:"Electronique"
+                 }
+              ],
+              },
+              {
+              id:23,
+              nom: "ipod",
+              path: "{{ asset('Shop/image/cache/catalog/demo/ipod_nano_5-90x90.jpg')}}",
+              price:123600,
+              model:"ipod_nano",
+              categorie:[
+               {
+                  nom:"sonore",
+                  flag:"Electronique"
+               }
+              ],
+              },
+              {
+              id:24,
+              nom: "ipod",
+              path: "{{ asset('Shop/image/cache/catalog/demo/ipod_shuffle_1-90x90.jpg')}}",
+              price:23100,
+              model:"ipod_shuffle",
+              categorie:[
+               {
+                  nom:"sonore",
+                  flag:"Electronique"
+               }
+              ],
+              },
+              {
+              id:25,
+              nom: "ipod",
+              path: "{{ asset('Shop/image/cache/catalog/demo/ipod_touch_1-90x90.jpg')}}",
+              price:23100,
+              model:"ipod_touch",
+              categorie:[
+               {
+                  nom:"sonore",
+                  flag:"Electronique"
+               }
+              ],
+              },
+              {
+              id:26,
+              nom: "macbook",
+              path: "{{ asset('Shop/image/cache/catalog/demo/macbook_1-74x74.jpg')}}",
+              price:256000,
+              model:"macbookm1",
+              categorie:[
+               {
+                  nom:"ordinateurs",
+                  flag:"Electronique"
+               }
+              ],
+              },
+              {
+              id:27,
+              nom: "macbook",
+              path: "{{ asset('Shop/image/cache/catalog/demo/macbook_3-460x460.jpg')}}",
+              price:546000,
+              model:"macbookm2",
+              categorie:[
+               {
+                  nom:"ordinateurs",
+                  flag:"Electronique"
+               }
+              ],
+              },
+              {
+              id:28,
+              nom: "macbook",
+              path: "{{ asset('Shop/image/cache/catalog/demo/macbook_5-90x90.jpg')}}",
+              price:354000,
+              model:"macbook-m1",
+              categorie:[
+               {
+                  nom:"ordinateurs",
+                  flag:"Electronique"
+               }
+              ],
+              },
+              {
+              id:29,
+              nom: "macbook",
+              path: "{{ asset('Shop/image/cache/catalog/demo/macbook_pro_1-100x100.jpg')}}",
+              price:1535000,
+              model:"macbook-m1",
+              categorie:[
+               {
+                  nom:"ordinateurs",
+                  flag:"Electronique"
+               }
+              ],
+              },
+              {
+              id:30,
+              nom: "nikon",
+              path: "{{ asset('Shop/image/cache/catalog/demo/nikon_d300_3-100x100.jpg')}}",
+              price:51000,
+              model:"nokon_d300",
+              categorie:[
+               {
+                  nom:"appareil photo",
+                  flag:"Electronique"
+               }
+              ],
+              },
+              {
+              id:31,
+              nom: "palm_treo",
+              path: "{{ asset('Shop/image/cache/catalog/demo/palm_treo_pro_1-74x74.jpg')}}",
+              price:156000,
+              model:"palm_treo",
+              categorie:[
+               {
+                  nom:"telephone",
+                  flag:"Electronique"
+               }
+              ],
+              },
+              {
+              id:32,
+              nom: "samsung",
+              path: "{{ asset('Shop/image/cache/catalog/demo/samsung_syncmaster_941bw-100x100.jpg')}}",
+              price:561000,
+              model:"samsung_syncmaster",
+              categorie:[
+               {
+                  nom:"ordinateurs",
+                  flag:"Electronique"
+               }
+              ],
+              },
+              {
+              id:33,
+              nom: "sony",
+              path: "{{ asset('Shop/image/cache/catalog/demo/sony_vaio_5-180x180.jpg')}}",
+              price:451000,
+              model:"sony_vaio",
+              categorie:[
+               {
+                  nom:"ordinateurs",
+                  flag:"Electronique"
+               }
+              ],
+              },
+              {
+              id:34,
+              nom: "samsung",
+              path: "{{ asset('Shop/image/cache/catalog/demo/samsung_tab_1-100x100.jpg')}}",
+              price:691000,
+              model:"samsung_tab",
+              categorie:[
+               {
+                  nom:"ordinateurs",
+                  flag:"Electronique"
+               }
+              ],
+              },
+              {
+              id:35,
+              nom: "sony",
+              path: "{{ asset('Shop/image/cache/catalog/demo/sony_vaio_1-100x100.jpg')}}",
+              price:5441000,
+              model:"sony_vaio",
+              categorie:[
+               {
+                  nom:"ordinateurs",
+                  flag:"Electronique"
+               }
+              ],
+              }, 
+            ];
+
+            var DATA_FILTER=[]; /* données resultant du filtre */
+            //var DATA_COMPAR = []; /* données ajouté à la liste des données  comparer */
+            console.log(DATA);
+            var contenuFilter = $("#result-produit .row .bloc-filter");
+            var contenuComp = $("#result-produit .bloc-compare table").find('tbody');
+            var parentContenuComp = $("#result-produit .bloc-compare");
+            var  nbr_compar_inner = $("#result-produit .nbr_compar_inner, #result-produit .nbr_compar_top");
+            var type_compar ="";
+
+            initSearch();
+            start_pagination();
+
+            function initSearch(){
+              parentContenuComp.hide();// laisse place à l'affichage des filtres
+              var categorie = {{categorie}};
+              var search = "{{search}}";
+              contenuFilter.html("");
+              DATA.forEach(
+                function(item,index){
+                  if(item.categorie[0].nom == categorie || categorie ==0 ){
+                    if(if_strVal_in_strProduct(item,search,index) !=-1){
+                      var inner = appendItem(item,index)
+                      contenuFilter.append(inner);
+                    }
+                  }
+                }
+              );
+            }
+
+            function appendItem(item, index){
+              var inner="", img="", descr="";
+              img="<div class='block_img'><img src='"+item.path+"'></div>"; 
+              descr ="<div class='block_img_widget'><div class='description'>"+
+                  "<ul>"+
+                    "<li>"+item.model+"</li>"+
+                    "<li>"+item.price+"</li>"+
+                  "</ul>"+
+                "</div>"+
+                "<div class='button-group'>"+
+                  "<button class='btn btn-add-cart addToCart' onclick='addCart("+item.id+", 1);'>Add to Cart</button>"+
+                  "<button class='wishlist btn-button' type='button' data-toggle='tooltip' title='love it' onclick='alert('pas encore d\'action deriere ce bouton);' data-original-title='Add to Wish List'><i class='fa fa-heart'></i></button>"+
+                  '<button class="compare btn-button" type="button" data-toggle="tooltip" title="compare this" onclick="addCompare('+item.id+');" data-original-title="Compare this Product"><i class="fa fa-refresh"></i></button>'+
+                "</div></div>";
+              inner= '<div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 search_prod col_item">'+
+                    '<a href="javascript:void(0);" target="_self" title="'+item.model+'&quot;">'+img+descr+
+                    '</a></div>';
+              return inner;
+            }
+
+            $("#result-produit select[name=search_categories]").change(function(){
+              $('#result-produit button.return_to_filter').hide();
+              parentContenuComp.hide();
+              contenuFilter.show();
+              var cat = $(this).val();
+              contenuFilter.html("");
+              DATA_FILTER=[];
+              DATA.forEach(
+                  function(item,index){
+                      if(item.categorie[0].nom == cat || cat ==0 ){
+                        var inner = appendItem(item,index);
+                        DATA_FILTER.push(item);
+                        contenuFilter.append(inner);
+                      }
+                  }
+              );
+              show_widget_item_img();
+              start_pagination();
+              console.log(DATA_FILTER);
+            })
+
+            function if_strVal_in_strProduct(item,value,index){
+              var itemStr="";
+                itemStr = item.nom+" "+item.model+" "+item.price+" "+item.categorie[0].nom+" "+item.categorie[0].flag;
+                itemStr = itemStr.toLowerCase();
+                value = value.toLowerCase();
+                return (itemStr.indexOf(value));
+            }
+
+            $("#result-produit input[name=search_query]").change(function(){
+              $('#result-produit button.return_to_filter').hide();
+              parentContenuComp.hide();
+              contenuFilter.show();
+              var value = $(this).val();
+              contenuFilter.html("");
+              DATA_FILTER=[];// vide mon tableau avant de faire de new ajout
+              DATA.forEach(
+                  function(item,index){
+                    if(if_strVal_in_strProduct(item,value,index) !=-1){
+                      var inner = appendItem(item,index);
+                      DATA_FILTER.push(item); //potentiel elt à comparer
+                      contenuFilter.append(inner);
+                    }
+                  }
+              );
+              show_widget_item_img();
+              start_pagination();
+              console.log(DATA_FILTER);
+            })
+          /*}
+        );*/
+        /*
+        function addCompareSearch(id){
+          addCompare(id); // dans cette fonction a une methode ajax dont la mise à jour du storage peut prendre un de temps
+        }   */
+
+        function compareProductFilter(){
+          type_compar = "compar_filter";
+          contenuComp.html("");
+          if(DATA_FILTER.length == 0)
+            DATA_FILTER =  JSON.parse(JSON.stringify(DATA));
+          DATA_FILTER.forEach(
+            function(item,index){
+              var inner = appendItemCompFilter(item,index);
+              contenuComp.append(inner);
+            }
+          );
+          $('#result-produit button.return_to_filter').show();
+        }
+        /* afficher le tableau de comparaison des produits ajoutés */
+
+        function compareProductAdd(){
+          var DATA_COMPAR = JSON.parse(localStorage.getItem('productCompare'));
+          contenuComp.html("");
+          if(DATA_COMPAR.length == 0){
+            contenuFilter.show();
+            parentContenuComp.hide();
+            alert('aucun article ajouté à la comparaison');
+          }
+          else{
+            type_compar = "compar_add"; // servira lors de la suppression dans la comparaison
+            DATA_COMPAR.forEach(
+              function(item,index){
+                var inner = appendItemComp(item,index);
+                contenuComp.append(inner);
+              }
+            );
+            $('#result-produit button.return_to_filter').show();
+          }
+        }
+
+        function appendItemComp(item,index){
+          var path = "{{ asset('Shop/image/cache/catalog/demo/path')}}";
+          path = path.replace("path",item.path); 
+          inner="";
+          inner = "<tr>"+
+                /*"<td>"+(index+1)+"</td>"+*/
+                "<td>"+item.name+"</td>"+
+                "<td class='block-img'><img src='"+path+"'></td>"+
+                "<td>"+item.model+"</td>"+
+                "<td>$"+item.priceUnit+"</td>"+
+                "<td>0.00g</td>"+
+                "<td class='action button-group'><button class='btn btn-add-cart addToCart' onclick='addCart("+item.id+", 1);'><span class='glyphicon glyphicon-cart-in'>&nbspAdd to cart</button><button class='btn btn-warning' onclick='removeCompareSearch("+index+");'><span class='glyphicon glyphicon-trash'></button></td>"+
+                /*"<td></td>"+*/  
+              "</tr>";
+          return inner;
+        }
+
+        function appendItemCompFilter(item,index){
+          inner="";
+          inner = "<tr>"+
+                /*"<td>"+(index+1)+"</td>"+*/
+                "<td>"+item.nom+"</td>"+
+                "<td class='block-img'><img src='"+item.path+"'</td>"+
+                "<td>"+item.model+"</td>"+
+                "<td>$"+item.price+"</td>"+
+                "<td>0.00g</td>"+
+                "<td class='action button-group'><button class='btn btn-add-cart addToCart' onclick='addCart("+item.id+", 1);'><span class='glyphicon glyphicon-cart-in'>&nbspAdd to cart</button><button class='btn btn-warning' onclick='removeCompareSearch("+index+");'><span class='glyphicon glyphicon-trash'></button></td>"+
+                /*"<td></td>"+*/  
+              "</tr>";
+          return inner;
+        }
+
+        $("#result-produit .widget_compar #compar_filter").click(function(e){
+          e.preventDefault();
+          contenuFilter.hide();//laisse place à l'affichage de la comparaison
+          parentContenuComp.show();
+          compareProductFilter();
+        });
+
+        $("#result-produit .widget_compar #compar_add").click(function(e){
+          e.preventDefault();
+          contenuFilter.hide();//laisse place à l'affichage de la comparaison
+          parentContenuComp.show();
+          compareProductAdd();
+        });
+
+        function removeCompareSearch(index) {
+          var DATA_COMPAR = JSON.parse(localStorage.getItem('productCompare'));
+          if(type_compar == "compar_add"){
+            removeCompare(index);
+            nbr_compar_inner.html("");
+            nbr_compar_inner.html(JSON.parse(localStorage.getItem('productCompare')).length);
+            if(DATA_COMPAR.length == 0){
+              $('#result-produit button.return_to_filter').hide();
+              contenuFilter.show();
+              parentContenuComp.hide();
+            }
+            else
+              compareProductAdd();
+          }
+          else if(type_compar == "compar_filter"){
+            DATA_FILTER.splice(index, 1);
+            if(DATA_FILTER.length == 0){
+              $('#result-produit button.return_to_filter').hide();
+              contenuFilter.show();
+              parentContenuComp.hide();
+            }
+            else
+              compareProductFilter();
+          }
+        }
+
+        $('button.return_to_filter').click(function(e){
+          e.preventDefault();
+          parentContenuComp.hide();
+          contenuFilter.show();// a été construit lorsque l'on a effectué un filtre
+          start_pagination();
+          $('#result-produit button.return_to_filter').hide();
+          console.log(DATA_FILTER);
+        });
+
+/******************** PAGINATION *****************/
+
+        $("#result-produit select[name=max_per_page]").change(function(){
+          var value = $(this).val();
+          MAX_PER_PAGE = parseInt(value); // on met à jour le max_per_page
+          start_pagination();
+        });
+
+        function set_display(first, last) {
+          $("#result-produit .row .bloc-filter").children().css('display', 'none');
+          $("#result-produit .row .bloc-filter").children().slice(first, last).css('display',
+          'block');
+        }
+        function previous(){
+          // si le nombre d'element qui precede celui possedant la classe active n'est pas null alors retourner en arriere
+          if($('.active').prev('.page_link').length)
+            go_to_page(current_page - 1);
+        }
+        function next(){
+          if($('.active').next('.page_link').length)
+            go_to_page(current_page + 1);
+        }
+
+        function next_prev_desabled(){
+          if( current_page == (Math.ceil(contenuFilter.children().size() / MAX_PER_PAGE)-1)){
+            $('#page_prev').removeClass('disabled');
+            $('#page_next').addClass('disabled');
+          }
+          else if(current_page == 0){
+            $('#page_next').removeClass('disabled');
+            $('#page_prev').addClass('disabled');
+          }
+          else{
+            $('#page_next').removeClass('disabled');
+            $('#page_prev').removeClass('disabled');
+          }
+        }
+
+        function go_to_page(page_num){
+          // NB: les paginations commence à page 0 <=> num 1
+          current_page = page_num;
+          start_from = current_page * MAX_PER_PAGE;
+          end_on = start_from + MAX_PER_PAGE;
+          set_display(start_from, end_on);
+          $('.active').removeClass('active');
+          $('#id' + page_num).addClass('active');
+          next_prev_desabled();
+        }
+
+       // $(document).ready(function() {
+        function start_pagination(){
+          current_page = 0;// ramener la page courante à 0 chaque fois kon rafrechi le pagination
+          var number_of_pages = Math.ceil(contenuFilter.children().size() / MAX_PER_PAGE);
+          var nav = '<ul class="pagination"><li id="page_prev"><a href="javascript:previous();"><<</a></li>';
+          var i = -1; // nous voulons travailler avec des indices commencant  0
+          while(number_of_pages > ++i ){
+            nav += '<li class="page_link'
+            if(!i) {
+              nav += ' active';
+            }
+            nav += '" id="id' + i +'">';
+            nav += '<a href="javascript:go_to_page(' + i +')">'+ (i + 1)
+            +'</a></li>';
+          }
+          nav += '<li id="page_next"><a href="javascript:next();">>></a></li></ul>';
+          $('#page_navigation').html(nav);
+          set_display(0, MAX_PER_PAGE);
+          next_prev_desabled();
+        }
+        //});
+
+    </script>
+{% endblock %}

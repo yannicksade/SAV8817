@@ -54,12 +54,6 @@
                                     </button>
                                 </div>
                                 <div class="btn-group">
-                                    <button style="margin-bottom: auto"
-                                            class="btn  btn-sm purple btn-outline purple edit_item">
-                                        <i class="fa fa-edit"></i> Edit
-                                    </button>
-                                </div>
-                                <div class="btn-group">
                                     <button data-href="delete-ajax" style="margin-bottom: auto"
                                             class="btn  btn-sm red btn-outline red delete_item" data-toggle="modal"
                                             href="#modal-confirm">
@@ -177,8 +171,6 @@
                     <div class="form-group">
                         <h3 class="inline"> Créer une offre </h3>
                         <input type="checkbox" class="group-checkboxes-form"/>
-                        <button disabled class="copier pull-right" data-toggle="modal" href="#modal-confirm">copier
-                        </button>
                     </div>
                     <div class="form-group">
                         {{ form_widget(form.id) }}
@@ -304,7 +296,7 @@
                         {{ form_errors(form.description) }}
                         {{ form_label(form.description, 'Description:', {'attr':{'class':'control-label'}}) }}
                         <span class="input-group-addon"><input type="checkbox"></span>
-                        {{ form_widget(form.description, {'attr':{'disabled':'true'}, "placeholder": "décrivez le produit ici..."}) }}
+                        {{ form_widget(form.description, {'attr':{'readonly':'true'}, "placeholder": "décrivez le produit ici..."}) }}
                     </div>
                     <input data-href="index-ajax" type="submit" value="Soumettre" disabled/>
                     <input type="reset" value="Effacer"/>
@@ -445,6 +437,7 @@
                         </table>
                     </div>
                     <div class="modal-footer">
+                        <a class="btn green pull-left" id="play-next"> next </a>
                         <a class="btn green pull-left modal-action-terminated" data-dismiss="modal"> OK </a>
                         <a class="btn btn-outline blue btn-sm blue edit_item" data-dismiss="modal"><i
                                     class="fa fa-edit"></i> Modifier </a>

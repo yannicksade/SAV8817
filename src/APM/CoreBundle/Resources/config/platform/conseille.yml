@@ -1,0 +1,6 @@
+evm_conseille_all:
+    path:     /
+    defaults: { _controller: APMCoreBundle:Platform/Conseille:index }
+evm_conseille_detail:
+    path:     /profil
+    defaults: { _controller: APMCoreBundle:Platform/Conseille:detail }

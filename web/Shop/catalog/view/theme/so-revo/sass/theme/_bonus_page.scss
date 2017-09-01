@@ -1,0 +1,272 @@
+/*===============================================
+	[SASS DIRECTORY ]
+	
+    [1] CONTACT PAGE
+    [2] PAEG ABOUT US
+    [3] PAGE BLOG
+    [4] PAGE 404 
+==============================================*/
+
+/*============ CONTACT PAGE ==============*/
+#map-canvas{
+  height: 550px;
+  width: 100%;
+  margin: 0px 0 10px;
+}
+.info-contact{padding-top: 30px;
+    .name-store h3{
+        font-size: 16px;
+        color: $gray-darker;
+        text-transform: uppercase;
+    }
+    .text{padding-#{$left}: 30px;}
+    .comment{
+        padding-bottom: 15px;
+        border-bottom: 1px solid #e9e9e9;
+        margin-bottom: 25px;
+    }
+    
+}
+.module.page_contact_custom{ margin-bottom: 0;
+  .block-contact .item .item-wrap {
+    background-color: #f2f2f2;
+    font-size: 14px;
+    color: #222;
+    overflow: hidden;
+    text-align: $left;
+    padding: 17px 20px;
+  }
+  .image-about-us img{
+    cursor: pointer;
+    @include transition(all .3s ease 0s);
+    &:hover{ opacity: 0.7; }
+  }
+  .block-contact .item .item-wrap .icon {
+    display: inline-block;
+    height: 66px;
+    width: 66px;
+    border-radius: 50%;
+    border: 1px solid #b7b7b7;
+    float: $left;
+    margin-#{$right}: 10px;
+  }
+  .block-contact .item .item-wrap .info { padding: 20px 0; line-height: 20px;     white-space: nowrap;}
+  .block-contact .item.address .item-wrap .info { padding: 13px 0; }
+  .block-contact .item.phone .item-wrap .icon {
+    background: url("#{$imgPath}icon/icon_general.png") no-repeat -9px -1761px #f2f2f2;
+  }
+  .block-contact .item.address .item-wrap .icon {
+    background: url("#{$imgPath}icon/icon_general.png") no-repeat -9px -1818px #f2f2f2;
+  }
+  .block-contact .item.support .item-wrap .icon {
+    background: url("#{$imgPath}icon/icon_general.png") no-repeat -9px -1706px #f2f2f2;
+  }
+  
+}
+.contact-form{
+    legend{
+        border: none;
+        padding: 0;
+        text-transform: uppercase;
+        font-weight: 600;
+        text-align: center;
+        h2{
+          font-size: 18px;
+          color: #222;
+          text-transform: uppercase;
+          margin-bottom: 20px;
+          text-align: center;
+          font-weight: bold;
+        }
+    }
+    p{ text-align: center; }
+   
+}
+
+
+/*============ PAEG ABOUT US ==============*/
+.about_us {
+  text-align: center;
+  .title-page {
+    font-size: 18px;
+    color: #222;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    font-weight: bold;
+  }
+  .content-page{ text-align: center;}
+}
+
+
+/*============ PAGE 404  ==============*/
+.button-404 > a{margin: 0 10px;}
+.content_404{ margin: 40px 0 30px; overflow:hidden; }
+.content_404 .block-top h2 {
+    color: #222;
+    font-size: 24px;
+    font-weight: bold;
+    text-transform: uppercase;
+    margin-bottom: 25px;
+}
+.content_404 .block-top .warning-code {
+    font-size: 14px;
+    color: #7d7d7d;
+    margin-bottom: 40px;
+}
+
+/*============ PAGE COMMING SOON  ==============*/
+.page-comingsoon{
+    background: url("#{$imgPath}/bg-comingsoon.jpg") no-repeat center center;
+    text-align: center;
+    min-height: 600px
+}
+
+/*INFOMATION*/
+
+.module-content{
+    background: #fff;border: 1px solid #ddd; padding: 0 20px;
+    .list-box{
+        li{
+            position: relative;
+            padding-#{$left}: 15px; 
+           &:before { position: absolute;display: block;top: 16px; background: #999; content: "";width: 6px; height: 6px; border-radius: 100%; #{$left}: 0;} 
+        }
+    }
+}
+.panel-default>.panel-heading{background: #fff;}
+.title-under{
+    position: relative;
+    margin-bottom: 50px;
+    &:after {
+        content: "";
+        position: absolute;
+        display: block;
+        height: 4px;
+        width: 68px;
+        background: $background;
+        bottom: -10px;
+    }
+}
+.owl2-carousel .owl2-item img {
+    transform-style: initial!important;
+}
+.title-under.text-center:after {
+    left: 50%;
+    margin-left: -34px;
+}
+.media-box-link--arrow .fa-arrow-right{    @include if-rtl {transform: rotate(180deg);}}
+.media-box-link--arrow .icon{font-size: 30px;}
+.media-box-link--figure .icon{font-size: 70px;}
+.media-box-link {
+  display: table-row;
+  width: 100%;
+  height: 100%;
+  background-color: $background;
+  cursor: pointer;
+  color: #fff;
+ @include transition(all 0.3s ease-in-out);
+}
+.btn-default{
+    background: $background;
+    border-radius: 0;
+    &:hover{
+        background: darken($background,10%!important);
+    }
+}
+.media-box-link h4 {
+  color: #fff;
+  @include transition(all 0.3s ease-in-out);
+}
+.media-box-link .icon {
+  @include transition(all 0.3s ease-in-out);
+}
+.media-box-link--figure,
+.media-box-link--content,
+.media-box-link--arrow {
+  display: table-cell;
+  padding: 6% 0;
+  vertical-align: middle;
+}
+.media-box-link--figure {
+  width: 23%;
+}
+.media-box-link--content {
+  padding-right: 5%;
+  width: 67%;
+}
+.media-box-link--arrow {
+  width: 10%;
+  vertical-align: middle;
+}
+.media-box-link:hover {
+  background-color: #f5f5f5;
+  color: #777777;
+}
+.media-box-link:hover h4 {
+  color: #333333;
+}
+.media-box-link:hover .icon {
+  color: $background;
+}
+.page_warranity{
+    color: #777;
+    .title-under{color: #333;}
+    .icon.icon-error{font-size: 30px;vertical-align: middle;}
+    .media-icon--content .color-dark.font18{color: #333;font-size: 500;}
+}
+.color {
+    color:  $background;
+}
+.title-decimal {
+    font-size: 20px;
+    @media (min-width: 1200px) {
+        font-size: 30px;
+    }
+
+    position: relative;
+    padding: side-values(4px 0 9px 69px);
+    &:before {
+        content: attr(data-content);
+        display: table-cell;
+        vertical-align: middle;
+        position: absolute;
+        top: 0px;
+        line-height: 40px;
+        background: $background;
+        width: 44px;
+        height: 44px;
+        color: #fff;
+        text-align: center;
+        -webkit-border-radius: 50%;
+        -moz-border-radius: 50%;
+        border-radius: 50%;
+        #{$left}: 0;
+    }
+}
+.decimal-list {
+    padding: 0;
+    margin: 10px 0 0 0;
+    list-style-type: none;
+    counter-reset: myCounter;
+}
+.decimal-list li {
+    font-size: 14px;
+    font-weight: bold;
+    color: #333;
+    padding: side-values(0 0 0 18px);
+    margin-bottom: 7px;
+    text-indent: 0;
+    position: relative;
+    &:before {
+        content: counter(myCounter);
+        counter-increment: myCounter;
+        position: absolute;
+        top: 0;
+        z-index: 1;
+        -webkit-transition: all 0.3s ease-in-out;
+        transition: all 0.3s ease-in-out;
+        color: $background;
+        font-weight: 500;
+        #{$left}: 0;
+    }
+}

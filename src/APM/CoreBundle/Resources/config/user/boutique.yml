@@ -1,4 +1,4 @@
 apm_core_gerant-boutique_index:
     path:     /
-    defaults: { _controller: "APMCoreBundle:GerantBoutique:index" }
+    defaults: { _controller: "APMCoreBundle:User/GerantBoutique:index" }
     methods:  GET

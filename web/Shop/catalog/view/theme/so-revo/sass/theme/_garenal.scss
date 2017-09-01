@@ -1,0 +1,341 @@
+/*===============================================
+	[SASS DIRECTORY ]
+	
+    [1] HEADING
+    [2] LINK & COLUMN
+    [3] BLOCK FORM
+    [4] BLOCK TABLE
+  
+==============================================*/
+
+/*================ HEADING ===================*/
+html {
+	width: 100%;
+	outline: 0!important;
+	@include if-rtl {direction: rtl;}
+	@include if-ltr {direction: ltr;}
+}
+body {
+	color: $textBody;
+	font-size: $font-size-base;
+	line-height: $line-height-computed;
+	
+}
+.owl2-carousel .owl2-item img{ transform-style: inherit; }
+h1 {font-size: $font-size-h1;}
+h2 {font-size: $font-size-h2;}
+h3 {font-size: $font-size-h3;}
+h4 {font-size: $font-size-h4;}
+h5 {font-size: $font-size-h5;}
+h6 {font-size: $font-size-h6;}
+.h1, .h2, .h3, h1, h2, h3,.h4, .h5, .h6, h4, h5, h6{margin: 0 0 15px 0;}
+
+@include scrollbars(.5em, $gray-light);
+@media only screen and (max-width: 992px){
+	@include scrollbars(.3em, $gray-light);
+}
+
+/*================ LINK & COLUMN ===================*/
+.textColor{color: $linkColor;}
+ul.menu, ol.menu ,ul.blank{list-style: none;margin: 0;padding: 0;}
+option { padding:2px 5px; border-width:1px;}
+.alert ol li {list-style-type:decimal;margin:0 0 5px 15px;	}
+
+img { max-width:100%;}
+.over{overflow: visible;}
+.align-center{display:table;margin:0 auto;}
+.text-danger{color: #fff; display: inline-block; background-color: #a94442; padding: 0 5px; margin: 5px 0; border-radius: 3px;font-size: 11px;}
+
+a{color: #666;
+	&:hover{color: $linkColorHover;text-decoration: none;}
+}
+a, a:visited, a:active, a:link, a:focus {cursor: pointer;text-decoration: none;outline: none; }
+
+ol {counter-reset: item;padding: 0 0 0 15px;}
+
+sup {color: #F00;font-size: 100%;top: -4px;}
+
+.list-inline{display: inline-block;margin: 0;
+	.container-megamenu &{
+		a{display: inline-block }
+	}
+	
+}
+.clearfix{clear: both;}
+.img-thumbnail{
+	&.pull-left{margin-right: 30px;}
+	&.pull-right{margin-left: 30px;}
+}
+
+
+.margin-zero{margin:0;}
+.col-xs-15,
+.col-sm-15,
+.col-md-15,
+.col-lg-15 {position: relative;min-height: 1px;padding-right: 15px;padding-left: 15px;}
+.col-xs-15 {width: 20%;float: $left;}
+@media (min-width: 768px) {.col-sm-15 {width: 20%;float: $left;}}
+@media (min-width: 992px) {.col-md-15 {width: 20%;float: $left;}}
+@media (min-width: 1200px) {.col-lg-15 { width: 20%; float: $left;}}
+
+/*================ FORM ===================*/
+legend {font-size: 18px;padding: 7px 0px}
+
+/* @group 2. Inputs
+-------------------*/
+textarea, 
+input[type="text"], 
+input[type="password"], 
+input[type="datetime"], 
+input[type="datetime-local"], 
+input[type="date"], 
+input[type="month"], 
+input[type="time"], 
+input[type="week"], 
+input[type="number"], 
+input[type="email"], 
+input[type="url"], 
+input[type="search"], 
+input[type="tel"], 
+input[type="color"], 
+.uneditable-input,
+.form-control,
+select {
+    border-radius: 3px;
+    border: none;
+    color: #3d3d3d;
+    padding: 9px;
+	 @include rem(font-size, 12px);
+	box-shadow: none !important;
+    transition: all 0.3s ease;
+}
+
+	input#input-captcha {
+		margin-bottom: 15px;
+	}
+	
+	
+	textarea:focus,
+	textarea:hover,
+	input[type="text"]:focus,
+	input[type="text"]:hover,
+	input[type="password"]:focus,
+	input[type="password"]:hover,
+	input[type="datetime"]:focus,
+	input[type="datetime"]:hover,
+	input[type="datetime-local"]:focus,
+	input[type="datetime-local"]:hover,
+	input[type="date"]:focus,
+	input[type="date"]:hover,
+	input[type="month"]:focus,
+	input[type="month"]:hover,
+	input[type="time"]:focus,
+	input[type="time"]:hover,
+	input[type="week"]:focus,
+	input[type="week"]:hover,
+	input[type="number"]:focus,
+	input[type="number"]:hover,
+	input[type="email"]:focus,
+	input[type="email"]:hover,
+	input[type="url"]:focus,
+	input[type="url"]:hover,
+	input[type="search"]:focus,
+	input[type="search"]:hover,
+	input[type="tel"]:focus,
+	input[type="tel"]:hover,
+	input[type="color"]:focus,
+	input[type="color"]:hover,
+	.uneditable-input:focus,
+	.uneditable-input:hover {
+	  outline: 0;
+	  outline: thin dotted \9;
+       background-color: #e9e9e9;
+	  
+	  /* IE6-9 */
+	}
+	
+	textarea {
+		max-width: 100%;
+	}
+	
+    .form-control{
+        height: 38px;
+    }
+/* @end */
+/* @group 3. Dropdown 
+-------------------*/
+.header-top-right .top-link > li{ position: relative; }
+header .dropdown-menu {
+	display: block;
+	opacity: 0;
+	filter: alpha(opacity=0);
+	visibility: hidden;
+	transition: all 0.2s ease-out;
+	margin-top: 20px;
+	min-width: 120px;
+	padding: 0;
+	border: 1px solid rgba(0,0,0,.15);
+	#{$right} : 0;
+	#{$left}  : auto;
+	-webkit-background-clip: padding-box;
+    background-clip: padding-box;
+}
+
+header .open > .dropdown-menu {
+  margin-top: 0;
+  opacity: 1;
+  filter: alpha(opacity=100);
+  visibility: visible;
+}
+.size-img-cart{ width: 80px; }
+.dropdown-menu {
+	background: #fff;
+	padding: 5px 0;
+	margin-top: 0;
+	border-radius:         0px;
+	border: none;
+	box-shadow:           0px 0px 25px rgba(0, 0, 0, 0.15);
+	font-size: 12px;
+}
+ 
+
+#sosearchpro{
+	 .dropdown-menu {
+		@include breakpoint(lg){ min-width: 300px; }
+		top: 100%;
+		
+		display: none;
+		.media-left{float: $left;}
+		.media-body a{@include linkGray();float: none;}
+		&:after{display: none;}
+	}
+}
+.dropdown-menu > li > a {padding: 5px 15px; @include linkGray();} 
+.dropdown-menu > li > a:hover,
+.dropdown-menu > li > a:focus {
+	background: #f7f7f7;
+}
+.nav-header {color: #667280;}
+/* @end */
+	
+/* @group 4. Buttons 
+------------------*/
+.input-group .form-control:last-child, .input-group-addon:last-child,
+.input-group-btn:last-child > .btn, .input-group-btn:last-child > .dropdown-toggle, .input-group-btn:first-child > .btn:not(:first-child) {
+    border-bottom-#{$left}-radius: 0;
+    border-top-#{$left}-radius: 0;
+}
+.button, .btn {
+	@include buttonColor();
+}
+.btn-warning{background: $brand-warning;}
+.btn-success{background: $brand-success;}
+.btn-info{background: #999; border-radius: 0; text-transform: uppercase;}
+.btn-primary{background: #999; border-radius: 0; text-transform: uppercase;}
+.btn-danger{background: $brand-danger; border-radius: 0;}
+.btn-revo{ 
+	background: $background;
+	height: 40px;
+    line-height: 40px;
+    color: #fff;
+    font-size: 14px;
+    border-radius: 20px;
+    padding: 0 35px;
+    display: inline-block;
+    vertical-align: top;
+    font-weight: bold;
+    text-transform: uppercase;
+    margin:side-values(0 20px 0 0px) ;
+    @include transition(all .3s ease 0s);
+    &:hover{ background: #999; }
+}
+.button, .btn{
+	.fa{margin: 0 5px;}
+}
+
+.button.inverse,
+.btn.inverse {
+    background-color: $gray;
+}
+.button.inverse:hover,
+.btn.inverse:hover {background-color: $background;}
+	
+	
+.button-continue-shopping {display: block;float: left;}
+.button-checkout {display: block;float: right;}
+
+.btn-lg,.btn-group-lg > .btn {padding: 10px 16px;font-size: 18px;line-height: 1.3333333;}
+.btn-sm,.btn-group-sm > .btn {padding: 5px 10px;font-size: 12px;line-height: 1.5;}
+.btn-xs,.btn-group-xs > .btn {padding: 1px 5px;font-size: 12px;line-height: 1.5;}
+/* @end */
+ .btn-inline{display: inline-block;}
+
+
+/*================ TABLE ===================*/
+.table thead > tr > th{background: #eee;}
+table.std th, table.std td {
+	vertical-align: middle;
+	border: $table-border-color;
+	padding: 10px;
+	text-align: center;
+}
+table.std th {
+	white-space: nowrap;
+	background: #f5f5f5;
+}
+table.std tfoot td {
+	color: #333;
+	text-align: $right;
+	white-space: nowrap;
+}
+ table.std {
+	background: #fdfdfd;
+	border-spacing: 0;
+	vertical-align: middle;
+	border: $table-border-color;
+	width: 100%;
+}
+table th {
+	border: $table-border-color;
+	color: #7a7a7a;
+	font-size: 13px;
+	font-weight: bold;
+	padding: 10px;
+	text-align: center;
+	vertical-align: middle;
+	text-transform: uppercase;
+}
+
+.delivery_option table td {
+	text-align: center;
+}
+table tfoot td { text-align: $right;}
+table.table-bordered thead >*{background-color: rgba(51, 51, 51, 0.1); font-weight: bold;}
+
+
+/*================ PAGINATION ===================*/
+.pagination > li {display: inline-block; margin: 0 2px; vertical-align: top;
+    span, a{padding: 3px 8px;}
+    a:hover, span:hover{color: #fff; background: $background1; border-color: $linkColor;}
+    &.active, &:hover{background: transparent; border-color: $linkColor;
+	   span{color: $linkColor; background: transparent; border-color: $linkColor;
+		  &:hover{background: $background1; border-color: $linkColor;}
+	   }
+    }
+    &:last-child{margin-#{$right}: 0;}
+}
+.pagination > li:first-child > a, .pagination > li:first-child > span {border-radius: 0;}
+.pagination > li > a, .pagination > li > span {color: #666;}
+.pagination > li:last-child > a, .pagination > li:last-child > span {border-radius: 0;}
+
+.checkout-cart{ 
+	.btn-block{
+		input{     
+			min-width: 40px;
+	    	text-align: center; 
+		}
+	}
+    .table-responsive{
+    	direction: ltr;
+    }
+}

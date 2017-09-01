@@ -1,0 +1,825 @@
+<script src="{{app.request.getSchemeAndHttpHost() ~ asset('plateform/hitel/js/jspdf.debug.js')}}" type="text/javascript"></script>
+
+<div class="page3  background-green"  >
+    <div class="image-container"  >
+        <div class="row">
+            <div class="col-sm-9 " style="padding: 0;margin: 0;">
+                <div class="col-sm-12 containe" style="padding: 0;margin: 0 0 0 1.8%;width: 99%">
+                    <div class="wizard-container"  style="padding-top: 0px">
+                        <div class="card wizard-card" data-color="green" id="wizard" style="height: 700px">
+                            <form action="" method="" style="background: white;">
+                                <div class="wizard-navigation">
+                                    <div class="progress-with-circle">
+                                        <div class="progress-bar" role="progressbar" aria-valuenow="1" aria-valuemin="1" aria-valuemax="4" style="width: 15%"></div>
+                                    </div>
+                                    <ul>
+                                        <li>
+                                            <a href="#location" data-toggle="tab">
+                                                <div class="icon-circle">
+                                                    <i class="ti-map"></i>
+                                                </div>
+                                                Produits
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a href="#type" data-toggle="tab"  id="refreshTrans">
+                                                <div class="icon-circle">
+                                                    <i class="ti-direction-alt"></i>
+                                                </div>
+                                                Transporteurs
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a href="#facilities" data-toggle="tab">
+                                                <div class="icon-circle">
+                                                    <i class="ti-user"></i>
+                                                </div>
+                                                Identification
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a href="#description" data-toggle="tab">
+                                                <div class="icon-circle">
+                                                    <i class="ti-star"></i>
+                                                </div>
+                                                Payement
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <br>
+                                <hr>
+                                <div class="tab-content">
+                                    <div class="tab-pane" id="location">
+                                        <div class="row">
+                                            <div class="col-sm-12">
+
+                                                <div class="row" id="result-produit">
+                                                    <table id="table_check_out" border="1" style="width: 100%;font-size: medium;font-weight: 600;">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>Photo</th>
+                                                                <th>Nom</th>
+                                                                <th>Quantite</th>
+                                                                <th>Prix unitaire</th>
+                                                                <th>Livraison</th>
+                                                                <th>Total</th>
+                                                                <th></th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody></tbody>
+                                                        <tfoot>
+                                                            <tr>
+                                                                <th>Photo</th>
+                                                                <th>Nom</th>
+                                                                <th>Quantite</th>
+                                                                <th>Prix unitaire</th>
+                                                                <th>Livraison</th>
+                                                                <th>Total</th>
+                                                                <th></th>
+                                                            </tr>
+                                                        </tfoot>
+                                                    </table>
+                                                    <br>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="tab-pane" id="type">
+                                        <h5 class="info-text">Votre localisation est <a>Cameroun/Yaounde</a> </h5>
+                                        <h5 class="info-text">Choix du transporteur </h5>
+                                        <div class="row">
+
+                                            <div class="row" id="result">
+                                                <table id="table_check_out_transport" border="1" style="width: 100%;font-size: medium;font-weight: 600;">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Photo</th>
+                                                            <th>Nom</th>
+                                                            <th>Quantite</th>
+                                                            <th>Boutique</th>
+                                                            <th>Zone de Boutique</th>
+                                                            <th>Transporteur sur zone</th>
+{#                                                            <th>Prix Livraison</th>#}
+                                                            <th>Total</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr>
+                                                            <td colspan="7"><center> Vous n avez selectionne aucun produit pour livraison par des transporteurs </center></td>
+                                                        </tr>
+                                                    </tbody>
+                                                    <tfoot>
+                                                        <tr>
+                                                            <th>Photo</th>
+                                                            <th>Nom</th>
+                                                            <th>Quantite</th>
+                                                            <th>Boutique</th>
+                                                            <th>Zone de Boutique</th>
+                                                            <th>Transporteur sur zone</th>
+{#                                                            <th>Prix Livraison</th>#}
+                                                            <th>Total</th>
+                                                        </tr>
+                                                    </tfoot>
+                                                </table>
+                                                <br>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="tab-pane" id="facilities">
+                                        <div class="row">
+                                            <table class="table-form2" id="identification">
+                                                <tr>
+                                                    <td colspan="2" style="text-transform: uppercase">
+                                                <center><b>Identifiez vous!</b></center>
+                                                </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        <input type="text" name="nom" placeholder="Votre Nom">
+                                                    </td>
+                                                    <td>
+                                                        <input type="text" name="prenom" placeholder="Votre Prenom">
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        <input type="text" name="email" placeholder="Votre Email">
+                                                    </td>
+                                                    <td>
+                                                        <input type="text" name="num" placeholder="Votre Numero de telephone">
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        <input type="text" name="" placeholder="Votre Pays">
+                                                    </td>
+                                                    <td>
+                                                        <input type="password" name="" placeholder="Votre Mot de Passe">
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        <input type="text" name="" placeholder="Votre Pays">
+                                                    </td>
+                                                    <td>
+                                                        <input type="password" name="" placeholder="Votre Mot de Passe">
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </div>
+                                    </div>
+                                    <div class="tab-pane" id="description">
+                                        <div class="row">
+                                            <div class="col-sm-12 col-sm-offset">
+                                                <div class="col-sm-3 col-sm-offset">
+                                                    <div class="choice" data-toggle="wizard-checkbox"  onclick="openNotif('Payement','Vous avez choisi Orange Money');">
+                                                        <input type="checkbox" name="payment" value="om">
+                                                        <div class="card card-checkboxes card-hover-effect">
+                                                            <img src="{{app.request.getSchemeAndHttpHost() ~ asset('plateform/hitel/images/om.jpg')}}" width="40px" heigth="40px">
+                                                            <p>Orange Money</p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-3">
+                                                    <div class="choice" data-toggle="wizard-checkbox"  onclick="openNotif('Payement','Vous avez choisi Mobile Money');">
+                                                        <input type="checkbox" name="payment" value="momo">
+                                                        <div class="card card-checkboxes card-hover-effect">
+                                                            <img src="{{app.request.getSchemeAndHttpHost() ~ asset('plateform/hitel/images/momo.jpg')}}" width="40px" heigth="40px">
+                                                            <p>Mobile Money</p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-3">
+                                                    <div class="choice" data-toggle="wizard-checkbox"  onclick="openNotif('Payement','Vous avez choisi Paypal');">
+                                                        <input type="checkbox" name="payment" value="pp">
+                                                        <div class="card card-checkboxes card-hover-effect">
+                                                            <img src="{{app.request.getSchemeAndHttpHost() ~ asset('plateform/hitel/images/pp.png')}}" width="40px" heigth="40px">
+                                                            <p>Paypal</p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-3">
+                                                    <div class="choice" data-toggle="wizard-checkbox"  onclick="openNotif('Payement','Vous avez choisi Visa');">
+                                                        <input type="checkbox" name="payment" value="vs">
+                                                        <div class="card card-checkboxes card-hover-effect">
+                                                            <img src="{{app.request.getSchemeAndHttpHost() ~ asset('plateform/hitel/images/vs.png')}}" width="40px" heigth="40px">
+                                                            <p>Visa</p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <center><button type='button' class="btn-pay" onclick="pdfFromHTML('#recap-Commande')">Imprimer avant achat</button></center>
+                                        <hr/>
+                                        <div id="recap-Commande">
+                                            <label for="recap-Commande">APM Facture avant achat</label>
+                                            <center><img class="logo img-responsive" src="{{app.request.getSchemeAndHttpHost() ~ asset('plateform/img/logoApm.png')}}" alt="LOGO" width="100" height="30"></center>
+                                            <center><h2 style="font-size:120%;text-align:center">APM ACHAT EN LIGNE</h2></center>
+                                            <center><h3>Informations Personnelles</h3></center>
+                                            <table border="1" style="width: 100%;" id="ident-Commande">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Nom</th>
+                                                            <th>Prenom</th>
+                                                            <th>Telephone</th>
+                                                            <th>Email</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody style="width: 100%;font-size: small;font-weight: 600;">
+                                                        <tr>
+                                                            <td><h4 id="nom-check-out">Inconnu</h4></td>
+                                                            <td><h4 id="prenom-check-out">Inconnu</h4></td>
+                                                            <td><h4 id="tel-check-out">Inconnu</h4></td>
+                                                            <td><h4 id="email-check-out">Inconnu</h4></td>
+                                                        </tr>
+                                                    </tbody>
+                                                    <tfoot>
+                                                        <tr>
+                                                            <th>Nom</th>
+                                                            <th>Prenom</th>
+                                                            <th>Telephone</th>
+                                                            <th>Email</th>
+                                                        </tr>
+                                                    </tfoot>
+                                                </table>
+                                            <center><h3>Informations Commande</h3></center>
+                                            <table border="1" style="width: 100%;" id="prod-Commande">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Image</th>
+                                                            <th>Nom</th>
+                                                            <th>Entreprise</th>
+                                                            <th>Quantite</th>
+                                                            <th>Prix</th>
+                                                            <th>Total</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody style="width: 100%;font-size: small;font-weight: 600;">
+                                                        
+                                                    </tbody>
+                                                    <tfoot>
+                                                        <tr>
+                                                            <th>Image</th>
+                                                            <th>Nom</th>
+                                                            <th>Entreprise</th>
+                                                            <th>Quantite</th>
+                                                            <th>Prix</th>
+                                                            <th>Total</th>
+                                                        </tr>
+                                                    </tfoot>
+                                                </table>
+                                            <center><h3>Total:<span id="total_all"></span> cfa</h3></center>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="wizard-footer">
+                                    <hr>
+                                    <div class="pull-right">
+                                        <input type='button' class='btn btn-next btn-fill btn-success btn-wd' name='next' value='Suivant' />
+                                        <input type='button' class='btn btn-finish btn-fill btn-success btn-wd' name='finish' value='Lancer le payement' />
+                                    </div>
+                                    <div class="pull-left">
+                                        <input type='button' class='btn btn-previous btn-default btn-wd' name='previous' value='Precedent' />
+                                    </div>
+                                    <div class="clearfix"></div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-3 state-prod-check">
+                <div class="containe">
+                    <div class="title-prod">
+                       Récapitulatif de la commande
+                    </div>
+                    <div class="content-prod">
+                        <table>
+                            <tbody>
+                                <tr>
+                                    <td>        
+                                        <center><img width="55%" src="{{app.request.getSchemeAndHttpHost() ~ asset('plateform/hitel/images/loading.gif') }}"></center>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="total-sum" >
+                        <label style="line-height: 2.5;margin-left: 25px;font-size: small;">Total Commande : </label>
+                        <div class="total">
+                            0
+                        </div>
+                    </div>
+                    <div class="btn-sum">
+                        <center>
+                            <button class=" btn-pay" >Acheter directement</button>
+                        </center>
+                        <img src='{{app.request.getSchemeAndHttpHost() ~ asset('plateform/demo/payment/payment.png')}}' class='search-elt-img' style=' width: 95%;'>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+
+<script type="text/javascript">
+    var CHECK_OUT_DATA = [];
+    var element = {
+      produit:{
+          code:'0',
+          nom:'0',
+          prix:0,
+          quantite:0,
+          photo:'0',
+          poids:1
+      } ,
+      boutique:{
+          code:'0',
+          nom:'0',
+          zone:'0'
+      },
+      transporteur:{
+          code:'0',
+          quantite:1,
+          nom:'0',
+          zone:'0',
+          prix:0
+      }
+    };
+    function clone(obj){
+        try{
+            var copy = JSON.parse(JSON.stringify(obj));
+        } catch(ex){
+            alert("Vous utilisez un vieux navigateur bien pourri, qui n'est pas pris en charge par ce site");
+        }
+        return copy;
+    }
+    
+                function refreshPriceQuantity(){
+                    var content_rigth = $(".state-prod-check .content-prod table tbody");
+                    var content_tot = $(".state-prod-check .total");
+                    var somme = 0;
+                    var content="";
+                    content_rigth.html("");
+                    CHECK_OUT_DATA.forEach(function(item,index){
+                        var prix = item.produit.prix*item.produit.quantite;
+                        var cols="";
+                        var ajout="";
+                        if(item.transporteur.code!=0){
+                            cols="rowspan='2'";
+                            var ajout ="<tr>"+
+                                    "<td>Transporteur : "+item.transporteur.nom+"</td>"+
+                                    "<td>Prix : "+item.transporteur.quantite*item.transporteur.prix+" fcfa</td>"+
+                                 "</tr>";
+                            somme+=item.transporteur.quantite*item.transporteur.prix;
+                        }
+                        var tpl ="<tr>"+
+                                    "<td "+cols+" ><img width='25p' heigth='25p' src='"+item.produit.photo+"' /><p>"+item.produit.nom+"</p></td>"+
+                                    "<td>Boutique : "+item.boutique.nom+"</td>"+
+                                    "<td>Prix : "+prix+" fcfa</td>"+
+                                 "</tr>"+ajout;
+                         somme+=prix;
+                        content_rigth.append(tpl); 
+                    });
+                    content_tot.html(somme+" fcfa");
+                    var content_recap = $("table#prod-Commande tbody");
+                    content_recap.html("");
+                    $("#total_all").html(somme);
+                    CHECK_OUT_DATA.forEach(function(item,index){
+                        var prix = item.produit.prix*item.produit.quantite;
+                        var cols="";
+                        var ajout="";
+                        if(item.transporteur.code!=0){
+                            cols="rowspan='2'";
+                            var ajout ="<tr>"+
+                                    "<td>Transporteur : "+item.transporteur.nom+"</td>"+
+                                    "<td>"+item.transporteur.quantite+" </td>"+
+                                    "<td>"+item.transporteur.prix+" fcfa</td>"+
+                                    "<td>"+item.transporteur.quantite*item.transporteur.prix+" fcfa</td>"+
+                                 "</tr>";
+                            somme+=item.transporteur.quantite*item.transporteur.prix;
+                        }
+                        var tpl ="<tr>"+
+                                    "<td "+cols+" ><img width='50px' heigth='50px' src='"+item.produit.photo+"'/></td>"+
+                                    "<td "+cols+">"+item.produit.nom+"</td>"+
+                                    "<td>Boutique : "+item.boutique.nom+"</td>"+
+                                    "<td>"+item.produit.quantite+" </td>"+
+                                    "<td>"+prix+" fcfa</td>"+
+                                    "<td>"+prix*item.produit.quantite+" fcfa</td>"+
+                                 "</tr>"+ajout;
+                         somme+=prix;
+                        content_recap.append(tpl); 
+                    });
+                }
+    function removeItem(_this) {
+        var id = $(_this).attr("data");
+        var data = localStorage.getItem(id);
+        var code = parseInt((data.split(","))[0]);
+        console.log(code);
+        if (confirm("Supprimer ce produit de votre panier? ")) {
+            
+            openNotif('Panier',"Un produit a ete supprime du panier!");
+            $("#" + id).hide(1000);
+            $("tr#" + id + " ").removeClass("exist");
+            $("tr#" + id + " td.quantity input").val(0);
+            $("tr#" + id + " td.price span").val(0);
+            $("tr#" + id + " td.priceTotal span").val(0);
+            var tmp=[];
+            CHECK_OUT_DATA.forEach(function(item,index){
+                if(item.produit.code!=code)
+                    tmp.push(item);
+            });
+            CHECK_OUT_DATA=tmp;
+            localStorage.removeItem(id);
+            refreshPriceQuantity();
+            initCard();
+            refreshPrice();
+        }
+    }
+    $(document).ready(
+            function () {
+                var DATA_PRODUITS=[];
+                var DATA_BOUTIQUE =[];
+                var DATA_TRANSPORT =[];
+                var TRANSPORT_PROD_ADD = [];
+                function refreshPrice() {
+                    var somme = 0, num = 0, sommeUnit = 0;
+                    var elts = $("table#table_check_out tr.exist td.priceTotal span");
+                    for (var i = 0; i < elts.length; i++) {
+                        somme += parseFloat($(elts[i]).html());
+                    }
+                    $("#totalPriceProduct span").html(somme);
+                    elts = $("table#table_check_out tr.exist td.quantity input");
+                    for (var i = 0; i < elts.length; i++) {
+                        num += parseInt($(elts[i]).val());
+                    }
+                    $("#numberProducts span").html(num);
+                    elts = $("table#table_check_out tr.exist td.price span");
+                    for (var i = 0; i < elts.length; i++) {
+                        sommeUnit += parseFloat($(elts[i]).html());
+                    }
+                    $("#totalPriceUnitProduct span").html(sommeUnit);
+                }
+                function refreshPriceTrans() {
+                    var somme = 0, num = 0, sommeUnit = 0;
+                    var elts = $("table#table_check_out_transport tr.exist td.priceTotal span");
+                    for (var i = 0; i < elts.length; i++) {
+                        somme += parseFloat($(elts[i]).html());
+                    }
+                    $("#trs-totalPriceProduct span").html(somme);
+                    $("#tot-price-trans").html(somme);
+                    elts = $("table#table_check_out_transport tr.exist td.quantity input");
+                    for (var i = 0; i < elts.length; i++) {
+                        num += parseInt($(elts[i]).val());
+                    }
+                    $("#trs-numberProducts span").html(num);
+                    elts = $("table#table_check_out_transport tr.exist td.price span");
+                    for (var i = 0; i < elts.length; i++) {
+                        sommeUnit += parseFloat($(elts[i]).html());
+                    }
+                    $("#trs-totalPriceUnitProduct span").html(sommeUnit);
+                }
+                function updateNumber(_this,code) {
+                    var id = $(_this).attr("target-id");
+                    var price = $("#" + id + " td.price span").html();
+                    var number = $(_this).val();
+                    $("#" + id + " td.priceTotal span").html(price * number);
+                    var code = parseInt($(_this).attr("target"));
+                    CHECK_OUT_DATA.forEach(function(item,index){
+                                    console.log("comppare "+code+" avec "+item.produit.code);
+                                    if(item.produit.code==code){
+                                        item.produit.quantite = parseInt(number);
+                                        console.log("MOdification");
+                                        console.log(item);
+                                    }
+                                });
+                    refreshPriceQuantity();
+                    refreshPrice();
+                }
+                $("table#table_check_out tr button").click(function () {
+                    removeItem(this);
+                });
+                function updateTrans(this_,target){
+                    var ville = $(this_).val();
+                    var code = parseInt(target.replace("trs-evm_card_product",""));
+                    var produit = null,cont=true;
+                    for(var index=0;index<CHECK_OUT_DATA.length;index++){
+                        var item = CHECK_OUT_DATA[index];
+                        if(item.produit.code==code){
+                            item.boutique.zone = ville;
+                            produit=item;
+                            break;
+                        }
+                    }
+                    var parent = ville,id_sel=target+"-select";
+                    var  transporteur_loc = "<div class='form-group'><select id='"+id_sel+"'  class='form-control valid sel-trans' aria-invalid='false'><option disabled='' selected=''>- Choisir votre transporteur -</option>";
+                    var VILLE_DEP = ville;
+                        DATA_TRANSPORT.forEach(function (item, index) {
+                                for (var j = 0; j < item.zone.length; j++) {
+                                    if (item.zone[j].nom == VILLE_DEP) {
+                                        transporteur_loc += ("<option value='" + item.zone[j].prix +","+ item.code + ","+ item.nom +"'>" + item.nom +" - "+item.transport[0]+" - ("+item.zone[j].prix+" cfa/Kg) </option>");
+                                        break;
+                                    }
+                                }
+                            });
+                    transporteur_loc += "</select></div>";
+                    console.log("#"+target+" > td.transport");
+                    $("#"+target+" > td.transport").html(transporteur_loc);
+                    $("#"+id_sel).change(function(){
+                        var data = $(this).val().split(",");
+                        var val = data[0];
+                        var nbre = parseInt($("#"+target+" > td.quantity input").val());
+                        val*=nbre;
+                        produit.transporteur.quantite = parseInt(nbre);
+                        produit.transporteur.code = parseInt(data[1]);
+                        produit.transporteur.nom = data[2];
+                        produit.transporteur.prix = parseInt(data[0]);
+                        console.log(produit);
+                        produit.transporteur.zone = ville;
+                        refreshPriceQuantity();
+                        $("#"+target+" .priceTotal span").html(val);
+                        refreshPriceTrans();
+                    });
+                    
+                }
+                function initCheckTransport() {
+                    var content = $("#table_check_out_transport tbody");
+                    content.html("");
+                    var somme = 0, num = 0;
+                    var lng = TRANSPORT_PROD_ADD.length;
+                    for (var i = 0; i < lng; i++) {
+                        var data = null, data_code = TRANSPORT_PROD_ADD[i];
+                        DATA_PRODUITS.forEach(function (item, index) {
+                            if (item.code == data_code)
+                                data = item;
+                        });
+                        if (data != null) {
+                            var code = data.code, prix = data.price, nom = data.nom, photo = data.face;
+                            var boutique = null;
+                            DATA_BOUTIQUE.forEach(function (item, index) {
+                                if (item.code == data.boutique)
+                                    boutique = item;
+                            });
+                            var boutique_loc = "<div class='form-group'><select  class='form-control valid' aria-invalid='false'><option disabled='' selected=''>- Choisir la zone de la boutique -</option>";
+                            var VILLE_DEP = "";
+                            if(boutique==null){
+                                continue;
+                            }
+                            for (var j = 0; j < boutique.zone.length; j++) {
+                                if (j == 0) {
+                                    VILLE_DEP = boutique.zone[j].nom;
+                                    boutique_loc += ("<option  value='" + boutique.zone[j].nom + "'>" + boutique.zone[j].nom + "</option>");
+                                } else
+                                    boutique_loc += ("<option  value='" + boutique.zone[j].nom + "'>" + boutique.zone[j].nom + "</option>");
+                            }
+                            boutique_loc += "</select></div>";
+                            var id_tr = "trs-evm_card_product" + data_code ;
+                            var node =
+                                    "<tr style='border-bottom:1px solid black;' id='"+id_tr+ "' class='exist'>" +
+                                    "<td><img src='" + photo + "'style='width: 130px;height: 90px;'></td>" +
+                                    "<td>" + nom + "</td>" +
+                                    "<td class='quantity'><input type='number' target='"+data_code+"' target-id='evm_card_product" + i + "' value='1' style='width: 50px;text-align: center;'/></td>" +
+                                    "<td class='price'><a>" + boutique.nom + "</a> fca</td>" +
+                                    "<td>" + boutique_loc + "</td>" +
+                                    "<td class='transport'><center><img src='{{app.request.getSchemeAndHttpHost() ~ asset('plateform/hitel/images/loading-bar.gif')}}' width='50px' heigth='10px'></center></td>" +
+                                    "<td class='priceTotal'><span>" + 0 + "</span> fca</td>" +
+                                    "</tr>";
+                            content.prepend(node);
+                            somme += parseInt(prix);
+                            $("#tot-price-trans").html(somme);
+                            var s = somme + parseInt( $("#tot-price-all").html());
+                            $("#tot-price-max").html(s);
+                            num++;
+                            
+                        }else{
+                            openNotif('Erreur Produit',"Chargement non acheve veillez reessayer?");
+                        }   
+                    }
+                    TRANSPORT_PROD_ADD.forEach(function (item, index) {
+                            var id_tr = "trs-evm_card_product" + item ;
+                            $("#" + id_tr+ " select").change(function(){updateTrans(this,id_tr);});
+                            $("#" + id_tr+ " .quantity input").change(function(){
+                                var val = $(this).val();
+                                var nbre = parseInt($("#"+id_tr+" > td.transport select").val());
+                                $("#"+id_tr+" .priceTotal span").html(val*nbre);
+                                var code = parseInt($(this).attr("target"));
+                                CHECK_OUT_DATA.forEach(function(item,index){
+                                    console.log("comppare "+code+" avec "+item.produit.code);
+                                    if(item.produit.code==code){
+                                        item.transporteur.quantite = parseInt(val);
+                                        console.log("MOdification");
+                                        console.log(item);
+                                    }
+                                });
+                                refreshPriceQuantity();
+                                refreshPriceTrans();
+                            });
+                    });
+                    var node = "<tr style='color:red'>" +
+                            "<td>Total</td>" +
+                            "<td>total</td>" +
+                            "<td id='trs-numberProducts'><span>" + num + "</span></td>" +
+                            "<td id='trs-totalPriceUnitProduct'><span>" + "-" + "</span> cfa</td>" +
+                            "<td id='trs-totalTranspCheck'>" + "-" + " </td>" +
+                            "<td id='trs-totalPriceUnitProduct'><span>" + "-" + "</span> cfa</td>" +
+                            "<td id='trs-totalPriceProduct'><span>" + 0 + "</span> fcfa</td>" +
+                            "</tr>";
+                    content.append(node);
+                    $("table#table_check_out tr button").click(function () {
+                        removeItem(this);
+                    });
+                    $("table#table_check_out tr input[type=number]").click(function () {
+                        updateNumber(this);
+                    });
+
+                }
+                function initCheck() {
+                    var nextId = localStorage.getItem("evm_card_number");
+                    var content = $("#table_check_out tbody");
+                    content.html("");
+                    if (nextId == null) {
+                        nextId = 1;
+                        localStorage.setItem("evm_card_number", nextId);
+
+                    }
+                    var somme = 0,somme2 = 0, num = 0;
+                    for (var i = 1; i < nextId; i++) {
+                        var data = localStorage.getItem("evm_card_product" + i)
+                        if (data != null) {
+                            data = data.split(",");
+                            var code = data[0], prix = data[1], nom = data[2], photo = data[3], nbre = parseInt(data[4]);
+
+                            var put_prod = clone(element);
+                            put_prod.produit.code = code;
+                            put_prod.produit.nom = nom;
+                            put_prod.produit.prix = prix;
+                            put_prod.produit.quantite = nbre;
+                            put_prod.produit.photo = photo;
+                            
+                            CHECK_OUT_DATA.push(put_prod);
+                            var node =
+                                    "<tr style='border-bottom:1px solid black;' id='evm_card_product" + i + "' class='exist'>" +
+                                    "<td><img src='" + photo + "'style='width: 140px;height: 90px;'></td>" +
+                                    "<td>" + nom + "</td>" +
+                                    "<td class='quantity'><input target='"+code+"'type='number'  target-id='evm_card_product" + i+ "' value='" + nbre + "' style='width: 50px;text-align: center;'/></td>" +
+                                    "<td class='price'><span>" + prix + "</span> fca</td>" +
+                                    "<td><input type='checkbox' value='" + code + "' style='height: 30px;width: 20px;text-align: center;margin-left: 25px;'/></td>" +
+                                    "<td class='priceTotal'><span>" + nbre*prix + "</span> fca</td>" +
+                                    "<td><span class='btn-remove' onclick=\" removeItem(this)\" data='evm_card_product" + i + "'>X</span></td>" +
+                                    "</tr>";
+                            content.prepend(node);
+                            somme += parseInt(prix);
+                            somme2 += nbre*parseInt(prix);
+                            $("#tot-price-all").html(somme2);
+                            num++;
+                        }
+                    }
+
+                    var node = "<tr style='color:red'>" +
+                            "<td>Total</td>" +
+                            "<td>total</td>" +
+                            "<td id='numberProducts'><span>" + num + "</span></td>" +
+                            "<td id='totalPriceUnitProduct'><span>" + somme + "</span> cfa</td>" +
+                            "<td id='totalTranspCheck'>" + 0 + " </td>" +
+                            "<td id='totalPriceProduct'><span>" + somme2 + "</span> fcfa</td>" +
+                            "</tr>";
+                    content.append(node);
+                    $("table#table_check_out tr button").click(function () {
+                        removeItem(this);
+                    });
+                    $("table#table_check_out tr input[type=number]").click(function () {
+                        updateNumber(this);
+                    });
+
+                }
+                initCheck();
+                function removeItemArray(code) {
+                    var List = [];
+                    var indexCheck = TRANSPORT_PROD_ADD.indexOf(code);
+                    TRANSPORT_PROD_ADD.forEach(
+                            function (item, index) {
+                                if (index != indexCheck)
+                                    List.push(item);
+                            }
+                    );
+                    TRANSPORT_PROD_ADD = List;
+                }
+                function addMoovProduct(_this) {
+                    var code = $(_this).val();
+                    if (TRANSPORT_PROD_ADD.indexOf(code) == -1) {
+                        TRANSPORT_PROD_ADD.push(code);
+                        openNotif('Transport',"Vous avez un nouveau produit pour la livraison express?");
+                    } else {
+                        removeItemArray(code);
+                        openNotif('Transport',"Vous avez retiré un produit pour la livraison express?");
+                    }
+                    initCheckTransport();
+                    console.log(TRANSPORT_PROD_ADD);
+                }
+                $("table#table_check_out tr input[type='checkbox']").click(function () {
+                    addMoovProduct(this);
+                });
+    {#                $("#refreshTrans").click(function(){initCheckTransport();});#}
+            $("#identification input[name='nom']").change(function(){$("#nom-check-out").html($(this).val());});
+            $("#identification input[name='prenom']").change(function(){$("#prenom-check-out").html($(this).val());});
+            $("#identification input[name='num']").change(function(){$("#tel-check-out").html($(this).val());});
+            $("#identification input[name='email']").change(function(){$("#email-check-out").html($(this).val());});
+            $.ajax({
+                        url :"{{path('evm_produit_all_get')}}",
+                        data:{},
+                        dataType:"json",
+                        success: function(data, status){
+                            data.forEach(function(item,index){item.face=LINK_FILE_ASSERT+item.face;});
+                            DATA_PRODUITS = data;
+                            openNotif('Chargement Termine',"Les produits ont ete charges avec succes");
+                            
+                            $.ajax({
+                                    url :"{{path('evm_boutique_get_all')}}",
+                                    data:{},
+                                    dataType:"json",
+                                    success: function(data, status){
+                                        data.forEach(function(item,index){item.logo=LINK_FILE_ASSERT+item.logo;});
+                                        data.forEach(function(item,index){item.produit=LINK_FILE_ASSERT+item.produit;});
+                                        DATA_BOUTIQUE = data;
+                                        openNotif('Chargement Termine',"Les boutiques ont ete charges avec succes");
+                                        CHECK_OUT_DATA.forEach(function(item,index){
+                                            DATA_PRODUITS.forEach(function(prod,index_prod){
+                                                if(prod.code==item.produit.code){
+                                                    item.boutique.code = prod.boutique;
+                                                    DATA_BOUTIQUE.forEach(function(shop,index_shop){
+                                                        if(shop.code==item.boutique.code){
+                                                            item.boutique.nom = shop.nom;
+                                                        }
+                                                    });
+                                                }
+                                            });
+                                        });
+                                        refreshPriceQuantity();
+                                    }
+                                });
+                        }
+                    });
+             $.ajax({
+                        url :"{{path('evm_transporteur_get_all')}}",
+                        data:{},
+                        dataType:"json",
+                        success: function(data, status){
+                            data.forEach(function(item,index){item.logo=LINK_FILE_ASSERT+item.logo;});
+                            data.forEach(function(item,index){item.avatar=LINK_FILE_ASSERT+item.avatar;});
+                            DATA_TRANSPORT = data;
+                            openNotif('Chargement Termine',"Les transporteurs ont ete charges avec succes");
+                        }
+                    });
+        }
+                        
+    );
+
+function pdfFromHTML(target) {
+	var pdf = new jsPDF('p', 'pt', 'letter')
+
+	// source can be HTML-formatted string, or a reference
+	// to an actual DOM element from which the text will be scraped.
+	, source = $(target)[0]
+
+	// we support special element handlers. Register them with jQuery-style 
+	// ID selector for either ID or node name. ("#iAmID", "div", "span" etc.)
+	// There is no support for any other type of selectors 
+	// (class, of compound) at this time.
+	, specialElementHandlers = {
+		// element with id of "bypass" - jQuery style selector
+		'#bypassme': function(element, renderer){
+			// true = "handled elsewhere, bypass text extraction"
+			return true
+		}
+	}
+
+	margins = {
+      top: 80,
+      bottom: 60,
+      left: 40,
+      width: 522
+    };
+    // all coords and widths are in jsPDF instance's declared units
+    // 'inches' in this case
+    pdf.fromHTML(
+    	source // HTML string or DOM elem ref.
+    	, margins.left // x coord
+    	, margins.top // y coord
+    	, {
+    		'width': margins.width // max width of content on PDF
+    		, 'elementHandlers': specialElementHandlers
+    	},
+    	function (dispose) {
+    	  // dispose: object with X, Y of the last line add to the PDF 
+    	  //          this allow the insertion of new lines after html
+          pdf.save('Facture_APM.pdf');
+        },
+    	margins
+    )
+}
+
+</script>

@@ -1,0 +1,30 @@
+{% set evm_title = 'Commission' %}
+{% set evm_cat_title = 'Intervention' %}
+
+{% extends "::base/platform/table.html.twig" %}
+      {% block evm_body %}
+
+
+      <div class=" ">
+         <div class=" ">
+
+            <div class="row" style="margin: 25px;background: white">   
+               <div class="col-sm-2" style="padding-right: 0">
+                  {% include "::base/platform/Template/left_menu_categorie.html.twig" %}
+               </div>
+               <div class="col-sm-10"  style="padding-left: 0">
+               
+                  <div class="hide_loading">
+                     <div class="content" style="width: 30%;height: 300%;margin-left: 32%;margin-top: 30%">
+                       <center><img src="{{app.request.getSchemeAndHttpHost() ~asset('plateform/img/loading.gif')}}" width="40%"></center>
+                     </div>
+                  </div>
+                  {% include "::base/platform/Template/table_commision.html.twig" %}
+               </div>   
+            </div>
+         </div>
+      </div>
+     
+     
+{% endblock evm_body %}
+

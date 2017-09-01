@@ -1,0 +1,30 @@
+{% set evm_title = 'Transport' %}
+{% set evm_cat_title = 'Moyen Transport' %}
+
+{% extends "::base/platform/init.html.twig" %}
+      {% block evm_body %}
+            <div class="">
+         <div class="" id="list_transporteurs">
+            <div class="row" style="margin: 25px;background: white">   
+               <div class="col-sm-3" style="padding-right: 0">
+                  {% include "::base/platform/Template/left_menu_auto.html.twig" %}
+                  <hr>
+                  {% set sup_loc = 1 %}
+                  {% include "::base/platform/Template/filtre_sup.html.twig" %}
+                  {% set sup_loc = 0 %}
+               </div>
+               <div class="col-sm-9"  style="padding-left: 0">
+                  <center><h2>Transporteurs</h2></center>
+                  <div class="banner-element">
+                     <button class="closed" onclick="$('.banner-element').hide()">X</button>
+                     <img src="{{ app.request.getSchemeAndHttpHost() ~ asset('plateform/demo/banners/home5/bg-featured-2.jpg')}}" width="100%" height="250px">
+                  </div>
+                  {% include "::base/platform/Template/filtre_prod.html.twig" %}
+                  <hr> <br>
+                  {% include "::base/platform/Template/result_transport.html.twig" %}
+               </div>   
+            </div>
+         </div>
+      </div>
+     
+{% endblock evm_body %}

@@ -1,0 +1,40 @@
+
+{# ceci est un tableau contenant les produits du panier
+    {{ render(controller('EasyTShopBundle:Shopping:getCart')) }}#}
+<div class="block-cart">
+    <div class="shopping_cart">
+        <div id="cart" class="btn-shopping-cart">
+            <div class="shopcart">
+                <span class="total-shopping-cart cart-total-full"><span class="items_cart">0 </span>
+            </div>
+            <ul class="dropdown-menu pull-right shoppingcart-box">
+                <!--
+                <li><p class="text-center empty">Your shopping cart is empty!</p></li>
+                -->
+                <li style="display:none">
+                </li>
+                <li class="content-item">
+                <table class="table table-striped">
+                <tbody>
+                </tbody>
+                </table>
+                </li>
+                <li>
+                    <div class="checkout clearfix">
+                        <a href="{{ path('easy_t_shopping_home') }}" class="btn btn-view-cart inverse">View Cart</a>
+                        <a href="{{ path('easy_t_checkout_home') }}" class="btn btn-checkout pull-right">Checkout</a>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+  $('.shopping_cart').mouseover(function(){
+      $('.btn-shopping-cart').addClass('open');
+  })
+  $('.shopping_cart').mouseout(function(){
+      $('.btn-shopping-cart').removeClass('open');
+  });
+</script>

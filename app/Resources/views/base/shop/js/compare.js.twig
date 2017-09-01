@@ -1,0 +1,94 @@
+<script type="text/javascript">
+	$('.counter-notif-comp').html("");
+	$('.counter-notif-comp').html(JSON.parse(localStorage.getItem('productCompare')).length);
+	$("#result-produit .nbr_compar_inner, #result-produit .nbr_compar_top").
+	html(JSON.parse(localStorage.getItem('productCompare')).length);
+
+
+    function addCompare(id){
+    var alertAddProd = $('#product-add-alert .notification-content');
+      $.ajax({
+        type: 'GET',
+        url: "{{path('easy_t_product_ID')}}",
+        data:{id:id},  
+        //data:{id:id, qte:$qte},  
+        dataType:"json",
+        /*beforeSend: function() {
+          $('.button-group button.addToCart').button('loading');
+        },
+        complete: function() {
+          $('.button-group button.addToCart').button('reset');
+        },*/
+        success: function(data) {
+        	if(addCompareStorage(data)){
+				$('.counter-notif-comp').html("");
+				$("#result-produit .nbr_compar_inner, #result-produit .nbr_compar_top").html("");
+				$('.counter-notif-comp').html(JSON.parse(localStorage.getItem('productCompare')).length);          
+				var path = "{{ asset('Shop/image/cache/catalog/demo/path')}}";
+				path = path.replace("path",data.path); 
+				$('#product-add-alert').fadeIn().delay(3000).fadeOut();
+				$("#result-produit .nbr_compar_inner, #result-produit .nbr_compar_top")
+				.html((JSON.parse(localStorage.getItem('productCompare')).length))
+				.fadeOut().delay(100).fadeIn().fadeOut().delay(100).fadeIn();
+				//$('#audioPlayer').play();
+				setTimeout(function(){ $('#product-add-alert .notification-content').html(""); }, 3500);
+				alertAddProd.append('<h5 style="font-weight:bold;">Product added to Compare</h5><img class="img-prod-add-alert" src="'+path+'"><p>'+data.model+' added to Compare</p>');
+
+	          console.log(data);
+        	}
+        	else{
+        		alert('Article de model '+data.model+' deja ajouté');
+        	}
+	
+        },
+        error: function() {
+          alert('La requête n\'a pas abouti');
+        },
+      })
+    }
+
+    function addCompareStorage(data){
+    	//test s il existe deja
+      if (!localStorage['productCompare']){  
+      	//alert('first');
+          var DATA = [];
+          DATA.push(data);
+          localStorage['productCompare'] = JSON.stringify(DATA);
+          return 1;
+      }
+      else if(!is_content_comp(data)){
+      	var NEW_DATA =[];
+          var LAST_DATA = JSON.parse(localStorage.getItem('productCompare'));
+          LAST_DATA.forEach( // on reconstruit la donnee
+			function(item,index){
+				NEW_DATA.push(item);
+			});      	
+		NEW_DATA.push(data);
+     	localStorage.setItem('productCompare', JSON.stringify(NEW_DATA));
+     	return 1;	
+  	}
+    else
+    	return 0;
+      console.log(localStorage.getItem('productCompare'));
+    }
+
+    function is_content_comp(data){
+    	var DATA = JSON.parse(localStorage.getItem('productCompare'));
+    	var i;
+        for(i=0; i<DATA.length; i++){
+            if(DATA[i].id == data.id)
+                return 1;           
+        }
+            return 0;
+    }
+
+    function removeCompare(index){
+		 var DATA =[];
+		 var DATA = JSON.parse(localStorage.getItem('productCompare'));
+		 DATA.splice(index, 1);
+		 localStorage.setItem('productCompare', JSON.stringify(DATA));
+		 $('.counter-notif-comp').html("");
+		 $('.counter-notif-comp').html(JSON.parse(localStorage.getItem('productCompare')).length);
+    }
+      
+</script>

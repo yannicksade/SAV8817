@@ -1,0 +1,118 @@
+<div class=" page5 full-modal" style="background-image:url('{{app.request.getSchemeAndHttpHost() ~ asset('plateform/img/wizard-boat.jpg')}}'); background-repeat: no-repeat;background-size: 100% 100%">
+         <div class="container">
+            <div class="">
+               <div class="col-sm-12">
+                  <div class="col-sm-4" style="float: left;margin-top: 15%;margin-left: 5%">
+                     <div class="head-logo">
+                        <img src="{{app.request.getSchemeAndHttpHost() ~ asset('plateform/img/new-store-logo-1487249703.jpg')}}" alt="LOGO">
+                     </div>
+                  </div>
+                  <div class="col-sm-4" style="float: right;margin-top: 2%">
+                     <div class="modal-content1">
+                        <div class="menu-tap">
+                           <div class="item1 active" target="id1" onclick="hiddenFormular(0)">
+                              <button>Identication</button>
+                           </div>
+                           <div class="item2 "  onclick="hiddenFormular(1)">
+                              <button>Enregistrement</button>
+                           </div>
+                           <button class="closed" style="position: absolute;top: 0;right: 0" onclick="$('div.page5.full-modal').slideUp(500)">x</button>
+                        </div>
+                        <table class="table-form2 hidden-login">
+                           <tr>
+                              <td colspan="3" style="text-transform: uppercase;font-weight: 800">
+                                 <center>
+                                    <h3>Connexion</h3>
+                                 </center>
+                              </td>
+                           </tr>
+                           <tr>
+                              <td colspan="3" >
+                                 <input type="text" name="" placeholder="Votre login">
+                              </td>
+                           </tr>
+                           <tr>
+                              <td colspan="3">
+                                 <input type="password" name="" placeholder="Votre Mot de Passe">
+                              </td>
+                           </tr>
+                           <tr>
+                              <td >
+                                 <input type="submit" class="btn btn-primary btn-md" name="" value="Connexion">
+                              </td>
+                              <td >
+                                 <input type="checkbox"   name="" value="Connexion">  
+                              </td>
+                              <td >
+                                 <span>Se souvenir.</span> 
+                              </td>
+                           </tr>
+                        </table>
+                        <table class="table-form2 hidden-reg hidden" >
+                           <tr>
+                              <td colspan="3" style="text-transform: uppercase;font-weight: 800">
+                                 <center>
+                                    <h3>Enregistrement</h3>
+                                 </center>
+                              </td>
+                           </tr>
+                           <tr>
+                              <td colspan="3" >
+                                 <input type="text" name="" placeholder="Votre Nom">
+                              </td>
+                           </tr>
+                           <tr>
+                              <td colspan="3" >
+                                 <input type="text" name="" placeholder="Votre Prenom">
+                              </td>
+                           </tr>
+                           <tr>
+                              <td colspan="3" >
+                                 <input type="text" name="" placeholder="Votre Email">
+                              </td>
+                           </tr>
+                           <tr>
+                              <td colspan="3" >
+                                 <input type="text" name="" placeholder="Votre Numero de telephone">
+                              </td>
+                           </tr>
+                           <tr>
+                              <td colspan="3" >
+                                 <input type="text" name="" placeholder="Votre Pays">
+                              </td>
+                           </tr>
+                           <tr>
+                              <td colspan="3">
+                                 <input type="password" name="" placeholder="Votre Mot de Passe">
+                              </td>
+                           </tr>
+                           <tr>
+                              <td>
+                                 Compte
+                              </td>
+                              <td>
+                                 <input type="checkbox" name="compet" value="0">Personnel
+                              </td>
+                              <td>
+                                 <input type="checkbox" name="compte" value="1">Entreprise
+                              </td>
+                           </tr>
+                           <tr>
+                              <td colspan="3">
+                                 <input type="submit" class="btn btn-primary btn-md" name="" style="width: 100%" value="Creer le compte">
+                              </td>
+                           </tr>
+                        </table>
+                        <hr>
+                        <div style="text-align: center" class=" hidden-login">
+                           <h3><a href="">Mot de Passe oublie?</a></h3>
+                        </div>
+                        <div class="bottom  hidden-login" onclick="hiddenFormular(1)"><a href="#" >Identifiez vous</a>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+            </div>
+         </div>
+      </div>
+      <div class="button-sub" onclick="$('.full-modal').slideDown(500)" style="">Connexion</div>

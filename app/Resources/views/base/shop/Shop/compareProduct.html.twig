@@ -1,0 +1,282 @@
+{% extends "::base/shop/layout.html.twig" %}
+
+{% block title %}
+    Compare-product - {{ parent() }}
+{% endblock %}
+
+{% block stylesheets %}
+  {{ parent() }}
+  
+    <link href="{{ asset('Shop/x_fresh_bootstrap_table/assets/css/bootstrap.css')}}" rel="stylesheet" />
+    <link href="{{ asset('Shop/x_fresh_bootstrap_table/assets/css/fresh-bootstrap-table.css')}}" rel="stylesheet" />
+     
+    <link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css')}}" rel="stylesheet">
+    <link href='http://fonts.googleapis.com/css?family=Roboto:400,700,300' rel='stylesheet' type='text/css'>
+    <script type="text/javascript" src="{{ asset('Shop/x_fresh_bootstrap_table/assets/js/bootstrap-table.js')}}"></script> 
+
+  <style type="text/css">
+  
+    .bloc-compare table .block-img{
+        height: 100px;
+        width: 9.6667%;
+    }
+    .bloc-compare table .block-img img{
+        width: 100%;
+        height: 100%;
+        max-height: 100px;
+    }
+    .card-view .value img{
+      max-height: 100px; 
+     }
+    .bloc-compare td.action{
+      width: 270px; 
+    }
+    /*.bloc-compare td, .bloc-compare th, .btn, button, li a{
+      vertical-align: center;
+      border: 1px solid red!important;
+    }*/
+
+    .bloc-compare td.action button{
+      margin-left: 5px;
+      margin-top: 5px;
+      padding: 7px;
+    }
+  
+  /*  .bloc-compare td.action button.btn-add-cart{
+      background: #297890; 
+    }
+    .bloc-compare td.action button.btn-add-cart:hover{
+      background: #777; 
+    }
+    */
+
+    .nbr_compar_inner{
+      border-radius: 100%;
+      background-color: #297890;
+      color: #fff;
+      text-align: center;
+      font-size: 15px;
+      padding: 5px;
+    }
+    .nbr_compar_top{
+      border-radius: 100%;
+      background-color: #fff;
+      color: #297890;
+      text-align: center;
+      font-size: 15px;
+      padding: 5px;
+    }
+    .fresh-table input{
+      background: rgba(101, 88, 88, 0.79);
+      color: #000;
+      border-radius: 20px;
+      border: 1px solid gray;
+      font-size: 15px;
+    }
+    .fresh-table .btn, .fresh-table button{
+      color: #fff;
+      background: #297890;
+    }
+    .fresh-table ul.pagination li a{
+      background-color: #297890!important;
+      color: #fff!important;
+    }
+
+    .fresh-table td, .fresh-table th{
+      border:1px solid #dddddd!important;
+    }
+
+  </style>
+
+{% endblock %}
+
+{% block bodyContent %}
+
+    <div class="container ">
+        <!-- BREADCRUMB -->
+        <ul class="breadcrumb">
+            <li><a href="{{ path('easy_t_shop_homepage')}}"><i class="fa fa-home"></i></a></li>
+        </ul>
+    </div>
+    <div id="compare-parent" class="container">
+        <div class="row">
+
+            <div class="col-sm-12 bloc-compare">
+                <div class="table fresh-table table-bordered table-striped">
+                    <div class="toolbar">
+                        <button id="alertBtn" class="btn btn-default">Alert</button>
+                    </div>
+                    <table id="fresh-table" class="table">
+                        <thead>
+                            <th data-field="rang">RANG</th>
+                            <th data-field="nom" data-sortable="true">NOM</th>
+                            <th data-field="image" data-sortable="true">IMAGE</th>
+                            <th data-field="modele" data-sortable="true">MODELE</th>
+                            <th data-field="prix" data-sortable="true">PRIX</th>
+                            <th data-field="poid" data-sortable="true">POID</th>
+                            <th>actions</th>
+                        </thead>
+                        <tbody>
+                        
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+      </div>
+
+    <script type="text/javascript">
+      var contenuComp = $('#compare-parent table').find('tbody');
+      
+      function compareProductAdd(){
+        var DATA_COMPAR = JSON.parse(localStorage.getItem('productCompare'));
+        contenuComp.html("");
+        DATA_COMPAR.forEach(
+          function(item,index){
+            var inner = appendItemComp(item,index);
+            contenuComp.append(inner);
+          }
+        );
+      }
+       
+      function appendItemComp(item,index){
+        inner="";
+        var path = "{{ asset('Shop/image/cache/catalog/demo/path')}}";
+        path = path.replace("path",item.path); 
+        inner = "<tr>"+
+              "<td>"+(index+1)+"</td>"+
+              "<td class='block-img'>"+item.name+"</td>"+
+              "<td class='block-img'><img src='"+path+"'</td>"+
+              "<td>"+item.model+"</td>"+
+              "<td>$"+item.priceUnit+"</td>"+
+              "<td>0.00g</td>"+
+              "<td class='action button-group'><button class='btn btn-add-cart addToCart' onclick='addCart("+item.id+");'><span class='glyphicon glyphicon-cart-in'>&nbspAdd to cart</button><button class='btn' onclick='removeComp("+index+");'><span class='glyphicon glyphicon-trash'></button></td>"+
+            "</tr>";
+        return inner;
+      }      
+      function addCart(id){
+        $qte = 1; // le nombre d'ajout par defaut est de 1
+        var alertAddProd = $('#product-add-alert .notification-content');
+        $.ajax({
+          type: 'GET',
+          url: "{{path('easy_t_product_ID')}}",
+          data:{id:id},  
+          //data:{id:id, qte:$qte},  
+          dataType:"json",/*
+          beforeSend: function() {
+            $('.button-group button.addToCart').button('loading');
+          },
+          complete: function() {
+            $('.button-group button.addToCart').button('reset');
+          },*/
+          success: function(data) {
+            addStorage(data, 1);
+            var path = "{{ asset('Shop/image/cache/catalog/demo/path')}}";
+            path = path.replace("path",data.path); 
+            $('#product-add-alert').fadeIn().delay(3000).fadeOut();
+            //$('#audioPlayer').play();
+            setTimeout(function(){ $('#product-add-alert .notification-content').html(""); }, 3100);
+            alertAddProd.append('<h5 style="font-weight:bold;">Product added to Cart</h5><img class="img-prod-add-alert" src="'+path+'"><p>'+data.model+' added to Shopping Cart</p>');
+            showCart(); // fonction qui affiche le panier de l'entete.
+            console.log(data);
+          },
+          error: function() {
+            alert('La requête n\'a pas abouti');
+          },
+        })
+      }
+      function removeComp(index){
+        removeCompare(index); 
+        compareProductAdd();
+
+      }
+      compareProductAdd();
+   /*           
+    $(document).ready(
+      function () {       
+        function removeComp(index){
+          removeCompare(index); 
+          compareProductAdd();
+        }
+        compareProductAdd();
+
+      }
+    ); 
+  */
+  /************************************/         
+      var $table = $('#fresh-table'),
+        $alertBtn = $('#alertBtn'),
+        full_screen = false;
+        
+    $().ready(function(){
+        $table.bootstrapTable({
+            toolbar: ".toolbar",
+
+            /*showRefresh: true,*/
+            search: false,
+            showToggle: false,
+            showColumns: false,
+            pagination: false,
+            striped: true,
+            pageSize: 5,
+            pageList: [5],
+            //pageList: [5,10,25,50,100],
+            
+            formatShowingRows: function(pageFrom, pageTo, totalRows){
+                //do nothing here, we don't want to show the text "showing x of y from..." 
+            },
+            formatRecordsPerPage: function(pageNumber){
+                return pageNumber + " rows visible";
+            },
+            icons: {
+                /*refresh: 'glyphicon-trash',*/
+                toggle: 'glyphicon-th-list',
+                columns: 'glyphicon-list-alt',
+                /*detailOpen: 'fa fa-plus-circle',
+                detailClose: 'fa fa-minus-circle'*/
+            }
+        });
+
+        $(window).resize(function () {
+            $table.bootstrapTable('resetView');
+        });
+        
+        window.operateEvents = {
+            'click .like': function (e, value, row, index) {
+                alert('You click like icon, row: ' + JSON.stringify(row));
+                console.log(value, row, index);
+            },
+            'click .edit': function (e, value, row, index) {
+                alert('You click edit icon, row: ' + JSON.stringify(row));
+                console.log(value, row, index);    
+            },
+            'click .remove': function (e, value, row, index) {
+                $table.bootstrapTable('remove', {
+                    field: 'id',
+                    values: [row.id]
+                });
+        
+            }
+        };
+        
+        $alertBtn.click(function () {
+            alert("Nous n avons pas encore programmé d action pour ce bouton");
+        });
+        
+    });  
+  /*  function operateFormatter(value, row, index) {
+        return [
+            '<a rel="tooltip" title="Like" class="table-action like" href="javascript:void(0)" title="Like">',
+                '<i class="fa fa-heart"></i>',
+            '</a>',
+            '<a rel="tooltip" title="Edit" class="table-action edit" href="javascript:void(0)" title="Edit">',
+                '<span class="glyphicon glyphicon-cart-in">',
+            '</a>',
+            '<a rel="tooltip" title="Remove" class="table-action remove" href="javascript:void(0)" title="Remove">',
+                '<i class="fa fa-remove"></i>',
+            '</a>'
+        ].join('');
+    }*/
+
+    </script>
+{% endblock %}

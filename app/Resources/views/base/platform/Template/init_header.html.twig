@@ -1,0 +1,109 @@
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+      <title>APM  {% if evm_title is defined %}  {{ evm_title }} {% endif %} </title>
+      <meta name="description" content="AMP By Hi Tel">
+      <meta name="generator" content="Hi Tel">
+      <meta name="robots" content="index,follow">
+      <meta name="viewport" content="width=device-width, minimum-scale=0.25, maximum-scale=1.0, initial-scale=1.0">
+      <meta name="apple-mobile-web-app-capable" content="yes">
+      <link rel="icon" type="image/vnd.microsoft.icon" href=" {{ app.request.getSchemeAndHttpHost() ~ asset('plateform/img/ico.ico')}}" >
+        
+
+
+    
+      
+    
+
+<link rel="stylesheet" href="{{app.request.getSchemeAndHttpHost() ~ asset('plateform/css/css')}}" type="text/css" media="all">
+      <link rel="stylesheet" href="{{app.request.getSchemeAndHttpHost() ~ asset('plateform/css/global.css')}}" type="text/css" media="all">
+  <link rel="stylesheet" href="{{app.request.getSchemeAndHttpHost() ~ asset('plateform/css/highdpi.css')}}" type="text/css" media="all">
+      <link rel="stylesheet" href="{{app.request.getSchemeAndHttpHost() ~ asset('plateform/css/jquery.bxslider.css')}}" type="text/css" media="all">
+      <link rel="stylesheet" href="{{app.request.getSchemeAndHttpHost() ~ asset('plateform/css/responsive-tables.css')}}" type="text/css" media="all">
+      <link rel="stylesheet" href="{{app.request.getSchemeAndHttpHost() ~ asset('plateform/css/ui-to-top.css')}}" type="text/css" media="all">
+      <link rel="stylesheet" href="{{app.request.getSchemeAndHttpHost() ~ asset('plateform/css/uniform.default.css')}}" type="text/css" media="all">
+      <link rel="stylesheet" href="{{app.request.getSchemeAndHttpHost() ~ asset('plateform/css/jquery.fancybox.css')}}" type="text/css" media="all">
+      <link rel="stylesheet" href="{{app.request.getSchemeAndHttpHost() ~ asset('plateform/css/product_list.css')}}" type="text/css" media="all">
+      <link rel="stylesheet" href="{{app.request.getSchemeAndHttpHost() ~ asset('plateform/css/blockcart.css')}}" type="text/css" media="all">
+      <link rel="stylesheet" href="{{app.request.getSchemeAndHttpHost() ~ asset('plateform/css/blockcategories.css')}}" type="text/css" media="all">
+      <link rel="stylesheet" href="{{app.request.getSchemeAndHttpHost() ~ asset('plateform/css/blockcurrencies.css')}}" type="text/css" media="all">
+      <link rel="stylesheet" href="{{app.request.getSchemeAndHttpHost() ~ asset('plateform/css/blockfacebook.css')}}" type="text/css" media="all">
+      <link rel="stylesheet" href="{{app.request.getSchemeAndHttpHost() ~ asset('plateform/css/blocklanguages.css')}}" type="text/css" media="all">
+      <link rel="stylesheet" href="{{app.request.getSchemeAndHttpHost() ~ asset('plateform/css/blockcontact.css')}}" type="text/css" media="all">
+      <link rel="stylesheet" href="{{app.request.getSchemeAndHttpHost() ~ asset('plateform/css/blocknewsletter.css')}}" type="text/css" media="all">
+      <link rel="stylesheet" href="{{app.request.getSchemeAndHttpHost() ~ asset('plateform/css/blocktags.css')}}" type="text/css" media="all">
+      <link rel="stylesheet" href="{{app.request.getSchemeAndHttpHost() ~ asset('plateform/css/blockviewed.css')}}" type="text/css" media="all">
+      <link rel="stylesheet" href="{{app.request.getSchemeAndHttpHost() ~ asset('plateform/css/homeslider.css')}}" type="text/css" media="all">
+      <link rel="stylesheet" href="{{app.request.getSchemeAndHttpHost() ~ asset('plateform/css/homefeatured.css')}}" type="text/css" media="all">
+      <link rel="stylesheet" href="{{app.request.getSchemeAndHttpHost() ~ asset('plateform/css/hooks.css')}}" type="text/css" media="all">
+      <link rel="stylesheet" href="{{app.request.getSchemeAndHttpHost() ~ asset('plateform/css/blockpermanentlinks.css')}}" type="text/css" media="all">
+      <link rel="stylesheet" href="{{app.request.getSchemeAndHttpHost() ~ asset('plateform/css/smartblogstyle.css')}}" type="text/css" media="all">
+      <link rel="stylesheet" href="{{app.request.getSchemeAndHttpHost() ~ asset('plateform/css/smartbloglatestnews.css')}}" type="text/css" media="all">
+      <link rel="stylesheet" href="{{app.request.getSchemeAndHttpHost() ~ asset('plateform/css/smartblogtags.css')}}" type="text/css" media="all">
+      <link rel="stylesheet" href="{{app.request.getSchemeAndHttpHost() ~ asset('plateform/css/blockwishlist.css')}}" type="text/css" media="all">
+      <link rel="stylesheet" href="{{app.request.getSchemeAndHttpHost() ~ asset('plateform/css/slick.css')}}" type="text/css" media="all">
+      <link rel="stylesheet" href="{{app.request.getSchemeAndHttpHost() ~ asset('plateform/css/slick-theme.css')}}" type="text/css" media="all">
+      <link rel="stylesheet" href="{{app.request.getSchemeAndHttpHost() ~ asset('plateform/css/tmolarkchat.css')}}" type="text/css" media="all">
+      <link rel="stylesheet" href="{{app.request.getSchemeAndHttpHost() ~ asset('plateform/css/video-js.css')}}" type="text/css" media="all">
+      <link rel="stylesheet" href="{{app.request.getSchemeAndHttpHost() ~ asset('plateform/css/tmproductvideos.css')}}" type="text/css" media="all">
+      <link rel="stylesheet" href="{{app.request.getSchemeAndHttpHost() ~ asset('plateform/css/tmmegalayout.css')}}" type="text/css" media="all">
+      <link rel="stylesheet" href="{{app.request.getSchemeAndHttpHost() ~ asset('plateform/css/tmmegamenu.css')}}" type="text/css" media="all">
+      <link rel="stylesheet" href="{{app.request.getSchemeAndHttpHost() ~ asset('plateform/css/theme.css')}}" type="text/css" media="all">
+      <link rel="stylesheet" href="{{app.request.getSchemeAndHttpHost() ~ asset('plateform/css/slide.css')}}" type="text/css" media="all">
+      <link rel="stylesheet" href="{{app.request.getSchemeAndHttpHost() ~ asset('plateform/css/hooks(1).css')}}" type="text/css" media="all">
+      <link rel="stylesheet" href="{{app.request.getSchemeAndHttpHost() ~ asset('plateform/css/tmhomepagecategorygallery.css')}}" type="text/css" media="all">
+      <link rel="stylesheet" href="{{app.request.getSchemeAndHttpHost() ~ asset('plateform/css/tmmanufacturerblock.css')}}" type="text/css" media="all">
+      <link rel="stylesheet" href="{{app.request.getSchemeAndHttpHost() ~ asset('plateform/css/tmadvancedfilter.css')}}" type="text/css" media="all">
+      <link rel="stylesheet" href="{{app.request.getSchemeAndHttpHost() ~ asset('plateform/css/front_collections.css')}}" type="text/css" media="all">
+      <link rel="stylesheet" href="{{app.request.getSchemeAndHttpHost() ~ asset('plateform/css/tmsearch.css')}}" type="text/css" media="all">
+      <link rel="stylesheet" href="{{app.request.getSchemeAndHttpHost() ~ asset('plateform/css/jquery.autocomplete.css')}}" type="text/css" media="all">
+      <link rel="stylesheet" href="{{app.request.getSchemeAndHttpHost() ~ asset('plateform/css/tmcategoryproducts.css')}}" type="text/css" media="all">
+      <link rel="stylesheet" href="{{app.request.getSchemeAndHttpHost() ~ asset('plateform/css/tmmediaparallax.css')}}" type="text/css" media="all">
+      <link rel="stylesheet" href="{{app.request.getSchemeAndHttpHost() ~ asset('plateform/css/rd-parallax.css')}}" type="text/css" media="all">
+      <link rel="stylesheet" href="{{app.request.getSchemeAndHttpHost() ~ asset('plateform/css/live_configurator.css')}}" type="text/css" media="all">
+      <link rel="stylesheet" href="{{app.request.getSchemeAndHttpHost() ~ asset('plateform/css/themeconfiglink.css')}}" type="text/css" media="all">
+      <link rel="stylesheet" href="{{app.request.getSchemeAndHttpHost() ~ asset('plateform/css/Header1.css')}}" type="text/css" media="all">
+      <link rel="stylesheet" href="{{app.request.getSchemeAndHttpHost() ~ asset('plateform/hitel/css/style.css')}}" type="text/css" media="all">
+      <link href="{{app.request.getSchemeAndHttpHost() ~ asset('plateform/hitel/css/bootstrap.css')}}" rel='stylesheet' />
+      <link href="{{app.request.getSchemeAndHttpHost() ~ asset('plateform/hitel/css/rotating-card.css')}}" rel='stylesheet' />
+      <link href="{{app.request.getSchemeAndHttpHost() ~ asset('plateform/css/paper-bootstrap-wizard.css')}}" rel="stylesheet" />
+      <link href="{{app.request.getSchemeAndHttpHost() ~ asset('plateform/css/demo.css')}}" rel="stylesheet" />
+
+      <link href="{{app.request.getSchemeAndHttpHost() ~ asset('plateform/css/themify-icons.css')}}" rel="stylesheet">
+      <script src="{{app.request.getSchemeAndHttpHost() ~ asset('plateform/js/jquery-1.11.0.min.js')}}"></script>
+      <script src="{{app.request.getSchemeAndHttpHost() ~ asset('plateform/js/jquery-migrate-1.2.1.min.js')}}"></script>
+      <script src="{{app.request.getSchemeAndHttpHost() ~ asset('plateform/js/jquery.easing.js')}}"></script>
+      <script src="{{app.request.getSchemeAndHttpHost() ~ asset('plateform/js/tools.js')}}"></script>
+      <script src="{{app.request.getSchemeAndHttpHost() ~ asset('plateform/js/global.js')}}"></script>
+      <script src="{{app.request.getSchemeAndHttpHost() ~ asset('plateform/js/10-bootstrap.min.js')}}"></script>
+      <script src="{{app.request.getSchemeAndHttpHost() ~ asset('plateform/js/14-device.min.js')}}"></script>
+      <script src="{{app.request.getSchemeAndHttpHost() ~ asset('plateform/js/15-jquery.total-storage.min.js')}}"></script>
+      <script src="{{app.request.getSchemeAndHttpHost() ~ asset('plateform/js/15-jquery.uniform-modified.js')}}"></script>
+      <script src="{{app.request.getSchemeAndHttpHost() ~ asset('plateform/js/16-jquery.scrollmagic.min.js')}}"></script>
+      <script src="{{app.request.getSchemeAndHttpHost() ~ asset('plateform/js/17-jquery.scrollmagic.debug.js')}}"></script>
+      <script src="{{app.request.getSchemeAndHttpHost() ~ asset('plateform/js/18-TimelineMax.min.js')}}"></script>
+      <script src="{{app.request.getSchemeAndHttpHost() ~ asset('plateform/js/19-TweenMax.min.js')}}"></script>
+      <script src="{{app.request.getSchemeAndHttpHost() ~ asset('plateform/js/20-jquery.bxslider.js')}}"></script>
+      <script src="{{app.request.getSchemeAndHttpHost() ~ asset('plateform/js/21-jquery.uitotop.js')}}"></script>
+      <script src="{{app.request.getSchemeAndHttpHost() ~ asset('plateform/js/jquery.fancybox.js')}}"></script>
+      <script src="{{app.request.getSchemeAndHttpHost() ~ asset('plateform/js/products-comparison.js')}}"></script>
+      <script src="{{app.request.getSchemeAndHttpHost() ~ asset('plateform/js/jquery.scrollTo.js')}}"></script>
+      <script src="{{app.request.getSchemeAndHttpHost() ~ asset('plateform/js/jquery.serialScroll.js')}}"></script>
+      <script src="{{app.request.getSchemeAndHttpHost() ~ asset('plateform/js/jquery.bxslider.js')}}"></script>
+      <script src="{{app.request.getSchemeAndHttpHost() ~ asset('plateform/js/homeslider.js')}}"></script>
+      <script src="{{app.request.getSchemeAndHttpHost() ~ asset('plateform/js/validate.js')}}"></script>
+      <script src="{{app.request.getSchemeAndHttpHost() ~ asset('plateform/js/slick.min.js')}}"></script>
+      <script src="{{app.request.getSchemeAndHttpHost() ~ asset('plateform/js/arrive.min.js')}}"></script>
+      <script src="{{app.request.getSchemeAndHttpHost() ~ asset('plateform/js/tmmegalayout.js')}}"></script>
+      <script src="{{app.request.getSchemeAndHttpHost() ~ asset('plateform/js/hoverIntent.js')}}"></script>
+      <script src="{{app.request.getSchemeAndHttpHost() ~ asset('plateform/js/superfish.js')}}"></script>
+      <script src="{{app.request.getSchemeAndHttpHost() ~ asset('plateform/js/tmmegamenu.js')}}"></script>
+      <script src="{{app.request.getSchemeAndHttpHost() ~ asset('plateform/js/vendor.js')}}"></script>
+      <script src="{{app.request.getSchemeAndHttpHost() ~ asset('plateform/js/tmadvancedfilter.js')}}"></script>
+      <script src="{{app.request.getSchemeAndHttpHost() ~ asset('plateform/js/jquery.autocomplete.js')}}"></script>
+      <script src="{{app.request.getSchemeAndHttpHost() ~ asset('plateform/js/jquery.youtubebackground.js')}}"></script>
+      <script src="{{app.request.getSchemeAndHttpHost() ~ asset('plateform/js/tmmediaparallax.js')}}"></script>
+      <script src="{{app.request.getSchemeAndHttpHost() ~ asset('plateform/js/index.js')}}"></script>
+
+      <link id="mpsl-core-css" href="{{app.request.getSchemeAndHttpHost() ~ asset('plateform/css/motoslider.css')}}" rel="stylesheet" type="text/css" media="all">
+      <link data-olark="true" rel="stylesheet" href="{{ app.request.getSchemeAndHttpHost() ~ asset('plateform/css/theme(1).css')}}" type="text/css">
+   </head>

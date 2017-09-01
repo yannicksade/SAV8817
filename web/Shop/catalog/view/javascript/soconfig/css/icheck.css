@@ -1,0 +1,51 @@
+/* ICheck */
+
+.icheckbox,
+.iradio{
+    cursor: pointer;
+    display: inline-block;
+    
+}
+
+.radio-inline .iradio, .checkbox-inline .icheckbox,
+.radio .iradio, .checkbox .icheckbox{
+    margin-left: -20px;
+}
+
+.icheckbox:before,
+.iradio:before{
+    content: "\f00c";
+
+    font: normal normal normal 14px/1 FontAwesome;
+    font-size: inherit;
+    text-rendering: auto;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    transform: translate(0, 0);
+    color: #fff;
+    line-height: 14px;
+    font-size: 10px;
+    text-align: center;
+    border-radius: 2px;
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    margin: 0px 5px 0 0;
+    vertical-align: middle;
+    border: 1px solid #e0e0e0;
+    background-color: #fff;
+}
+
+.iradio:before{
+    border-radius: 100%;
+}
+
+.mfilter-box .icheckbox:before,
+.mfilter-box .iradio:before{
+    content: "";
+    width: 10px;
+    height: 10px;
+    line-height: 8px;
+    font-size: 6px;
+}
+

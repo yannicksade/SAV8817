@@ -1,0 +1,310 @@
+<div class="notification-body">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="col-md-6 col-sm-6 anomce-item" style="background-image:url('{{app.request.getSchemeAndHttpHost() ~ asset('plateform/demo/banners/home1/11.jpg')}}')">
+                <div id="myCarousel0" class="carousel slide vertical">
+                    <div class="carousel-inner" id="zone-produit">
+                    </div>
+                    <a class="carousel-control left" href="#myCarousel0" data-slide="prev">&lsaquo;</a>
+                    <a class="carousel-control right" href="#myCarousel0" data-slide="next">&rsaquo;</a>
+                </div>
+                <div class="bas-annonce" style="background: #035324;"><i class="thin-icon-shop"> : ARTICLES/PRODUITS</i></div>
+            </div>
+            <div class="col-md-6 col-sm-6 anomce-item" style="background-image:url('{{app.request.getSchemeAndHttpHost() ~ asset('plateform/demo/banners/home1/8.jpg')}}')">
+                <div id="myCarousel10" class="carousel slide vertical">
+                    <div class="carousel-inner" id ="zone-service">
+                    </div>
+                    <a class="carousel-control left" href='#myCarousel10' data-slide="prev">&lsaquo;</a>
+                    <a class="carousel-control right" href='#myCarousel10' data-slide="next">&rsaquo;</a>
+                </div>
+                <div class="bas-annonce"><i class="thin-icon-transport"> : SERVICES</i></div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="hide_loading">
+    <div class="content" style="
+         width: 30%;
+         height: 300%;
+         margin-left: 32%;
+         margin-top: 30%">
+        <center>
+            " <img src="{{app.request.getSchemeAndHttpHost() ~ asset('plateform/img/loading.gif')}}" width="40%">
+        </center>
+    </div>
+</div>
+<script type="text/javascript">
+    $(document).ready(
+            function () {
+
+                var DATA__FULL = [
+                    {
+                        nom: "Boutique Benito",
+                        type: "Boutique",
+                        logo: "{{app.request.getSchemeAndHttpHost() ~ asset('plateform/demo/manufacturer/redbull.png')}}",
+                        new : true,
+                        solde: false,
+                        service: true,
+                        code: "987423",
+                        categorie: [{"nom": "Téléphones", "tag": "CAT1393", "flag": "phone"}, {"nom": "Soprt et Divertissement", "tag": "CAT1193", "flag": "sport"}, {"nom": "Vetement", "tag": "CAT1193", "flag": "vetement"}],
+                        description: "Les produits en solde dans nos boutiques jusqu`au premier janvier 2017",
+                        description2: "Dans nos boutiques nous vous livrons nos produits avec un solde de 20%. Et ceci pour une date limitee et ce ci dans une certainse zone<br>Dans nos boutiques nous vous livrons nos produits avec un solde de 20%. Et ceci pour une date limitee et ce ci dans un certainse zone<br>Rendez vous a la boutique",
+                        produits: [
+                            {
+                                nom: "MACBOOK",
+                                url: "{{app.request.getSchemeAndHttpHost() ~ asset('plateform/demo/product/macbook.jpg')}}"
+                            },
+                            {
+                                nom: "Appareil Photo",
+                                url: "{{app.request.getSchemeAndHttpHost() ~ asset('plateform/demo/nikon_d300_4.jpg')}}"
+                            },
+                            {
+                                nom: "MACBOOK",
+                                url: "{{app.request.getSchemeAndHttpHost() ~ asset('plateform/demo/macbook_1.jpg')}}"
+                            },
+                            {
+                                nom: "Appareil Photo",
+                                url: "{{app.request.getSchemeAndHttpHost() ~ asset('plateform/demo/ipod_classic_1.jpg')}}"
+                            },
+                            {
+                                nom: "MACBOOK",
+                                url: "{{app.request.getSchemeAndHttpHost() ~ asset('plateform/demo/macbook_1.jpg')}}"
+                            }
+                        ],
+                        like: 21,
+                        share: 14,
+                        sell: 53
+                    },
+                    {
+                        nom: "Boutique Papito",
+                        type: "Boutique",
+                        logo: "{{app.request.getSchemeAndHttpHost() ~ asset('plateform/demo/manufacturer/burgerking.png')}}",
+                        new : true,
+                        solde: false,
+                        service: false,
+                        code: "987423",
+                        categorie: [{"nom": "Téléphones", "tag": "CAT1393", "flag": "phone"}, {"nom": "Soprt et Divertissement", "tag": "CAT1193", "flag": "sport"}, {"nom": "Vetement", "tag": "CAT1193", "flag": "vetement"}],
+                        description: "Les produits en solde dans nos boutiques jusqu`au premier janvier 2017",
+                        description2: "Dans nos boutiques nous vous livrons nos produits avec un solde de 20%. Et ceci pour une date limitee et ce ci dans une certainse zone<br>Dans nos boutiques nous vous livrons nos produits avec un solde de 20%. Et ceci pour une date limitee et ce ci dans un certainse zone<br>Rendez vous a la boutique",
+                        produits: [
+                            {
+                                nom: "MACBOOK",
+                                url: "{{app.request.getSchemeAndHttpHost() ~ asset('plateform/demo/product/macbook.jpg')}}"
+                            },
+                            {
+                                nom: "Appareil Photo",
+                                url: "{{app.request.getSchemeAndHttpHost() ~ asset('plateform/demo/nikon_d300_4.jpg')}}"
+                            },
+                            {
+                                nom: "MACBOOK",
+                                url: "{{app.request.getSchemeAndHttpHost() ~ asset('plateform/demo/macbook_1.jpg')}}"
+                            },
+                            {
+                                nom: "Appareil Photo",
+                                url: "{{app.request.getSchemeAndHttpHost() ~ asset('plateform/demo/ipod_classic_1.jpg')}}"
+                            },
+                            {
+                                nom: "MACBOOK",
+                                url: "{{app.request.getSchemeAndHttpHost() ~ asset('plateform/demo/macbook_1.jpg')}}"
+                            }
+                        ],
+                        like: 21,
+                        share: 14,
+                        sell: 53
+                    },
+                    {
+                        nom: "Boutique Benito",
+                        type: "Boutique",
+                        logo: "{{app.request.getSchemeAndHttpHost() ~ asset('plateform/demo/manufacturer/redbull.png')}}",
+                        new : true,
+                        solde: false,
+                        service: false,
+                        code: "987423",
+                        categorie: [{"nom": "Ordinateurs", "tag": "CAT1293", "flag": "machine"}, {"nom": "Soprt et Divertissement", "tag": "CAT1193", "flag": "sport"}, {"nom": "Vetement", "tag": "CAT1193", "flag": "vetement"}],
+                        description: "Les produits en solde dans nos boutiques jusqu`au premier janvier 2017",
+                        description2: "Dans nos boutiques nous vous livrons nos produits avec un solde de 20%. Et ceci pour une date limitee et ce ci dans une certainse zone<br>Dans nos boutiques nous vous livrons nos produits avec un solde de 20%. Et ceci pour une date limitee et ce ci dans un certainse zone<br>Rendez vous a la boutique",
+                        produits: [
+                            {
+                                nom: "MACBOOK",
+                                url: "{{app.request.getSchemeAndHttpHost() ~ asset('plateform/demo/product/macbook.jpg')}}"
+                            },
+                            {
+                                nom: "Appareil Photo",
+                                url: "{{app.request.getSchemeAndHttpHost() ~ asset('plateform/demo/nikon_d300_4.jpg')}}"
+                            },
+                            {
+                                nom: "MACBOOK",
+                                url: "{{app.request.getSchemeAndHttpHost() ~ asset('plateform/demo/macbook_1.jpg')}}"
+                            },
+                            {
+                                nom: "Appareil Photo",
+                                url: "{{app.request.getSchemeAndHttpHost() ~ asset('plateform/demo/ipod_classic_1.jpg')}}"
+                            },
+                            {
+                                nom: "MACBOOK",
+                                url: "{{app.request.getSchemeAndHttpHost() ~ asset('plateform/demo/macbook_1.jpg')}}"
+                            }
+                        ],
+                        like: 21,
+                        share: 14,
+                        sell: 53
+                    },
+                    {
+                        nom: "Boutique Papito",
+                        type: "Boutique",
+                        logo: "{{app.request.getSchemeAndHttpHost() ~ asset('plateform/demo/manufacturer/burgerking.png')}}",
+                        new : true,
+                        solde: false,
+                        service: true,
+                        code: "987423",
+                        categorie: [{"nom": "Ordinateurs", "tag": "CAT1293", "flag": "machine"}, {"nom": "Téléphones", "tag": "CAT1393", "flag": "phone"}, {"nom": "Soprt et Divertissement", "tag": "CAT1193", "flag": "sport"}, {"nom": "Vetement", "tag": "CAT1193", "flag": "vetement"}],
+                        description: "Les produits en solde dans nos boutiques jusqu`au premier janvier 2017",
+                        description2: "Dans nos boutiques nous vous livrons nos produits avec un solde de 20%. Et ceci pour une date limitee et ce ci dans une certainse zone<br>Dans nos boutiques nous vous livrons nos produits avec un solde de 20%. Et ceci pour une date limitee et ce ci dans un certainse zone<br>Rendez vous a la boutique",
+                        produits: [
+                            {
+                                nom: "MACBOOK",
+                                url: "{{app.request.getSchemeAndHttpHost() ~ asset('plateform/demo/product/macbook.jpg')}}"
+                            },
+                            {
+                                nom: "Appareil Photo",
+                                url: "{{app.request.getSchemeAndHttpHost() ~ asset('plateform/demo/nikon_d300_4.jpg')}}"
+                            },
+                            {
+                                nom: "MACBOOK",
+                                url: "{{app.request.getSchemeAndHttpHost() ~ asset('plateform/demo/macbook_1.jpg')}}"
+                            },
+                            {
+                                nom: "Appareil Photo",
+                                url: "{{app.request.getSchemeAndHttpHost() ~ asset('plateform/demo/ipod_classic_1.jpg')}}"
+                            },
+                            {
+                                nom: "MACBOOK",
+                                url: "{{app.request.getSchemeAndHttpHost() ~ asset('plateform/demo/macbook_1.jpg')}}"
+                            }
+                        ],
+                        categorie: [{"nom": "vetement", "tag": "CAT1293", "flag": "machine"}, {"nom": "Soprt et Divertissement", "tag": "CAT1193", "flag": "sport"}, {"nom": "Vetement", "tag": "CAT1193", "flag": "vetement"}],
+                        like: 21,
+                        share: 14,
+                        sell: 53
+                    }
+                ];
+                var DATA_ = DATA__FULL;
+                function make_item_annonce(item, index) {
+                    var ajout = "";
+                    if (item.new)
+                        ajout = "<img src='{{ app.request.getSchemeAndHttpHost() ~ asset('plateform/img/barre_new.png')}}' class='col_item_img'>";
+                    var li = "";
+                    for (var i = item.produits.length - 1; i >= 0; i--)
+                        li += "<li><img alt='" + item.produits[i].nom + "' src='" + item.produits[i].url + "' /></li>";
+                    var isActive;
+                    var parent = "<div class='item col_item '>" +
+                            ajout +
+                            "<div class='card-container manual-flip'>" +
+                            "<div class='card'>" +
+                            "<div class='front'>" +
+                            "<div class=''>" +
+                            "<img class='img-circle' src='" + item.logo + "'/>" +
+                            "</div>" +
+                            "<div class='content'>" +
+                            "<div class='main'>" +
+                            "<h3 class='name'>" + item.nom + "</h3>" +
+                            "<p class='profession'>" + item.type + "</p>" +
+                            "<div class='container'>" +
+                            "<p class='text-description'>" + item.description + "</p>" +
+                            "<div class='row'>" +
+                            "<div class='col-md-12'>" +
+                            "<ul class='bxslider'>" +
+                            li +
+                            "</ul>" +
+                            "</div>" +
+                            "</div>" +
+                            "</div>" +
+                            "</div>" +
+                            "<div class='footer'>" +
+                            "<button class='btn btn-md btn-primary' onclick='rotateCard(this)'>" +
+                            "<i class='fa fa-mail-forward'></i> Voir les détails" +
+                            "</button>" +
+                            "</div>" +
+                            "</div>" +
+                            "</div>" +
+                            "<div class='back'>" +
+                            "<div class='header'>" +
+                            "<h5 class='motto'>Contenu de l`annonce</h5>" +
+                            "</div>" +
+                            "<div class='content'>" +
+                            "<div class='main'>" +
+                            "<h3 class='text-center'>" + item.nom + "</h3>" +
+                            "<p class='text-center'>" + item.description2 + "</p>" +
+                            "<div class='stats-container' style='text-align: center'>" +
+                            "<button class='btn btn-md btn-primary' onclick='rotateCard(this)'>" +
+                            "<i class='fa fa-mail-forward'></i>Rendez vous a la boutique" +
+                            "</button>" +
+                            "</div>" +
+                            "</div>" +
+                            "</div>" +
+                            "<div class='footer'>" +
+                            "<br><br><br><button class='btn btn-md btn-primary' rel='tooltip' title='Flip Card' onclick='rotateCard(this)'>" +
+                            "<i class='fa fa-reply'></i> Retour" +
+                            "</button>" +
+                            "</div>" +
+                            "</div>" +
+                            "</div>" +
+                            "</div>" +
+                            "</div>";
+                    return parent;
+                }
+                var contenu = $("#zone-produit");
+
+                var contenu2 = $("#zone-service");
+                function initAnonces() {
+                    contenu.html("");
+                    contenu2.html("");
+                    DATA_.forEach(
+                            function (item, index) {
+                                var parent = make_item_annonce(item, index);
+                                if (!item.service)
+                                    contenu.append(parent);
+                                else
+                                    contenu2.append(parent);
+                                $("#zone-produit > div.item:first-child,#zone-service > div.item:first-child").addClass("active");
+
+                            }
+                    );
+                }
+                initAnonces();
+                function searchWord(words) {
+                    console.log(words);
+                    DATA_ = [];
+                    DATA__FULL.forEach(function (item, index) {
+                        for (var i = 0; i < words.length; i++) {
+                            var word = words[i];
+                            if (node_sub_string_search_anonce(item, word)) {
+                                DATA_.push(item);
+                                return;
+                            }
+                        }
+                    });
+                    initAnonces();
+                }
+                function node_sub_string_search_anonce(item, str) {
+                    var str2 = str.toLowerCase();
+                    if (item.nom.toLowerCase().search(str2) >= 0)
+                        return true;
+                    if (item.type.toLowerCase().search(str2) >= 0)
+                        return true;
+                    if (item.code.toLowerCase().search(str2) >= 0)
+                        return true;
+                    console.log(item);
+                    for (var i = 0; i < item.categorie.length; i++) {
+                        if (item.categorie[i].nom.toLowerCase().search(str2) >= 0)
+                            return true;
+                    }
+                    return false;
+                }
+                {#$(".indiv-category-list li").click(function () {
+                    console.log(""+$(this).attr("data"));
+                    searchWord($(this).attr("data").split(" "));
+                });#}
+            }
+    );
+</script>

@@ -1,4 +1,4 @@
 apm_core_conseillerA2_index:
     path:     /
-    defaults: { _controller: "APMCoreBundle:ConseillerA2:index" }
+    defaults: { _controller: "APMCoreBundle:User/ConseillerA2:index" }
     methods:  GET

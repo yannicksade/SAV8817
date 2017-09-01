@@ -47,3 +47,5 @@ apm_vente_AjaxBoutique_index:
     path:     /query/ajax-boutique
     defaults: { _controller: "APMVenteBundle:AjaxQueryVente:indexBoutique" }
     methods:  GET
+
+#------------------- Shop publique ---------------------------------------------

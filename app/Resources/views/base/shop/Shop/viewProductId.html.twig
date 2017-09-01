@@ -1,0 +1,348 @@
+{% extends "::base/shop/layout.html.twig" %}
+
+{% block title %}
+    Produits - {{ parent() }}
+{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+            /* jssor slider arrow navigator skin 05 css */
+            /*
+            .jssora05l                  (normal)
+            .jssora05r                  (normal)
+            .jssora05l:hover            (normal mouseover)
+            .jssora05r:hover            (normal mouseover)
+            .jssora05l.jssora05ldn      (mousedown)
+            .jssora05r.jssora05rdn      (mousedown)
+            .jssora05l.jssora05lds      (disabled)
+            .jssora05r.jssora05rds      (disabled)
+            */
+            .jssora05l, .jssora05r {
+                display: block;
+                position: absolute;
+                /* size of arrow element */
+                width: 40px;
+                height: 40px;
+                cursor: pointer;
+                background: url('img/a17.png') no-repeat;
+                overflow: hidden;
+            }
+            .jssora05l { background-position: -10px -40px; }
+            .jssora05r { background-position: -70px -40px; }
+            .jssora05l:hover { background-position: -130px -40px; }
+            .jssora05r:hover { background-position: -190px -40px; }
+            .jssora05l.jssora05ldn { background-position: -250px -40px; }
+            .jssora05r.jssora05rdn { background-position: -310px -40px; }
+            .jssora05l.jssora05lds { background-position: -10px -40px; opacity: .3; pointer-events: none; }
+            .jssora05r.jssora05rds { background-position: -70px -40px; opacity: .3; pointer-events: none; }
+            /* jssor slider thumbnail navigator skin 01 css *//*.jssort01 .p            (normal).jssort01 .p:hover      (normal mouseover).jssort01 .p.pav        (active).jssort01 .p.pdn        (mousedown)*/.jssort01 .p {    position: absolute;    top: 0;    left: 0;    width: 72px;    height: 72px;}.jssort01 .t {    position: absolute;    top: 0;    left: 0;    width: 100%;    height: 100%;    border: none;}.jssort01 .w {    position: absolute;    top: 0px;    left: 0px;    width: 100%;    height: 100%;}.jssort01 .c {    position: absolute;    top: 0px;    left: 0px;    width: 68px;    height: 68px;    border: #000 2px solid;    box-sizing: content-box;    background: url('img/t01.png') -800px -800px no-repeat;    _background: none;}.jssort01 .pav .c {    top: 2px;    _top: 0px;    left: 2px;    _left: 0px;    width: 68px;    height: 68px;    border: #000 0px solid;    _border: #fff 2px solid;    background-position: 50% 50%;}.jssort01 .p:hover .c {    top: 0px;    left: 0px;    width: 70px;    height: 70px;    border: #fff 1px solid;    background-position: 50% 50%;}.jssort01 .p.pdn .c {    background-position: 50% 50%;    width: 68px;    height: 68px;    border: #000 2px solid;}* html .jssort01 .c, * html .jssort01 .pdn .c, * html .jssort01 .pav .c {    /* ie quirks mode adjust */    width /**/: 72px;    height /**/: 72px;}
+    </style>
+{% endblock %}
+
+{% block bodyContent %}
+
+    <div class="container ">
+        <!-- BREADCRUMB -->
+        <ul class="breadcrumb">
+            <li><a href="{{ path('easy_t_shop_homepage')}}"><i class="fa fa-home"></i></a></li>
+            <li><a href="{{ path('easy_t_product_detail',{'id_prod': 1})}}">iPod Classic</a></li>
+        </ul>
+    </div>
+    <div class="container product-detail product-full">
+        <div class="row">
+            <div id="content" class="col-sm-12">
+                <a href="javascript:void(0)" class="open-sidebar hidden-lg hidden-md"><i class="fa fa-bars"></i> Sidebar</a>
+                <div class="sidebar-overlay "></div>
+                <div class="row product-view product-info clearfix" itemprop="offerDetails" itemscope="" itemtype="http://schema.org/Product">
+                    <div class="content-product-left  class-honizol col-md-7 col-sm-12 col-xs-12 ">
+                        <div id="jssor_1" style="position:relative;margin:0 auto;top:0p;width:800px;height:656px;background-color:#24262e;">
+                            <!-- Loading Screen -->
+                            <div data-u="slides" style="cursor:default;position:relative;top:0px;left:0px;width:800px;height:556px;overflow:hidden;">
+                                <div>
+                                    <img data-u="image" src="{{ asset('Shop/image/cache/catalog/demo/'~produit.path)}}" /><br/><p>tooto</p>
+                                    <img data-u="thumb" src="{{ asset('Shop/image/cache/catalog/demo/'~produit.path)}}"/>
+                                </div>
+                                <div>
+                                    <img data-u="image" src="{{ asset('Shop/image/cache/catalog/demo/iphone_2-1000x1000.jpg')}}" />
+                                    <img data-u="thumb" src="{{ asset('Shop/image/cache/catalog/demo/iphone_2-1000x1000.jpg')}}" />
+                                </div>
+                                <div>
+                                    <img data-u="image" src="{{ asset('Shop/image/cache/catalog/demo/iphone_3-460x460.jpg')}}" />
+                                    <img data-u="thumb" src="{{ asset('Shop/image/cache/catalog/demo/iphone_3-460x460.jpg')}}" />
+                                </div>
+                                <div>
+                                    <img data-u="image" src="{{ asset('Shop/image/cache/catalog/demo/'~produit.path)}}" />
+                                    <img data-u="thumb" src="{{ asset('Shop/image/cache/catalog/demo/'~produit.path)}}" />
+                                </div>
+                                <div>
+                                    <img data-u="image" src="{{ asset('Shop/image/cache/catalog/demo/iphone_4-460x460.jpg')}}" />
+                                    <img data-u="thumb" src="{{ asset('Shop/image/cache/catalog/demo/iphone_4-460x460.jpg')}}" />
+                                </div> 
+                            </div>
+                            <!-- Thumbnail Navigator -->
+                            <div data-u="thumbnavigator" class="jssort01" style="position:absolute;left:0px;bottom:0px;width:800px;height:100px;" data-autocenter="1">
+                                <!-- Thumbnail Item Skin Begin -->
+                                <div data-u="slides" style="cursor: default;">
+                                    <div data-u="prototype" class="p">
+                                        <div class="w">
+                                            <div data-u="thumbnailtemplate" class="t"></div>
+                                        </div>
+                                        <div class="c"></div>
+                                    </div>
+                                </div>
+                                <!-- Thumbnail Item Skin End -->
+                            </div>
+                            <!-- Arrow Navigator -->
+                            <span data-u="arrowleft" class="jssora05l" style="top:158px;left:8px;width:40px;height:40px;"></span>
+                            <span data-u="arrowright" class="jssora05r" style="top:158px;right:8px;width:40px;height:40px;"></span>
+                        </div>
+                    </div>
+                    <div class="content-product-right info-right col-md-4 col-sm-12 col-xs-12 pull-right">
+                        <div class="title-product">
+                            <h1 itemprop="name">{{produit.model}}</h1>
+                        </div>
+                        <!-- Review ---->
+                        <div class="box-review" itemprop="aggregateRating" itemscope="" itemtype="http://schema.org/AggregateRating">
+                            <div class="ratings">
+                                <div class="rating-box" itemprop="ratingValue" content="0">
+                                    <span class="fa fa-stack"><i class="fa fa-star-o fa-stack-1x"></i></span>
+                                    <span class="fa fa-stack"><i class="fa fa-star-o fa-stack-1x"></i></span>
+                                    <span class="fa fa-stack"><i class="fa fa-star-o fa-stack-1x"></i></span>
+                                    <span class="fa fa-stack"><i class="fa fa-star-o fa-stack-1x"></i></span>
+                                    <span class="fa fa-stack"><i class="fa fa-star-o fa-stack-1x"></i></span>
+                                </div>
+                            </div>
+                            <a class="reviews_button" href="javascript:void(0);" onclick="$('a[href=\'#tab-review\']').trigger('click'); return false;" itemprop="reviewCount" content="<b>Notice</b>: Undefined variable: count_reviews in <b>C:\wamp\www\vegasMarket2.3Other\catalog\view\theme\so-revo\template\product\product.tpl</b> on line <b>202</b>">0 reviews</a> | <a class="write_review_button" href="javascript:void(0);" onclick="$('a[href=\'#tab-review\']').trigger('click'); return false;">Write a review</a>
+                        </div>
+                        <div class="product-label">
+                            <div class="product_page_price price" itemprop="offers" itemscope="" itemtype="http://schema.org/Offer">
+                                <span class="price-new">
+                                    <span itemprop="price" id="price-old" content="<b>Notice</b>: Undefined variable: price_value in <b>C:\wamp\www\vegasMarket2.3Other\catalog\view\theme\so-revo\template\product\product.tpl</b> on line <b>214</b>">${{produit.priceUnit}}</span>
+                                    <meta itemprop="priceCurrency" content="<b>Notice</b>: Undefined variable: currency in <b>C:\wamp\www\vegasMarket2.3Other\catalog\view\theme\so-revo\template\product\product.tpl</b> on line <b>214</b>">
+                                </span>
+                                <div class="price-tax"><span>Ex Tax:</span> $100.00</div>
+                            </div>
+                        </div>
+                        <div class="product-box-desc">
+                            <div class="inner-box-desc">
+                                <div class="brand"><span>Brand:</span><a href="index.php?route=product/manufacturer/info&amp;manufacturer_id=8">{{produit.name}}}</a></div>
+                                <div class="model"><span>Product Code:</span> product {{produit.id}}</div>
+                                <div class="stock"><span> Stock </span> <i class="fa fa-check-square-o"></i>  Instock </div>
+                            </div>
+                        </div>
+                        <div class="short_description form-group" itemprop="description">
+                            <h3>Overview</h3>
+                            More room to move.
+                            With 80GB or 160GB of storage and up to 40 hours of battery life, the new iPod classic lets you enjoy up to 40,...                
+                        </div>
+                        <!--Countdown box-->
+                        <!--End countdown box-->
+                        <div id="product">
+                            <div class="box-cart cart clearfix">
+                                <!-- QUALYTY -->
+                                <div class="form-group box-info-product">
+                                    <div class="option quantity">
+                                        <div class="input-group quantity-control" unselectable="on" style="user-select: none;">
+                                            <label>Qty</label>
+                                            <input class="form-control qte" type="text" name="quantity" value="1"><!--
+                                            <input type="hidden" name="product_id" value="48">-->
+                                            <span class="input-group-addon product_quantity_down fa fa-caret-down"></span>
+                                            <span class="input-group-addon product_quantity_up fa fa-caret-up"></span>
+                                        </div>
+                                    </div>
+                                    <!-- CART -->
+                                    <div class="cart">
+                                        <input type="button" data-toggle="tooltip" title="" value="Add to Cart" onclick="addCart({{produit.id}}, 0)" data-loading-text="Loading..." id="button-cart" class="btn btn-mega btn-lg" data-original-title="Add to Cart">
+                                    </div>
+                                    <div class="add-to-links wish_comp">
+                                        <ul class="blank">
+                                            <li class="wishlist">
+                                                <a class="icon" data-toggle="tooltip" title="" onclick="wishlist.add('48');" data-original-title="Add to Wish List"><i class="fa fa-heart-o"></i></a>
+                                            </li>
+                                            <li class="compare">
+                                                <a class="icon" data-toggle="tooltip" title="" onclick="addCompare({{produit.id}});" data-original-title="Compare this Product"><i class="fa fa-retweet"></i></a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- end box info product -->
+                    </div>
+                </div>
+                <div class="row product-bottom">
+                    <div class="col-xs-12">
+                        <div class="producttab ">
+                            <div class="tabsslider   col-xs-12">
+                                <ul class="nav nav-tabs font-sn">
+                                    <li class="active"><a data-toggle="tab" href="#tab-1">Description</a></li>
+                                    <li class="item_nonactive"><a data-toggle="tab" href="#tab-review">Reviews (0)</a></li>
+                                </ul>
+                                <div class="tab-content  col-xs-12">
+                                    <div id="tab-1" class="tab-pane fade active in">
+                                        <div class="cpt_product_description ">
+                                            <div>
+                                                <p>
+                                                    <strong>More room to move.</strong>
+                                                </p>
+                                                <p>
+                                                    With 80GB or 160GB of storage and up to 40 hours of battery life, the new iPod classic lets you enjoy up to 40,000 songs or up to 200 hours of video or any combination wherever you go.
+                                                </p>
+                                                <p>
+                                                    <strong>Cover Flow.</strong>
+                                                </p>
+                                                <p>
+                                                    Browse through your music collection by flipping through album art. Select an album to turn it over and see the track list.
+                                                </p>
+                                                <p>
+                                                    <strong>Enhanced interface.</strong>
+                                                </p>
+                                                <p>
+                                                    Experience a whole new way to browse and view your music and video.
+                                                </p>
+                                                <p>
+                                                    <strong>Sleeker design.</strong>
+                                                </p>
+                                                <p>
+                                                    Beautiful, durable, and sleeker than ever, iPod classic now features an anodized aluminum and polished stainless steel enclosure with rounded edges.
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <!-- cpt_container_end -->                              
+                                    </div>
+                                    <div id="tab-review" class="tab-pane fade active in ">
+                                        <form>
+                                            <div id="review">
+                                                <p>There are no reviews for this product.</p>
+                                            </div>
+                                            <h2 id="review-title">Write a review</h2>
+                                            <div class="contacts-form">
+                                                <div class="form-group">
+                                                    <span class="icon icon-user"></span>
+                                                    <input type="text" name="name" class="form-control" value="Your Name" onblur="if (this.value == '') {this.value = 'Your Name';}" onfocus="if(this.value == 'Your Name') {this.value = '';}">
+                                                </div>
+                                                <div class="form-group">
+                                                    <span class="icon icon-bubbles-2"></span>
+                                                    <textarea class="form-control" name="text" onblur="if (this.value == '') {this.value = 'Your Review';}" onfocus="if(this.value == 'Your Review') {this.value = '';}">Your Review</textarea>
+                                                </div>
+                                                <div class="form-group has-error">
+                                                    <span style="font-size: 11px;"><span class="text-danger">Note:</span> HTML is not translated!</span>
+                                                    <br>
+                                                    <br>
+                                                    <b>Rating</b> <span>Bad</span>&nbsp;
+                                                    <input type="radio" name="rating" value="1">
+                                                    &nbsp;
+                                                    <input type="radio" name="rating" value="2">
+                                                    &nbsp;
+                                                    <input type="radio" name="rating" value="3">
+                                                    &nbsp;
+                                                    <input type="radio" name="rating" value="4">
+                                                    &nbsp;
+                                                    <input type="radio" name="rating" value="5">
+                                                    &nbsp;<span>Good</span><br>
+                                                </div>
+                                                <div class="buttons clearfix"><a id="button-review" class="btn btn-info">Continue</a></div>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bottom-product clearfix">
+                        <ul class="nav nav-tabs">
+                            <li class="active"><a data-toggle="tab" href="#product-upsell">UPSELL PRODUCTS</a></li>
+                        </ul>
+                        <div class="tab-content">
+                            <div id="product-related" class="tab-pane fade">
+                            </div>
+                            <div id="product-upsell" class="tab-pane fade in active">
+                                <div class="module so-extraslider-ltr ex_upsell custom-extra clearfix">
+                                    <div class="modcontent">
+                                        Has no item to show!
+                                    </div>
+                                    <!-- /.modcontent -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+        <script src="{{ asset('Shop/image-gallery.slider.jquery/js/jssor.slider-23.1.0.mini.js')}}" type="text/javascript"></script>
+    <script type="text/javascript">
+        jQuery(document).ready(function ($) {
+
+                var jssor_1_SlideshowTransitions = [
+                  {$Duration:1200,x:0.3,$During:{$Left:[0.3,0.7]},$Easing:{$Left:$Jease$.$InCubic,$Opacity:$Jease$.$Linear},$Opacity:2},
+                  {$Duration:1200,x:-0.3,$SlideOut:true,$Easing:{$Left:$Jease$.$InCubic,$Opacity:$Jease$.$Linear},$Opacity:2},
+                  {$Duration:1200,x:-0.3,$During:{$Left:[0.3,0.7]},$Easing:{$Left:$Jease$.$InCubic,$Opacity:$Jease$.$Linear},$Opacity:2},
+                  {$Duration:1200,x:0.3,$SlideOut:true,$Easing:{$Left:$Jease$.$InCubic,$Opacity:$Jease$.$Linear},$Opacity:2},
+                  {$Duration:1200,y:0.3,$During:{$Top:[0.3,0.7]},$Easing:{$Top:$Jease$.$InCubic,$Opacity:$Jease$.$Linear},$Opacity:2},
+                  {$Duration:1200,y:-0.3,$SlideOut:true,$Easing:{$Top:$Jease$.$InCubic,$Opacity:$Jease$.$Linear},$Opacity:2},
+                  {$Duration:1200,y:-0.3,$During:{$Top:[0.3,0.7]},$Easing:{$Top:$Jease$.$InCubic,$Opacity:$Jease$.$Linear},$Opacity:2},
+                  {$Duration:1200,y:0.3,$SlideOut:true,$Easing:{$Top:$Jease$.$InCubic,$Opacity:$Jease$.$Linear},$Opacity:2},
+                  {$Duration:1200,x:0.3,$Cols:2,$During:{$Left:[0.3,0.7]},$ChessMode:{$Column:3},$Easing:{$Left:$Jease$.$InCubic,$Opacity:$Jease$.$Linear},$Opacity:2},
+                  {$Duration:1200,x:0.3,$Cols:2,$SlideOut:true,$ChessMode:{$Column:3},$Easing:{$Left:$Jease$.$InCubic,$Opacity:$Jease$.$Linear},$Opacity:2},
+                  {$Duration:1200,y:0.3,$Rows:2,$During:{$Top:[0.3,0.7]},$ChessMode:{$Row:12},$Easing:{$Top:$Jease$.$InCubic,$Opacity:$Jease$.$Linear},$Opacity:2},
+                  {$Duration:1200,y:0.3,$Rows:2,$SlideOut:true,$ChessMode:{$Row:12},$Easing:{$Top:$Jease$.$InCubic,$Opacity:$Jease$.$Linear},$Opacity:2},
+                  {$Duration:1200,y:0.3,$Cols:2,$During:{$Top:[0.3,0.7]},$ChessMode:{$Column:12},$Easing:{$Top:$Jease$.$InCubic,$Opacity:$Jease$.$Linear},$Opacity:2},
+                  {$Duration:1200,y:-0.3,$Cols:2,$SlideOut:true,$ChessMode:{$Column:12},$Easing:{$Top:$Jease$.$InCubic,$Opacity:$Jease$.$Linear},$Opacity:2},
+                  {$Duration:1200,x:0.3,$Rows:2,$During:{$Left:[0.3,0.7]},$ChessMode:{$Row:3},$Easing:{$Left:$Jease$.$InCubic,$Opacity:$Jease$.$Linear},$Opacity:2},
+                  {$Duration:1200,x:-0.3,$Rows:2,$SlideOut:true,$ChessMode:{$Row:3},$Easing:{$Left:$Jease$.$InCubic,$Opacity:$Jease$.$Linear},$Opacity:2},
+                  {$Duration:1200,x:0.3,y:0.3,$Cols:2,$Rows:2,$During:{$Left:[0.3,0.7],$Top:[0.3,0.7]},$ChessMode:{$Column:3,$Row:12},$Easing:{$Left:$Jease$.$InCubic,$Top:$Jease$.$InCubic,$Opacity:$Jease$.$Linear},$Opacity:2},
+                  {$Duration:1200,x:0.3,y:0.3,$Cols:2,$Rows:2,$During:{$Left:[0.3,0.7],$Top:[0.3,0.7]},$SlideOut:true,$ChessMode:{$Column:3,$Row:12},$Easing:{$Left:$Jease$.$InCubic,$Top:$Jease$.$InCubic,$Opacity:$Jease$.$Linear},$Opacity:2},
+                  {$Duration:1200,$Delay:20,$Clip:3,$Assembly:260,$Easing:{$Clip:$Jease$.$InCubic,$Opacity:$Jease$.$Linear},$Opacity:2},
+                  {$Duration:1200,$Delay:20,$Clip:3,$SlideOut:true,$Assembly:260,$Easing:{$Clip:$Jease$.$OutCubic,$Opacity:$Jease$.$Linear},$Opacity:2},
+                  {$Duration:1200,$Delay:20,$Clip:12,$Assembly:260,$Easing:{$Clip:$Jease$.$InCubic,$Opacity:$Jease$.$Linear},$Opacity:2},
+                  {$Duration:1200,$Delay:20,$Clip:12,$SlideOut:true,$Assembly:260,$Easing:{$Clip:$Jease$.$OutCubic,$Opacity:$Jease$.$Linear},$Opacity:2}
+                ];
+
+                var jssor_1_options = {
+                  $AutoPlay: 1,
+                  $SlideshowOptions: {
+                    $Class: $JssorSlideshowRunner$,
+                    $Transitions: jssor_1_SlideshowTransitions,
+                    $TransitionsOrder: 1
+                  },
+                  $ArrowNavigatorOptions: {
+                    $Class: $JssorArrowNavigator$
+                  },
+                  $ThumbnailNavigatorOptions: {
+                    $Class: $JssorThumbnailNavigator$,
+                    $Cols: 10,
+                    $SpacingX: 8,
+                    $SpacingY: 8,
+                    $Align: 360
+                  }
+                };
+
+                var jssor_1_slider = new $JssorSlider$("jssor_1", jssor_1_options);
+
+                /*responsive code begin*/
+                /*remove responsive code if you don't want the slider scales while window resizing*/
+                function ScaleSlider() {
+                    var refSize = jssor_1_slider.$Elmt.parentNode.clientWidth;
+                    if (refSize) {
+                        refSize = Math.min(refSize, 800);
+                        jssor_1_slider.$ScaleWidth(refSize);
+                    }
+                    else {
+                        window.setTimeout(ScaleSlider, 30);
+                    }
+                }
+                ScaleSlider();
+                $(window).bind("load", ScaleSlider);
+                $(window).bind("resize", ScaleSlider);
+                $(window).bind("orientationchange", ScaleSlider);
+                /*responsive code end*/
+        });
+    </script>
+{% endblock %}

@@ -1,0 +1,1465 @@
+{% extends "::base/shop/layout.html.twig" %}
+
+{% block title %}
+    Checkout - {{ parent() }}
+{% endblock %}
+{% block stylesheets %}
+   {{ parent() }}
+    <link href="{{ asset('Shop/wizard-list-place/assets/css/bootstrap.min.css')}}" rel="stylesheet" />
+    <link href="{{ asset('Shop/wizard-list-place/assets/css/paper-bootstrap-wizard.css')}}" rel="stylesheet" />
+    <link href="{{ asset('Shop/wizard-list-place/assets/css/demo.css')}}" rel="stylesheet" />
+
+    <!-- Fonts and Icons -->
+    <link href="{{ asset('Shop/wizard-list-place/assets/css/themify-icons.css')}}" rel="stylesheet">
+    <!--   Core JS Files   -->
+<link rel="stylesheet" type="text/css" href="{{ asset('Shop/resCarossel/css/resCarousel.css')}}">
+
+<style type="text/css">
+
+    .wizard-container .wizard-card {
+        min-height: 410px;
+        box-shadow: 0px 5px 0px 6px rgba(41, 120, 144, 0.7);
+    }
+    .wizard-container .cart{
+        box-shadow:none;
+    }
+    .wizard-container .wizard-header{
+        background: rgba(69, 137, 158, 0.53);
+    }
+        .form-group label{
+            font-size: 15px;
+            font-family: Roboto,Helvetica,Arial,sans-serif;
+        }
+        form .row{
+            margin: 15px!important;
+        }
+        form input, form textarea, form select{
+            background: #FFF!important;
+            border:1px solid #e8e7e3!important ;
+            font-size: 20px!important;
+        }
+        form input[type="text"]{
+            border:1px solid #e8e7e3!important;
+        }
+        form #textarea{
+            height: 150px!important;
+        }
+        /*.title-pan{
+            margin-top: 30px;
+        }*/
+        .title-pan .legende{
+            font-size: 25px;
+            font-weight: bold;
+            font-family: 'Glyphicons Halflings';       
+        }
+        h4.sous-titre{
+            font-weight: none;
+            font-family: Roboto,Helvetica,Arial,sans-serif;   
+        }
+        form .adresseSup{
+            font-size: 15px;
+            font-family: Roboto,Helvetica,Arial,sans-serif;
+            color: #c2c2c2;
+            font-weight: bold;
+            text-decoration: underline #c2c2c2;
+        }
+        form.livraison input{
+            float: left;
+        }
+        #resume td{
+            text-align: center;
+        }
+        #resume td img{
+            width: 100%;
+            height: 100%;
+            max-width:52px;
+        }
+        .transp-list{
+            height: 80px
+        }
+        .transp-item {
+            height: 100%;
+            margin: 0px;
+            padding: 0px;
+            border: 2px solid rgba(153, 153, 153, 0.52);
+            border-radius: 20px;
+            margin-left: 3px;
+        }
+        .transp-item img {
+            width: 100%;
+            height: 100%;
+            border-radius: 20px;
+        }
+        .trans-choose a{
+            height: 180px;
+            width: 200px;
+            padding: 5px;
+            margin-right: 50px;
+        }
+
+        .trans-choose img{
+            height: 100%;
+            width: 100%;
+            max-height: 90px;
+        }
+        .transp-list .panel.panel-primary{
+            position: absolute;
+            left: 30%;
+            bottom: 74%;
+            box-shadow: 0px 0px 2px 4px rgba(10, 3, 3, 0.25);
+            border: none;
+        }
+        .panel-heading{
+            font-size: 20px;
+            padding: 5px;
+            text-align: center;
+        }
+        .transp-list .panel.panel-primary .panel-body{
+            width: 320px;
+            background: #fff;
+        }
+        .transp-list .panel.panel-primary{
+            display: none;
+        }
+        .panel-footer button.btn {
+            margin-left: 105px;
+        }
+        .panel-footer {
+            background-color: #297890;
+            border-top: none;
+        }
+        .panel-footer .btn,.modal-footer button.btn{
+            border: none;
+            color: #FFF;
+        }
+        .panel-footer .btn{
+            background: #0461ab!important;
+        }
+        .panel-footer a{
+            color: #fff;
+            font-size: 17px;
+            text-decoration: underline;
+        }
+        .panel-body .logo{
+            height: 90px;
+        }
+        .panel-body .details{
+            margin-top: 10px;
+        }
+        .panel-body .contact{
+            text-align: right;
+        }
+        #paiement .logo-evm-commande{
+            max-width: 50%;
+        }
+        #img-paiement{
+            width: 100%;
+            height: 100%;
+        }
+        #paiement input{
+            border: 1px solid #c2c2c2;
+        }
+        #paiement .infos-commande, #paiement .transaction{
+            border-radius:  18px solid #c2c2c2!important;
+            box-shadow: 2px 2px rgba(0, 0, 0, 0.2);
+            margin-left: 15px;
+        }
+        #paiement .value-info{
+            background: #d6d6d6;
+        }
+        #confirmation ul{
+            font-size: 25px;
+            font-weight: bold;
+        }
+
+        .nav-tabs>li>a {
+        padding: 2px;
+        }
+        .nav.nav-tabs li img {
+            height: 40px;
+            width: 60px;
+            padding: 2px;
+        }
+        .transaction .nav.nav-tabs{
+            border: none;
+        }
+
+        .nav-tabs>li {
+            float: left;
+            margin-bottom: -8px;
+            margin: -1px!important;
+            max-width: 70px;
+            background: #e4d7d7;
+        }
+        .transaction .tab-content{
+            padding: 0px!important;
+        }
+        .transaction .nav-tabs>li.active>a, .transaction .nav-tabs>li.active>a:hover, .transaction .nav-tabs>li.active>a:focus{
+            border: 1px solid;
+            border-bottom: none!important;
+        }
+        .wizard-header h3.wizard-title{
+            color: #ffffff;
+            font-size: 45px;
+            font-weight: bold;
+            font-family: 'Glyphicons Halflings';
+        }
+        .wizard-navigation ul li a{
+            font-size: 20px;
+            color: rgba(4, 10, 12, 0.42);
+        }
+        .wizard-card .tab-content {
+            min-height: initial;
+        }
+        a{
+            color: #297890;
+        }
+        .retirer-transport{
+            color: #297890;
+            cursor: pointer;
+        }
+        .modal-header{
+            padding: 10px;
+        }
+        .tab-content .tab-pane{
+            padding: 15px;
+        }
+        .tab-content .alert-block.alert-danger{
+            margin-bottom: 0px;
+            font-size: 23px;
+            margin-top: 15px;
+        }
+        .modal-body, .modal-body p{
+            padding: 15px;
+            font-size: 20px;
+        }
+        .infos-commande h4, .transaction h4.paiement{
+            background: #297890;
+            padding: 3px;
+            color: #fff;
+            font-size: 24px;
+            padding-left: 15px;
+        }
+    /**** facture**************/
+
+    .facture{
+        border: 1px solid rgba(198, 181, 181, 0.53);
+        min-height: 700px;
+        padding: 80px;
+        box-shadow: 4px 6px 14px 0px rgba(10, 17, 19, 0.68);
+        margin-top: 20px;
+    }
+    .facture-header{
+        border-bottom: 3px solid #297890;
+        padding-bottom: 50px;
+    }
+    .num-facture{
+        text-align: right;
+        background: rgba(42, 121, 144, 0.77);
+        padding: 3px;
+        padding-right: 45px;
+        color: #fff;
+        font-size: 28px;
+        font-weight: bold;
+        margin-bottom: 31px;
+    }
+    .infos-boutique p.nom-boutique{
+            font-size: 25px;
+        color: #297890;
+        font-weight: bold;
+    }
+
+    .infos-boutique p.adresse-boutique{
+        font-size: 20px;
+        font-family: 'Muli', 'Helvetica', Arial, sans-serif;
+    }
+    .facture-content{
+            margin-top: 30px;
+        font-size: 25px;
+    }
+    .facture-content p.infos-commande{
+            font-size: 30px;
+    }
+    .facture-content p.infos-commande span{
+        font-weight: bold;
+    }
+    .facture-content div.total-facture{
+        font-size: 45px;
+        padding: 5px;
+        margin-top: 50px;
+        border-top: 2px solid #297890;
+        border-bottom: 2px solid #297890;
+        font-family: 'Muli', 'Helvetica', Arial, sans-serif;
+    }
+    .facture-footer{
+        margin-top: 250px;
+    }
+
+    .facture-footer .condition-paiement{
+        font-weight: bold;
+        border-left: 1px solid #2a7990;
+    }
+
+    img.img-merci{
+        height: 100%;
+        width: 100%;
+        padding-top: 50px;
+    }
+
+    .icon-circle img.stape-ok{
+        position: absolute;
+        z-index: 3;
+        left: -3px;
+        bottom: -6px;
+        height: 82px; 
+        display: none;                                               
+    }
+    .tab-content .alert-danger img.stape-fail{
+        height: 48px;
+        float: left;
+        padding-right: 15px;
+    }
+    .adresse_circle a:hover{
+        border-color: green;
+    } 
+            .item div h1 {
+            background: rgba(0, 0, 0, .4);
+        }
+</style>
+{% endblock %}
+{% block bodyContent %}
+    <div class="container">
+        <ul class="breadcrumb">
+            <li><a href="{{ path('easy_t_shop_homepage')}}"><i class="fa fa-home"></i></a></li>
+            <li><a href="{{ path('easy_t_shopping_home')}}">Shopping Cart</a></li>
+            <li><a href="{{ path('easy_t_checkout_home')}}">Checkout</a></li>
+        </ul>
+        <div class="row">
+    <div class="col-sm-10 col-sm-offset-1 clearfix" style="background:##ffffff none repeat scroll 0% 0%;">
+        <div class="wizard-container">
+            <div class="card wizard-card" data-color="green" id="wizard">
+            <!--        You can switch " data-color="green" "  with one of the next bright colors: "blue", "azure", "orange", "red"       -->
+
+                    <div class="wizard-header">
+                        <h3 class="wizard-title">Procedure de paiement</h3>
+                    </div>
+                    <div class="wizard-navigation">
+                        <div class="progress-with-circle">
+                            <div class="progress-bar" role="progressbar" aria-valuenow="1" aria-valuemin="1" aria-valuemax="4" style="width: 15%;"></div>
+                        </div>
+                        <ul>
+                            <li class="adresse_circle">
+                                <a href="#adresse" data-toggle="tab">
+                                    <div class="icon-circle">
+                                        <img class="stape1-ok stape-ok" src="{{ asset('Shop/image/49460.png')}}">
+                                        <i class="ti-map"></i>
+                                    </div>
+                                    Adresse
+                                </a>
+                            </li>
+                            <li class="livraison_circle">
+                                <a href="#livraison" data-toggle="tab">
+                                    <div class="icon-circle">
+                                        <img class=" stape2-ok stape-ok" src="{{ asset('Shop/image/49460.png')}}">
+                                        <i class="ti-panel"></i>
+                                    </div>
+                                    Livraison
+                                </a>
+                            </li>
+                           <li class="resume_circle">
+                                <a href="#resume" data-toggle="tab">
+                                    <div class="icon-circle">
+                                        <img class=" stape3-ok stape-ok" src="{{ asset('Shop/image/49460.png')}}">
+                                        <i class="ti-panel"></i>
+                                    </div>
+                                    resume
+                                </a>
+                            </li>
+                            <li class="paiement_circle">
+                                <a href="#paiement" data-toggle="tab">
+                                    <div class="icon-circle">
+                                        <img class=" stape4-ok stape-ok" src="{{ asset('Shop/image/49460.png')}}">
+                                        <i class="ti-comments"></i>
+                                    </div>
+                                    Paiement
+                                </a>
+                            </li>
+                            <li class="confirmation_circle">
+                                <a href="#confirmation" data-toggle="tab">
+                                    <div class="icon-circle">
+                                        <i class="ti-comments"></i>
+                                    </div>
+                                    confirmation
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="tab-content">
+                        <div class="alert alert-block alert-danger" style="display:none;"><img class="stape-fail" src="{{ asset('Shop/image/croix.png')}}">&nbspveuillez renseigner toutes les informations requises pour cette étape et passer à la suivante
+                        </div>
+                        <div class="tab-pane" id="adresse">                          
+                            <div class="title-pan">
+                                <span class="legende">Entrez votre adresse ici</span>
+                                <hr>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-10 col-sm-offset-1">
+                                    <br>
+                                <form method="post" id="form_adresse" class="form-horizontal adresse">
+                                    <div class="row">
+                                        <div class="form-group">
+                                            <label for="prenom" class="col-sm-2">Prenom* </label>
+                                            <div class="col-sm-8">
+                                                <input type="text" required name="prenom" placeholder="Votre Prenom" class="form-control" id="prenom">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="form-group">
+                                            <label for="nom" class="col-sm-2">Nom* </label>
+                                            <div class="col-sm-8">
+                                                <input type="text" required name="nom" placeholder="Votre Nom" class="form-control" id="nom">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="form-group">
+                                            <label for="adresse" class="col-sm-2">Adresse* </label>
+                                            <div class="col-sm-8">
+                                                <input type="text" required name="adresse" placeholder="votre Adresse" class="form-control" id="adresse">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-sm-8 col-sm-offset-2">
+                                            <span class="pull-right adresseSup">+ Ajouter un complément d'adresse</span>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="form-group">
+                                            <label for="telephone" class="col-sm-2">Téléphone* </label>
+                                            <div class="col-sm-8">
+                                                <input type="phone" required name="phone" placeholder="000 000 000" class="form-control" id="telephone">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="form-group">
+                                            <label for="selectRegion" class="col-sm-2">Region* </label>
+                                            <div class="col-sm-8">
+                                                <select id="selectRegion" required name="selectRegion" class="form-control" >
+                                                    <option value="littoral" selected>Littoral</option>
+                                                    <option value="nord"> Nord</option>
+                                                    <option value="centre">Centre</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="form-group">
+                                            <label for="selectVille" required class="col-sm-2">Ville* </label>
+                                            <div class="col-sm-8">
+                                                <select id="selectVille" name="selectVille" class="form-control" >
+                                                    <!--<option value="0" selected>Selectionner...</option>-->
+                                                    <option value="douala-bassa">Douala-bassa</option>
+                                                    <option value="douala-akwa">Douala-Akwa</option>
+                                                    <option value="douala-bali">Douala-Bali</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>   
+                                     <div class="row">
+                                        <div class="col-sm-8 col-sm-offset-2">
+                                            <button type="submit" class="pull-right btn btn-fill btn-success">Enregister et continuer</button>
+                                        </div>
+                                    </div>   
+                                </form>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="tab-pane" id="livraison">
+                            <div class="title-pan">
+                                <span class="legende">Livraison</span>
+                                <hr>
+                            </div>
+                            <div class="row">
+                                <h4 class="sous-titre"> Choisir votre mode de livraison</h4>
+                                <div class="radio col-sm-5">
+                                    <input type= "radio" name="delais" value="2-5" checked> <p style="font-size:25px;">Livré entre 2-5 jours à votre adresse pour 800 FCFA<br><a href="javascript:void(0);" style="color:#297890;font-weight:bold;">Livraison standart</a></p>
+                                </div>
+                                <div class="radio col-sm-7">
+                                    <input type= "radio" name="delais" value="2-3"> <p style="font-size:25px;">Livré entre 2-3 jours dans un point relais avec frais de livraison éventuellement inférieurs à ceux de l'expedition à domicile<br>NB: Les articles à destination du Grand Nord prendront 5-6 jours ouvrables pour arriver au point relais.<br><a href="javascript:void(0)" style="color:#297890;font-weight:bold;">Point relais Evm</a></p>
+                                </div>
+                            </div>
+                            <span style="font-size:25px;">Vous recevrez votre commande en 2 colis</span>
+
+                            <div class="row">
+                                <div class="transport">
+                                    <h4 class="sous-titre"> choisissez votre moyen de transport</h4>
+                                </div>
+                                <div class="row">
+                                <div class="resCarousel" data-items="1-1-1-4">
+                                <div class="resCarousel-inner">
+                                <div class="transp-list">
+
+                                </div>
+                                </div>
+                                    <button class='btn btn-default leftRs'><</button>
+                                    <button class='btn btn-default rightRs'>></button>
+                                </div>
+                                </div>
+                            </div>
+                            <hr>
+                            <div class="row" style="font-size:20px;">
+                                <div class="transport">
+                                    <h5 class="sous-titre"> details sur le delais et le moyen de livraison de votre colis</h5>
+                                </div>
+                                <div class="col-sm-4 date-colis transport delais-choose">
+                                   <!-- <h5>delais de livraison</h5>
+                                    <form>
+                                    <fieldset>
+                                    <legend>Colis 1</legend>
+                                        <span class="delais-livraison"> Sous 2-7 jours </span>
+                                        <span class="pull-right">
+                                        <a href="javascript:void(0);" title="Expedié par l'agence de voyage Touristique sous 2-7 jours à votre adresse  laptop IMac ccore-i2, 500G DD, intel..." data-toggle="tooltip" data-placement="right">Voir detail >> </a>
+                                        </span>
+                                    </fieldset>
+                                    <br>
+                                    <fieldset>
+                                    <legend>Colis 2</legend>
+                                        <span class="delais-livraison"> Sous 2-7 jours </span>
+                                        <span class="pull-right">
+                                        <a href="javascript:void(0);" title="Expedié par l'agence de voyage Touristique sous 2-7 jours à votre adresse  ipod-inode 15G..." data-toggle="tooltip" data-placement="right">Voir detail>></a></span>
+                                    </fieldset> 
+                                    </form>-->
+                                </div>
+                                <div class="col-sm-2 transport trans-choose pull-right">
+                                 <!--   <h5 style="text-align:center">transport du colis</h5>
+                                    <a href="javascript:void(0);" title="Le choix d'un moyen de transport ou d'un autre peut contribuer à une surfacturation sur le mode de livraison choisi" data-toggle="tooltip" data-placement="left">
+                                        <img src="{{ asset('Shop/image/transport/touristique.png')}}">
+                                    </a>
+                                    <h5 style="text-align:center">
+                                        <span class="retirer-transport">Annuler ce choix</span></h5>-->
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tab-pane" id="resume">
+                            <div class="title-pan">
+                                <span class="legende">Resumé de votre commande</span>
+                                <hr>
+                            </div>
+                            <div class="row">
+                                <table class="table table_resume table-bordered table-striped">
+                                    <thead>
+                                        <th>Article</th><th>Quantite</th><th>Prix Unitaire</th><th>Details de la livraison</th><th>Sous-Total</th>
+                                    </thead>
+                                    <tbody>
+                                    </tbody>
+                                </table>    
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <table class="livraison resume info-livraison table table-bordered table-striped">
+                                        <tr> <td colspan="2">INFOS LIVRAISON</td></tr>
+                                        <tr> <td>Delais livraison</td><td class="details-livraison"></td></tr>
+                                        <tr> <td>Transport:</td><td class="transport"></td></tr>
+                                    </table>
+                                </div>
+                                <div class="col-sm-6">
+                                    <table class="table  resume_montant table-bordered table-striped">
+                                        <tr> <td>SOUS-TOTAL:</td><td class="sous-total"></td></tr>
+                                        <tr> <td>MONTANT DE LA LIVRAISON:</td><td class="livraison" value="800"> 800 FCFA</td></tr>
+                                        <tr> <td>DONT TVA:</td><td class="tva" value="81.56"> 81.56 FCFA</td></tr>
+                                        <tr style="font-weight:bold;"> <td>TOTAL:</td><td class="total"></td></tr>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tab-pane" id="paiement">
+                            <div class="title-pan">
+                                <span class="legende">Espace de paiement</span>
+                                <hr>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-4 infos-commande">
+                                    <h4 class="sous-titre">Infos commande</h4>
+                                    <img src="{{ asset('Shop/image/catalog/new-store-logo-1487249703.jpg')}}" class="logo-evm-commande">
+                                    <p></p>
+                                    <table class="table table-bordered">
+                                        <tr>
+                                            <td> Adresse
+                                            </td>
+                                            <td class="value-info adresse" style="font-size:20px; font-weight:bold;"></td>
+                                        </tr>
+                                        <tr>
+                                            <td>Code commande
+                                            </td>
+                                            <td class="value-info" style="font-size:20px; font-weight:bold;">002650</td>
+                                        </tr>
+                                        <tr>
+                                            <td> Montant
+                                            </td>
+                                            <td class="counter-montant value-info montant" style="font-size:20px; font-weight:bold;"></td>
+                                        </tr>
+                                    </table>  
+                                </div>
+                                <div class="col-sm-7 transaction">
+                                    <h4 class="sous-titre paiement">Moyen de paiement</h4>
+
+                                  <ul class="nav nav-tabs" role="tablist">
+                                    <li role="presentation" class="active"><a href="#delta" aria-controls="delta" role="tab" data-toggle="tab"><img src="{{ asset('Shop/image/catalog/demo/paiement/delta.png')}}"></a></li>
+                                    <li role="presentation">
+                                      <a href="#laser" aria-controls="laser" role="tab" data-toggle="tab"><img src="{{ asset('Shop/image/catalog/demo/paiement/laser.png')}}"></a>
+                                    </li>
+                                    <li role="presentation">
+                                        <a href="#masterCart" aria-controls="masterCart" role="tab" data-toggle="tab"><img src="{{ asset('Shop/image/catalog/demo/paiement/masterCart.png')}}"></a>
+                                    </li>
+                                    <li role="presentation">
+                                        <a href="#masterTrod" aria-controls="masterTrod" role="tab" data-toggle="tab"><img src="{{ asset('Shop/image/catalog/demo/paiement/masterTrod.png')}}"></a>
+                                    </li>
+                                    <li role="presentation">
+                                        <a href="#paypal" aria-controls="paypal" role="tab" data-toggle="tab"><img src="{{ asset('Shop/image/catalog/demo/paiement/paypal.png')}}"></a>
+                                    </li>
+                                    <li role="presentation">
+                                        <a href="#sco" aria-controls="sco" role="tab" data-toggle="tab"><img src="{{ asset('Shop/image/catalog/demo/paiement/sco.png')}}"></a>
+                                    </li>
+                                    <li role="presentation">
+                                        <a href="#visa" aria-controls="visa" role="tab" data-toggle="tab"><img src="{{ asset('Shop/image/catalog/demo/paiement/visa.png')}}"></a>
+                                    </li></a>
+                                    </li>
+                                    <!--                               
+                                    <li class="dropdown">
+                                      <a id="dLabel" data-target="#" href="http://example.com" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                                        <img src="{{ asset('Shop/image/catalog/demo/paiement/visa.png')}}">
+                                        <span class="caret"></span>
+                                          <ul class="dropdown-menu" aria-labelledby="dLabel">
+                                            <li role="presentation"><a href="#visa" aria-controls="visa" role="tab" data-toggle="tab"><img src="{{ asset('Shop/image/catalog/demo/paiement/visa.png')}}"></a></li>
+                                            <li role="presentation"><a href="#visa2" aria-controls="visa2" role="tab" data-toggle="tab"><img src="{{ asset('Shop/image/catalog/demo/paiement/visa2.png')}}"></a></li>
+                                          </ul>
+                                        </a>
+                                     </li>-->
+                                    </ul>
+
+                                  <!-- Tab panes -->
+                                  <div class="tab-content">
+                                    <div role="tabpanel" class="tab-pane active" id="delta">
+                                    <span style="text-align:center;"> <h4 class="paiement">Montant de la transaction:   <span class="counter-montant"></span></h4></span>
+
+                                    <form method="post" id="form_delta" class="form-horizontal adresse">
+                                        <div class="row">
+                                            <div class="form-group">
+                                                <label for="num_cart" class="col-sm-5">Numero de carte bancaire</label>
+                                                <div class="col-sm-7">
+                                                    <input type="text" required name="num_cart_delta" placeholder="Votre numero de carte bancaire" class="form-control" id="num_cart">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="form-group">
+                                                <label for="code" class="col-sm-5">Code de vérification </label>
+                                                <div class="col-sm-7">
+                                                    <input type="text" required name="code_verification_delta" placeholder="Code de verification" class="form-control" id="code">
+                                                </div>
+                                            </div>
+                                        </div>
+                                         <div class="row">
+                                            <div class="col-sm-8 col-sm-offset-4">
+                                                <button type="submit" class="pull-right btn btn-fill btn-success">Valider</button>
+                                                                                    <div class="alert alert-block alert-warning"
+                                    style="display:none">
+                                    <h4>Erreur !</h4>
+                                    Tous les champs sont obligatoires !
+                                    </div>
+                                            </div>
+                                        </div>   
+                                    </form>
+
+                                    </div>
+                                    <div role="tabpanel" class="tab-pane" id="laser">
+                                        <span style="text-align:center;"> 
+                                            <h4>Montant de la transaction:   <span class="counter-montant"></span></h4>
+                                        </span>
+                                    <form method="post" id="form_laser" class="form-horizontal adresse">
+                                        <div class="row">
+                                            <div class="form-group">
+                                                <label for="num_cart" class="col-sm-5">Numero de carte bancaire</label>
+                                                <div class="col-sm-7">
+                                                    <input type="text" required name="num_cart_laser" placeholder="Votre numero de carte bancaire" class="form-control" id="num_cart">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="form-group">
+                                                <label for="code" class="col-sm-5">Code de vérification </label>
+                                                <div class="col-sm-7">
+                                                    <input type="text" required name="code_verification_laser" placeholder="Code de verification" class="form-control" id="code">
+                                                </div>
+                                            </div>
+                                        </div>
+                                         <div class="row">
+                                            <div class="col-sm-8 col-sm-offset-4">
+                                                <button type="submit" class="pull-right btn btn-fill btn-success">Valider</button>
+                                                                                    <div class="alert alert-block alert-danger"
+                                    style="display:none">
+                                    <h4>Erreur !</h4>
+                                    Tous les champs sont obligatoires !
+                                    </div>
+                                            </div>
+                                        </div>   
+                                    </form>
+                                    </div>
+
+                                    <div role="tabpanel" class="tab-pane" id="masterCart">
+                                    <span style="text-align:center;"> <h4>Montant de la transaction:   <span class="counter-montant"></span></h4></span>
+
+                                    <form method="post" id="form_masterCart" class="form-horizontal adresse">
+                                        <div class="row">
+                                            <div class="form-group">
+                                                <label for="num_cart" class="col-sm-5">Numero de carte bancaire</label>
+                                                <div class="col-sm-7">
+                                                    <input type="text" required name="num_cart_masterCart" placeholder="Votre numero de carte bancaire" class="form-control" id="num_cart">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="form-group">
+                                                <label for="code" class="col-sm-5">Code de vérification </label>
+                                                <div class="col-sm-7">
+                                                    <input type="text" required name="code_verification_masterCart" placeholder="Code de verification" class="form-control" id="code">
+                                                </div>
+                                            </div>
+                                        </div>
+                                         <div class="row">
+                                            <div class="col-sm-8 col-sm-offset-4">
+                                                <button type="submit" class="pull-right btn btn-fill btn-success">Valider</button>
+                                                                                    <div class="alert alert-block alert-danger"
+                                    style="display:none">
+                                    <h4>Erreur !</h4>
+                                    Tous les champs sont obligatoires !
+                                    </div>
+                                            </div>
+                                        </div>   
+                                    </form>
+                                    </div>
+
+                                    <div role="tabpanel" class="tab-pane" id="masterTrod">
+                                    <span style="text-align:center;"> <h4>Montant de la transaction:   <span class="counter-montant"></span></h4></span>
+
+                                    <form method="post" id="form_masterTrod" class="form-horizontal adresse">
+                                        <div class="row">
+                                            <div class="form-group">
+                                                <label for="num_cart" class="col-sm-5">Numero de carte bancaire</label>
+                                                <div class="col-sm-7">
+                                                    <input type="text" required name="num_cart_masterTrod" placeholder="Votre numero de carte bancaire" class="form-control" id="num_cart">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="form-group">
+                                                <label for="code" class="col-sm-5">Code de vérification </label>
+                                                <div class="col-sm-7">
+                                                    <input type="text" required name="code_verification_masterTrod" placeholder="Code de verification" class="form-control" id="code">
+                                                </div>
+                                            </div>
+                                        </div>
+                                         <div class="row">
+                                            <div class="col-sm-8 col-sm-offset-4">
+                                                <button type="submit" class="pull-right btn btn-fill btn-success">Valider</button>
+                                                                                    <div class="alert alert-block alert-danger"
+                                    style="display:none">
+                                    <h4>Erreur !</h4>
+                                    Tous les champs sont obligatoires !
+                                    </div>
+                                            </div>
+                                        </div>   
+                                    </form>
+                                    </div>
+
+                                    <div role="tabpanel" class="tab-pane" id="paypal">
+                                    <span style="text-align:center;"> <h4>Montant de la transaction:   <span class="counter-montant"></span></h4></span>
+
+                                    <form method="post" id="form_paypal" class="form-horizontal adresse">
+                                        <div class="row">
+                                            <div class="form-group">
+                                                <label for="num_cart" class="col-sm-5">Numero de carte bancaire</label>
+                                                <div class="col-sm-7">
+                                                    <input type="text" required name="num_cart_paypal" placeholder="Votre numero de carte bancaire" class="form-control" id="num_cart">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="form-group">
+                                                <label for="code" class="col-sm-5">Code de vérification </label>
+                                                <div class="col-sm-7">
+                                                    <input type="text" required name="code_verification_paypal" placeholder="Code de verification" class="form-control" id="code">
+                                                </div>
+                                            </div>
+                                        </div>
+                                         <div class="row">
+                                            <div class="col-sm-8 col-sm-offset-4">
+                                                <button type="submit" class="pull-right btn btn-fill btn-success">Valider</button>
+                                                                                    <div class="alert alert-block alert-danger"
+                                    style="display:none">
+                                    <h4>Erreur !</h4>
+                                    Tous les champs sont obligatoires !
+                                    </div>
+                                            </div>
+                                        </div>   
+                                    </form>
+
+                                    </div>
+
+                                    <div role="tabpanel" class="tab-pane" id="sco">
+                                    <span style="text-align:center;"> <h4>Montant de la transaction:   <span class="counter-montant"></span></h4></span>
+
+                                    <form method="post" id="form_sco" class="form-horizontal adresse">
+                                        <div class="row">
+                                            <div class="form-group">
+                                                <label for="num_cart" class="col-sm-5">Numero de carte bancaire</label>
+                                                <div class="col-sm-7">
+                                                    <input type="text" required name="num_cart_sco" placeholder="Votre numero de carte bancaire" class="form-control" id="num_cart">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="form-group">
+                                                <label for="code" class="col-sm-5">Code de vérification </label>
+                                                <div class="col-sm-7">
+                                                    <input type="text" required name="code_verification_sco" placeholder="Code de verification" class="form-control" id="code">
+                                                </div>
+                                            </div>
+                                        </div>
+                                         <div class="row">
+                                            <div class="col-sm-8 col-sm-offset-4">
+                                                <button type="submit" class="pull-right btn btn-fill btn-success">Valider</button>
+                                                                                    <div class="alert alert-block alert-danger"
+                                    style="display:none">
+                                    <h4>Erreur !</h4>
+                                    Tous les champs sont obligatoires !
+                                    </div>
+                                            </div>
+                                        </div>   
+                                    </form>
+                                    </div>
+
+                                    <div role="tabpanel" class="tab-pane" id="visa">
+                                        <span style="text-align:center;"> <h4>Montant de la transaction:   <span class="counter-montant"></span></h4></span>
+
+                                    <form method="post" id="form_visa" class="form-horizontal adresse">
+                                        <div class="row">
+                                            <div class="form-group">
+                                                <label for="num_cart" class="col-sm-5">Numero de carte bancaire</label>
+                                                <div class="col-sm-7">
+                                                    <input type="text" required name="num_cart_visa" placeholder="Votre numero de carte bancaire" class="form-control" id="num_cart">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="form-group">
+                                                <label for="code" class="col-sm-5">Code de vérification </label>
+                                                <div class="col-sm-7">
+                                                    <input type="text" required name="code_verification_visa" placeholder="Code de verification" class="form-control" id="code">
+                                                </div>
+                                            </div>
+                                        </div>
+                                         <div class="row">
+                                            <div class="col-sm-8 col-sm-offset-4">
+                                                <button type="submit" class="pull-right btn btn-fill btn-success">Valider</button>
+                                                                                    <div class="alert alert-block alert-danger"
+                                    style="display:none">
+                                    <h4>Erreur !</h4>
+                                    Tous les champs sont obligatoires !
+                                    </div>
+                                            </div>
+                                        </div>   
+                                    </form>
+                                    </div>
+                                <!--
+
+                                    <div role="tabpanel" class="tab-pane" id="visa2">
+                                        <span style="text-align:center;"> <h4>visa2 Montant de la transaction: 1.659.064 FCFA</h4></span>
+
+                                    <form method="post" id="form_visa2" class="form-horizontal adresse">
+                                        <div class="row">
+                                            <div class="form-group">
+                                                <label for="num_cart" class="col-sm-5">Numero de carte bancaire</label>
+                                                <div class="col-sm-7">
+                                                    <input type="text" name="num_cart" placeholder="Votre numero de carte bancaire" class="form-control" id="num_cart">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="form-group">
+                                                <label for="code" class="col-sm-5">Code de vérification </label>
+                                                <div class="col-sm-7">
+                                                    <input type="text" name="code_verification" placeholder="Code de verification" class="form-control" id="code">
+                                                </div>
+                                            </div>
+                                        </div>
+                                         <div class="row">
+                                            <div class="col-sm-8 col-sm-offset-4">
+                                                <button type="submit" class="btn btn-primary pull-right btn btn-default">Valider</button>
+                                            </div>
+                                        </div>   
+                                    </form>
+                                    </div>
+                                -->
+                                  </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tab-pane" id="confirmation">
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <span style="font-size: 50px;"> Paiement effectué avec succes  &nbsp <span style="color:green;" class='glyphicon glyphicon-check'></span>
+                                </div>
+                                <div class="col-sm-12 facture">
+                                    <div class="row facture-header">
+                                        <div class="col-sm-12 num-facture">FACTURE  <span>&nbsp &nbsp</span>089545</div>
+                                        <div class="col-sm-3 infos-boutique">
+                                            <p class="nom-boutique">Evm sarl inc</p>
+                                            <p class="adresse-boutique">45e rue boulevard
+                                            </br> Douala-Cameroun</p>
+                                        </div>
+                                        <div class="col-sm-3 logo-boutique pull-right">
+                                            <img src="{{ asset('Shop/image/catalog/new-store-logo-1487249703.jpg')}}" class="logo-evm-commande">
+                                        </div>
+                                    </div>
+                                    <div class="row facture-content">
+                                        <p class="infos-commande">
+                                        Client: <span class="nom-prenom"></span></br>
+                                        Adresse livraison: <span class="adresse-livraison"></span></br>
+                                        Numero commande: <span class="num-commande">002650</span></br>
+                                        Transport: <span class="transport"></span></br>
+                                        Delais livraison: <span class="delais-livraison"></span></br>
+                                        </p>
+                                        <div class="total-facture">Total de la facture: <span class="montant-total" style="font-weight:bold;"></span> </div>
+                                    </div>
+                                    <div class="row col-sm-10 facture-footer pull-right">
+                                        <div class="col-sm-4">
+                                            <img src="{{ asset('Shop/image/merci.png')}}" class="img-merci">
+                                        </div>
+                                        <div class="col-sm-8 condition-paiement">
+                                            <p>Conditions et modalités de paiement</p>
+                                            <p>Payment is due withing 15 day</p>
+                                            <p>California N.A</br> Accounter number: 7854592</br>
+                                                Routing:225599</p>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                            <div style="margin-top:40px;">
+                                <a href="javascript:void(0);" class="btn btn-fill btn-success"><< retourn achat</a>
+                            </div>
+                        </div>
+                        <!-- /. start modal -->
+                        <div class="modal fade" tabindex="-1" id="mon-modal" role="dialog" aria-labelledby="gridSystemModalLabel">
+                          <div class="modal-dialog" role="document">
+                            <div class="modal-content" style="margin-top: 150px;">
+                              <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                <h4 class="modal-title" id="gridSystemModalLabel">Transport</h4>
+                              </div>
+                              <div class="modal-body">
+                                 <div class="row">
+                                   <div class="container">
+                                    <p>Le choix d'une agence de transport plutot qu'une autre peut entrainer une surfacturation de la commande totale</p>
+
+                                    <p>Pour ce transport vous serez facturé de <span class="frais-trans"></span> </p>
+                                   </div>
+
+                                </div>
+                              </div>
+                              <div class="modal-footer">
+                                <button type="button" class="btn btn-default annuler-transport" data-dismiss="modal">Annuler</button>
+                                <button type="button" class="btn btn-primary confirmer-transport" value="0" data-dismiss="modal">Confirmer</button>
+                              </div>
+                            </div><!-- /.modal-content -->
+                          </div><!-- /.modal-dialog -->
+                        </div><!-- /.modal -->
+                    </div>
+                    <div class="wizard-footer">
+                        <div class="pull-right">
+                            <input type='button' class='btn btn-next btn-fill btn-success btn-wd' name='next' value='Next' />
+                            <input type='button' class='btn btn-finish btn-fill btn-success btn-wd' name='finish' value='Finish' />
+                        </div>
+
+                        <div class="pull-left">
+                            <input type='button' class='btn btn-previous btn-default btn-wd' name='previous' value='Previous' />
+                        </div>
+                        <div class="clearfix"></div>
+                    </div>
+            </div>
+    </div>  
+        </div>
+        </div>
+    </div>
+
+    <script type="text/javascript">
+        var TRANSPORT =
+        [
+            {
+                id:1,
+                nom:"dhl",
+                facturation:1400,
+                email:"dhl",
+                site_officiel:"javascript:void(0);",
+                contact:"675837080 / 656645659",
+                path:"{{ asset('Shop/image/transport/dhl.png')}}",
+                description:"DHL est une agence de transport bla bla... lorem upsum lorem upsum lorem upsum lorem upsumlorem upsumlorem upsumlorem upsum orem upsum lorem upsum lorem upsum lorem upsumlorem upsumlorem upsumlorem upsum..."
+
+            },
+            {
+                id:2,
+                nom:"tnt",
+                facturation:1800,
+                email:"tnt@gmail.com",
+                site_officiel:"javascript:void(0);",
+                contact:"675837080 / 656645659",
+                path:"{{ asset('Shop/image/transport/tnt.png')}}",
+                description:"TNT est une agence de transport bla bla... lorem upsum lorem upsum lorem upsum lorem upsumlorem upsumlorem upsumlorem upsum orem upsum lorem upsum lorem upsum lorem upsumlorem upsumlorem upsumlorem upsum..."
+
+            },
+            {
+                id:3,
+                nom:"colissimot",
+                facturation:1200,
+                email:"colissimo@gmail.com",
+                site_officiel:"javascript:void(0);",
+                contact:"675837080 / 656645659",
+                path:"{{ asset('Shop/image/transport/colissimot.png')}}",
+                description:"COLISSIMO est une agence de transport bla bla... lorem upsum lorem upsum lorem upsum lorem upsumlorem upsumlorem upsumlorem upsum orem upsum lorem upsum lorem upsum lorem upsumlorem upsumlorem upsumlorem upsum..."
+
+            },
+            {
+                id:4,
+                nom:"relay",
+                facturation:2000,
+                email:"Relay@gmail.com",
+                site_officiel:"javascript:void(0);",
+                contact:"675837080 / 656645659",
+                path:"{{ asset('Shop/image/transport/relay.png')}}",
+                description:"RELAY est une agence de transport bla bla... lorem upsum lorem upsum lorem upsum lorem upsumlorem upsumlorem upsumlorem upsum orem upsum lorem upsum lorem upsum lorem upsumlorem upsumlorem upsumlorem upsum..."
+
+            },
+            {
+                id:5,
+                nom:"touristique",
+                facturation:800,
+                email:"touristique@gmail.com",
+                site_officiel:"javascript:void(0);",
+                contact:"675837080 / 656645659",
+                path:"{{ asset('Shop/image/transport/touristique.png')}}",
+                description:"TOURISTIQUE est une agence de transport bla bla... lorem upsum lorem upsum lorem upsum lorem upsumlorem upsumlorem upsumlorem upsum orem upsum lorem upsum lorem upsum lorem upsumlorem upsumlorem upsumlorem upsum..."
+            }
+        ];
+
+        var content_transportList = $('.resCarousel-inner .transp-list');
+
+        fix_transport();
+        function fix_transport(){
+          content_transportList.html("");
+          TRANSPORT.forEach(
+            function(item,index){
+              var inner = appendItemTransport(item,index);
+              content_transportList.append(inner);   
+            }
+          );
+        }
+
+         function appendItemTransport(item, index){
+            var $innerTransp="<div class='item transp-item'>"+
+                "<img src='"+item.path+"'>"+
+                "<div class='panel panel-primary'>"+
+                    "<div class='panel-heading'>Agence de transport "+item.nom.toUpperCase()+"</div>"+
+                    "<div class='panel-body'>"+
+                        "<div class='col-sm-12 logo'>"+
+                            "<img src='"+item.path+"'>"+
+                        "</div>"+
+                        "<div class='col-sm-12 details'>"+
+                            "<p>"+item.description+"</p>"+
+                            "<div class='contact'>"+
+                                "<h3>Contact</h3>"+
+                                "<span> "+ item.contact+"</br>"+item.email+
+                                "</span>"+
+                            "</div>"+
+                        "</div>"+
+                    "</div>"+
+                    "<div class='panel-footer'>"+
+                        "<a href='"+item.site_officiel+"'> Site officiel</a><button class='btn btn-primary valid-transport' value='"+item.nom+"' facturation='"+item.facturation+"' data-toggle='modal' data-target='#mon-modal'>Valider</button>"+
+                    "</div>"+
+                "</div>"+
+            "</div>";
+            return $innerTransp;
+         }
+
+    
+    //var transport_valid="0";
+    //var mode_livraison ="2-5";
+    var copieSTAPE =[];
+    var currentIndex=0;
+    //var adresse_livraison="";
+    //var nom_prenom="";
+
+    var $nom_prenom="";
+    var $adresse_livraison="";
+    var $mode_livraison ="";
+    var $delais_livraison="2-5";
+    var $transport_valide="";
+    var $transport_confirm="";
+    var $total_facture=0;
+
+    //copieSTAPE = JSON.parse(JSON.stringify(STAPE));
+
+    getIndex();
+    function getIndex(){
+        var i;
+        $('.wizard-footer input[name=next]').click(function(e){  
+            if(currentIndex < 4){
+                for(i=0; i<= currentIndex; i++){
+                    if(!copieSTAPE[i]){
+                        return false;
+                    }
+                }
+                currentIndex += 1;
+            }
+        })
+        $('.wizard-footer input[name=previous]').click(function(e){
+            if(currentIndex > 0)
+                currentIndex -= 1;
+        })
+        $('.icon-circle').click(function(e){
+            if($(this).parent().attr("href") == "#adresse"){
+                currentIndex = 0;
+            }
+            if($(this).parent().attr("href") == "#livraison"){
+                if(!copieSTAPE[0])
+                    return null;
+                currentIndex = 1;
+            }
+            if($(this).parent().attr("href") == "#resume"){
+                for(i=0; i<= 1; i++){
+                    if(!copieSTAPE[i]){
+                        return null;
+                    }
+                }
+                currentIndex = 2;
+            }
+            if($(this).parent().attr("href") == "#paiement"){
+                for(i=0; i<= 2; i++){
+                    if(!copieSTAPE[i]){
+                        return null;
+                    }
+                }
+                currentIndex = 3;
+            }
+            if($(this).parent().attr("href") == "#confirmation"){
+                for(i=0; i<= 3; i++){
+                    if(!copieSTAPE[i]){
+                        return null;
+                    }
+                }
+                currentIndex = 4;
+            }
+        })
+    }
+/*********** stape adresse ********/
+    function stape1(STAPE){
+        copieSTAPE = STAPE; // garde une copie de STAPE, une modif du contenu de l'un modifie aussi l autre
+        $('#form_adresse').on('submit', function(e){
+            e.preventDefault(); 
+            $prenom = $("input[name=prenom]").val();
+            $nom = $("input[name=nom]").val();
+            $adresse = $("input[name=adresse]").val();
+            $telephone = $("input[name=phone]").val();
+            $region = $("select[name=selectRegion]").val();
+            $ville = $("select[name=selectVille]").val();
+            if(check_adresse_form($prenom, $nom, $adresse, $telephone, $region, $ville)){
+                $nom_prenom = $nom+" "+$prenom ;
+                $nom_prenom = $nom_prenom.toUpperCase();
+                $adresse_livraison = $adresse;
+                STAPE[0]=true;
+                $('.icon-circle .stape1-ok').fadeIn();
+                $('.tab-content .alert.alert-block.alert-danger').hide();
+            }
+            else{
+                STAPE[0]=false;// ne peux plus avancer meme si les etapes suivantes etaient bonnes
+                $('.icon-circle .stape1-ok').hide();
+                $('.tab-content .alert.alert-block.alert-danger').show("slow");
+            }
+        
+        });     
+    }
+
+    function check_adresse_form($prenom, $nom, $adresse, $telephone, $region, $ville){
+        if($prenom.length && $nom.length && $adresse.length && $telephone.length
+         && $region.length && $ville.length){
+            return true;
+        }
+        else
+            return false;   
+    }
+ /******** stape livraison ******/
+
+    // on recupere la valeur du transport selectionné et l'enregistre
+    $('button.valid-transport').click(function(e){
+        e.preventDefault();
+        $transport_valide = $(this).attr("value");
+        $facturation = $(this).attr("facturation")
+        $color_transport = getTransportColor($transport_valide, $facturation);
+        var path = "{{ asset('Shop/image/transport/path')}}";
+        path = path.replace("path",$transport_valide);
+        $('.modal-header .modal-title').html("<img style='max-height:65px;' src='"+path+".png'>"+$color_transport);
+    });
+
+    $(':radio[name="delais"], .wizard-footer input[name=next], .icon-circle').click(function(e){
+       // eviter de mettre ceci e.preventDefault(); sinon le bouton restera blocké(plus soumis)
+        if($(this).attr("name") && $(this).attr("name") == "delais"){
+            $delais_livraison = $(this).attr("value");
+            append_delais_livraison($delais_livraison);
+        }
+        else if($(this).parent().attr("href") == "#livraison" || currentIndex ==1){
+           append_delais_livraison($delais_livraison);
+        }
+    })
+    // on passe la valeur du transport selectionné à la validation et on la 
+    //communique son etat à stape.
+    $('button.confirmer-transport').click(function(e){
+        e.preventDefault();
+        $transport_confirm = $transport_valide;
+        append_choose_transp($transport_valide);
+        stape2(copieSTAPE); 
+    });
+
+    function getTransportColor($transport_valide, $facturation){
+        $transport = "";
+        $transport = $transport_valide.toUpperCase();      
+
+        if($transport_valide =="dhl"){
+            $('.modal-footer button.btn').css('background', '#edbf0e');
+            $('.modal-body .container span.frais-trans').css('color','#edbf0e');
+            $('.modal-body .container span.frais-trans').html(" <b> "+$facturation+" FCFA</b>");
+            return "<span style='color:#edbf0e;'> "+$transport+" TRANSPORT</span>";
+        }
+        else if($transport_valide == "tnt"){
+            $('.modal-footer button.btn').css('background', '#fe5a00');
+            $('.modal-body .container span.frais-trans').css('color','#fe5a00');
+            $('.modal-body .container span.frais-trans').html(" <b> "+$facturation+" FCFA</b>");
+            return "<span style=color:#fe5a00>  "+$transport+" TRANSPORT</span>";
+        }
+        else if($transport_valide == "colissimot"){
+            $('.modal-footer button.btn').css('background', '#f28b07');
+            $('.modal-body .container span.frais-trans').css('color','#f28b07');
+            $('.modal-body .container span.frais-trans').html(" <b> "+$facturation+" FCFA</b>");
+            return "<span style=color:#f28b07>  "+$transport+" TRANSPORT</span>";
+        }
+        else if($transport_valide == "relay"){
+            $('.modal-footer button.btn').css('background', '#c42f4d');
+            $('.modal-body .container span.frais-trans').css('color','#c42f4d');
+            $('.modal-body .container span.frais-trans').html(" <b> "+$facturation+" FCFA</b>");
+            return "<span style=color:#c42f4d>  "+$transport+" TRANSPORT</span>";
+        }
+        else if($transport_valide == "touristique"){
+            $('.modal-footer button.btn').css('background', '#148a14');
+            $('.modal-body .container span.frais-trans').css('color','#148a14');
+            $('.modal-body .container span.frais-trans').html(" <b> "+$facturation+" FCFA</b>");
+            return "<span style=color:#148a14>  "+$transport+" TRANSPORT</span>";
+        }
+        else
+            return "#<span style=color:black>  "+$transport+" TRANSPORT</span>";
+    }
+
+    function stape2(STAPE){
+        if($transport_confirm.length && $(':radio[name="delais"]:checked').val()){
+            STAPE[1]=true;
+            $('.icon-circle .stape2-ok').fadeIn();
+            $('.tab-content .alert.alert-block.alert-danger').hide();
+        }
+        else{
+            $('.tab-content .alert.alert-block.alert-danger').show("slow");
+            $('.icon-circle .stape2-ok').hide();
+        }
+    }
+    
+    function append_choose_transp($transport_valide){
+        var path = "{{ asset('Shop/image/transport/path')}}";
+        path = path.replace("path",$transport_valide);
+        var block_transp_resume= "<h5 style='text-align:center'>transport du colis</h5>"+
+        "<a href='javascript:void(0);'><img src='"+path+".png'></a>";
+
+        if($('.transport.trans-choose').hasClass('animated zoomIn'))
+            $('.transport.trans-choose').removeClass('animated zoomIn');
+        $('.transport.trans-choose').html(block_transp_resume).show();
+        $('.transport.trans-choose').addClass('animated zoomIn')
+    }
+
+    function append_delais_livraison($delais_livraison){
+        var block_delais_resume = "<h5>delais de livraison</h5>"+
+            "<form><fieldset><legend>Colis 1</legend>"+
+                "<span class='delais-livraison'> Sous "+$delais_livraison+" jours </span>"+
+                "<span class='pull-right'>"+
+            "<a href='javascript:void(0);' title='Expedié par l'agence de voyage Touristique sous 2-7 jours à votre adresse  laptop IMac ccore-i2, 500G DD, intel...' data-toggle='tooltip' data-placement='right'>Voir detail >> </a></span></fieldset><br>"+
+                "<fieldset><legend>Colis 2</legend>"+
+                "<span class='delais-livraison'> Sous "+$delais_livraison+" jours </span>"+
+                "<span class='pull-right'>"+
+            "<a href='javascript:void(0);' title='Expedié par l'agence de voyage Touristique sous 2-7 jours à votre adresse ipod 15df' data-toggle='tooltip' data-placement='right'>Voir detail >> </a></span></fieldset></form>";
+
+            if($('.transport.delais-choose').hasClass('animated zoomIn'))
+                $('.transport.delais-choose').removeClass('animated zoomIn');
+            $('.transport.delais-choose').html(block_delais_resume).show();
+            $('.transport.delais-choose').addClass('animated zoomIn');
+    }
+
+ /************** stape resume *****************/
+    var contenu_resume = $('#resume table.table_resume').find('tbody');
+    var sous_total = $('#resume table.resume_montant td.sous-total');
+    var total = $('#resume table.resume_montant td.total'); 
+    $cal_sous_total = 0; // total  sans tva et autres frais...
+
+    function stape3(STAPE){
+        $('.wizard-footer input[name=next], .icon-circle').click(function(e){
+            if($(this).parent().attr("href") == "#resume" || currentIndex ==2 ){
+                if(copieSTAPE[0] && copieSTAPE[1]){
+                    STAPE[2]=true; // partie de visualisation du resume de la commande
+                    $('.icon-circle .stape3-ok').fadeIn();
+                    $('.tab-content .alert.alert-block.alert-danger').hide();
+                }
+    
+            }
+        })
+    }
+    $('.wizard-footer input[name=next], .icon-circle').click(function(e){
+        if($(this).parent().attr("href") == "#resume" || currentIndex ==2 ){
+            e.preventDefault();
+            /* resume produits panier */
+            contenu_resume.html("");// on vide sinon on aura des ajout sur <<les precedents click>>
+            show_resume(); 
+            /* info livraison */
+            $('table.livraison.resume td.details-livraison').html($delais_livraison);
+            $('table.resume.info-livraison td.transport').html($transport_confirm);
+        }
+    }) 
+    function show_resume(){
+        $cal_sous_total = 0; // ramerner la valeur de la somme total à 0 a fin de reprendre une new incrementation pour eviter des ajout sur le resultat du click precedent
+        var DATA_CART = JSON.parse(localStorage.getItem('productCart'));
+        DATA_CART.forEach(
+            function(item,index){
+                $cal_sous_total += item.priceUnit*item.quantity ;
+                var inner = appendItemResume(item, index)
+                contenu_resume.append(inner);
+            }
+        );
+        /* resume montant */
+        sous_total.html($cal_sous_total);
+        $total_facture = $cal_sous_total + parseInt($('#resume table.resume_montant td.livraison').attr("value"))+ parseFloat($('#resume table.resume_montant td.tva').attr("value"));
+        total.html($total_facture);       
+    }   
+
+    function appendItemResume(item, index){
+        var path = "{{ asset('Shop/image/cache/catalog/demo/path')}}";
+        path = path.replace("path",item.path);
+        var inner="";
+        inner = "<tr>"+
+                    "<td class='article'>"+
+                        "<div> <img src='"+path+"'> </div>"+
+                    "</td>"+
+                    "<td class='quantite'><span>"+item.quantity+"</span></td>"+
+                    "<td class='prixUnitaire'>"+item.priceUnit+" FCFA</td>"+
+                    "<td class='details-livraison'>Livraison sous "+$delais_livraison+" jours</td>"+
+                    "<td class='sous-total'>"+(item.priceUnit*item.quantity)+" FCFA</td>"+
+                "</tr>";
+
+        return inner;
+    }
+
+/***********         paiement           **********/
+    function stape4(STAPE){
+        $('#form_paypal, #form_delta, #form_sco, #form_masterTrod, #form_masterCart, #form_laser, #form_visa').on('submit', function(e){
+            e.preventDefault();
+            $num_carte_bank="";
+            $code_verifi="";
+            $paiement_type = $(this).attr("id").split("_")[1];
+            $code_verifi = $("input[name=code_verification_"+$paiement_type+"]").val(); 
+            $num_carte_bank = $("input[name=num_cart_"+$paiement_type+"]").val();
+            if(check_form_paiement($code_verifi, $num_carte_bank)){
+                STAPE[3]=true;
+                $('.icon-circle .stape4-ok').fadeIn();
+                $('.tab-content .alert.alert-block.alert-danger').hide();
+            }
+            else{
+                STAPE[3]=false;
+                $('.icon-circle .stape4-ok').hide();
+                $('.tab-content .alert.alert-block.alert-danger').show("slow");
+            }
+        });   
+    }
+
+    function check_form_paiement($code_verifi, $num_carte_bank){
+        if($code_verifi.length && $num_carte_bank.length)
+            return true;
+        else{
+            $("div.alert-warning").show("slow").delay(4000).hide("slow");
+            return false;
+        }
+    }
+ 
+    $('.wizard-footer input[name=next], .icon-circle, .nav.nav-tabs li img').click(function(e){
+        if($(this).parent().attr("href") == "#paiement" || currentIndex ==3 ){
+            //var somme = $total_facture;
+            $string_total_facture = $total_facture+"";
+            $decimal = $string_total_facture.split('.')[1];
+            var debut =  Math.trunc($total_facture/Math.pow(10,3))*Math.pow(10,3);
+            debut = debut+'.'+ $decimal;
+            $('.counter-montant').animationCounter({
+              start: parseFloat(debut),
+              end: $total_facture,
+              step: 1,
+              delay: 2,
+              txt: ' FCFA'
+        })
+          $('td.value-info.adresse').html($adresse_livraison);
+        }
+    })
+
+/************* confirmation  *************/
+    $('.wizard-footer input[name=next], .icon-circle').click(function(e){
+        if($(this).parent().attr("href") == "#confirmation" || currentIndex ==4 ){
+            $('.facture-content .nom-prenom').html($nom_prenom);
+            $('.facture-content .adresse-livraison').html($adresse_livraison);
+            $('.facture-content .delais-livraison').html($delais_livraison);
+            $('.facture-content .transport').html($transport_confirm);
+            $('.facture-content .montant-total').html($total_facture+" FCFA");
+        }
+    })
+        </script>
+
+        <script type="text/javascript">
+            $('.transp-list .transp-item').mouseenter(function(e){
+              e.preventDefault();
+              $(this).find('.panel.panel-primary').show();
+              $(this).find('.panel.panel-primary').addClass('animated zoomOut');
+              $position = Math.trunc($(this).offset().left - $(this).find('.panel.panel-primary').offset().left);
+              $(this).find('.panel.panel-primary').animate({ "left": "+="+$position+"px" }, "3500" );
+            })
+
+            $('.transp-list .transp-item').mouseleave(function(e){
+                e.preventDefault();
+                $(this).find('.panel.panel-primary').hide();
+                $position = Math.trunc($(this).offset().left - $(this).find('.panel.panel-primary').offset().left);
+                $(this).find('.panel.panel-primary').animate({ "left": "-="+$position+"px" }, "3500" );
+            })
+        </script>
+{% endblock %}
+{% block javascripts %}
+    {{ parent() }}
+    <script src="{{ asset('Shop/wizard-list-place/assets/js/jquery.bootstrap.wizard.js')}}" type="text/javascript"></script>
+
+    <!--  Plugin for the Wizard -->
+    <script src="{{ asset('Shop/wizard-list-place/assets/js/paper-bootstrap-wizard.js')}}" type="text/javascript"></script>
+    <script src="{{ asset('Shop/wizard-list-place/assets/js/jquery.validate.min.js')}}" type="text/javascript"></script>
+        <script src="{{ asset('Shop/resCarossel/js/resCarousel.js')}}" type="text/javascript"></script>
+
+{% endblock %}

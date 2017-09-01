@@ -1,0 +1,21 @@
+
+{% set evm_title = 'Conseiller' %}
+{% set evm_cat_title = 'Conseiller' %}
+
+{% extends "::base/platform/init.html.twig" %}
+{% block evm_body %}
+   <div class="page2 background-red" >
+         <div class="col-sm-12 row content2" style="padding-left: 0px">
+            <div class="col-sm-2" style="padding-left: 5px;padding-right: 0px">
+               {% include "::base/platform/Template/left_menu_conseiller_profil.html.twig" %}
+            </div>
+            <div class="col-sm-7" style="background: #e4ecec;padding: 0">
+               {% include "::base/platform/Template/description_conseille.html.twig" %}
+            </div>
+            <div class="col-sm-3 " style="padding-right: 0px">
+                  {% include "::base/platform/Template/best_boutique.html.twig" %}
+            </div>
+         </div>
+      </div>
+     
+{% endblock evm_body %}
