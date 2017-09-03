@@ -9,8 +9,7 @@
         <input type="submit" value="Go"/>
         {{ form_end(filter) }}
     {% endif %}
-    <p>----------------------------------------------------------------</p>
-    Boutique: <strong>SIMINTA</strong>
+
     <h1> Offres {% if boutique -%} - <a
             href="{{ path('apm_vente_boutique_show', { 'id': boutique.id }) }}">{{ boutique }}
             {% if categorie %}- <a

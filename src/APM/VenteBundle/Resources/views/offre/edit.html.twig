@@ -1,6 +1,7 @@
-{% extends ":base/dashboard:layout.html.twig" %}
-
-{% block content_body %}
+{#{% extends ":base/dashboard:layout.html.twig" %}#}
+{% extends "APMAdminBundle:_Main:layout.html.twig" %}
+{#{% block content_body %}#}
+{% block body %}
     <h1>Offre edit</h1>
 
     {{ form_start(edit_form) }}
@@ -18,4 +19,4 @@
             {{ form_end(delete_form) }}
         </li>
     </ul>
-{% endblock content_body %}
+{% endblock body %}

@@ -379,12 +379,7 @@ var GlobalPageCustomScript = function () {
             if ($(this).hasClass('reset-image')) {
                 $('.big-view', p).remove();
                 $('.preview-pane', p).remove();
-                $(input['name="x"']).val('');
-                $(input['name="y"']).val('');
-                $(input['name="w"']).val('');
-                $(input['name="h"']).val('');
             }
-
             if (p.hasClass('in-modal')) {
                 $('.modal-spinner', p).addClass('hidden');
             }
@@ -410,19 +405,20 @@ var GlobalPageCustomScript = function () {
         displayText(modal_stk.modalElement, p[2]); // tr line
     };
     var ready = function (parent) {
-        reinitializeModal();
-        var cbs =[] ;
-        cbs= getCheckedBoxes($('tbody', parent));
+        var cbs = [];
+        cbs = getCheckedBoxes($('tbody', parent));
         var nb = cbs.length;
         var elt;
-        if(nb > 0) {
+        if (nb > 0) {
+            reinitializeModal();
             elt = $(cbs).first();
             play(elt);
         }
-        var i=1;
+        var i = 1;
         $('#play-next').click(function () {
             nb--;
-            if(nb > 0){
+            if (nb > 0) {
+                reinitializeModal();
                 elt = cbs[i];
                 play(elt);
             }
@@ -435,6 +431,8 @@ var GlobalPageCustomScript = function () {
         $('[name="_id"]', modal_stk.modalElement).val('');
         $('td', modal_stk.modalElement).text('');
         $(modal_stk.modalTab1, modal_stk.modalElement).click(); //go back to the first tab
+        $('.modal-spinner', modal_stk.modalElement).addClass('hidden');
+        $('input[type="reset"]', modal_stk.modalElement).each(function () {$(this).click();});
     };
     var afficher = function () {
         //-------------------------- voir ---------------------
