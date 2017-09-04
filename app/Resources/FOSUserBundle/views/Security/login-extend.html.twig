@@ -63,8 +63,12 @@ License: You must have a valid license purchased only from themeforest(the above
     <!-- BEGIN PAGE LEVEL CUSTOM-->
     {% block stylesheets %}
     {% endblock stylesheets %}
-    {% block custom_page_css %}
+    {% block custom_page_css %} {#This block will be overridden#}
+        {% stylesheets 'dashboard/assets/pages/css/custom-login.css' filter='cssrewrite' %}
+        <link href="{{ asset_url }}" rel="stylesheet" type="text/css">
+        {% endstylesheets %}
     {% endblock custom_page_css %}
+
     <!-- END PAGE LEVEL CUSTOM-->
     <!-- BEGIN THEME GLOBAL STYLES -->
     {% stylesheets 'dashboard/assets/global/css/components.min.css' filter='cssrewrite' %}
@@ -147,12 +151,14 @@ License: You must have a valid license purchased only from themeforest(the above
         });
     })
 </script>
-{% block custom_page_js %}
+{% block custom_page_js %} {#This block will be overridden#}
+    {% javascripts 'dashboard/assets/pages/scripts/custom-login.js' %}
+    <script src="{{ asset_url }}" type="text/javascript"></script>
+    {% endjavascripts %}
 {% endblock custom_page_js %}
 <!-- BEGIN PAGE LEVEL CUSTOM-->
 {% block js %}
 {% endblock js %}
-
 <!-- END PAGE LEVEL CUSTOM-->
 </body>
 
