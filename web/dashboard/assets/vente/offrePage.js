@@ -2,51 +2,466 @@
  Custom module for you to write your own javascript functions
  **/
 var OffrePage = function () {
-    //global variables
-    //----pages
 
-    //----- modal
+    var initEditables = function () {
 
-    /* var sendFile =  function sendFile(file) {
-     var uri = "http://localhost/SAV8817.git/web/app_dev.php/apm/vente/offre/index?id="+29;
-     var xhr = new XMLHttpRequest();
-     var fd = new FormData();
+        $.fn.editable.defaults.mode = 'inline';
 
-     xhr.open("POST", uri, true);
-     xhr.onreadystatechange = function() {
-     if (xhr.readyState === 4 && xhr.status === 200) {
-     alert(xhr.responseText); // handle response.
-     }
-     };
-     fd.append('myFile', file);
-     // Initiate a multipart/form-data upload
-     xhr.send(fd);
-     };*/
+        //global settings
+        $.fn.editable.defaults.inputclass = 'form-control';
+        $.fn.editable.defaults.url = 'ajax-table_1';
+        $.fn.editable.defaults.mode = 'inline';
 
-    /*var modalNotification = function (message) {
-        var tmpl = [
-            // tabindex is required for focus
-            '<div class="modal hide fade" tabindex="-1">',
-            '<div class="modal-header">',
-            '<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>',
-            '<h4 class="modal-title">Alerte</h4>',
-            '</div>',
-            '<div class="modal-body">',
-            '<p>' + message + '</p>',
-            '</div>',
-            '<div class="modal-footer">',
-            '<a href="#" data-dismiss="modal" class="btn btn-default">Close</a>',
-            '</div>',
-            '</div>'
-        ].join('');
+        //editables element samples
+        $('[name="_designation[1]"]').editable({
+            validate: function (value) {
+                if ($.trim(value) === '') return 'This field is required';
+            }
+        });
+        $('[name="_categorie[1]"]').editable({
 
-        $(tmpl).modal('modal');
-    };*/
-    //---- notification
+        });
+
+        $('[name="_dateExpiration[1]"]').editable({
+            format: 'yyyy-mm-dd hh:ii',
+            viewformat: 'dd/mm/yyyy hh:ii',
+            validate: function (v) {
+                if (v && v.getDate() == 10) return 'Day cant be 10!';
+            },
+            datetimepicker: {
+                rtl: App.isRTL(),
+                todayBtn: 'linked',
+                weekStart: 1
+            }
+        });
+
+        $('[name="_dureeGarantie[1]"]').editable({
+
+        });
+        $('[name="_apparence[1]"]').editable({
+
+        });
+        $('[name="_retourne[1]"]').editable({
+
+        });
+        $('[name="_etat[1]"]').editable({
+
+        });
+        $('[name="_remise[1]"]').editable({
+
+        });
+        $('[name="_modeVente[1]"]').editable({
+
+        });
+        $('[name="_modelDeSerie[1]"]').editable({
+
+        });
+        $('[name="_prixUnitaire[1]"]').editable({
+
+        });
+        $('[name="_quantite[1]"]').editable({
+
+        });
+        $('[name="_unite[1]"]').editable({
+
+        });
+        $('[name="_publiable[1]"]').editable({
+
+        });
+        $('[name="_type[1]"]').editable({
+
+        });
+
+        /*
+         $('#sex').editable({
+         prepend: "not selected",
+         inputclass: 'form-control',
+         source: [{
+         value: 1,
+         text: 'Male'
+         }, {
+         value: 2,
+         text: 'Female'
+         }],
+         display: function (value, sourceData) {
+         var colors = {
+         "": "gray",
+         1: "green",
+         2: "blue"
+         },
+         elem = $.grep(sourceData, function (o) {
+         return o.value == value;
+         });
+
+         if (elem.length) {
+         $(this).text(elem[0].text).css("color", colors[value]);
+         } else {
+         $(this).empty();
+         }
+         }
+         });
+
+
+         $('#group').editable({
+         showbuttons: false
+         });
+
+         $('#vacation').editable({
+         rtl: App.isRTL()
+         });
+
+
+         $('#event').editable({
+         placement: (App.isRTL() ? 'left' : 'right'),
+         combodate: {
+         firstItem: 'name'
+         }
+         });
+
+
+         $('#comments').editable({
+         showbuttons: 'bottom'
+         });
+
+         $('#note').editable({
+         showbuttons: (App.isRTL() ? 'left' : 'right')
+         });
+
+         $('#pencil').click(function (e) {
+         e.stopPropagation();
+         e.preventDefault();
+         $('#note').editable('toggle');
+         });
+
+         $('#state').editable({
+         source: ["Alabama", "Alaska", "Arizona", "Arkansas", "California", "Colorado", "Connecticut", "Delaware", "Florida", "Georgia", "Hawaii", "Idaho", "Illinois", "Indiana", "Iowa", "Kansas", "Kentucky", "Louisiana", "Maine", "Maryland", "Massachusetts", "Michigan", "Minnesota", "Mississippi", "Missouri", "Montana", "Nebraska", "Nevada", "New Hampshire", "New Jersey", "New Mexico", "New York", "North Dakota", "North Carolina", "Ohio", "Oklahoma", "Oregon", "Pennsylvania", "Rhode Island", "South Carolina", "South Dakota", "Tennessee", "Texas", "Utah", "Vermont", "Virginia", "Washington", "West Virginia", "Wisconsin", "Wyoming"]
+         });
+
+         $('#fruits').editable({
+         pk: 1,
+         limit: 3,
+         source: [{
+         value: 1,
+         text: 'banana'
+         }, {
+         value: 2,
+         text: 'peach'
+         }, {
+         value: 3,
+         text: 'apple'
+         }, {
+         value: 4,
+         text: 'watermelon'
+         }, {
+         value: 5,
+         text: 'orange'
+         }]
+         });
+
+         $('#fruits').on('shown', function (e, reason) {
+
+         });
+
+         $('#tags').editable({
+         inputclass: 'form-control input-medium',
+         select2: {
+         data: ['html', 'javascript', 'css', 'ajax'],
+         tags: true,
+         tokenSeparators: [',', ' '],
+         multiple: true
+         }
+         });
+         */
+        var countries = [];
+        $.each({
+            "BD": "Bangladesh",
+            "BE": "Belgium",
+            "BF": "Burkina Faso",
+            "BG": "Bulgaria",
+            "BA": "Bosnia and Herzegovina",
+            "BB": "Barbados",
+            "WF": "Wallis and Futuna",
+            "BL": "Saint Bartelemey",
+            "BM": "Bermuda",
+            "BN": "Brunei Darussalam",
+            "BO": "Bolivia",
+            "BH": "Bahrain",
+            "BI": "Burundi",
+            "BJ": "Benin",
+            "BT": "Bhutan",
+            "JM": "Jamaica",
+            "BV": "Bouvet Island",
+            "BW": "Botswana",
+            "WS": "Samoa",
+            "BR": "Brazil",
+            "BS": "Bahamas",
+            "JE": "Jersey",
+            "BY": "Belarus",
+            "O1": "Other Country",
+            "LV": "Latvia",
+            "RW": "Rwanda",
+            "RS": "Serbia",
+            "TL": "Timor-Leste",
+            "RE": "Reunion",
+            "LU": "Luxembourg",
+            "TJ": "Tajikistan",
+            "RO": "Romania",
+            "PG": "Papua New Guinea",
+            "GW": "Guinea-Bissau",
+            "GU": "Guam",
+            "GT": "Guatemala",
+            "GS": "South Georgia and the South Sandwich Islands",
+            "GR": "Greece",
+            "GQ": "Equatorial Guinea",
+            "GP": "Guadeloupe",
+            "JP": "Japan",
+            "GY": "Guyana",
+            "GG": "Guernsey",
+            "GF": "French Guiana",
+            "GE": "Georgia",
+            "GD": "Grenada",
+            "GB": "United Kingdom",
+            "GA": "Gabon",
+            "SV": "El Salvador",
+            "GN": "Guinea",
+            "GM": "Gambia",
+            "GL": "Greenland",
+            "GI": "Gibraltar",
+            "GH": "Ghana",
+            "OM": "Oman",
+            "TN": "Tunisia",
+            "JO": "Jordan",
+            "HR": "Croatia",
+            "HT": "Haiti",
+            "HU": "Hungary",
+            "HK": "Hong Kong",
+            "HN": "Honduras",
+            "HM": "Heard Island and McDonald Islands",
+            "VE": "Venezuela",
+            "PR": "Puerto Rico",
+            "PS": "Palestinian Territory",
+            "PW": "Palau",
+            "PT": "Portugal",
+            "SJ": "Svalbard and Jan Mayen",
+            "PY": "Paraguay",
+            "IQ": "Iraq",
+            "PA": "Panama",
+            "PF": "French Polynesia",
+            "BZ": "Belize",
+            "PE": "Peru",
+            "PK": "Pakistan",
+            "PH": "Philippines",
+            "PN": "Pitcairn",
+            "TM": "Turkmenistan",
+            "PL": "Poland",
+            "PM": "Saint Pierre and Miquelon",
+            "ZM": "Zambia",
+            "EH": "Western Sahara",
+            "RU": "Russian Federation",
+            "EE": "Estonia",
+            "EG": "Egypt",
+            "TK": "Tokelau",
+            "ZA": "South Africa",
+            "EC": "Ecuador",
+            "IT": "Italy",
+            "VN": "Vietnam",
+            "SB": "Solomon Islands",
+            "EU": "Europe",
+            "ET": "Ethiopia",
+            "SO": "Somalia",
+            "ZW": "Zimbabwe",
+            "SA": "Saudi Arabia",
+            "ES": "Spain",
+            "ER": "Eritrea",
+            "ME": "Montenegro",
+            "MD": "Moldova, Republic of",
+            "MG": "Madagascar",
+            "MF": "Saint Martin",
+            "MA": "Morocco",
+            "MC": "Monaco",
+            "UZ": "Uzbekistan",
+            "MM": "Myanmar",
+            "ML": "Mali",
+            "MO": "Macao",
+            "MN": "Mongolia",
+            "MH": "Marshall Islands",
+            "MK": "Macedonia",
+            "MU": "Mauritius",
+            "MT": "Malta",
+            "MW": "Malawi",
+            "MV": "Maldives",
+            "MQ": "Martinique",
+            "MP": "Northern Mariana Islands",
+            "MS": "Montserrat",
+            "MR": "Mauritania",
+            "IM": "Isle of Man",
+            "UG": "Uganda",
+            "TZ": "Tanzania, United Republic of",
+            "MY": "Malaysia",
+            "MX": "Mexico",
+            "IL": "Israel",
+            "FR": "France",
+            "IO": "British Indian Ocean Territory",
+            "FX": "France, Metropolitan",
+            "SH": "Saint Helena",
+            "FI": "Finland",
+            "FJ": "Fiji",
+            "FK": "Falkland Islands (Malvinas)",
+            "FM": "Micronesia, Federated States of",
+            "FO": "Faroe Islands",
+            "NI": "Nicaragua",
+            "NL": "Netherlands",
+            "NO": "Norway",
+            "NA": "Namibia",
+            "VU": "Vanuatu",
+            "NC": "New Caledonia",
+            "NE": "Niger",
+            "NF": "Norfolk Island",
+            "NG": "Nigeria",
+            "NZ": "New Zealand",
+            "NP": "Nepal",
+            "NR": "Nauru",
+            "NU": "Niue",
+            "CK": "Cook Islands",
+            "CI": "Cote d'Ivoire",
+            "CH": "Switzerland",
+            "CO": "Colombia",
+            "CN": "China",
+            "CM": "Cameroon",
+            "CL": "Chile",
+            "CC": "Cocos (Keeling) Islands",
+            "CA": "Canada",
+            "CG": "Congo",
+            "CF": "Central African Republic",
+            "CD": "Congo, The Democratic Republic of the",
+            "CZ": "Czech Republic",
+            "CY": "Cyprus",
+            "CX": "Christmas Island",
+            "CR": "Costa Rica",
+            "CV": "Cape Verde",
+            "CU": "Cuba",
+            "SZ": "Swaziland",
+            "SY": "Syrian Arab Republic",
+            "KG": "Kyrgyzstan",
+            "KE": "Kenya",
+            "SR": "Suriname",
+            "KI": "Kiribati",
+            "KH": "Cambodia",
+            "KN": "Saint Kitts and Nevis",
+            "KM": "Comoros",
+            "ST": "Sao Tome and Principe",
+            "SK": "Slovakia",
+            "KR": "Korea, Republic of",
+            "SI": "Slovenia",
+            "KP": "Korea, Democratic People's Republic of",
+            "KW": "Kuwait",
+            "SN": "Senegal",
+            "SM": "San Marino",
+            "SL": "Sierra Leone",
+            "SC": "Seychelles",
+            "KZ": "Kazakhstan",
+            "KY": "Cayman Islands",
+            "SG": "Singapore",
+            "SE": "Sweden",
+            "SD": "Sudan",
+            "DO": "Dominican Republic",
+            "DM": "Dominica",
+            "DJ": "Djibouti",
+            "DK": "Denmark",
+            "VG": "Virgin Islands, British",
+            "DE": "Germany",
+            "YE": "Yemen",
+            "DZ": "Algeria",
+            "US": "United States",
+            "UY": "Uruguay",
+            "YT": "Mayotte",
+            "UM": "United States Minor Outlying Islands",
+            "LB": "Lebanon",
+            "LC": "Saint Lucia",
+            "LA": "Lao People's Democratic Republic",
+            "TV": "Tuvalu",
+            "TW": "Taiwan",
+            "TT": "Trinidad and Tobago",
+            "TR": "Turkey",
+            "LK": "Sri Lanka",
+            "LI": "Liechtenstein",
+            "A1": "Anonymous Proxy",
+            "TO": "Tonga",
+            "LT": "Lithuania",
+            "A2": "Satellite Provider",
+            "LR": "Liberia",
+            "LS": "Lesotho",
+            "TH": "Thailand",
+            "TF": "French Southern Territories",
+            "TG": "Togo",
+            "TD": "Chad",
+            "TC": "Turks and Caicos Islands",
+            "LY": "Libyan Arab Jamahiriya",
+            "VA": "Holy See (Vatican City State)",
+            "VC": "Saint Vincent and the Grenadines",
+            "AE": "United Arab Emirates",
+            "AD": "Andorra",
+            "AG": "Antigua and Barbuda",
+            "AF": "Afghanistan",
+            "AI": "Anguilla",
+            "VI": "Virgin Islands, U.S.",
+            "IS": "Iceland",
+            "IR": "Iran, Islamic Republic of",
+            "AM": "Armenia",
+            "AL": "Albania",
+            "AO": "Angola",
+            "AN": "Netherlands Antilles",
+            "AQ": "Antarctica",
+            "AP": "Asia/Pacific Region",
+            "AS": "American Samoa",
+            "AR": "Argentina",
+            "AU": "Australia",
+            "AT": "Austria",
+            "AW": "Aruba",
+            "IN": "India",
+            "AX": "Aland Islands",
+            "AZ": "Azerbaijan",
+            "IE": "Ireland",
+            "ID": "Indonesia",
+            "UA": "Ukraine",
+            "QA": "Qatar",
+            "MZ": "Mozambique"
+        }, function (k, v) {
+            countries.push({
+                id: k,
+                text: v
+            });
+        });
+
+        $('#country').editable({
+            inputclass: 'form-control input-medium',
+            source: countries
+        });
+
+        $('#address').editable({
+            url: '/post',
+            value: {
+                city: "San Francisco",
+                street: "Valencia",
+                building: "#24"
+            },
+            validate: function (value) {
+                if (value.city == '') return 'city is required!';
+            },
+            display: function (value) {
+                if (!value) {
+                    $(this).empty();
+                    return;
+                }
+                var html = '<b>' + $('<div>').text(value.city).html() + '</b>, ' + $('<div>').text(value.street).html() + ' st., bld. ' + $('<div>').text(value.building).html();
+                $(this).html(html);
+            }
+        });
+    };
 
     return {
         init: function () {
-
+            initEditables();
         }
     };
 }();

@@ -13,7 +13,25 @@ var GlobalPageCustomScript = function () {
     var notifAlert;
     var nbProcessusEnCours = 0;
     var labelProcess = $('#ajax-label-process');
+    var modalNotification = function (message) {
+        var tmpl = [
+            // tabindex is required for focus
+            '<div class="modal hide fade" tabindex="-1">',
+            '<div class="modal-header">',
+            '<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>',
+            '<h4 class="modal-title">Alerte</h4>',
+            '</div>',
+            '<div class="modal-body">',
+            '<p>' + message + '</p>',
+            '</div>',
+            '<div class="modal-footer">',
+            '<a href="#" data-dismiss="modal" class="btn btn-default">Close</a>',
+            '</div>',
+            '</div>'
+        ].join('');
 
+        $(tmpl).modal('modal');
+    };
     var uncheckBoxes = function (parent) {
         $('input[type="checkbox"]:checked', parent).each(function () {
             $(this).click();
@@ -391,12 +409,7 @@ var GlobalPageCustomScript = function () {
         $('.data-content', modal_stk.modalElement).removeClass("hidden"); //afficher tous les tabs du modals
         $('.data-content .display-control-static', display).each(function () {
             var input = $('[name="' + $(this).attr("data-display") + '"]', parent);
-            if (input.is('a')) {
-                $(this).html(input.text());
-            }
-            else if ('input') {
-                $(this).html(input.val());
-            }
+                $(this).html('<a name="'+$(this).attr("data-display")+'[1]">'+input.text()+'</a>');
         });
         $('[name="_id"]', display).val($('[name="_id[]"]', parent).val());
     };

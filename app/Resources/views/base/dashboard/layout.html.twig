@@ -13,11 +13,14 @@
     <!-- END PAGE LEVEL SCRIPTS -->
 
     <!-- BEGIN PAGE LEVEL PLUGINS -->
-    {% stylesheets "dashboard/assets/global/plugins/bootstrap-modal/css/bootstrap-modal-bs3patch.css"
+    {% stylesheets "dashboard/assets/global/plugins/bootstrap-editable/bootstrap-editable/css/bootstrap-editable.css"
+    "dashboard/assets/global/plugins/bootstrap-modal/css/bootstrap-modal-bs3patch.css"
     "dashboard/assets/global/plugins/bootstrap-modal/css/bootstrap-modal.css"
     "dashboard/assets/global/plugins/datatables/datatables.min.css"
     "dashboard/assets/global/plugins/datatables/plugins/bootstrap/datatables.bootstrap.css"
-    "dashboard/assets/global/plugins/jquery-notific8/jquery.notific8.min.css" filter='cssrewrite' %}
+    "dashboard/assets/global/plugins/jquery-notific8/jquery.notific8.min.css"
+    "dashboard/assets/global/plugins/bootstrap-wysihtml5/bootstrap-wysihtml5.css"
+    "dashboard/assets/global/plugins/bootstrap-editable/inputs-ext/address/address.css" filter='cssrewrite' %}
     <link rel="stylesheet" href="{{ asset_url }}" type="text/css">
     {% endstylesheets %}
     <!-- END PAGE LEVEL PLUGINS -->
@@ -33,8 +36,8 @@
     {% block custom_stylesheets %}
     {% endblock custom_stylesheets %}
     <!-- END THEME LAYOUT STYLES -->
-    <link rel="shortcut icon" type="image/x-icon" href="{{ asset("dashboard/assets/apps/img/favicon.ico") }}"/>
 {% endblock stylesheets %}
+
 {% block custom_page_css %}
     {% stylesheets 'dashboard/assets/pages/css/custom.css' filter='cssrewrite' %}
     <link href="{{ asset_url }}" rel="stylesheet" type="text/css">
@@ -2372,31 +2375,41 @@
 {% endblock custom_page_js %}
 
 {% block js %}
-    <!-- BEGIN PAGE LEVEL PLUGINS -->
-    {% javascripts "dashboard/assets/global/plugins/bootstrap-modal/js/bootstrap-modalmanager.js"
-    "dashboard/assets/global/plugins/bootstrap-modal/js/bootstrap-modal.js"
-    'dashboard/assets/global/plugins/bootstrap-growl/jquery.bootstrap-growl.min.js' %}
+    <!-- BEGIN GLOBAL LEVEL PLUGINS -->
+    {% javascripts 'dashboard/assets/global/scripts/datatable.js' %}
     <script src="{{ asset_url }}" type="text/javascript"></script>
     {% endjavascripts %}
-    <!-- END PAGE LEVEL PLUGINS -->
+    <!-- END GLOBAL LEVEL PLUGINS -->
 
-    {% javascripts 'dashboard/assets/global/scripts/datatable.js'
+    <!-- BEGIN PAGE LEVEL PLUGINS -->
+    {% javascripts 'dashboard/assets/global/plugins/bootstrap-editable/bootstrap-editable/js/bootstrap-editable.js'
+    'dashboard/assets/global/plugins/bootstrap-wysihtml5/wysihtml5-0.3.0.js'
+    'dashboard/assets/global/plugins/bootstrap-wysihtml5/bootstrap-wysihtml5.js'
+    'dashboard/assets/global/plugins/moment.min.js'
+    'dashboard/assets/global/plugins/jquery.mockjax.js'
+    'dashboard/assets/global/plugins/bootstrap-typeahead/bootstrap3-typeahead.min.js'
+    'dashboard/assets/global/plugins/bootstrap-editable/inputs-ext/address/address.js'
+    'dashboard/assets/global/plugins/bootstrap-editable/inputs-ext/wysihtml5/wysihtml5.js'
+    'dashboard/assets/global/plugins/bootstrap-modal/js/bootstrap-modalmanager.js'
+    'dashboard/assets/global/plugins/bootstrap-modal/js/bootstrap-modal.js'
+    'dashboard/assets/global/plugins/bootstrap-growl/jquery.bootstrap-growl.min.js'
     'dashboard/assets/global/plugins/datatables/datatables.min.js'
     'dashboard/assets/global/plugins/datatables/plugins/bootstrap/datatables.bootstrap.js' %}
     <script src="{{ asset_url }}" type="text/javascript"></script>
     {% endjavascripts %}
+    <!-- END PAGE LEVEL PLUGINS -->
 
     <!-- BEGIN PAGE LEVEL SCRIPTS -->
     {% javascripts 'dashboard/assets/pages/scripts/ui-extended-modals.js'
     'dashboard/assets/pages/scripts/table-datatables-ajax.js'
-    'dashboard/assets/pages/scripts/ui-notific8.js'
-    'dashboard/assets/pages/scripts/ui-extended-modals.js' %}
+    'dashboard/assets/pages/scripts/ui-notific8.js' %}
     <script src="{{ asset_url }}" type="text/javascript"></script>
     {% endjavascripts %}
     <!-- END PAGE LEVEL SCRIPTS -->
+
     <!-- BEGIN THEME LAYOUT SCRIPTS -->
     {% javascripts 'dashboard/assets/layouts/layout/scripts/layout.min.js'
-        'dashboard/assets/layouts/layout/scripts/custom.js'
+    'dashboard/assets/layouts/layout/scripts/custom.js'
     'dashboard/assets/layouts/layout/scripts/demo.min.js'
     'dashboard/assets/layouts/global/scripts/quick-sidebar.min.js'
     'dashboard/assets/layouts/global/scripts/quick-nav.min.js' %}

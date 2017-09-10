@@ -12,6 +12,7 @@ use Doctrine\DBAL\Exception\ConstraintViolationException;
 use SebastianBergmann\CodeCoverage\RuntimeException;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\File\File;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
@@ -698,16 +699,16 @@ class OffreController extends Controller
                      $apparence = $offre->getApparenceNeuf()?"NEUF": "OCCASION";
                     $updatedAt = $offre->getUpdatedAt()->format("d/m/Y - H:i");
                     $records['data'][] = array(
-                        '<label class="mt-checkbox mt-checkbox-single mt-checkbox-outline">' . $id . ' <input value="'.$offre->getId().'" name="_id[]" type="checkbox" class="checkboxes"/><span></span><input type="hidden" name="_categorie" value="' . $categorie . '">
-                        <input type="hidden" name="_description" value="' . $offre->getDescription() . '"/><input type="hidden" name="_vendeur" value="' . $offre->getVendeur()->getUsername() . '"><input type="hidden" name="_credit" value="' . $offre->getCredit() . '"/><input type="hidden" name="_image" value="' . $offre->getImage() . '"/>
-                        <input type="hidden" name="_dateExpiration" value="' . $dateExp . '"><input type="hidden" name="_dateCreation" value="' . $dateCreate . '"><input type="hidden" name="_dureeGarantie" value="' . $dureeGarantie . '"><input type="hidden" name="_prixUnitaire" value="' . $offre->getPrixUnitaire() . '">
-                        <input type="hidden" name="_publiable" value="' . $publier . '"><input type="hidden" value="'.$retourne.'"><input type="hidden" name="_apparence" value="' . $apparence . '"><input type="hidden" name="_modeVente" value="' . $mode_vente[$offre->getModeVente()] . '">
-                        <input type="hidden" name="_modelDeSerie" value="' . $offre->getModelDeSerie() . '"><input type="hidden" name="_unite" value="' . $offre->getUnite() . '"><input type="hidden" name="_quantite" value="' . $offre->getQuantite() . '"><input type="hidden" name="_remise" value="' . $offre->getRemiseProduit() . '"><input type="hidden" name="_rate" value="' . $offre->getEvaluation() . '"><input type="hidden" name="_type" value="' . $type_offre[$offre->getTypeOffre()] . '"><input type="hidden" name="_dataSheet" value="' . $offre->getDataSheet() . '"></label>',
-                        '<a name="_code">' . $offre->getCode() . '</a>',
-                        '<a href="' . $offre->getId() . '/show" name="_designation">' . $offre . '</a>',
+                        '<label class="mt-checkbox mt-checkbox-single mt-checkbox-outline">' . $id . ' <input value="'.$offre->getId().'" name="_id[]" type="checkbox" class="checkboxes"/><span></span><input class="hidden" name="_categorie" value="' . $categorie . '">
+                        <span class="hidden" name="_description">' . $offre->getDescription() . '</span><span class="hidden" name="_vendeur">' . $offre->getVendeur()->getUsername() . '</span><span class="hidden" name="_credit">' . $offre->getCredit() . '</span><span class="hidden" name="_image" >' . $offre->getImage() . '</span>
+                        <span class="hidden" name="_dateExpiration">' . $dateExp . '</span><span class="hidden" name="_dateCreation">' . $dateCreate . '</span><span class="hidden" name="_dureeGarantie">' . $dureeGarantie . '</span><span class="hidden" name="_prixUnitaire">' . $offre->getPrixUnitaire() . '</span>
+                        <span class="hidden" name="_publiable">' . $publier . '</span><span class="hidden">'.$retourne.'</span><span class="hidden" name="_apparence">' . $apparence . '</span><span class="hidden" name="_modeVente">' . $mode_vente[$offre->getModeVente()] . '</span>
+                        <span class="hidden" name="_modelDeSerie">' . $offre->getModelDeSerie() . '</span><span class="hidden" name="_unite">' . $offre->getUnite() . '</span><span class="hidden" name="_quantite">' . $offre->getQuantite() . '</span><span class="hidden" name="_remise">' . $offre->getRemiseProduit() . '</span><span class="hidden" name="_rate">' . $offre->getEvaluation() . '</span><span class="hidden" name="_type">' . $type_offre[$offre->getTypeOffre()] . '</span><span class="hidden" name="_dataSheet">' . $offre->getDataSheet() . '</span></label>',
+                        '<span name="_code"><a  href="' . $offre->getId() . '/show">' . $offre->getCode() . '</span>',
+                        '<span name="_designation">'.$offre.'</span>',
                         $aboutiqueRoute,
-                        '<a name="_updatedAt">' . $updatedAt . '</a>',
-                        '<span class="label label-sm label-' . (key($status_list[$etat])) . '"><input name="_etat" type="hidden" value="' . (current($status_list[$etat]))  . '"/>' . (current($status_list[$etat])) . '</span>'
+                        '<span name="_updatedAt">' . $updatedAt . '</span>',
+                        '<span class="label label-sm label-' . (key($status_list[$etat])) . '"  name="_etat">' . (current($status_list[$etat])) . '</span>'
                     );
                 }
                 $records['draw'] = $sEcho;
@@ -723,7 +724,7 @@ class OffreController extends Controller
             }
         }
 
-        return new JsonResponse();
+        return new JsonResponse('name');
     }
 
     public function deleteAjaxAction(Request $request)
