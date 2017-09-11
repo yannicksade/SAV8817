@@ -45,6 +45,10 @@ apm_vente_offre_deleteFromList:
     defaults: { _controller: "APMVenteBundle:Offre:deleteFromList" }
 
 #-------------------------- Ajax routes----------------------------------
+apm_vente_offre_get_ajax:
+    path:     /handle-element
+    defaults: { _controller: "APMVenteBundle:Offre:handleOffre" }
+    methods:  PUT
 
 apm_vente_AjaxOffre_index:
     path:     /query/ajax-offre

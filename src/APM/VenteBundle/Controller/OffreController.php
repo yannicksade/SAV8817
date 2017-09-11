@@ -3,6 +3,7 @@
 namespace APM\VenteBundle\Controller;
 
 use APM\UserBundle\Entity\Utilisateur_avm;
+use function Couchbase\defaultDecoder;
 use Doctrine\Common\Collections\Collection;
 use APM\VenteBundle\Entity\Boutique;
 use APM\VenteBundle\Entity\Categorie;
@@ -17,7 +18,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use APM\CoreBundle\Form\Type\FilterFormType;
-
 
 
 /**
@@ -114,7 +114,6 @@ class OffreController extends Controller
             'url_image' => $this->get('apm_core.packages_maker')->getPackages()->getUrl('/', 'img'),
         ));
     }
-
 
     /**
      * Tout utilisateur AVM peut voir une offre
@@ -288,7 +287,17 @@ class OffreController extends Controller
     private $dateFrom_filter;
     private $dateTo_filter;
     private $record_filter;
-
+    private $status_list = array(
+        array("success" => "Disponible en stock"), //0
+        array("danger" => "Non disponible en stock"),//1
+        array("info" => "Vente sur commande"),//2
+        array("danger" => "Vente suspendue"),//3
+        array("danger" => "Vente annulée"),//4
+        array("warning" => "Stock limité"),//5
+        array("warning" => "Article en panne"),//6
+        array("info" => "Disponible uniquement en région"),//7
+        array("danger" => "Vente interdite"),//8
+    );
 
     public function ImageLoaderAction(Request $request)
     {
@@ -322,7 +331,7 @@ class OffreController extends Controller
                         return $this->json(json_encode(["item" => null]));
                     }
                     //test de validité du type de fichier
-                    if(preg_match('/^image\/*?/i', $file['type']) !== 1){
+                    if (preg_match('/^image\/*?/i', $file['type']) !== 1) {
                         $session->getFlashBag()->add('danger', "<strong>Fichier Invalide.</strong><br>Vous devez charger une image valide!");
                         return $this->json(json_encode(["item" => null]));
                     }
@@ -334,7 +343,7 @@ class OffreController extends Controller
                     }
                     /** @var File_NAME $file */
                     $file = new File($path);
-                    $fileName = md5(uniqid()).'.'.$file->guessExtension();
+                    $fileName = md5(uniqid()) . '.' . $file->guessExtension();
                     $file->move($this->getParameter('images_url'), $fileName); // renomer le fichier
                     $offre->setImage($fileName);
                     $em->flush();
@@ -368,7 +377,7 @@ class OffreController extends Controller
     }
 
     /**
-     * Create and update
+     * Create
      * @param Request $request
      * @return \Symfony\Component\HttpFoundation\Response | JsonResponse
      */
@@ -380,232 +389,64 @@ class OffreController extends Controller
         if ($request->isXmlHttpRequest() && $request->getMethod() === "POST" && $form->isSubmitted() && $form->isValid()) {
             $em = $this->getDoctrine()->getManager();
             $session = $this->get('session');
-            $this->editAndDeleteAjaxSecurity();
-            /** @var Offre $offre */
-            $data = $request->request->get('offre');
-            $offre = null;
-            $id = intval($data['id']);
-            if (is_numeric($id)) $offre = $em->getRepository('APMVenteBundle:Offre')->find($id);
-            $json['item'] = array();
-            if (null !== $offre) { //Update- Mise à jour
-                try {
-                    //autorisation d'accès
-                    //***---double vérification à l'aide du code ---
-                    if ($data['code'] !== $offre->getCode()) {
-                        $session->getFlashBag()->add('danger', "Action interdite!<br>Vous n'êtes pas autorisés à effectuer cette opération!");
-                        return $this->json(json_encode(["item" => null]));
+            try { // valider  le formulaire ici
+                // create a new element
+                $json['item'] = array();
+                //---create security 1------//
+                $this->createSecurity();
+                $data = $request->request->get('offre');
+                /** @var Offre $offre */
+                $offre = TradeFactory::getTradeProvider("offre");
+                if (null !== $offre) {
+                    $categorie = null;
+                    $boutique = null;
+                    if (isset($data['boutique'])) {
+                        $boutique = $em->getRepository('APMVenteBundle:Boutique')->find($data['boutique']);
+                        $offre->setBoutique($boutique);
+                        $this->createSecurity($boutique, null);
                     }
-                    //***-----------------------------------------
-                    $user = $this->getUser();
-                    $gerant = null;
-                    $proprietaire = null;
-                    $boutique = $offre->getBoutique();
-                    if (null !== $boutique) {
-                        $gerant = $boutique->getGerant();
-                        $proprietaire = $boutique->getProprietaire();
+                    if (isset($data['categorie'])) {
+                        $categorie = $em->getRepository('APMVenteBundle:Categorie')->find($data['categorie']);
+                        $offre->setCategorie($categorie);
+                        $this->createSecurity($boutique, $categorie);
                     }
-                    $vendeur = $offre->getVendeur();
-                    $this->editAndDeleteAjaxSecurity($user, $gerant, $proprietaire, $vendeur);
-                    //------------------ security: allow only the seller, the manager and the owner of the product-----------------------
-                    $description = "undefined";
-                    $etat = "undefined";
-                    $garantie = "undefined";
-                    $designation = "undefined";
-                    $dateExpiration = "undefined";
-                    $categorie = "undefined";
-                    $publiable = "undefined";
-                    $apparence = "undefined";
-                    $modeVente = "undefined";
-                    $modelDeSerie = "undefined";
-                    $prixUnitaire = "undefined";
-                    $quantite = "undefined";
-                    $remise = "undefined";
-                    $typeOffre = "undefined";
-                    $unite = "undefined";
-                    $catID = null;
-                    if ($user === $gerant || $user === $proprietaire || $user === $vendeur) { //permettra de scinder les traitements et mises à jour des attributs selon les ayant-droits
+                    //---create security 2------//
+                    $offre->setVendeur($this->getUser());
 
-                        if (isset($data['etat'])) {
-                            $e = $data['etat'];
-                            if ($offre->getEtat() != $e) {
-                                $etat = $e;
-                                $offre->setEtat($etat);
-                            }
-                        }
-                        if (isset($data['categorie'])) {
-                            $categorieID = $data['categorie'];
-                            $cat = $offre->getCategorie();
-                            if (null !== $cat) $catID = $cat->getId();
-                            if ($catID != $categorieID) {
-                                $categorie = $em->getRepository('APMVenteBundle:Categorie')->find($categorieID);
-                                $offre->setCategorie($categorie);
-                            }
-                        }
-                        if (isset($data['publiable'])) {
-                            $pub = $data['publiable'];
-                            if ($offre->getPubliable() != $pub) {
-                                $publiable = $pub;
-                                $offre->setPubliable($publiable);
-                            }
-                        }
-                        if (isset($data['apparenceNeuf'])) {
-                            $isBrandNew = $data['apparenceNeuf'];
-                            if ($offre->getApparenceNeuf() != $isBrandNew) {
-                                $apparence = $isBrandNew;
-                                $offre->setApparenceNeuf($apparence);
-                            }
-                        }
-                        if (isset($data['modeVente'])) {
-                            $mode = $data['modeVente'];
-                            if ($offre->getModeVente() != $mode) {
-                                $modeVente = $mode;
-                                $offre->setModeVente($modeVente);
-                            }
-                        }
-                        if (isset($data['typeOffre'])) {
-                            $type = $data['typeOffre'];
-                            if ($offre->getTypeOffre() != $type) {
-                                $typeOffre = $type;
-                                $offre->setTypeOffre($typeOffre);
-                            }
-                        }
-                        if (isset($data['description'])) {
-                            $desc = $data['description'];
-                            if ($offre->getDescription() != $desc) {
-                                $description = $desc;
-                                $offre->setDescription($description);
-                            }
-                        }
-                        if (isset($data['dateExpiration'])) {
-                            $date = $data['dateExpiration'];
-                            if ($offre->getDateExpiration() != $date) {
-                                $dateExpiration = $date;
-                                $offre->setDateExpiration($dateExpiration);
-                            }
-
-                        }
-                        $duree = $data['dureeGarantie'];
-                        if ($offre->getDureeGarantie() != $duree) {
-                            $garantie = $duree;
-                            $offre->setDureeGarantie($garantie);
-                        }
-                        $name = $data['designation'];
-                        if ($offre->getDesignation() != $name) {
-                            $designation = $name;
-                            $offre->setDesignation($designation);
-                        }
-                        $serialNumber = $data['modelDeSerie'];
-                        if ($offre->getModelDeSerie() != $serialNumber) {
-                            $modelDeSerie = $serialNumber;
-                            $offre->setModelDeSerie($modelDeSerie);
-                        }
-                        $price = $data['prixUnitaire'];
-                        if ($offre->getPrixUnitaire() != $price) {
-                            $prixUnitaire = $price;
-                            $offre->setPrixUnitaire($prixUnitaire);
-                        }
-                        $qte = $data['quantite'];
-                        if ($offre->getQuantite() != $qte) {
-                            $quantite = $qte;
-                            $offre->setQuantite($quantite);
-                        }
-                        $discount = $data['remiseProduit'];
-                        if ($offre->getRemiseProduit() != $discount) {
-                            $remise = $discount;
-                            $offre->setRemiseProduit($remise);
-                        }
-                        $u = $data['unite'];
-                        if ($offre->getUnite() != $u) {
-                            $unite = $u;
-                            $offre->setUnite($unite);
-                        }
-                    }
-                    //----------------------------------------------------------------------------------------
-                    //-------- prepareration de la reponse du vendeur----
-                    $json["item"] = array(//permet au client de différencier les mises a jour des nouveaux éléments
-                        "action" => 1,
-                        "id" => $id,
+                    $offre->setDesignation($data['designation']);
+                    if (isset($data['etat'])) $offre->setEtat($data['etat']);
+                    $offre->setQuantite($data['quantite']);
+                    if (isset($data['description'])) $offre->setDescription($data['description']);
+                    $offre->setRemiseProduit($data['remiseProduit']);
+                    $offre->setPrixunitaire($data['prixUnitaire']);
+                    $offre->setModelDeSerie($data['modelDeSerie']);
+                    if (isset($data['modeVente'])) $offre->setModeVente($data['modeVente']);
+                    if (isset($data['typeOffre'])) $offre->setTypeOffre($data['typeOffre']);
+                    if (isset($data['publiable'])) $offre->setPubliable($data['publiable']);
+                    if (isset($data['apparenceNeuf'])) $offre->setApparenceNeuf($data['apparenceNeuf']);
+                    if (isset($data['credit'])) $offre->setCredit($data['credit']); // variable à enregistrement parallèlement dans par un formulaire distinct: dit varible optionnelles comme les autres
+                    $offre->setDureeGarantie($data['dureeGarantie']);
+                    if (isset($data['imageFile'])) $offre->setImage($data['imageFile']);
+                    $em->persist($offre);
+                    $em->flush();
+                    $json["item"] = array(//permet au client de différencier les nouveaux éléments des élements juste modifiés
+                        "action" => 0,
+                        "id" => null, //it is null because the table will be reload automatically
                     );
-                    // préparation de la notification du client
-                    if ($publiable === "undefined" || $designation !== "undefined" || $description !== "undefined" || $etat !== "undefined" || $garantie !== "undefined" || $dateExpiration !== "undefined" || $typeOffre !== "undefined"
-                        || $remise !== "undefined" || $quantite !== "undefined" || $modelDeSerie !== "undefined" || $apparence !== "undefined" || $prixUnitaire !== "undefined" || $categorie !== "undefined" || $modeVente !== "undefined"
-                        || $unite !== "undefined"
-                    ) {
-                        $em->flush();
-                        $session->getFlashBag()->add('success', "Modification ou Mise à jour de l\offre :<strong>" . $offre->getCode() . "</strong><br> Opération effectuée avec succès!");
-                        return $this->json(json_encode($json));
-                    } else {
-                        $session->getFlashBag()->add('info', "<strong> Aucune modification</strong><br> Action non effectuée!");
-                        return $this->json(json_encode(["item" => null]));
-                    }
-                } catch (ConstraintViolationException $cve) {
-                    $session->getFlashBag()->add('danger', "Echec de la Modification <br>L'enregistrement a échoué dû à une contrainte de données!");
-                    return $this->json(json_encode(["item" => null]));
-                } catch (RuntimeException $rte) {
-                    $session->getFlashBag()->add('danger', "Echec de la Modification <br>L'enregistrement a échoué. bien vouloir réessayer plutard, svp!");
-                    return $this->json(json_encode(["item" => null]));
-                } catch (AccessDeniedException $ads) {
-                    $session->getFlashBag()->add('danger', "Action interdite!<br>Vous n'êtes pas autorisés à effectuer cette opération!");
-                    return $this->json(json_encode(["item" => null]));
+                    $session->getFlashBag()->add('success', "<strong> Création de l'Offre. réf:" . $offre->getCode() . "</strong><br> Opération effectuée avec succès!");
+                    return $this->json(json_encode($json));
                 }
-            } else {// create a new element
-                try { // valider  le formulaire ici
-                    //---create security 1------//
-                    $this->createSecurity();
-                    /** @var Offre $offre */
-                    $offre = TradeFactory::getTradeProvider("offre");
-                    if (null !== $offre) {
-                        $categorie = null;
-                        $boutique = null;
-                        if (isset($data['boutique'])) {
-                            $boutique = $em->getRepository('APMVenteBundle:Boutique')->find($data['boutique']);
-                            $offre->setBoutique($boutique);
-                            $this->createSecurity($boutique, null);
-                        }
-                        if (isset($data['categorie'])) {
-                            $categorie = $em->getRepository('APMVenteBundle:Categorie')->find($data['categorie']);
-                            $offre->setCategorie($categorie);
-                            $this->createSecurity($boutique, $categorie);
-                        }
-                        //---create security 2------//
-                        $offre->setVendeur($this->getUser());
-
-                        $offre->setDesignation($data['designation']);
-                        if (isset($data['etat'])) $offre->setEtat($data['etat']);
-                        $offre->setQuantite($data['quantite']);
-                        if (isset($data['description'])) $offre->setDescription($data['description']);
-                        $offre->setRemiseProduit($data['remiseProduit']);
-                        $offre->setPrixunitaire($data['prixUnitaire']);
-                        $offre->setModelDeSerie($data['modelDeSerie']);
-                        if (isset($data['modeVente'])) $offre->setModeVente($data['modeVente']);
-                        if (isset($data['typeOffre'])) $offre->setTypeOffre($data['typeOffre']);
-                        if (isset($data['publiable'])) $offre->setPubliable($data['publiable']);
-                        if (isset($data['apparenceNeuf'])) $offre->setApparenceNeuf($data['apparenceNeuf']);
-                        if (isset($data['credit'])) $offre->setCredit($data['credit']); // variable à enregistrement parallèlement dans par un formulaire distinct: dit varible optionnelles comme les autres
-                        $offre->setDureeGarantie($data['dureeGarantie']);
-                        if (isset($data['imageFile'])) $offre->setImage($data['imageFile']);
-                        $em->persist($offre);
-                        $em->flush();
-                        $json["item"] = array(//permet au client de différencier les nouveaux éléments des élements juste modifiés
-                            "action" => 0,
-                            "id" => null, //it is null because the table will be reload automatically
-                        );
-                        $session->getFlashBag()->add('success', "<strong> Création de l'Offre. réf:" . $offre->getCode() . "</strong><br> Opération effectuée avec succès!");
-                        return $this->json(json_encode($json));
-
-                    }
-                    $session->getFlashBag()->add('danger', "<strong>Echec de l'enregistrement. </strong><br>Un problème est survenu et l'enregistrement a échoué! veuillez réessayer dans un instant!");
-                    return $this->json(json_encode(["item" => null]));
-                } catch (ConstraintViolationException $cve) {
-                    $session->getFlashBag()->add('danger', "<strong>Echec de l'enregistrement. </strong><br>L'enregistrement a échoué dû à une contrainte de données!");
-                    return $this->json(json_encode(["item" => null]));
-                } catch (RuntimeException $rte) {
-                    $session->getFlashBag()->add('danger', "<strong>Echec de l'opération.</strong><br>L'enregistrement a échoué. bien vouloir réessayer plutard, svp!");
-                    return $this->json(json_encode(["item" => null]));
-                } catch (AccessDeniedException $ads) {
-                    $session->getFlashBag()->add('danger', "<strong>Action interdite.</strong><br>Vous n'êtes pas autorisez à effectuer cette opération!");
-                    return $this->json(json_encode(["item" => null]));
-                }
+                $session->getFlashBag()->add('danger', "<strong>Echec de l'enregistrement. </strong><br>Un problème est survenu et l'enregistrement a échoué! veuillez réessayer dans un instant!");
+                return $this->json(json_encode(["item" => null]));
+            } catch (ConstraintViolationException $cve) {
+                $session->getFlashBag()->add('danger', "<strong>Echec de l'enregistrement. </strong><br>L'enregistrement a échoué dû à une contrainte de données!");
+                return $this->json(json_encode(["item" => null]));
+            } catch (RuntimeException $rte) {
+                $session->getFlashBag()->add('danger', "<strong>Echec de l'opération.</strong><br>L'enregistrement a échoué. bien vouloir réessayer plutard, svp!");
+                return $this->json(json_encode(["item" => null]));
+            } catch (AccessDeniedException $ads) {
+                $session->getFlashBag()->add('danger', "<strong>Action interdite.</strong><br>Vous n'êtes pas autorisez à effectuer cette opération!");
+                return $this->json(json_encode(["item" => null]));
             }
         }
         //------------------ Form---------------
@@ -617,8 +458,6 @@ class OffreController extends Controller
         ));
 
     }
-
-
 
     //Liste tous les Offres
     public function loadTableAction(Request $request)
@@ -642,24 +481,6 @@ class OffreController extends Controller
                 $iDisplayStart = intval($request->request->get('start'));
                 $sEcho = intval($request->request->get('draw'));
 
-                $status_list = array(
-                    array("success" => "Disponible en stock"), //0
-                    array("danger" => "Non disponible en stock"),//1
-                    array("info" => "Vente sur commande"),//2
-                    array("danger" => "Vente suspendue"),//3
-                    array("danger" => "Vente annulée"),//4
-                    array("warning" => "Stock limité"),//5
-                    array("warning" => "Article en panne"),//6
-                    array("info" => "Disponible uniquement en région"),//7
-                    array("danger" => "Vente interdite"),//8
-                );
-
-                $mode_vente = array(
-                    "Vente Normale", "Vente aux enchères", "Vente en solde", "Vente restreinte"
-                );
-                $type_offre = array(
-                    "Article", "Produit", "Service",
-                );
                 //-----Source -------
                 /** @var Utilisateur_avm $user */
                 $user = $this->getUser();
@@ -687,28 +508,17 @@ class OffreController extends Controller
                 foreach ($offres as $offre) {
                     $id += 1;
                     $etat = $offre->getEtat();
-                    $dateCreate = $offre->getDateCreation()?$offre->getDateCreation()->format("d/m/Y - H:i"):'';
-                    $dureeGarantie = $offre->getDureeGarantie();
-                    $categorie = null !== $offre->getCategorie()?$offre->getCategorie():'';
                     $boutique = $offre->getBoutique();
                     $aboutiqueRoute = "<i>free lance</i>";
-                   if(null !== $boutique)$aboutiqueRoute = '<a href="../boutique/' . $boutique->getId() . '/show" name="_boutique">' . $boutique . '</a>';
-                    $dateExp = $offre->getDateExpiration()? $offre->getDateExpiration()->format("d/m/Y - H:i"):'';
-                    $retourne = $offre->getRetourne() ? "OUI" : "NON";
-                    $publier = $offre->getPubliable() ? "OUI" : "NON";
-                     $apparence = $offre->getApparenceNeuf()?"NEUF": "OCCASION";
+                    if (null !== $boutique) $aboutiqueRoute = '<a href="../boutique/' . $boutique->getId() . '/show">' . $boutique . '</a>';
                     $updatedAt = $offre->getUpdatedAt()->format("d/m/Y - H:i");
                     $records['data'][] = array(
-                        '<label class="mt-checkbox mt-checkbox-single mt-checkbox-outline">' . $id . ' <input value="'.$offre->getId().'" name="_id[]" type="checkbox" class="checkboxes"/><span></span><input class="hidden" name="_categorie" value="' . $categorie . '">
-                        <span class="hidden" name="_description">' . $offre->getDescription() . '</span><span class="hidden" name="_vendeur">' . $offre->getVendeur()->getUsername() . '</span><span class="hidden" name="_credit">' . $offre->getCredit() . '</span><span class="hidden" name="_image" >' . $offre->getImage() . '</span>
-                        <span class="hidden" name="_dateExpiration">' . $dateExp . '</span><span class="hidden" name="_dateCreation">' . $dateCreate . '</span><span class="hidden" name="_dureeGarantie">' . $dureeGarantie . '</span><span class="hidden" name="_prixUnitaire">' . $offre->getPrixUnitaire() . '</span>
-                        <span class="hidden" name="_publiable">' . $publier . '</span><span class="hidden">'.$retourne.'</span><span class="hidden" name="_apparence">' . $apparence . '</span><span class="hidden" name="_modeVente">' . $mode_vente[$offre->getModeVente()] . '</span>
-                        <span class="hidden" name="_modelDeSerie">' . $offre->getModelDeSerie() . '</span><span class="hidden" name="_unite">' . $offre->getUnite() . '</span><span class="hidden" name="_quantite">' . $offre->getQuantite() . '</span><span class="hidden" name="_remise">' . $offre->getRemiseProduit() . '</span><span class="hidden" name="_rate">' . $offre->getEvaluation() . '</span><span class="hidden" name="_type">' . $type_offre[$offre->getTypeOffre()] . '</span><span class="hidden" name="_dataSheet">' . $offre->getDataSheet() . '</span></label>',
-                        '<span name="_code"><a  href="' . $offre->getId() . '/show">' . $offre->getCode() . '</span>',
-                        '<span name="_designation">'.$offre.'</span>',
-                        $aboutiqueRoute,
-                        '<span name="_updatedAt">' . $updatedAt . '</span>',
-                        '<span class="label label-sm label-' . (key($status_list[$etat])) . '"  name="_etat">' . (current($status_list[$etat])) . '</span>'
+                        '<label class="mt-checkbox mt-checkbox-single mt-checkbox-outline">' . $id . ' <input value="' . $offre->getId() . '" name="_id[]" type="checkbox" class="checkboxes"/><span></span></label>',
+                        '<span><a  href="' . $offre->getId() . '/show">' . $offre->getCode() . '</a></span>',
+                        '<span>' . $offre . '</span>',
+                        '<span>' . $aboutiqueRoute . '</span>',
+                        '<span>' . $updatedAt . '</span>',
+                        '<span class="label label-sm label-' . (key($this->status_list[$etat])) . '" >' . (current($this->status_list[$etat])) . '</span>'
                     );
                 }
                 $records['draw'] = $sEcho;
@@ -761,7 +571,7 @@ class OffreController extends Controller
                         $j++;
                     }
                 }
-                $json = json_encode(['ids' => $json, 'action'=>3]);
+                $json = json_encode(['ids' => $json, 'action' => 3]);
                 $session->getFlashBag()->add('danger', "<strong>" . $j . "</strong> Element(s) supprimé(s)<br> Opération effectuée avec succès!");
                 return $this->json($json);
             } catch (AccessDeniedException $ads) {
@@ -771,10 +581,178 @@ class OffreController extends Controller
                 $session->getFlashBag()->add('danger', "<strong>Echec de la suppression </strong><br>Une erreur systeme s'est produite. bien vouloir réessayer plutard, svp!");
                 return $this->json(json_encode(["ids" => null]));
             } catch (ConstraintViolationException $cve) {
-                $session->getFlashBag()->add('danger', "<strong>Echec de la suppression</strong><br> <b>" . ($j) . " element(s) supprimé(s); ". ($count - $j) . " échoué(s) </b>, il se peut qu'une d'elle soit utilisée par d'autre ressource");
-                return $this->json(json_encode(['ids' => $json, 'action'=>3]));
+                $session->getFlashBag()->add('danger', "<strong>Echec de la suppression</strong><br> <b>" . ($j) . " element(s) supprimé(s); " . ($count - $j) . " échoué(s) </b>, il se peut qu'une d'elle soit utilisée par d'autre ressource");
+                return $this->json(json_encode(['ids' => $json, 'action' => 3]));
             }
         }
+        return new JsonResponse();
+    }
+
+    /*
+     * Update an offer
+     */
+    public function handleOffreAction(Request $request)
+    {
+        if (!$request->isXmlHttpRequest()) return new JsonResponse();
+        $em = $this->getDoctrine()->getManager();
+        $session = $this->get('session');
+        $json['item'] = array();
+        /** @var Offre $offre */
+        $offre = null;
+        $m_request = $request->query->get('method');
+        try {
+            if (isset($m_request) && $m_request === "get") {//get data with id through put method
+                $this->listAndShowSecurity();
+                $item = $request->request->get('item');
+                $item = json_decode($item);
+                $id = $item[0];
+                $id = intval($id);
+                if (is_numeric($id)) $offre = $em->getRepository('APMVenteBundle:Offre')->find($id);
+                if (null === $offre) return new JsonResponse();
+                $mode_vente = array(
+                    "Vente Normale", "Vente aux enchères", "Vente en solde", "Vente restreinte"
+                );
+                $type_offre = array(
+                    "Article", "Produit", "Service",
+                );
+                $json['item'] = array(
+                    'designation' => $offre->getDesignation(),
+                    'code' => $offre->getCode(),
+                    'categorie' => $offre->getCategorie() ? $offre->getCategorie()->getDesignation() : '',
+                    'boutique' => $offre->getBoutique() ? $offre->getBoutique()->getDesignation() : '-',
+                    'dureeGarantie' => $offre->getDureeGarantie(),
+                    'remise' => $offre->getRemiseProduit(),
+                    'modeVente' => $mode_vente[$offre->getModeVente()],
+                    'modelDeSerie' => $offre->getModelDeSerie(),
+                    'prixUnitaire' => $offre->getPrixUnitaire(),
+                    'quantite' => $offre->getQuantite(),
+                    'unite' => $offre->getUnite(),
+                    'rate' => $offre->getEvaluation(),
+                    'type' => $type_offre[$offre->getTypeOffre()],
+                    'description' => $offre->getDescription(),
+                    'publiable' => $offre->getPubliable() ? "No" : "Yes",
+                    'apparence' => $offre->getApparenceNeuf() ? "Neuf" : "Occasion",
+                    'etat' => current($this->status_list[$offre->getEtat()]),
+                    'retourne' => $offre->getRetourne() ? "Oui" : "Non",
+                    'updatedAt' => $offre->getUpdatedAt()->format("d/m/Y - H:i"),
+                    'dateCreation' => $offre->getDateCreation() ? $offre->getDateCreation()->format("d/m/Y - H:i") : '',
+                    'dateExpiration' => $offre->getDateExpiration() ? $offre->getDateExpiration()->format("d/m/Y - H:i") : '',
+                    'vendeur' => $offre->getVendeur()->getUsername(),
+                );
+                return $this->json(json_encode($json));
+
+            }
+            elseif (isset($m_request) && $m_request === "post") {//individual property edit
+                //autorisation d'accès
+                $this->editAndDeleteAjaxSecurity();
+                $pk = $request->request->get('pk');
+                $id = intval($pk);
+                if (is_numeric($id)) $offre = $em->getRepository('APMVenteBundle:Offre')->find($id);
+                if (null === $offre) return new JsonResponse();
+
+                //***---double vérification à l'aide du code ---
+                /*if ($data['code'] !== $offre->getCode()) {
+                    $session->getFlashBag()->add('danger', "Action interdite!<br>Vous n'êtes pas autorisés à effectuer cette opération!");
+                    return $this->json(json_encode(["item" => null]));
+                }*/
+                //***-----------------------------------------
+                $user = $this->getUser();
+                $gerant = null;
+                $proprietaire = null;
+                $boutique = $offre->getBoutique();
+                if (null !== $boutique) {
+                    $gerant = $boutique->getGerant();
+                    $proprietaire = $boutique->getProprietaire();
+                }
+                $vendeur = $offre->getVendeur();
+                $this->editAndDeleteAjaxSecurity($user, $gerant, $proprietaire, $vendeur);
+                //------------------ security: allow only the seller, the manager and the owner of the product-----------------------
+                if ($user === $gerant || $user === $proprietaire || $user === $vendeur) { //permettra de scinder les traitements et mises à jour des attributs selon les ayant-droits
+                    $property = $request->request->get('name');
+                    $value = $request->request->get('value');
+                    switch ($property) {
+                        case 'etat':
+                            $offre->setEtat($value);
+                            $json["item"] = array(//pour actualiser la table
+                                "action" => 1,
+                            );
+                            break;
+                        case 'categorie':
+                            $categorie = $em->getRepository('APMVenteBundle:Categorie')->find($value);
+                            $offre->setCategorie($categorie);
+                            break;
+                        case 'publiable':
+                            $offre->setPubliable($value);
+                            break;
+                        case 'apparenceNeuf':
+                            $offre->setApparenceNeuf($value);
+                            break;
+                        case 'modeVente' :
+                            $offre->setModeVente($value);
+                            break;
+                        case 'typeOffre' :
+                            $offre->setTypeOffre($value);
+                            break;
+                        case 'description':
+                            $offre->setDescription($value);
+                            break;
+                        case 'dateExpiration':
+                            $offre->setDateExpiration($value);
+                            break;
+
+                        case 'dureeGarantie':
+                            $offre->setDureeGarantie($value);
+                            break;
+                        case 'designation':
+                            $offre->setDesignation($value);
+                            $json["item"] = array(//pour actualiser la table
+                                "action" => 1,
+                            );
+                            break;
+                        case 'modelDeSerie':
+                            $offre->setModelDeSerie($value);
+                            break;
+                        case 'prixUnitaire':
+                            $offre->setPrixUnitaire($value);
+                            break;
+                        case 'quantite':
+                            $offre->setQuantite($value);
+                            break;
+                        case 'remiseProduit':
+                            $offre->setRemiseProduit($value);
+                            break;
+                        case 'unite':
+                            $offre->setUnite($value);
+                            break;
+                        default:
+                            $session->getFlashBag()->add('info', "<strong> Aucune modification</strong>");
+                            return $this->json(json_encode(["item" => null]));
+                    }
+
+                    //----------------------------------------------------------------------------------------
+                    //-------- prepareration de la reponse du vendeur----
+                    // préparation de la notification du client
+                    $em->flush();
+                    $session->getFlashBag()->add('success', "Modification ou Mise à jour de l'offre :<strong>" . $offre->getCode() . "</strong><br> Opération effectuée avec succès!");
+                    return $this->json(json_encode($json));
+                }
+            }
+            elseif ($request->getMethod() === "POST") { //multiple property edit
+
+                $session->getFlashBag()->add('success', "Modification ou Mise à jour de l'offre------TEST POST :<strong>" . $offre->getCode() . "</strong><br> Opération effectuée avec succès!");
+                return $this->json(json_encode(["item" => null]));
+            }
+        } catch (ConstraintViolationException $cve) {
+            $session->getFlashBag()->add('danger', "Echec de la Modification <br>L'enregistrement a échoué dû à une contrainte de données!");
+            return $this->json(json_encode(["item" => null]));
+        } catch (RuntimeException $rte) {
+            $session->getFlashBag()->add('danger', "Echec de la Modification <br>L'enregistrement a échoué. bien vouloir réessayer plutard, svp!");
+            return $this->json(json_encode(["item" => null]));
+        } catch (AccessDeniedException $ads) {
+            $session->getFlashBag()->add('danger', "Action interdite!<br>Vous n'êtes pas autorisés à effectuer cette opération!");
+            return $this->json(json_encode(["item" => null]));
+        }
+
         return new JsonResponse();
     }
 
@@ -836,6 +814,7 @@ class OffreController extends Controller
 
         return ($offres != null) ? $offres->toArray() : [];
     }
+
     /**
      * @param Categorie $categorie
      * @param Boutique $boutique

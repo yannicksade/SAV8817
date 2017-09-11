@@ -11,8 +11,6 @@ var GlobalPageCustomScript = function () {
     var tab2 = document.querySelector('#tab2');
     var uploadedFile;
     var notifAlert;
-    var nbProcessusEnCours = 0;
-    var labelProcess = $('#ajax-label-process');
     var modalNotification = function (message) {
         var tmpl = [
             // tabindex is required for focus
@@ -52,8 +50,14 @@ var GlobalPageCustomScript = function () {
         'tab3': '#modal-tab_3',
         'tab4': '#modal-tab_4',
         'tab5': '#modal-tab_5',
-        'bodyContainer': '#tab_1'
+        'bodyContainer': '#tab_1',
+        'display':"#modal-tab_1",
+        'enableEdit':false
     };
+
+    var nbProcessusEnCours = 0;
+    var labelProcess = $('#ajax-label-process');
+
     var modifierImpl = function (parent) {
         //------ Compress the table 1 -----------------
         var form = $('.form-element', parent);
@@ -72,7 +76,7 @@ var GlobalPageCustomScript = function () {
             var p = $(child).parents();
             if ($(p[0]).hasClass('modal-footer')) {//suppression à partir de la modal
                 elements[0] = $('input[name="_id"]', p[1]).val();
-                $('.alerte', modalConfirm).html('Vous êtes sur le point de supprimer définitivement l\'offre de référence:<strong>' + $('td[data-display=_code]', p[1]).text() + '</strong><br/> Voulez-vous continuer?');
+                $('.alerte', modalConfirm).html('Vous êtes sur le point de supprimer définitivement l\'offre de référence:<strong>' + $('td[data-display=code]', p[1]).text() + '</strong><br/> Voulez-vous continuer?');
             } else { //suppression apartir de la table
                 var cboxes = getCheckedBoxes($('.tab-element', p[5])), tr, //p5: search for tab element from portlet
                     nb = cboxes.length;
@@ -88,7 +92,7 @@ var GlobalPageCustomScript = function () {
             actionConfirm = 1; //s'assurer que l'action ne vient pas d'ailleurs
             modalConfirm.on('click', '#action-confirm', function () {
                 if (actionConfirm !== 1) return;
-                if (elements.length > 0) anActionForm(child, elements, table);
+                if (elements.length > 0) deleteElement(child, elements, table);
                 elements = [];
             });
             modalConfirm.on('click', '.action-cancel', function () {
@@ -327,7 +331,7 @@ var GlobalPageCustomScript = function () {
             }
         })
     };
-    var anActionForm = function (child, elements, option) {
+    var deleteElement = function (child, elements, option) {
         var parent = $(child).parents('.data-content');
         var items = JSON.stringify(elements);
         var item_sp;
@@ -386,6 +390,53 @@ var GlobalPageCustomScript = function () {
             }
         });
     };
+    var getElement = function (id,parent) {
+        var item =[];
+        item[0] = id;
+        var elt = JSON.stringify(item);
+        var data = null;
+        var item_sp;
+        return $.ajax({
+            url: 'handle-element?method=get',
+            type: "put",
+            data: 'item=' + elt,
+            dataType: "json",
+            error: function () {
+                if (nbProcessusEnCours < 0) $('#ct-sp').addClass('hidden'); // if spinner errs
+                alert('error');
+            },
+            beforeSend: function () {
+                nbProcessusEnCours += 1;
+                labelProcess.html(nbProcessusEnCours + ' traitement(s) en cours...');
+                if (nbProcessusEnCours === 1) $('#ct-sp').click();
+                item_sp = $('.modal-spinner', parent);
+                if (item_sp) item_sp.click();
+            },
+
+            complete: function () {
+                notifAlert = document.querySelector("#notif-active"); //notification
+                if (notifAlert) notifAlert.click();
+                nbProcessusEnCours -= 1;
+                labelProcess.html(nbProcessusEnCours + ' traitement(s) en cours...');
+                item_sp = $('.modal-spinner', parent);
+                if (item_sp) item_sp.click();
+                if (nbProcessusEnCours === 0) $('#ct-sp').click();
+            },
+            success: function (json) {
+                json = JSON.parse(json);
+                data = json.item;
+                setTimeout(function () {
+                    if (data) {
+                        $('.data-content .display-control-static').each(function () {
+                            $(this).html('<span class="editable-input">'+data[$(this).attr("data-display")]+'</span>');
+                            modal_stk.enableEdit = false;
+                        });
+                    }
+                }, 100);
+            }
+
+        });
+    };
     var reset = function () {
         $('input[type="reset"], a[type="reset"]').click(function () {
             var p = $(this).parents('form');
@@ -404,48 +455,61 @@ var GlobalPageCustomScript = function () {
         });
 
     };
-    var displayText = function (display, parent) { //display = where to display text; parent = where to retreive data from
-        $('.alerte', display).addClass("hidden"); //cacher l'affichage
+    var displayText = function(display, parent) { //display = where to display text; parent = where to retreive data from
+        $('.alerte',  modal_stk.modalElement).addClass("hidden"); //cacher l'affichage
         $('.data-content', modal_stk.modalElement).removeClass("hidden"); //afficher tous les tabs du modals
-        $('.data-content .display-control-static', display).each(function () {
-            var input = $('[name="' + $(this).attr("data-display") + '"]', parent);
-                $(this).html('<a name="'+$(this).attr("data-display")+'[1]">'+input.text()+'</a>');
-        });
-        $('[name="_id"]', display).val($('[name="_id[]"]', parent).val());
+        //loading alert goes here!
+        //fetch data from the db
+        var id = $('[name="_id[]"]', parent).val();
+        $('[name="_id"]', display).val(id);
+        getElement(id, display);
     };
     var play = function (elt) {
         var p = $(elt).parents();
-        displayText(modal_stk.modalElement, p[2]); // tr line
+        displayText(modal_stk.display, p[2]); // tr line
     };
     var ready = function (parent) {
         var cbs = [];
         cbs = getCheckedBoxes($('tbody', parent));
         var nb = cbs.length;
+        var limit = nb;
         var elt;
         if (nb > 0) {
             reinitializeModal();
             elt = $(cbs).first();
             play(elt);
-        }
-        var i = 1;
-        $('#play-next').click(function () {
+            uncheckBoxes(parent);
             nb--;
-            if (nb > 0) {
+        }
+        var i = 0;
+        $('#play-next').click(function () {
+            if (nb > 0 && i>=0) {
                 reinitializeModal();
-                elt = cbs[i];
+                elt = cbs[++i];
                 play(elt);
+                nb--;
             }
-            i++;
+        });
+        $('#play-prev').click(function () {
+            if ( nb >= 0 && nb < limit && i>0) {
+                reinitializeModal();
+                elt = cbs[--i];
+                play(elt);
+                nb++;
+            }
         });
     };
     var reinitializeModal = function () {
         $('.data-content', modal_stk.modalElement).addClass("hidden");
         $('.alerte', modal_stk.modalElement).removeClass("hidden");
         $('[name="_id"]', modal_stk.modalElement).val('');
-        $('td', modal_stk.modalElement).text('');
+        $('td.display-control-static', modal_stk.display).html('');
+        uncheckBoxes(modal_stk.display);
         $(modal_stk.modalTab1, modal_stk.modalElement).click(); //go back to the first tab
         $('.modal-spinner', modal_stk.modalElement).addClass('hidden');
-        $('input[type="reset"]', modal_stk.modalElement).each(function () {$(this).click();});
+        $('input[type="reset"]', modal_stk.modalElement).each(function () {
+            $(this).click();
+        });
     };
     var afficher = function () {
         //-------------------------- voir ---------------------
@@ -455,8 +519,9 @@ var GlobalPageCustomScript = function () {
     };
     return {
         ajaxForm: ajaxForm, //submit post form
-        anActionForm: anActionForm, //submit delete form
+        deleteElement: deleteElement, //submit delete form
         displayText: displayText,
+        modal: modal_stk,
         init: function () {
             reset();
             loadFile();
@@ -475,8 +540,6 @@ var GlobalPageCustomScript = function () {
             };
         }
     };
-
-
 }();
 
 jQuery(document).ready(function () {
