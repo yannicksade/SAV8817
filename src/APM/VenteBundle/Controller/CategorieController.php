@@ -7,7 +7,9 @@ use APM\VenteBundle\Entity\Categorie;
 use APM\VenteBundle\Factory\TradeFactory;
 use APM\VenteBundle\Form\CategorieType;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Session\Session;
 
 /**
  * Categorie controller.
@@ -18,15 +20,27 @@ class CategorieController extends Controller
 
     /**
      * Liste les catégories par Boutique
+     * @param Request $request
      * @param Boutique $boutique
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function indexAction(Boutique $boutique)
+    public function indexAction(Request $request, Boutique $boutique)
     {
         $this->listAndShowSecurity($boutique);
         $categories = $boutique->getCategories();
-
-        return $this->render('APMVenteBundle:categorie:index.html.twig', array(
+        if($request->isXmlHttpRequest()){
+            $json = array();
+            if(null === $categories)return $this->json($json, 205);
+            /** @var Categorie $category */
+            foreach ($categories as $category) {
+                array_push($json, array(
+                    'value' => $category->getId(),
+                    'text' => $category->getDesignation(),
+                ));
+            }
+            return $this->json($json, 200);
+        }else
+            return $this->render('APMVenteBundle:categorie:index.html.twig', array(
             'categories' => $categories,
             'boutique' => $boutique
         ));

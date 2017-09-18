@@ -31,6 +31,7 @@ var GlobalPageCustomScript = function () {
         $(tmpl).modal('modal');
     };
     var uncheckBoxes = function (parent) {
+        $('.group-checkable:checked', parent).click();
         $('input[type="checkbox"]:checked', parent).each(function () {
             $(this).click();
         });
@@ -51,8 +52,8 @@ var GlobalPageCustomScript = function () {
         'tab4': '#modal-tab_4',
         'tab5': '#modal-tab_5',
         'bodyContainer': '#tab_1',
-        'display':"#modal-tab_1",
-        'enableEdit':false
+        'display': "#modal-tab_1",
+        'enableEdit': false
     };
 
     var nbProcessusEnCours = 0;
@@ -372,8 +373,7 @@ var GlobalPageCustomScript = function () {
                 if (notifAlert) notifAlert.click();
                 nbProcessusEnCours -= 1;
                 labelProcess.html(nbProcessusEnCours + ' traitement(s) en cours...');
-                item_sp = $('input[type="submit"], a[type="submit"]', parent);
-                if (item_sp) item_sp.removeClass('disabled');
+                $('input[type="submit"], a[type="submit"]', parent).removeClass('disabled');
                 item_sp = $('.modal-spinner', parent);
                 if (item_sp) {
                     item_sp.click();
@@ -390,12 +390,12 @@ var GlobalPageCustomScript = function () {
             }
         });
     };
-    var getElement = function (id,parent) {
-        var item =[];
+    var getElement = function (id, parent) {
+        var item = [];
         item[0] = id;
         var elt = JSON.stringify(item);
         var data = null;
-        var item_sp;
+        var item_sp = 0;
         return $.ajax({
             url: 'handle-element?method=get',
             type: "put",
@@ -403,23 +403,30 @@ var GlobalPageCustomScript = function () {
             dataType: "json",
             error: function () {
                 if (nbProcessusEnCours < 0) $('#ct-sp').addClass('hidden'); // if spinner errs
+                $('.modal-spinner', parent).addClass('hidden');
                 alert('error');
             },
             beforeSend: function () {
+                $('input[type="submit"], a[type="submit"]', parent).attr('disabled', true);
+                $('#play-prev', parent).attr('disabled', true);
+                $('#play-next', parent).attr('disabled', true);
                 nbProcessusEnCours += 1;
+                item_sp += 1;
                 labelProcess.html(nbProcessusEnCours + ' traitement(s) en cours...');
                 if (nbProcessusEnCours === 1) $('#ct-sp').click();
-                item_sp = $('.modal-spinner', parent);
-                if (item_sp) item_sp.click();
+                if (item_sp === 1) $('.modal-spinner', parent).click();
             },
 
             complete: function () {
+                $('input[type="submit"], a[type="submit"]', parent).attr('disabled', false);
+                $('#play-prev', parent).attr('disabled', false);
+                $('#play-next', parent).attr('disabled', false);
                 notifAlert = document.querySelector("#notif-active"); //notification
                 if (notifAlert) notifAlert.click();
                 nbProcessusEnCours -= 1;
+                item_sp -= 1;
                 labelProcess.html(nbProcessusEnCours + ' traitement(s) en cours...');
-                item_sp = $('.modal-spinner', parent);
-                if (item_sp) item_sp.click();
+                if (item_sp === 0) $('.modal-spinner', parent).click();
                 if (nbProcessusEnCours === 0) $('#ct-sp').click();
             },
             success: function (json) {
@@ -428,7 +435,7 @@ var GlobalPageCustomScript = function () {
                 setTimeout(function () {
                     if (data) {
                         $('.data-content .display-control-static').each(function () {
-                            $(this).html('<span class="editable-input">'+data[$(this).attr("data-display")]+'</span>');
+                            $(this).html('<span class="editable-input">' + data[$(this).attr("data-display")] + '</span>');
                             modal_stk.enableEdit = false;
                         });
                     }
@@ -455,8 +462,8 @@ var GlobalPageCustomScript = function () {
         });
 
     };
-    var displayText = function(display, parent) { //display = where to display text; parent = where to retreive data from
-        $('.alerte',  modal_stk.modalElement).addClass("hidden"); //cacher l'affichage
+    var displayText = function (display, parent) { //display = where to display text; parent = where to retreive data from
+        $('.alerte', modal_stk.modalElement).addClass("hidden"); //cacher l'affichage
         $('.data-content', modal_stk.modalElement).removeClass("hidden"); //afficher tous les tabs du modals
         //loading alert goes here!
         //fetch data from the db
@@ -465,36 +472,35 @@ var GlobalPageCustomScript = function () {
         getElement(id, display);
     };
     var play = function (elt) {
-        var p = $(elt).parents();
-        displayText(modal_stk.display, p[2]); // tr line
+        var p = elt.parentNode.parentNode;
+        displayText(modal_stk.display, p); // p=tr line
     };
-    var ready = function (parent) {
-        var cbs = [];
-        cbs = getCheckedBoxes($('tbody', parent));
+    var ready = function (cbs) {
         var nb = cbs.length;
         var limit = nb;
-        var elt;
+        var i = 0;
         if (nb > 0) {
             reinitializeModal();
-            elt = $(cbs).first();
-            play(elt);
-            uncheckBoxes(parent);
+            play(cbs[0]);
             nb--;
         }
-        var i = 0;
         $('#play-next').click(function () {
-            if (nb > 0 && i>=0) {
+            if (nb > 0 && i >= 0) {
+                i++;
                 reinitializeModal();
-                elt = cbs[++i];
-                play(elt);
+                (function (i) {
+                    play(cbs[i]);
+                })(i);
                 nb--;
             }
         });
         $('#play-prev').click(function () {
-            if ( nb >= 0 && nb < limit && i>0) {
+            if (nb >= 0 && nb < limit && i > 0) {
+                i--;
                 reinitializeModal();
-                elt = cbs[--i];
-                play(elt);
+                (function (i) {
+                    play(cbs[i]);
+                })(i);
                 nb++;
             }
         });
@@ -514,7 +520,14 @@ var GlobalPageCustomScript = function () {
     var afficher = function () {
         //-------------------------- voir ---------------------
         $('.see_item').click(function () {
-            ready($(this).parents('.data-content')); // remplacer "this" par le "parent" pour une rotation des elements selectionés
+            var elt = this;
+            setTimeout(function () {
+                var cbs = [];
+                var parent = $(elt).parents('.data-content');
+                cbs = getCheckedBoxes($('tbody', parent));
+                uncheckBoxes(parent);
+                ready(cbs); // remplacer "this" par le "parent" pour une rotation des elements selectionés
+            }, 100)();
         });
     };
     return {

@@ -37,7 +37,7 @@ security:
         main:
             #remember_me:
                 #secret:   '%secret%'
-                #lifetime: 100 # 1 week in seconds
+                #lifetime: 100 # in seconds
                 #path:     /
 
                         # by default, the feature is enabled by checking a
@@ -48,6 +48,11 @@ security:
             form_login:
                 provider: fos_userbundle
                 csrf_token_generator: security.csrf.token_manager
+                # login success redirecting options (read further below)
+                always_use_default_target_path: true
+                default_target_path:            /easy-trade/user/dashboard
+                target_path_parameter:          _target_path
+                use_referer:                    false
             logout:       true
             anonymous:    true
 
@@ -56,9 +61,11 @@ security:
 
     #     pages accessibles aux utilisateurs anonymes
         - { path: ^/login, role: IS_AUTHENTICATED_ANONYMOUSLY } # This is for All users logged in or anonymous
+        - { path: ^/relogin, role: IS_AUTHENTICATED_ANONYMOUSLY } # This is for All users logged in or anonymous
         - { path: ^/logout, role: IS_AUTHENTICATED_REMEMBERED }  # This is for users logged in even with a remembered me cokie
         - { path: ^/change-password, role: IS_AUTHENTICATED_FULLY } # This is strictly for users who have successfully logged in and not via remembered me cookie
         - { path: ^/profile, role: IS_AUTHENTICATED_FULLY }
+        - { path: ^/lock-dashboard, role: IS_AUTHENTICATED_FULLY }
         - { path: ^/register/utilisateur-avm, role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/resetting, role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/easy-trade/costumer, role: IS_AUTHENTICATED_ANONYMOUSLY}
@@ -92,7 +99,7 @@ security:
         - { path: /apm, role: ROLE_SUPER_ADMIN } # Everything that is below or above this path belong to the super user
 
         - { path: /easy-trade, role: ROLE_SUPER_ADMIN}
-       # - { path: ^/, role: ROLE_SUPER_ADMIN} # Everything that has not been included in any careful path belong to the super user
+        - { path: ^/, role: ROLE_SUPER_ADMIN} # Everything that has not been included in any careful path belong to the super user
 
 
 

@@ -33,7 +33,7 @@ class Service_apres_venteController extends Controller
      *
      * Liste tous les SAV enregistrés entant que client et les SAV receptionné en tant que boutique ou les SAV d'une offre
      */
-    public function indexAction(Boutique $boutique = null, Offre $offre = null)
+    public function indexAction(Request $request, Boutique $boutique = null, Offre $offre = null)
     {
         if($boutique){
             $this->listAndShowSecurity($boutique, null);
@@ -67,6 +67,8 @@ class Service_apres_venteController extends Controller
             }
 
         }
+        $session = $request->getSession();
+        $session->set('previous_location', $request->getUri());
         return $this->render('APMAchatBundle:service_apres_vente:index.html.twig', array(
             'service_apres_ventes' => $service_apres_ventes,
         ));
@@ -365,6 +367,8 @@ class Service_apres_venteController extends Controller
                 }
             }
         }
+        $session = $request->getSession();
+        $session->set('previous_location', $request->getUri());
         //------------------ Form---------------
         $form = $this->createForm('APM\AchatBundle\Form\Service_apres_venteType');
         $form2 = $this->createForm('APM\AchatBundle\Form\Service_apres_venteType');

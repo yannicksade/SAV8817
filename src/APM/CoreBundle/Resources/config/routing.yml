@@ -1,12 +1,20 @@
-#-------- DANGER: creer toute route dans le path correct pour garantir un accès dédiée ex: /easy-trade/user dédié aux utilisateurs ayant le role USERAVM---------
+
+#-------- ATTENTION: creer toute route dans le path correct pour garantir un accès dédiée et sécurisé ex: /easy-trade/user dédié aux utilisateurs ayant le role USERAVM---------
 
 apm_core_homepage:
-    path:     / #masque fos_user.registration_register et redirige vers la plateforme
+    path:     / #masque fos_user.registration_register et redirige la requete
     defaults: { _controller: APMCoreBundle:Default:index }
 
+apm_core_relogin:
+    path:     /relogin
+    defaults: { _controller: APMCoreBundle:LockedScreen:relogin }
+    methods:  GET
+
 apm_core_locked-screen:
-    path:     /locked-screen
+    path:     /lock-dashboard
     defaults: { _controller: APMCoreBundle:LockedScreen:index }
+    methods:  GET
+
 #--------------------- pages utilisateur ----------------------------------------------
 apm_core_user-registration:
     resource: "@APMCoreBundle/Resources/config/user/registration.yml"

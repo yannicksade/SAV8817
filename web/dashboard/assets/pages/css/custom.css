@@ -1,6 +1,6 @@
 .modal-spinner {
     position: absolute;
-    z-index: 2000;
+    z-index: 2020;
     left: 40%;
     top:40%;
     width: auto;

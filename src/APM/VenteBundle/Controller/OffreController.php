@@ -3,7 +3,6 @@
 namespace APM\VenteBundle\Controller;
 
 use APM\UserBundle\Entity\Utilisateur_avm;
-use function Couchbase\defaultDecoder;
 use Doctrine\Common\Collections\Collection;
 use APM\VenteBundle\Entity\Boutique;
 use APM\VenteBundle\Entity\Categorie;
@@ -18,6 +17,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use APM\CoreBundle\Form\Type\FilterFormType;
+use Symfony\Component\HttpFoundation\Session\Session;
 
 
 /**
@@ -77,8 +77,6 @@ class OffreController extends Controller
             'url_image' => $this->get('apm_core.packages_maker')->getPackages()->getUrl('/', 'img'),
         ));
     }
-
-
     /**
      *
      * @param Request $request
@@ -245,7 +243,7 @@ class OffreController extends Controller
     }
 
     /**
-     * Deletes a Offre entity.
+     * Deletes an Offre entity.
      * @param Request $request
      * @param Offre $offre
      * @return \Symfony\Component\HttpFoundation\RedirectResponse
@@ -276,10 +274,7 @@ class OffreController extends Controller
 
         return $this->redirectToRoute('apm_vente_offre_index');
     }
-
-
     /********************************************AJAX REQUEST********************************************/
-
     private $desc_filter;
     private $boutique_filter;
     private $code_filter;
@@ -298,13 +293,13 @@ class OffreController extends Controller
         array("info" => "Disponible uniquement en région"),//7
         array("danger" => "Vente interdite"),//8
     );
-
     public function ImageLoaderAction(Request $request)
     {
         if ($request->isXmlHttpRequest() && $request->getMethod() === "POST") {
             $this->listAndShowSecurity();
             $session = $this->get('session');
-            $id = intval($request->request->get('oData'));
+            $id = $request->request->get('oData');
+            $id = $session->get('offre_'.$id);
             $em = $this->getDoctrine()->getManager();
             $offre = null;
             if (is_numeric($id))
@@ -353,7 +348,7 @@ class OffreController extends Controller
                     $json["item"] = array(//permet au client de différencier les nouveaux éléments des élements juste modifiés
                         "isNew" => false,
                         "isImage" => true,
-                        "id" => $offre->getId(),
+                        "id" => $id,
                     );
                     $this->get('apm_core.crop_image')->liipImageResolver($offre->getImage());//resolution et deplacement de l'images dans media/
 
@@ -375,7 +370,6 @@ class OffreController extends Controller
         }
         return new JsonResponse();
     }
-
     /**
      * Create
      * @param Request $request
@@ -450,7 +444,8 @@ class OffreController extends Controller
             }
         }
         //------------------ Form---------------
-        /*$image_form = $this->createForm(ImageType::class);*/
+        $session = $request->getSession();
+        $session->set('previous_location', $request->getUri());
         return $this->render('APMVenteBundle:offre:index_ajax.html.twig', array(
             // 'image_form'=>$image_form->createView(),
             'form' => $form->createView(),
@@ -458,7 +453,6 @@ class OffreController extends Controller
         ));
 
     }
-
     //Liste tous les Offres
     public function loadTableAction(Request $request)
     {
@@ -466,6 +460,7 @@ class OffreController extends Controller
         if ($request->isXmlHttpRequest() && $request->getMethod() === "POST") {
             $records = array();
             $records['data'] = array();
+            /** @var Session $session */
             $session = $this->get('session');
             try { //----- Security control  -----
                 $this->listAndShowSecurity();
@@ -501,19 +496,21 @@ class OffreController extends Controller
                     return $dt1 <= $dt2 ? 1 : -1;
                 });
                 $offres = array_slice($offres, $iDisplayStart, $iDisplayLength, true); //slicing, preserve the keys' order
-
+                //$arr = array();
                 //------------------------------------
                 $id = 0; // identity of rows in the table
                 /** @var Offre $offre */
                 foreach ($offres as $offre) {
                     $id += 1;
+                    $session->set('offre_'.$id, $offre->getId()); //convert id before sending them to client
+                    $session->save();
                     $etat = $offre->getEtat();
                     $boutique = $offre->getBoutique();
                     $aboutiqueRoute = "<i>free lance</i>";
                     if (null !== $boutique) $aboutiqueRoute = '<a href="../boutique/' . $boutique->getId() . '/show">' . $boutique . '</a>';
                     $updatedAt = $offre->getUpdatedAt()->format("d/m/Y - H:i");
                     $records['data'][] = array(
-                        '<label class="mt-checkbox mt-checkbox-single mt-checkbox-outline">' . $id . ' <input value="' . $offre->getId() . '" name="_id[]" type="checkbox" class="checkboxes"/><span></span></label>',
+                        '<label class="mt-checkbox mt-checkbox-single mt-checkbox-outline">' . $id . ' <input value="' . $id . '" name="_id[]" type="checkbox" class="checkboxes"/><span></span></label>',
                         '<span><a  href="' . $offre->getId() . '/show">' . $offre->getCode() . '</a></span>',
                         '<span>' . $offre . '</span>',
                         '<span>' . $aboutiqueRoute . '</span>',
@@ -553,7 +550,8 @@ class OffreController extends Controller
                 $count = count($elements);
                 for ($i = 0; $i < $count; $i++) {
                     $offre = null;
-                    $id = intval($elements[$i]);
+                    $id = $elements[$i];
+                    $id = $session->get('offre_'.$id);
                     if (is_numeric($id)) $offre = $em->getRepository('APMVenteBundle:Offre')->find($id);
                     if ($offre !== null) {
                         //---- Secutity 2 : allow only the autor to delete -------
@@ -567,7 +565,7 @@ class OffreController extends Controller
                         $this->editAndDeleteAjaxSecurity($this->getUser(), $gerant, $proprietaire, $offre->getVendeur());
                         $em->remove($offre);
                         $em->flush();
-                        $json[] = $id;
+                        $json[] = $session->get('offre_'.$id);
                         $j++;
                     }
                 }
@@ -587,7 +585,6 @@ class OffreController extends Controller
         }
         return new JsonResponse();
     }
-
     /*
      * Update an offer
      */
@@ -606,7 +603,7 @@ class OffreController extends Controller
                 $item = $request->request->get('item');
                 $item = json_decode($item);
                 $id = $item[0];
-                $id = intval($id);
+                $id = $session->get('offre_'.$id);
                 if (is_numeric($id)) $offre = $em->getRepository('APMVenteBundle:Offre')->find($id);
                 if (null === $offre) return new JsonResponse();
                 $mode_vente = array(
@@ -620,18 +617,19 @@ class OffreController extends Controller
                     'code' => $offre->getCode(),
                     'categorie' => $offre->getCategorie() ? $offre->getCategorie()->getDesignation() : '',
                     'boutique' => $offre->getBoutique() ? $offre->getBoutique()->getDesignation() : '-',
+                    'boutiqueID' => !$offre->getBoutique() ?:$offre->getBoutique()->getId(),
                     'dureeGarantie' => $offre->getDureeGarantie(),
-                    'remise' => $offre->getRemiseProduit(),
+                    'remiseProduit' => $offre->getRemiseProduit(),
                     'modeVente' => $mode_vente[$offre->getModeVente()],
                     'modelDeSerie' => $offre->getModelDeSerie(),
                     'prixUnitaire' => $offre->getPrixUnitaire(),
                     'quantite' => $offre->getQuantite(),
                     'unite' => $offre->getUnite(),
                     'rate' => $offre->getEvaluation(),
-                    'type' => $type_offre[$offre->getTypeOffre()],
+                    'typeOffre' => $type_offre[$offre->getTypeOffre()],
                     'description' => $offre->getDescription(),
                     'publiable' => $offre->getPubliable() ? "No" : "Yes",
-                    'apparence' => $offre->getApparenceNeuf() ? "Neuf" : "Occasion",
+                    'apparenceNeuf' => $offre->getApparenceNeuf() ? "Neuf" : "Occasion",
                     'etat' => current($this->status_list[$offre->getEtat()]),
                     'retourne' => $offre->getRetourne() ? "Oui" : "Non",
                     'updatedAt' => $offre->getUpdatedAt()->format("d/m/Y - H:i"),
@@ -646,10 +644,9 @@ class OffreController extends Controller
                 //autorisation d'accès
                 $this->editAndDeleteAjaxSecurity();
                 $pk = $request->request->get('pk');
-                $id = intval($pk);
+                $id = $session->get('offre_'.$pk);
                 if (is_numeric($id)) $offre = $em->getRepository('APMVenteBundle:Offre')->find($id);
                 if (null === $offre) return new JsonResponse();
-
                 //***---double vérification à l'aide du code ---
                 /*if ($data['code'] !== $offre->getCode()) {
                     $session->getFlashBag()->add('danger', "Action interdite!<br>Vous n'êtes pas autorisés à effectuer cette opération!");
@@ -725,7 +722,7 @@ class OffreController extends Controller
                             $offre->setUnite($value);
                             break;
                         default:
-                            $session->getFlashBag()->add('info', "<strong> Aucune modification</strong>");
+                            $session->getFlashBag()->add('info', "<strong> Aucune mis à jour effectuée</strong>");
                             return $this->json(json_encode(["item" => null]));
                     }
 
@@ -733,14 +730,9 @@ class OffreController extends Controller
                     //-------- prepareration de la reponse du vendeur----
                     // préparation de la notification du client
                     $em->flush();
-                    $session->getFlashBag()->add('success', "Modification ou Mise à jour de l'offre :<strong>" . $offre->getCode() . "</strong><br> Opération effectuée avec succès!");
+                    $session->getFlashBag()->add('success', "Mis à jour propriété : <strong>".$property."</strong> réf. offre :". $offre->getCode() . "<br> Opération effectuée avec succès!");
                     return $this->json(json_encode($json));
                 }
-            }
-            elseif ($request->getMethod() === "POST") { //multiple property edit
-
-                $session->getFlashBag()->add('success', "Modification ou Mise à jour de l'offre------TEST POST :<strong>" . $offre->getCode() . "</strong><br> Opération effectuée avec succès!");
-                return $this->json(json_encode(["item" => null]));
             }
         } catch (ConstraintViolationException $cve) {
             $session->getFlashBag()->add('danger', "Echec de la Modification <br>L'enregistrement a échoué dû à une contrainte de données!");
@@ -755,9 +747,7 @@ class OffreController extends Controller
 
         return new JsonResponse();
     }
-
 //------------------------ End INDEX ACTION --------------------------------------------
-
     /**
      * @param Collection $offres
      * @return array
@@ -814,7 +804,6 @@ class OffreController extends Controller
 
         return ($offres != null) ? $offres->toArray() : [];
     }
-
     /**
      * @param Categorie $categorie
      * @param Boutique $boutique
@@ -847,8 +836,6 @@ class OffreController extends Controller
         }
         //----------------------------------------------------------------------------------------
     }
-
-
     /**
      * @param Boutique $boutique
      */
@@ -870,7 +857,6 @@ class OffreController extends Controller
         }
         //----------------------------------------------------------------------------------------
     }
-
     private function editAndDeleteAjaxSecurity($user = null, $gerant = null, $proprietaire = null, $vendeur = null)
     {
         //---------------------------------security-----------------------------------------------

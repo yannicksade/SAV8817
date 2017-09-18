@@ -13,7 +13,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Security;
-use Symfony\Component\Security\Http\RememberMe\RememberMeServicesInterface;
 
 class SecurityController extends Controller
 {
@@ -27,7 +26,7 @@ class SecurityController extends Controller
         /** @var $session \Symfony\Component\HttpFoundation\Session\Session */
         $session = $request->getSession();
         $authErrorKey = Security::AUTHENTICATION_ERROR;
-        $lastUsernameKey = Security::LAST_USERNAME;
+        //$lastUsernameKey = Security::LAST_USERNAME;
 
         // get the error if any (works with forward and redirect -- see below)
         if ($request->attributes->has($authErrorKey)) {
@@ -44,14 +43,18 @@ class SecurityController extends Controller
         }
 
         // last username entered by the user
-        $lastUsername = (null === $session) ? '' : $session->get($lastUsernameKey);
+        $lastUsername =  (null !== $session) && $session->has('username')?$session->get('username'):'';
+        $image = (null !== $session) && $session->has('image')?$session->get('image'):'';
+        $email = (null !== $session) && $session->has('email')?$session->get('email'):'';
 
         $csrfToken = $this->has('security.csrf.token_manager')
             ? $this->get('security.csrf.token_manager')->getToken('authenticate')->getValue()
             : null;
 
-        return $this->renderLogin(array(
+        return $this->renderLogin($lastUsername, array(
             'last_username' => $lastUsername,
+            'image' => $image,
+            'email' => $email,
             'error' => $error,
             'csrf_token' => $csrfToken,
             'url_image' => $this->get('apm_core.packages_maker')->getPackages()->getUrl('/', 'resolve_img'),
@@ -62,14 +65,14 @@ class SecurityController extends Controller
      * Renders the login template with the given parameters. Overwrite this function in
      * an extended controller to provide additional data for the login template.
      *
+     * @param $lastUsername
      * @param array $data
-     *
      * @return Response
      */
-    protected function renderLogin(array $data)
+    protected function renderLogin($lastUsername, array $data)
     {
-
-        return $this->render('@FOSUser/Security/login.html.twig', $data);
+        $template = $lastUsername?'@FOSUser/Security/locked-screen.html.twig':'@FOSUser/Security/login.html.twig';
+        return $this->render($template, $data);
     }
 
     public function checkAction()

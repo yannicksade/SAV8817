@@ -10,7 +10,6 @@
             <th>Designation</th>
             <th>Livrable?</th>
             <th>Etat</th>
-            <th>Image</th>
             <th>Actions</th>
         </tr>
         </thead>
@@ -23,7 +22,6 @@
                 <td>{{ categorie.designation }}</td>
                 <td>{% if categorie.livrable %}Yes{% else %}No{% endif %}</td>
                 <td>{{ categorie.etat }}</td>
-                <td>{{ categorie.image }}</td>
                 <td>
 
                     <a href="{{ path('apm_vente_categorie_show', { 'id': categorie.id }) }}">show</a> |
