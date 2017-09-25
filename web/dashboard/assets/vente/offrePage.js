@@ -4,20 +4,20 @@
 var OffrePage = function () {
     var modal = GlobalPageCustomScript.modal;
     var initEditables = function () {
-
+        var id = $('[name="_id"]', modal.display).val();
         $.fn.editable.defaults.mode = 'inline';
         var nbProcessusEnCours = 0;
         var labelProcess = $('#ajax-label-process');
         //global settings
         $.fn.editable.defaults.inputclass = 'form-control';
-        $.fn.editable.defaults.url = 'handle-element?method=post';
+        $.fn.editable.defaults.url = id+'/edit';
         $.fn.editable.defaults.mode = 'inline';
-        $.fn.editable.defaults.ajaxOptions = {type: "PUT"};
-        var id = $('[name="_id"]', modal.display).val();
+        $.fn.editable.defaults.ajaxOptions = {type: "POST"};
+
         var boutiqueID = $('[data-display=boutiqueID]', modal.display).text();
         if(!isNaN(parseInt(boutiqueID))){
             $('td[data-display=categorie] span', modal.display).editable({
-                pk: id,
+                pk: '1',
                 type: 'select',
                 inputClass : 'form-control',
                 name: 'categorie',
@@ -26,7 +26,7 @@ var OffrePage = function () {
         }
         //editables element samples
         $('td[data-display=designation] span', modal.display).editable({
-            pk: id,
+            pk: '1',
             name: 'designation',
             inputClass : 'form-control',
             validate : function (value) {

@@ -167,7 +167,7 @@
                     </div>
                 </div>
                 <div class="col-lg-3 form-element thumbnail">
-                    {{ form_start(form, {"attr":{"class":"data-form", "enctype":"multipart/form-data", "method":"post"}}) }}
+                    {{ form_start(form, {"attr":{"class":"data-form", "enctype":"multipart/form-data", "action":"new", "method":"post"}}) }}
                     <div class="form-group">
                         <h3 class="inline"> Créer une offre </h3>
                         <input type="checkbox" class="group-checkboxes-form"/>
@@ -298,7 +298,7 @@
                         <span class="input-group-addon"><input type="checkbox"></span>
                         {{ form_widget(form.description, {'attr':{'readonly':'true'}, "placeholder": "décrivez le produit ici..."}) }}
                     </div>
-                    <input data-href="index-ajax" type="submit" value="Soumettre" disabled/>
+                    <input data-href="new" type="submit" value="Soumettre" disabled/>
                     <input type="reset" value="Effacer"/>
                     <input data-target="#m-ajax" data-toggle="modal" class="charger-image" type="button"
                            value="cliquez ici pour charger une image"/>

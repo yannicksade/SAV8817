@@ -1,7 +1,7 @@
 
 #---------------------------- routes -----------------------
 apm_vente_offre_index:
-    path:     /
+    path:     /ajax-table_1
     defaults: { _controller: "APMVenteBundle:Offre:index" }
     methods:  [GET,POST]
 
@@ -12,6 +12,11 @@ apm_vente_offre_boutique-categorie_index:
 
 apm_vente_offre_boutique_index:
     path:     /boutique/{id}
+    defaults: { _controller: "APMVenteBundle:Offre:index" }
+    methods:  [GET,POST]
+
+apm_vente_offre_boutique_index:
+    path:     /user/{id}
     defaults: { _controller: "APMVenteBundle:Offre:index" }
     methods:  [GET,POST]
 
@@ -40,34 +45,10 @@ apm_vente_offre_delete:
     defaults: { _controller: "APMVenteBundle:Offre:delete" }
     methods:  DELETE
 
-apm_vente_offre_deleteFromList:
-    path:     /list/{id}/delete
-    defaults: { _controller: "APMVenteBundle:Offre:deleteFromList" }
-
-#-------------------------- Ajax routes----------------------------------
-apm_vente_offre_get_ajax:
-    path:     /handle-element
-    defaults: { _controller: "APMVenteBundle:Offre:handleOffre" }
-    methods:  PUT
-
-apm_vente_AjaxOffre_index:
-    path:     /query/ajax-offre
-    defaults: { _controller: "APMVenteBundle:AjaxQueryVente:indexOffre"}
-    methods:  GET
-
-apm_vente_offre_index_ajax:
-    path:     /index-ajax
-    defaults: { _controller: "APMVenteBundle:Offre:createAjax" }
-
-apm_vente_offre_loader:
-    path:     /ajax-table_1
-    defaults: { _controller: "APMVenteBundle:Offre:loadTable" }
-    methods: [GET, POST]
-
 apm_vente_offre_delete_ajax:
     path:     /delete-ajax
-    defaults: { _controller: "APMVenteBundle:Offre:deleteAjax" }
-    methods: [GET, POST]
+    defaults: { _controller: "APMVenteBundle:Offre:delete" }
+    methods: POST
 
 apm_vente_offre_show-image_ajax:
     path:     /image

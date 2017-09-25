@@ -38,9 +38,3 @@ apm_vente_boutique_deleteFromList:
     path:     /list/{id}/delete
     defaults: { _controller: "APMVenteBundle:Boutique:deleteFromList" }
 
-apm_vente_AjaxBoutique_index:
-    path:     /query/ajax-boutique
-    defaults: { _controller: "APMVenteBundle:AjaxQueryVente:indexBoutique" }
-    methods:  GET
-
-#------------------- Shop publique ---------------------------------------------

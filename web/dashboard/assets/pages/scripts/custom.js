@@ -391,16 +391,10 @@ var GlobalPageCustomScript = function () {
         });
     };
     var getElement = function (id, parent) {
-        var item = [];
-        item[0] = id;
-        var elt = JSON.stringify(item);
-        var data = null;
         var item_sp = 0;
         return $.ajax({
-            url: 'handle-element?method=get',
-            type: "put",
-            data: 'item=' + elt,
-            dataType: "json",
+            url: id+'/show',
+            type: "get",
             error: function () {
                 if (nbProcessusEnCours < 0) $('#ct-sp').addClass('hidden'); // if spinner errs
                 $('.modal-spinner', parent).addClass('hidden');

@@ -3,12 +3,6 @@
 
 {#{% block content_body %}#}
 {% block body %}
-    {% if filter is defined %}
-        {{ form_start(filter) }}
-        {{ form_widget(filter) }}
-        <input type="submit" value="Go"/>
-        {{ form_end(filter) }}
-    {% endif %}
 
     <h1> Offres {% if boutique -%} - <a
             href="{{ path('apm_vente_boutique_show', { 'id': boutique.id }) }}">{{ boutique }}
@@ -43,7 +37,7 @@
                             <a href="{{ path('apm_vente_offre_edit', { 'id': offre.id }) }}">modifier</a> |
                         </li>
                         <li>
-                            <a href="{{ path('apm_vente_offre_deleteFromList', { 'id': offre.id }) }}">supprimer</a>
+                            <a href="{{ path('apm_vente_offre_delete', { 'id': offre.id }) }}">supprimer</a>
                             |
                         </li>
                         {#  {% endif %}#}
