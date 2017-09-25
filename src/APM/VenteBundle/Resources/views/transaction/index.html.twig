@@ -79,8 +79,7 @@
                 </td>
 
                 <td>
-                    <a href="{{ path('apm_vente_transaction_show', { 'id': transaction.id }) }}">afficher</a> |
-
+                    <a href="{{ path('apm_vente_transaction_show', { 'id': transaction.id }) }}">afficher</a>
                 </td>
             </tr>
         {% endfor %}
@@ -92,18 +91,11 @@
             <a href="{{ path('apm_vente_transaction_new') }}">Faites une transaction ordinaire</a>
         </li>
         <li>
-            <a href="{{ path('apm_vente_transaction_produit_accueil_new') }}">Faites une transaction de produit</a>
-        </li>
-        <li>
             <a href="{{ path('apm_vente_boutique_index') }}">Liste les boutiques</a>
         </li>
         {% if boutique %}
             <li>
                 <a href="{{ path('apm_vente_boutique_show', {'id':boutique.id}) }}">Retour à la boutique</a>
-            </li>
-            <li>
-                <a href="{{ path('apm_vente_transaction_produit_boutique_index', {'id':boutique.id}) }}">Liste les
-                    transactions des produits de la boutique</a>
             </li>
             <li>
                 <a href="{{ path('apm_transport_livraison_new', {'id': boutique.id}) }}">Créer une livraison
@@ -118,10 +110,6 @@
                 <a href="{{ path('apm_transport_livraison_new') }}">Créer une livraison</a>
             </li>
         {% endif %}
-        <li>
-            <a href="{{ path('apm_vente_transaction_produit_user_index') }}">Liste les transaction de produits
-                effectuées </a>
-        </li>
         <li>
             <a href="{{ path('apm_transport_livraison_index') }}">Liste toutes mes livraiosons</a>
         </li>

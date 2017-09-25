@@ -12,7 +12,7 @@
                 <tbody>
                 <tr>
                     <th>Etat du compte:</th>
-                    <td>{{ user.etatDuCompte }} </td>
+                    <td>{% if user.enabled -%} activé {%-else-%} désactivé {% endif %}</td>
                 </tr>
                 <tr>
                     <th>Code de l'utilisateur:</th>
@@ -51,7 +51,7 @@
                 </tr>
                 <tr>
                     <th>Genre:</th>
-                    <td>{{ user.genre }}</td>
+                    <td>{% if  user.genre -%} Homme {%-else-%} Femme {% endif %}</td>
                 </tr>
                 <tr>
                     <th>Téléphone:</th>
@@ -74,19 +74,20 @@
 
         </div>
     </div>
-    <div class="row">
-        {% if type %}
-            admin
-            <a href="{{ path('apm_admin_profile_edit') }}">
-                <button class="btn btn-default">Modifier</button>
-            </a>
-        {% else %}
-            user
-            <a href="{{ path('apm_user_profile_edit') }}">
-                <button class="btn btn-default">Modifier</button>
-            </a>
-        {% endif %}
-        <a href="{{ path('fos_user_change_password') }}" class="btn btn-default">Changer votre mot de passe</a>
-    </div>
-
+    {% if app.user == user %}
+        <div class="row">
+            {% if type %}
+                admin
+                <a href="{{ path('apm_admin_profile_edit') }}">
+                    <button class="btn btn-default">Modifier</button>
+                </a>
+            {% else %}
+                user
+                <a href="{{ path('apm_user_profile_edit') }}">
+                    <button class="btn btn-default">Modifier</button>
+                </a>
+            {% endif %}
+            <a href="{{ path('fos_user_change_password') }}" class="btn btn-default">Changer votre mot de passe</a>
+        </div>
+    {% endif %}
 {% endblock content_body %}

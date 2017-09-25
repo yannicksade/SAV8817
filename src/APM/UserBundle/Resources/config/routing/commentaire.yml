@@ -1,7 +1,7 @@
 apm_user_commentaire_index:
     path:     /{id}
     defaults: { _controller: "APMUserBundle:Commentaire:index" }
-    methods:  GET
+    methods:  [GET, POST]
 
 apm_user_commentaire_show:
     path:     /{id}/show

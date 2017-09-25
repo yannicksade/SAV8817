@@ -33,8 +33,7 @@ class Commentaire extends TradeFactory
 
     /**
      * @var boolean
-     * @Assert\Choice({0,1})
-     * @ORM\Column(name="publiable", type="boolean", nullable=true)
+     * @ORM\Column(name="publiable", type="boolean", nullable=false)
      */
     private $publiable;
 
@@ -88,7 +87,7 @@ class Commentaire extends TradeFactory
      */
     public function __construct($var)
     {
-        $this->date = new \DateTime();
+        $this->date = new \DateTime('now');
         $this->code = "DL" . $var;
     }
 
@@ -265,5 +264,15 @@ class Commentaire extends TradeFactory
     public function setPubliable(bool $publiable)
     {
         $this->publiable = $publiable;
+    }
+
+    /**
+     * Get publiable
+     *
+     * @return boolean
+     */
+    public function getPubliable()
+    {
+        return $this->publiable;
     }
 }

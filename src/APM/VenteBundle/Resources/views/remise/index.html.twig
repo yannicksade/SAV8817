@@ -5,12 +5,12 @@
     <h1>Remises sur les offres</h1>
     <table>
         <tbody>
-        {% for offre_remise in offre_remises %}
-            {% for ristourne in offre_remise.remises %}
+        Remise {% if boutique %}{{ boutique }}{% endif %} {% if offre %}{{ offre }}{% endif %}
+        {% for ristourne  in offre_remises %}
             <tr>
                 <td><a href="{{ path('apm_vente_remise_show', { 'id': ristourne.id }) }}">{{ ristourne.code }}</a></td>
                 <td>
-                    <a href="{{ path('apm_vente_offre_show', { 'id': offre_remise.offre.id }) }}"><strong>{{ offre_remise.offre }}</strong></a>
+                    <a href="{{ path('apm_vente_offre_show', { 'id': ristourne.offre.id }) }}"><strong>{{ ristourne.offre }}</strong></a>
                 </td>
                 <td>{% if ristourne.dateExpiration %}{{ ristourne.dateExpiration|date('Y-m-d H:i:s') }}{% endif %}</td>
                 <td>
@@ -28,7 +28,6 @@
                     </ul>
                 </td>
             </tr>
-        {% endfor %}
         {% endfor %}
         </tbody>
     </table>

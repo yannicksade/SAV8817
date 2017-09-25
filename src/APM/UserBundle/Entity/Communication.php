@@ -80,21 +80,18 @@ class Communication extends TradeFactory
 
     /**
      * @var integer
-     * @Assert\Choice({0,1,2,3,4,5,6})
      * @ORM\Column(name="etat", type="integer", nullable=true)
      */
     private $etat;
 
     /**
      * @var integer
-     * @Assert\Choice({0,1,2,3,4,5})
      * @ORM\Column(name="type", type="integer", nullable=true)
      */
     private $type;
 
     /**
      * @var boolean
-     * @Assert\choice({0,1})
      * @ORM\Column(name="valide", type="boolean", nullable=true)
      */
     private $valide;
@@ -139,7 +136,7 @@ class Communication extends TradeFactory
      */
     public function __construct($var)
     {
-        $this->date = new \DateTime();
+        $this->date = new \DateTime('now');
         $this->offres= new ArrayCollection();
         $this->documents = new ArrayCollection();
         $this->code = 'CO' . $var;

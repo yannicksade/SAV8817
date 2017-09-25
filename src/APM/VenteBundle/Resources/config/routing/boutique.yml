@@ -1,18 +1,13 @@
 #--------------------------- Objects factory ------------------------------------------
 apm_vente_boutique_index:
-    path:     /personal
+    path:     /
     defaults: { _controller: "APMVenteBundle:Boutique:index" }
-    methods:  GET
+    methods:  [GET, POST]
 
-apm_vente_boutique_search:
-    path:     / #=index liste toutes les boutiques
-    defaults: { _controller: "APMVenteBundle:Boutique:search" }
-    methods:  GET
-
-apm_vente_boutique_search_creteria_by:
-    path:     /{name}:{value} #=index liste par critère
-    defaults: { _controller: "APMVenteBundle:Boutique:search" }
-    methods:  GET
+apm_vente_boutique_index_utilisateur:
+    path:     /{id}
+    defaults: { _controller: "APMVenteBundle:Boutique:index" }
+    methods:  [GET, POST]
 
 apm_vente_boutique_show:
     path:     /{id}/show

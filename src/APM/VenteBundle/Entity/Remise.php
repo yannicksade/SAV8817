@@ -24,6 +24,20 @@ class Remise extends TradeFactory
     private $code;
 
     /**
+     * @var integer
+     *
+     * @ORM\Column(name="etat", type="integer", nullable=false)
+     */
+    private $etat;
+
+    /**
+     * @var \DateTime
+     * @Assert\DateTime
+     * @ORM\Column(name="dateCreation", type="datetime", nullable=false)
+     */
+    private $date;
+
+    /**
      * @var \DateTime|null
      * @Assert\DateTime
      * @ORM\Column(name="dateExpiration", type="datetime", nullable=true)
@@ -89,6 +103,7 @@ class Remise extends TradeFactory
     function __construct($var)
     {
         $this->code = "RS" . $var;
+        $this->date = new \DateTime('now');
     }
 
     /**
@@ -171,16 +186,6 @@ class Remise extends TradeFactory
         $this->restreint = $estRestreint;
 
         return $this;
-    }
-
-    /**
-     * Get nombreUtilisation
-     *
-     * @return integer
-     */
-    public function getNombreUtilisationn()
-    {
-        return $this->nombreUtilisation;
     }
 
     /**
@@ -316,5 +321,53 @@ class Remise extends TradeFactory
     public function __toString()
     {
         return $this->code;
+    }
+
+    /**
+     * Set etat
+     *
+     * @param integer $etat
+     *
+     * @return Remise
+     */
+    public function setEtat($etat)
+    {
+        $this->etat = $etat;
+
+        return $this;
+    }
+
+    /**
+     * Get etat
+     *
+     * @return integer
+     */
+    public function getEtat()
+    {
+        return $this->etat;
+    }
+
+    /**
+     * Set date
+     *
+     * @param \DateTime $date
+     *
+     * @return Remise
+     */
+    public function setDate($date)
+    {
+        $this->date = $date;
+
+        return $this;
+    }
+
+    /**
+     * Get date
+     *
+     * @return \DateTime
+     */
+    public function getDate()
+    {
+        return $this->date;
     }
 }

@@ -32,9 +32,9 @@
 
     <ul>
         <li>
-            <a href="{{ path('apm_vente_transaction_produit_liste_index',{'id': transaction_produit.transaction.id}) }}">afficher
-                les offres de cette transaction</a>
+            <a href="{{ path('apm_vente_transaction_produit_liste_index',{'id': transaction_produit.transaction.id}) }}"> retouner aux transactions</a>
         </li>
+
         {% if transaction_produit.transaction.auteur == app.user %}
             {% if transaction_produit.transaction.boutique %}
                 <li>
@@ -55,14 +55,11 @@
                 <a href="{{ path('apm_vente_transaction_produit_edit', { 'id': transaction_produit.id }) }}">modifier</a>
             </li>
             <li>
-                <a href="{{ path('apm_vente_transaction_produit_new',{'id': transaction_produit.produit.id}) }}">Créer
-                    une nouvelle transaction du produit</a>
+                <a href="{{ path('apm_vente_transaction_produit_new',{'id': transaction_produit.transaction.id}) }}">Préparer une
+                    nouvelle transaction </a>
             </li>
         {% endif %}
-        <li>
-            <a href="{{ path('apm_vente_transaction_produit_user_index') }}">Retour à la liste de mes transactions
-                produits</a>
-        </li>
+
         <li>
             {{ form_start(delete_form) }}
             <input type="submit" value="Delete">

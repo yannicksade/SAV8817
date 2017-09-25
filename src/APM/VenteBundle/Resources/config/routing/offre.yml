@@ -57,15 +57,17 @@ apm_vente_AjaxOffre_index:
 
 apm_vente_offre_index_ajax:
     path:     /index-ajax
-    defaults: { _controller: "APMVenteBundle:Offre:indexAjax" }
+    defaults: { _controller: "APMVenteBundle:Offre:createAjax" }
 
 apm_vente_offre_loader:
     path:     /ajax-table_1
     defaults: { _controller: "APMVenteBundle:Offre:loadTable" }
+    methods: [GET, POST]
 
 apm_vente_offre_delete_ajax:
     path:     /delete-ajax
     defaults: { _controller: "APMVenteBundle:Offre:deleteAjax" }
+    methods: [GET, POST]
 
 apm_vente_offre_show-image_ajax:
     path:     /image

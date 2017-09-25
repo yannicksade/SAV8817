@@ -1,7 +1,7 @@
 apm_user_communication_index:
     path:     /
     defaults: { _controller: "APMUserBundle:Communication:index" }
-    methods:  GET
+    methods:  [GET, POST]
 
 apm_user_communication_show:
     path:     /{id}/show

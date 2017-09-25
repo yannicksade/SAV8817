@@ -1,31 +1,6 @@
-apm_user_individu-to-groupe_index:
-    path:     /
-    defaults: { _controller: "APMUserBundle:Individu_to_groupe:index" }
-    methods:  GET
-
 apm_user_groupe_individu_index:
     path:     /group/{id}
     defaults: { _controller: "APMUserBundle:Individu_to_groupe:index" }
-    methods:  GET
-
-apm_user_individu_to_groupe_liste-user_index:
-    path:     /liste/utilisateurs-groupe/{id}
-    defaults: { _controller: "APMUserBundle:Individu_to_groupe:listUsers" }
-    methods:  GET
-
-apm_user_individu_to_conversational-group_index:
-    path:     /conversational-group
-    defaults: { _controller: "APMUserBundle:Individu_to_groupe:indexConversationalGroup" }
-    methods:  GET
-
-apm_user_individu-to-groupe_show:
-    path:     /{id}/show
-    defaults: { _controller: "APMUserBundle:Individu_to_groupe:show" }
-    methods:  GET
-
-apm_user_individu-to-groupe_new:
-    path:     /new
-    defaults: { _controller: "APMUserBundle:Individu_to_groupe:new" }
     methods:  [GET, POST]
 
 apm_user_groupe_individu_new:

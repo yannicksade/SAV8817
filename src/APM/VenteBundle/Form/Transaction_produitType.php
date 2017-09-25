@@ -23,7 +23,6 @@ class Transaction_produitType extends AbstractType
                 'class' => 'APMVenteBundle:Offre',
                 'required' => true
             ])
-            ->add('transaction', TransactionType::class)
         ;
     }
 

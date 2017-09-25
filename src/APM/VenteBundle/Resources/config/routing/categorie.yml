@@ -2,7 +2,7 @@
 apm_vente_categorie_index:
     path:     /{id}
     defaults: { _controller: "APMVenteBundle:Categorie:index" }
-    methods:  GET
+    methods:  [GET, POST]
 
 apm_vente_categorie_show:
     path:     /{id}/show
@@ -10,7 +10,12 @@ apm_vente_categorie_show:
     methods:  GET
 
 apm_vente_categorie_new:
-    path:     /new/{id}
+    path:     /new
+    defaults: { _controller: "APMVenteBundle:Categorie:new" }
+    methods:  [GET, POST]
+
+apm_vente_categorie_boutique_new:
+    path:     /new/boutique/{id}
     defaults: { _controller: "APMVenteBundle:Categorie:new" }
     methods:  [GET, POST]
 

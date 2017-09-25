@@ -1,12 +1,12 @@
 apm_vente_transaction_index:
     path:     /
     defaults: { _controller: "APMVenteBundle:Transaction:index" }
-    methods:  GET
+    methods:  [GET, POST]
 
 apm_vente_transaction_boutique_index:
     path:     /boutique/{id}
     defaults: { _controller: "APMVenteBundle:Transaction:index" }
-    methods:  GET
+    methods:  [GET, POST]
 
 apm_vente_transaction_show:
     path:     /{id}/show
@@ -36,5 +36,6 @@ apm_vente_transaction_delete:
 apm_vente_transaction_deleteFromList:
     path:     /list/{id}/delete
     defaults: { _controller: "APMVenteBundle:Transaction:deleteFromList" }
+
 
 

@@ -4,6 +4,7 @@ namespace APM\UserBundle\Form;
 
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
@@ -21,6 +22,13 @@ class CommentaireType extends AbstractType
         $builder
             ->add('contenu', TextareaType::class, ['required' => false])
             ->add('evaluation', NumberType::class, ['required' => false])
+            ->add('publiable', ChoiceType::class, [
+                'choices' => array(
+                    'Yes' => 1,
+                    'No' => 0,
+                ),
+                'required' => false
+            ])
         ;
     }
 

@@ -1,6 +1,6 @@
-{% extends ":base/dashboard:layout.html.twig" %}
+{% extends "APMAdminBundle:_Main:layout.html.twig" %}
 
-{% block content_body %}
+{% block body %}
 
     <h1>Groupe_relationnel</h1>
 
@@ -39,20 +39,16 @@
 
     <ul>
         <li>
-            <a href="{{ path('apm_user_groupe-relationnel_index') }}">Retour à la liste des groupes</a>
+            <a href="{{ path('apm_user_groupe_individu_index', { 'id': groupe_relationnel.id }) }}">Liste les membres du groupe</a>
         </li>
         <li>
-            <a href="{{ path('apm_user_individu-to-groupe_index') }}">Retour à la liste des groupes relationnels</a>
+            <a href="{{ path('apm_user_groupe-relationnel_index') }}">Retour à la liste des groupes</a>
         </li>
         <li>
             <a href="{{ path('apm_user_groupe-relationnel_edit', { 'id': groupe_relationnel.id }) }}">Modifier</a>
         </li>
         <li>
             <a href="{{ path('apm_user_groupe-relationnel_new') }}">Créer un nouveau groupe</a>
-        </li>
-        <li>
-            <a href="{{ path('apm_user_individu_to_groupe_liste-user_index', {'id':groupe_relationnel.id}) }}">Liste les
-                utilisateurs du groupe</a>
         </li>
         <li>
             <a href="{{ path('apm_user_groupe_individu_new', {'id':groupe_relationnel.id}) }}">Affecter une personne au
@@ -64,4 +60,4 @@
             {{ form_end(delete_form) }}
         </li>
     </ul>
-{% endblock content_body %}
+{% endblock %}

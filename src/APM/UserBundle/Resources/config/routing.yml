@@ -22,3 +22,7 @@ apm_user_groupe-relationnel:
 apm_user_individu-to-groupe:
     resource: "@APMUserBundle/Resources/config/routing/individu_to_groupe.yml"
     prefix:   /user/individu-to-groupe
+
+apm_user_profile:
+    resource: "@APMUserBundle/Resources/config/routing/utilisateur.yml"
+    prefix:   /user/system

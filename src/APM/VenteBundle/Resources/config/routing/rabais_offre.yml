@@ -1,12 +1,12 @@
 apm_vente_rabais_offre_index:
     path:     /{id}
     defaults: { _controller: "APMVenteBundle:Rabais_offre:index" }
-    methods:  GET
+    methods:  [GET, POST]
 
 apm_vente_rabais_user_index:
     path:     /utilisateur
     defaults: { _controller: "APMVenteBundle:Rabais_offre:index" }
-    methods:  GET
+    methods:  [GET, POST]
 
 apm_vente_rabais_offre_show:
     path:     /{id}/show

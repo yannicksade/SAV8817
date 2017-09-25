@@ -2,15 +2,16 @@
 
 namespace APM\VenteBundle\Controller;
 
-use APM\UserBundle\Entity\Utilisateur_avm;
-use APM\VenteBundle\Entity\Boutique;
 use APM\VenteBundle\Entity\Offre;
 use APM\VenteBundle\Entity\Transaction;
 use APM\VenteBundle\Entity\Transaction_produit;
 use APM\VenteBundle\Factory\TradeFactory;
+use Doctrine\Common\Collections\Collection;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
+use Symfony\Component\HttpFoundation\Session\Session;
 
 /**
  * Transaction_produit controller.
@@ -18,67 +19,148 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
  */
 class Transaction_produitController extends Controller
 {
+    private $reference_filter;
+    private $quantiteTo_filter;
+    private $quantiteFrom_filter;
+    private $designation_filter;
+    private $codeTransaction_filter;
+    private $designationProduit_filter;
+    private $dateInsertionTo_filter;
+    private $dateInsertionFrom_filter;
 
     /**
-     *Liste les transactions produits d'une offre
+     * Liste les transactions produits d'une offre, d'une boutique ou d'un individu
      * @ParamConverter("offre", options={"mapping": {"offre_id":"id"}})
-     * @param Boutique $boutique
-     * @param Offre $offre
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @param Request $request
+     * @param Transaction $transaction
+     * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function indexAction(Boutique $boutique = null, Offre $offre = null)
+    public function indexAction(Request $request, Transaction $transaction)
     {
-        $this->listAndShowSecurity(null, $boutique, $offre);
-        if ($offre) {
-            $transactionsRecues = null;
-            $transactionsEffectues [] = array(
-                'transaction' => null,
-                'transaction_produits' => $offre->getProduitTransactions()
-            );
-            $boutique = $offre->getBoutique();
-        } else {
-            if ($boutique) {
-                $transactionEffectues = $boutique->getTransactions();
-                $transactionRecues = $boutique->getTransactionsRecues();
-            } else {
-                /** @var Utilisateur_avm $user */
-                $user = $this->getUser();
-                $transactionEffectues = $user->getTransactionsEffectues();
-                $transactionRecues = $user->getTransactionsRecues();
+        $this->listAndShowSecurity($transaction, null);
+        $transaction_produits = $transaction->getTransactionProduits();
+        if ($request->isXmlHttpRequest()) {
+            $this->reference_filter = $request->request->has('reference_filter') ? $request->request->get('reference_filter') : "";
+            $this->designation_filter = $request->request->has('designation_filter') ? $request->request->get('designation_filter') : "";
+            $this->quantiteFrom_filter = $request->request->has('quantiteFrom_filter') ? $request->request->get('quantiteFrom_filter') : "";
+            $this->quantiteTo_filter = $request->request->has('quantiteTo_filter') ? $request->request->get('quantiteTo_filter') : "";
+            $this->codeTransaction_filter = $request->request->has('codeTransaction_filter') ? $request->request->get('codeTransaction_filter') : "";
+            $this->dateInsertionFrom_filter = $request->request->has('dateInsertionFrom_filter') ? $request->request->get('dateInsertionFrom_filter') : "";
+            $this->dateInsertionTo_filter = $request->request->has('dateInsertionTo_filter') ? $request->request->get('dateInsertionTo_filter') : "";
+            $iDisplayLength = $request->request->has('length') ? $request->request->get('length') : -1;
+            $iDisplayStart = $request->request->has('start') ? intval($request->request->get('start')) : 0;
+            $json = array();
+            $json['items'] = array();
+            $iTotalRecords = count($transaction_produits);
+            if ($iDisplayLength < 0) $iDisplayLength = $iTotalRecords;
+            $transaction_produits = $this->handleResults($transaction_produits, $iTotalRecords, $iDisplayStart, $iDisplayLength);
+            /** @var Transaction_produit $transaction_produit */
+            foreach ($transaction_produits as $transaction_produit) {
+                array_push($json['items'], array(
+                    'value' => $transaction_produit->getId(),
+                    'text' => $transaction_produit->getProduit()->getDesignation(),
+                ));
             }
-            $transactionsEffectues = null;
-            $transactionsRecues = null;
-            /** @var Transaction $transactions */
-            foreach ($transactionEffectues as $transactions) {
-                $transactionsEffectues [] = array(
-                    'transaction' => $transactions,
-                    'transaction_produits' => $transactions->getTransactionProduits()
-                );
-            }
-            /** @var Transaction $transactions */
-            foreach ($transactionRecues as $transactions) {
-                $transactionsRecues [] = array(
-                    'transaction' => $transactions,
-                    'transaction_produits' => $transactions->getTransactionProduits()
-                );
-            }
+            return $this->json(json_encode($json), 200);
         }
+
         return $this->render('APMVenteBundle:transaction_produit:index.html.twig', array(
-            'transactionsEffectues' => $transactionsEffectues,
-            'transactionsRecues' => $transactionsRecues,
-            'boutique' => $boutique,
-            'offre' => $offre,
+            'transactions' => $transaction_produits,
+            'transaction' => $transaction
         ));
     }
+
+    /**
+     * @param Collection $transactions
+     * @param $iTotalRecords
+     * @param $iDisplayStart
+     * @param $iDisplayLength
+     * @return array
+     */
+    private function handleResults($transactions, $iTotalRecords, $iDisplayStart, $iDisplayLength)
+    {
+        //filtering
+        if ($transactions === null) return array();
+
+        if ($this->codeTransaction_filter != null) {
+            $transactions = $transactions->filter(function ($e) {//filtrage select
+                /** @var Transaction_produit $e */
+                return $e->getTransaction()->getCode() === $this->codeTransaction_filter;
+            });
+        }
+
+        if ($this->reference_filter != null) {
+            $transactions = $transactions->filter(function ($e) {//filtrage select
+                /** @var Transaction_produit $e */
+                return $e->getReference() === $this->reference_filter;
+            });
+        }
+        if ($this->quantiteFrom_filter != null) {
+            $transactions = $transactions->filter(function ($e) {//start date
+                /** @var Transaction_produit $e */
+                return $e->getQuantite() >= $this->quantiteFrom_filter;
+            });
+        }
+        if ($this->quantiteTo_filter != null) {
+            $transactions = $transactions->filter(function ($e) {//start date
+                /** @var Transaction_produit $e */
+                return $e->getQuantite() <= $this->quantiteTo_filter;
+            });
+        }
+
+        if ($this->dateInsertionFrom_filter != null) {
+            $transactions = $transactions->filter(function ($e) {//start date
+                /** @var Transaction_produit $e */
+                $dt1 = (new \DateTime($e->getDateInsertion()->format('d-m-Y')))->getTimestamp();
+                $dt2 = (new \DateTime($this->dateInsertionFrom_filter))->getTimestamp();
+                return $dt1 - $dt2 >= 0 ? true : false; //start from the given date 'dateFrom_filter'
+            });
+        }
+        if ($this->dateInsertionTo_filter != null) {
+            $transactions = $transactions->filter(function ($e) {//end date
+                /** @var Transaction_produit $e */
+                $dt = (new \DateTime($e->getDateInsertion()->format('d-m-Y')))->getTimestamp();
+                $dt2 = (new \DateTime($this->dateInsertionTo_filter))->getTimestamp();
+                return $dt - $dt2 <= 0 ? true : false;// end from at the given date 'dateTo_filter'
+            });
+        }
+        if ($this->designationProduit_filter != null) {
+            $transactions = $transactions->filter(function ($e) {//search for occurences in the text
+                /** @var Transaction_produit $e */
+                $subject = $e->getProduit()->getDesignation();
+                $pattern = $this->designationProduit_filter;
+                return preg_match('/' . $pattern . '/i', $subject) === 1 ? true : false;
+            });
+        }
+
+        $transactions = ($transactions !== null) ? $transactions->toArray() : [];
+        //assortment: descending of date -- du plus recent au plus ancient
+        usort(
+            $transactions, function ($e1, $e2) {
+            /**
+             * @var Transaction_produit $e1
+             * @var Transaction_produit $e2
+             */
+            $dt1 = $e1->getDateInsertion()->getTimestamp();
+            $dt2 = $e2->getDateInsertion()->getTimestamp();
+            return $dt1 <= $dt2 ? 1 : -1;
+        });
+        if ($iDisplayLength < 0) $iDisplayLength = $iTotalRecords;
+        //paging; slice and preserve keys' order
+        $transactions = array_slice($transactions, $iDisplayStart, $iDisplayLength, true);
+
+        return $transactions;
+    }
+
 
     //liste les offres d'une transaction de produit
 
     /**
-     * @param Transaction_produit $transaction_produit
-     * @param Boutique $boutique
+     * @param Transaction $transaction
      * @param Offre $offre
+     * @internal param Transaction_produit $transaction_produit
      */
-    private function listAndShowSecurity($transaction_produit, $boutique, $offre)
+    private function listAndShowSecurity($transaction, $offre)
     {
         //-----------------------------------security-------------------------------------------
         $this->denyAccessUnlessGranted('ROLE_USERAVM', null, 'Unable to access this page!');
@@ -87,105 +169,80 @@ class Transaction_produitController extends Controller
         }
 
         $user = $this->getUser();
-        $beneficiaire = null;
         $vendeur = null;
         $gerant = null;
         $proprietaire = null;
-        if ($offre) {
+        if (null !== $offre) {
             $vendeur = $offre->getVendeur();
             $boutique = $offre->getBoutique();
-            $gerant = null;
-            if ($boutique) {
+            if (null !== $boutique) {
                 $gerant = $boutique->getGerant();
                 $proprietaire = $boutique->getProprietaire();
                 $vendeur = null;
             }
-            if ($transaction_produit) {
-                $beneficiaire = $transaction_produit->getTransaction()->getBeneficiaire();
-            }
-        } else {
-            if ($boutique) {
-                $gerant = $boutique->getGerant();
-                $proprietaire = $boutique->getProprietaire();
-                $vendeur = null;
-            } else $vendeur = $user;
         }
-        if ($user !== $beneficiaire && $user !== $gerant && $user !== $proprietaire && $user !== $vendeur) {
+        $auteur = $transaction->getAuteur();
+        if ($user !== $auteur && $user !== $gerant && $user !== $proprietaire && $user !== $vendeur && $user !== $transaction->getBeneficiaire()) {
             throw $this->createAccessDeniedException();
         }
         //----------------------------------------------------------------------------------------
     }
 
-    //créer une transaction produit liée à la création d'une transaction
-
-    public function listeOffresAction(Transaction $transaction)
-    {
-
-
-        $offres = array();
-        $categorie = null;
-        $vendeur = null;
-        $boutique = null;
-        $count = 0;
-        $transaction_produits = $transaction->getTransactionProduits();
-        if(null !== $transaction_produits) {
-            /** @var Transaction_produit $transaction_produit */
-            foreach ($transaction_produits as $transaction_produit) {
-                $count = array_push($offres, $transaction_produit->getProduit());
-            }
-
-            if (0 !== $count) {
-                $anOffer = $offres[0];
-                if ($anOffer) {
-                    $vendeur = $anOffer->getVendeur();
-                    $boutique = $anOffer->getBoutique();
-                    }
-            }
-
-        }
-        return $this->render('APMVenteBundle:offre:index.html.twig', array(
-            'offres' => $offres,
-            'boutique' => $boutique,
-           'categorie' => $categorie,
-             'vendeur' => $vendeur,
-           'transaction' => $transaction,
-        ));
-    }
-
     /**
+     * @ParamConverter("offre", options={"mapping": {"offre_id":"id"}})
      * @param Request $request
-     * @param Offre $offre
+     * @param Transaction $transaction
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function newAction(Request $request, Offre $offre = null)
+    public function newAction(Request $request, Transaction $transaction)
     {
-        $this->createSecurity($offre);
+        $this->createSecurity();
+        /** @var Session $session */
+        $session = $request->getSession();
         /** @var Transaction_produit $transaction_produit */
         $transaction_produit = TradeFactory::getTradeProvider('transaction_produit');
-        /** @var Transaction $transaction */
-        $transaction = TradeFactory::getTradeProvider('transaction');
-        $transaction_produit->setTransaction($transaction);
-        if ($offre) $transaction_produit->setProduit($offre);
         $form = $this->createForm('APM\VenteBundle\Form\Transaction_produitType', $transaction_produit);
-        if ($offre) $form->remove('produit');
         $form->handleRequest($request);
-
         if ($form->isSubmitted() && $form->isValid()) {
-            if (!$offre) {
-                $offre = $form->get('produit')->getData();
+            try {
+                $this->createSecurity($transaction_produit->getProduit());
+                $transaction_produit->setTransaction($transaction);
+                $em = $this->getDoctrine()->getManager();
+                if ($request->isXmlHttpRequest()) {
+                    $json['item'] = array();
+                    $data = $request->request->get('transaction_produit');
+                    if (isset($data['quantite'])) $transaction_produit->setQuantite($data['quantite']);
+                    if (isset($data['reference'])) $transaction_produit->setReference($data['reference']);
+                    if (isset($data['produit']) && is_numeric($id = $data['produit'])) {
+                        /** @var Offre $produit */
+                        $produit = $em->getRepository('APMVenteBundle:Offre')->find($id);
+                        $transaction_produit->setProduit($produit);
+                    }
+                    $em->persist($transaction_produit);
+                    $em->flush();
+                    $json["item"] = array(//prevenir le client
+                        "action" => 0,
+                    );
+                    $session->getFlashBag()->add('success', "<strong> préparation de la transaction réf:" . $transaction_produit->getReference() . "</strong><br> Opération effectuée avec succès!");
+                    return $this->json(json_encode($json), 200);
+                }
+                $em->persist($transaction_produit);
+                $em->flush();
+                return $this->redirectToRoute('apm_vente_transaction_produit_show', array('id' => $transaction_produit->getId()));
+            } catch (ConstraintViolationException $cve) {
+                $session->getFlashBag()->add('danger', "<strong>Echec de l'enregistrement. </strong><br>L'enregistrement a échoué dû à une contrainte de données!");
+                return $this->json(json_encode(["item" => null]));
+            } catch (RuntimeException $rte) {
+                $session->getFlashBag()->add('danger', "<strong>Echec de l'opération.</strong><br>L'enregistrement a échoué. bien vouloir réessayer plutard, svp!");
+                return $this->json(json_encode(["item" => null]));
+            } catch (AccessDeniedException $ads) {
+                $session->getFlashBag()->add('danger', "<strong>Action interdite.</strong><br>Vous n'êtes pas autorisez à effectuer cette opération!");
+                return $this->json(json_encode(["item" => null]));
             }
-            $this->createSecurity($offre);
-            $transaction->setBoutique($offre->getBoutique());
-            $transaction->setAuteur($this->getUser());
-            $em = $this->getDoctrine()->getManager();
-            $em->persist($transaction_produit);
-            $em->flush();
-
-            return $this->redirectToRoute('apm_vente_transaction_produit_show', array('id' => $transaction_produit->getId()));
         }
-
+        $session->set('previous_location', $request->getUri());
         return $this->render('APMVenteBundle:transaction_produit:new.html.twig', array(
-            'transaction_produit' => $transaction_produit,
+            'transaction' => $transaction,
             'form' => $form->createView(),
         ));
     }
@@ -193,7 +250,7 @@ class Transaction_produitController extends Controller
     /**
      * @param Offre $offre
      */
-    private function createSecurity($offre)
+    private function createSecurity($offre = null)
     {
         //---------------------------------security-----------------------------------------------
         // Unable to access the controller unless you have a USERAVM role
@@ -228,9 +285,19 @@ class Transaction_produitController extends Controller
      */
     public function showAction(Transaction_produit $transaction_produit)
     {
-        $this->listAndShowSecurity($transaction_produit, null, $transaction_produit->getProduit());
+        $this->listAndShowSecurity($transaction_produit->getTransaction(), $transaction_produit->getProduit());
+        if ($request->isXmlHttpRequest()) {
+            $json = array();
+            $json['item'] = array(
+                'id' => $transaction_produit->getId(),
+                'code' => $transaction_produit->getTransaction()->getCode(),
+                'reference' => $transaction_produit->getReference(),
+                'quantite' => $transaction_produit->getQuantite(),
+                'produit' => $transaction_produit->getProduit()->getDesignation(),
+            );
+            return $this->json(json_encode($json), 200);
+        }
         $deleteForm = $this->createDeleteForm($transaction_produit);
-
         return $this->render('APMVenteBundle:transaction_produit:show.html.twig', array(
             'transaction_produit' => $transaction_produit,
             'delete_form' => $deleteForm->createView(),
@@ -260,14 +327,35 @@ class Transaction_produitController extends Controller
      */
     public function editAction(Request $request, Transaction_produit $transaction_produit)
     {
-        $this->editAndDeleteSecurity();
+        $this->editAndDeleteSecurity($transaction_produit);
+        if ($request->isXmlHttpRequest() && $request->getMethod() === "POST") {
+            $json = array();
+            $json['item'] = array();
+            /** @var Session $session */
+            $session = $request->getSession();
+            $em = $this->getDoctrine()->getManager();
+            $property = $request->request->get('name');
+            $value = $request->request->get('value');
+            switch ($property) {
+                case 'reference':
+                    $transaction_produit->setReference($value);
+                    break;
+                case 'quantite':
+                    $transaction_produit->setQuantite($value);
+                    break;
+                default:
+                    $session->getFlashBag()->add('info', "<strong> Aucune mis à jour effectuée</strong>");
+                    return $this->json(json_encode(["item" => null]), 205);
+            }
+            $em->flush();
+            $session->getFlashBag()->add('success', "Mis à jour propriété : <strong>" . $property . "</strong> réf. transaction :" . $transaction_produit->getReference() . "<br> Opération effectuée avec succès!");
+            return $this->json(json_encode($json), 200);
+        }
 
         $deleteForm = $this->createDeleteForm($transaction_produit);
         $editForm = $this->createForm('APM\VenteBundle\Form\Transaction_produitType', $transaction_produit);
         $editForm->handleRequest($request);
-
         if ($editForm->isSubmitted() && $editForm->isValid()) {
-            $this->editAndDeleteSecurity();
             $em = $this->getDoctrine()->getManager();
             $em->persist($transaction_produit);
             $em->flush();
@@ -284,12 +372,13 @@ class Transaction_produitController extends Controller
 
     /**
      * Une Transaction produit portant sur une offre ne peut être modifiée ni supprimée par l'utilisateur. Contrairement à une transaction
+     * @param Transaction_produit $transaction_produit
      */
-    private function editAndDeleteSecurity()
+    private function editAndDeleteSecurity($transaction_produit)
     {
         //---------------------------------security-----------------------------------------------
-        $this->denyAccessUnlessGranted('ROLE_SUPER_ADMIN', null, 'Unable to access this page!');
-        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY')) {
+        $this->denyAccessUnlessGranted('ROLE_USERAVM', null, 'Unable to access this page!');
+        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY') || $this->getUser() !== $transaction_produit->getTransaction()->getAuteur()) {
             throw $this->createAccessDeniedException();
         }
         //----------------------------------------------------------------------------------------
@@ -303,27 +392,30 @@ class Transaction_produitController extends Controller
      */
     public function deleteAction(Request $request, Transaction_produit $transaction_produit)
     {
-        $this->editAndDeleteSecurity();
+        $this->editAndDeleteSecurity($transaction_produit);
         $form = $this->createDeleteForm($transaction_produit);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $this->editAndDeleteSecurity();
             $em = $this->getDoctrine()->getManager();
             $em->remove($transaction_produit);
             $em->flush();
         }
 
-        return $this->redirectToRoute('apm_vente_transaction_produit_index');
+        return $this->redirectToRoute('apm_vente_transaction_produit_index', ['id' => $transaction_produit->getTransaction()->getId()]);
     }
 
     public function deleteFromListAction(Transaction_produit $transaction_produit)
     {
-        $this->editAndDeleteSecurity();
+        $this->editAndDeleteSecurity($transaction_produit);
         $em = $this->getDoctrine()->getManager();
         $em->remove($transaction_produit);
         $em->flush();
+        if ($request->isXmlHttpRequest()) {
+            $json = array();
+            return $this->json($json, 200);
+        }
 
-        return $this->redirectToRoute('apm_vente_transaction_produit_index');
+        return $this->redirectToRoute('apm_vente_transaction_produit_index', ['id' => $transaction_produit->getTransaction()->getId()]);
     }
 }

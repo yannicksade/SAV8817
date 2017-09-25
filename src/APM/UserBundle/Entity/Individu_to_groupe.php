@@ -16,6 +16,12 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
  */
 class Individu_to_groupe extends TradeFactory
 {
+    /**
+     * @var \DateTime
+     * @Assert\DateTime
+     * @ORM\Column(name="dateCreation", type="datetime", nullable=false)
+     */
+    private $dateInsertion;
 
     /**
      * @var integer
@@ -59,6 +65,11 @@ class Individu_to_groupe extends TradeFactory
      * })
      */
     private $individu;
+
+    function __construct()
+    {
+        $this->dateInsertion = new  \DateTime('now');
+    }
 
     /**
      * Get propriete
@@ -168,4 +179,28 @@ class Individu_to_groupe extends TradeFactory
         return $this;
     }
 
+
+    /**
+     * Set dateInsertion
+     *
+     * @param \DateTime $dateInsertion
+     *
+     * @return Individu_to_groupe
+     */
+    public function setDateInsertion($dateInsertion)
+    {
+        $this->dateInsertion = $dateInsertion;
+
+        return $this;
+    }
+
+    /**
+     * Get dateInsertion
+     *
+     * @return \DateTime
+     */
+    public function getDateInsertion()
+    {
+        return $this->dateInsertion;
+    }
 }

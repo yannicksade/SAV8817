@@ -2,25 +2,19 @@
 
 {% block body %}
 
-    <h1 xmlns="http://www.w3.org/1999/html"> Liste de Groupes d'Individus</h1>
+    <h1 xmlns="http://www.w3.org/1999/html"> Liste des individus du groupe: <a href="{{ path('apm_user_groupe-relationnel_show', {'id':groupe.id}) }}">{{ groupe }}</a></h1>
 
-    {% for relations in individu_to_groupes %}
-        <a href="{{ path('apm_user_groupe-relationnel_show', {'id':relations.groupe.id}) }}">{{ relations.groupe }}</a>
-        {% for membre in relations.personnes %}
-            <p>
-                {{ membre.individu }}
-                <a href="{{ path('apm_user_individu-to-groupe_edit', {'id':membre.id}) }}"> |modifier </a>
-                <a href="{{ path('apm_user_individu-to-groupe_deleteFromList', {'id':membre.id}) }}"> retirer du
-                    groupe|</a>
-            </p>
-        {% endfor %}
+    {% for individu_groupe in individu_to_groupes %}
+        <p>
+            <a href="{{ path('apm_user_profile_show', {'id':individu_groupe.individu.id}) }}">{{ individu_groupe.individu }}</a>
+            <a href="{{ path('apm_user_individu-to-groupe_edit', {'id':individu_groupe.id}) }}"> |modifier </a>
+            <a href="{{ path('apm_user_groupe_individu_new', {'id':individu_groupe.groupeRelationnel.id}) }}"> |inserer une personne </a>
+            <a href="{{ path('apm_user_individu-to-groupe_deleteFromList', {'id':individu_groupe.id}) }}">|retirer du
+                groupe|</a>
+        </p>
     {% endfor %}
 
-
     <ul>
-        <li>
-            <a href="{{ path('apm_user_individu-to-groupe_new') }}">Insérer une nouvelle personne</a>
-        </li>
         <li>
             <a href="{{ path('apm_user_groupe-relationnel_index') }}">Retour à la liste des groupes</a>
         </li>

@@ -24,6 +24,12 @@ class Transaction_produit extends TradeFactory
      */
     private $quantite;
 
+    /**
+     * @var \DateTime
+     * @Assert\DateTime
+     * @ORM\Column(name="date", type="datetime", nullable=false)
+     */
+    private $dateInsertion;
 
     /**
      * @var string
@@ -51,7 +57,7 @@ class Transaction_produit extends TradeFactory
 
     /**
      * @var Transaction
-     * @ORM\ManyToOne(targetEntity="APM\VenteBundle\Entity\Transaction" , inversedBy="transactionProduits", cascade={"persist","remove"})
+     * @ORM\ManyToOne(targetEntity="APM\VenteBundle\Entity\Transaction" , inversedBy="transactionProduits")
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="transaction_id", referencedColumnName="id", nullable=false)
      * })
@@ -64,6 +70,7 @@ class Transaction_produit extends TradeFactory
      */
     function __construct()
     {
+        $this->dateInsertion = new \DateTime('now');
     }
 
     /**
@@ -171,5 +178,29 @@ class Transaction_produit extends TradeFactory
         $this->reference = $reference;
 
         return $this;
+    }
+
+    /**
+     * Set dateInsertion
+     *
+     * @param \DateTime $dateInsertion
+     *
+     * @return Transaction_produit
+     */
+    public function setDateInsertion($dateInsertion)
+    {
+        $this->dateInsertion = $dateInsertion;
+
+        return $this;
+    }
+
+    /**
+     * Get dateInsertion
+     *
+     * @return \DateTime
+     */
+    public function getDateInsertion()
+    {
+        return $this->dateInsertion;
     }
 }

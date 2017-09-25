@@ -41,7 +41,7 @@ class Groupe_relationnel extends TradeFactory
      * @var string
      * @Assert\NotBlank
      * @Assert\Length(min=2, max=155)
-     * @ORM\Column(name="designation", type="string", length=255, nullable=true)
+     * @ORM\Column(name="designation", type="string", length=255, nullable=false)
      */
     private $designation;
 
@@ -113,6 +113,13 @@ class Groupe_relationnel extends TradeFactory
      * @var \DateTime
      */
     private $updatedAt;
+
+    /**
+     * @ORM\Column(name="dateCreation", type="datetime", nullable= true)
+     * @var \DateTime
+     */
+    private $dateCreation;
+
     /**
      * @var Collection
      * @ORM\OneToMany(targetEntity ="APM\VenteBundle\Entity\Rabais_offre", mappedBy="groupe")
@@ -128,6 +135,7 @@ class Groupe_relationnel extends TradeFactory
         $this->groupeIndividus = new ArrayCollection();
         $this->code = "GR" . $var;
         $this->rabais = new ArrayCollection();
+        $this->dateCreation = $this->updatedAt = new \DateTime('now');
     }
 
     public function getImageFile()

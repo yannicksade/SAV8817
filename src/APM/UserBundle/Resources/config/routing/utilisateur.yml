@@ -1,0 +1,4 @@
+apm_user_profile_show:
+    path:     /{id}
+    defaults: { _controller: "APMUserBundle:Profile:show" }
+    methods:  [GET, POST]

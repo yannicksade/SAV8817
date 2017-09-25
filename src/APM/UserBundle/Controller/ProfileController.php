@@ -10,49 +10,135 @@ namespace APM\UserBundle\Controller;
 
 use APM\UserBundle\Entity\Admin;
 use APM\UserBundle\Entity\Utilisateur;
-use FOS\UserBundle\Controller\ProfileController as BaseProfileController;
+use APM\UserBundle\Entity\Utilisateur_avm;
 use FOS\UserBundle\Event\FilterUserResponseEvent;
 use FOS\UserBundle\Event\FormEvent;
-use FOS\UserBundle\Event\GetResponseUserEvent;
 use FOS\UserBundle\FOSUserEvents;
 use FOS\UserBundle\Model\UserInterface;
 use FOS\UserBundle\Model\UserManagerInterface;
 use PUGX\MultiUserBundle\Form\FormFactory;
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
-class ProfileController extends BaseProfileController
+class ProfileController extends Controller
 {
     /**
      * Show the user.
+     * @param Request $request
+     * @param Utilisateur $user
+     * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function showAction()
+    public function showAction(Request $request, Utilisateur $user = null)
     {
+        if(null === $user) $user = $this->getUser();
+            if (!is_object($user) || !$user instanceof UserInterface) {
+                throw new AccessDeniedException('This user does not have access to this section.');
+            }
+            if ($request->isXmlHttpRequest()) {
+                $json = array();
+                $json['item'] = array(
+                    'id' => $user->getId(),
+                    'code' => $user->getCode(),
+                    'nom' => $user->getNom(),
+                    'prenom' => $user->getPrenom(),
+                    'email' => $user->getEmail(),
+                    'username' => $user->getUsername(),
+                    'enabled' => $user->isEnabled(),
+                    'profession' => $user->getProfession(),
+                    'dateNaissance' => $user->getDateNaissance(),
+                    'pays' => $user->getPays(),
+                    'genre' => $user->getGenre(),
+                    'telephone' => $user->getTelephone(),
+                    'adresse' => $user->getAdresse(),
+                    'etatDuCompte' => $user->getEtatDuCompte(),
+                    'image' => $user->getImage(),
+                    'dateEnregistrement' => $user->getDateEnregistrement()->format('d-m-Y H:i'),
+                    'updatedAt' => $user->getUpdatedAt()->format('d-m-Y H:i'),
+                );
+                return $this->json(json_encode($json), 200);
+            }
+            return $this->render('@FOSUser/Profile/show.html.twig', array(
+                'user' => $user,
+                'url_image' => $this->get('apm_core.packages_maker')->getPackages()->getUrl('/', 'resolve_img'),
+                'type' => $user instanceof Admin,
+            ));
+    }
+
+    /**
+     * @param Request $request
+     * @return \Symfony\Component\HttpFoundation\JsonResponse|RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     */
+    public function editAction(Request $request)
+    {
+        /** @var Utilisateur $user */
         $user = $this->getUser();
         if (!is_object($user) || !$user instanceof UserInterface) {
             throw new AccessDeniedException('This user does not have access to this section.');
         }
-
-        return $this->render('@FOSUser/Profile/show.html.twig', array(
-            'user' => $user,
-            'url_image' => $this->get('apm_core.packages_maker')->getPackages()->getUrl('/', 'resolve_img'),
-            'type' => $user instanceof Admin,
-        ));
-    }
-
-    public function editAction(Request $request)
-    {
-        $user = $this->getUser();
-        if (!is_object($user) || !$user instanceof UserInterface) {
-            throw new AccessDeniedException('This user does not have access to this section.');
+        if ($request->isXmlHttpRequest() && $request->getMethod() === "POST") {
+            $json = array();
+            $json['item'] = array();
+            /** @var Session $session */
+            $session = $request->getSession();
+            $em = $this->getDoctrine()->getManager();
+            $property = $request->request->get('name');
+            $value = $request->request->get('value');
+            switch ($property) {
+                case 'etatDuCompte' :
+                    $user->setEtatDuCompte($value);
+                    break;
+                case 'username':
+                    $user->setUsername($value);
+                    break;
+                case 'email' :
+                    $user->setEmail($value);
+                    break;
+                case 'enabled' :
+                    $user->setEnabled($value);
+                    break;
+                case 'nom' :
+                    $user->setNom($value);
+                    break;
+                case 'prenom' :
+                    $user->setPrenom($value);
+                    break;
+                case 'profession' :
+                    $user->setProfession($value);
+                    break;
+                case 'dateNaissance' :
+                    $user->setDateNaissance($value);
+                    break;
+                case 'pays' :
+                    $user->setPays($value);
+                    break;
+                case 'genre' :
+                    $user->setGenre($value);
+                    break;
+                case 'telephone' :
+                    $user->setTelephone($value);
+                    break;
+                case 'adresse' :
+                    $user->setAdresse($value);
+                    break;
+                case 'image' :
+                    $user->setImageFile($value);
+                    break;
+                default:
+                    $session->getFlashBag()->add('info', "<strong> Aucune mis à jour effectuée</strong>");
+                    return $this->json(json_encode(["item" => null]), 205);
+            }
+            $em->flush();
+            $session->getFlashBag()->add('success', "Mis à jour profile. Propriété <strong>" . $property . "</strong> mis à jour<br> Opération effectuée avec succès!");
+            return $this->json(json_encode($json), 200);
         }
         /** @var FormFactory $formFactory */
         $formFactory = $this->get('fos_user.profile.form.factory');
         $form = $formFactory->createForm();
         $form->setData($user);
-
         $event = new FormEvent($form, $request);
         /** @var $dispatcher EventDispatcherInterface */
         $dispatcher = $this->get('event_dispatcher');

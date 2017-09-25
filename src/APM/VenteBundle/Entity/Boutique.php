@@ -34,6 +34,19 @@ class Boutique extends TradeFactory
     private $code;
 
     /**
+     * @var integer
+     * @ORM\Column(name="etat", type="integer", nullable=false)
+     */
+    private $etat;
+
+    /**
+     * @var \DateTime
+     * @Assert\DateTime
+     * @ORM\Column(name="dateCreation", type="datetime", nullable=false)
+     */
+    private $dateCreation;
+
+    /**
      * @var string
      * @Assert\Length(min=2, max=254)
      * @ORM\Column(name="description", type="string", length=255, nullable=true)
@@ -208,6 +221,7 @@ class Boutique extends TradeFactory
         $this->transactionsRecues = new ArrayCollection();
         $this->livreurBoutiques = new ArrayCollection();
         $this->code = "BQ" . $var;
+        $this->updatedAt = $this->dateCreation =  new \DateTime('now');
     }
 
     public function getImageFile()
@@ -247,8 +261,8 @@ class Boutique extends TradeFactory
      */
     public function setDescription($description)
     {
+        $this->updatedAt = new \DateTime('now');
         $this->description = $description;
-
         return $this;
     }
 
@@ -271,6 +285,7 @@ class Boutique extends TradeFactory
      */
     public function setNationalite($nationalite)
     {
+        $this->updatedAt = new \DateTime('now');
         $this->nationalite = $nationalite;
 
         return $this;
@@ -295,6 +310,7 @@ class Boutique extends TradeFactory
      */
     public function setDesignation($designation)
     {
+        $this->updatedAt = new \DateTime('now');
         $this->designation = $designation;
 
         return $this;
@@ -319,6 +335,7 @@ class Boutique extends TradeFactory
      */
     public function setRaisonSociale($raisonSociale)
     {
+        $this->updatedAt = new \DateTime('now');
         $this->raisonSociale = $raisonSociale;
 
         return $this;
@@ -343,6 +360,7 @@ class Boutique extends TradeFactory
      */
     public function setStatutSocial($statutSocial)
     {
+        $this->updatedAt = new \DateTime('now');
         $this->statutSocial = $statutSocial;
 
         return $this;
@@ -377,6 +395,7 @@ class Boutique extends TradeFactory
      */
     public function setGerant(Utilisateur_avm $gerant = null)
     {
+        $this->updatedAt = new \DateTime('now');
         $this->gerant = $gerant;
 
         return $this;
@@ -401,6 +420,7 @@ class Boutique extends TradeFactory
      */
     public function setProprietaire(Utilisateur_avm $proprietaire)
     {
+        $this->updatedAt = new \DateTime('now');
         $this->proprietaire = $proprietaire;
 
         return $this;
@@ -415,6 +435,7 @@ class Boutique extends TradeFactory
      */
     public function addOffre(Offre $offre)
     {
+        $this->updatedAt = new \DateTime('now');
         $this->offres[] = $offre;
 
         return $this;
@@ -426,7 +447,7 @@ class Boutique extends TradeFactory
      * @param Offre $offre
      */
     public function removeOffre(Offre $offre)
-    {
+    {$this->updatedAt = new \DateTime('now');
         $this->offres->removeElement($offre);
     }
 
@@ -845,5 +866,53 @@ class Boutique extends TradeFactory
         $this->updatedAt = $updatedAt;
 
         return $this;
+    }
+
+    /**
+     * Set etat
+     *
+     * @param integer $etat
+     *
+     * @return Boutique
+     */
+    public function setEtat($etat)
+    {
+        $this->etat = $etat;
+
+        return $this;
+    }
+
+    /**
+     * Get etat
+     *
+     * @return integer
+     */
+    public function getEtat()
+    {
+        return $this->etat;
+    }
+
+    /**
+     * Set dateCreation
+     *
+     * @param \DateTime $dateCreation
+     *
+     * @return Boutique
+     */
+    public function setDateCreation($dateCreation)
+    {
+        $this->dateCreation = $dateCreation;
+
+        return $this;
+    }
+
+    /**
+     * Get dateCreation
+     *
+     * @return \DateTime
+     */
+    public function getDateCreation()
+    {
+        return $this->dateCreation;
     }
 }

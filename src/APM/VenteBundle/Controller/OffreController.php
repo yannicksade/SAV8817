@@ -2,6 +2,7 @@
 
 namespace APM\VenteBundle\Controller;
 
+use APM\UserBundle\Entity\Admin;
 use APM\UserBundle\Entity\Utilisateur_avm;
 use Doctrine\Common\Collections\Collection;
 use APM\VenteBundle\Entity\Boutique;
@@ -147,14 +148,22 @@ class OffreController extends Controller
 
     /**
      * Tout utilisateur AVM peut voir une offre
+     * @param Request $request
      * @param Offre $offre
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
-    public function showAction(Offre $offre)
+    public function showAction(Request $request, Offre $offre)
     {
         $this->listAndShowSecurity();
+        if($request->isXmlHttpRequest()){
+            $json = array();
+            $json['item']  = array(
+                'value'=>$offre->getId(),
+                'text'=>$offre->getDesignation(),
+            );
+            return $this->json(json_encode($json), 200);
+        }
         $deleteForm = $this->createDeleteForm($offre);
-
         return $this->render('APMVenteBundle:offre:show.html.twig', array(
             'offre' => $offre,
             'delete_form' => $deleteForm->createView(),
@@ -216,33 +225,6 @@ class OffreController extends Controller
     }
 
     /**
-     * @param Offre $offre
-     */
-    private function editAndDeleteSecurity($offre)
-    {
-        //---------------------------------security-----------------------------------------------
-        // Unable to access the controller unless you have a USERAVM role
-        $this->denyAccessUnlessGranted('ROLE_USERAVM', null, 'Unable to access this page!');
-        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY')) {
-            throw $this->createAccessDeniedException();
-        }
-        /* ensure that the user is logged in  # granted even through remembering cookies
-        *  and that the one is the owner
-        */
-        $boutique = $offre->getBoutique();
-        if ($boutique) {
-            $user = $this->getUser();
-            $gerant = $boutique->getGerant();
-            $proprietaire = $boutique->getProprietaire();
-            if ($user !== $gerant && $user !== $proprietaire) {
-                throw $this->createAccessDeniedException();
-            }
-        }
-        //----------------------------------------------------------------------------------------
-
-    }
-
-    /**
      * Deletes an Offre entity.
      * @param Request $request
      * @param Offre $offre
@@ -275,7 +257,7 @@ class OffreController extends Controller
         return $this->redirectToRoute('apm_vente_offre_index');
     }
     /********************************************AJAX REQUEST********************************************/
-    private $desc_filter;
+    private $designation_filter;
     private $boutique_filter;
     private $code_filter;
     private $etat_filter;
@@ -375,14 +357,16 @@ class OffreController extends Controller
      * @param Request $request
      * @return \Symfony\Component\HttpFoundation\Response | JsonResponse
      */
-    public function indexAjaxAction(Request $request)
+    public function createAjaxAction(Request $request)
     {
         //---------------------------post------------------------
         $form = $this->createForm('APM\VenteBundle\Form\OffreType');
         $form->handleRequest($request);
+        /** @var Session $session */
+        $session = $request->getSession();
         if ($request->isXmlHttpRequest() && $request->getMethod() === "POST" && $form->isSubmitted() && $form->isValid()) {
             $em = $this->getDoctrine()->getManager();
-            $session = $this->get('session');
+
             try { // valider  le formulaire ici
                 // create a new element
                 $json['item'] = array();
@@ -444,7 +428,6 @@ class OffreController extends Controller
             }
         }
         //------------------ Form---------------
-        $session = $request->getSession();
         $session->set('previous_location', $request->getUri());
         return $this->render('APMVenteBundle:offre:index_ajax.html.twig', array(
             // 'image_form'=>$image_form->createView(),
@@ -454,10 +437,15 @@ class OffreController extends Controller
 
     }
     //Liste tous les Offres
-    public function loadTableAction(Request $request)
+    public function loadTableAction(Request $request, Utilisateur_avm $user = null)
     {
-        //------------------
         if ($request->isXmlHttpRequest() && $request->getMethod() === "POST") {
+            /** @var Utilisateur_avm $user */
+            if (null === $user) {
+                $user = $this->getUser();
+            }else{
+                $this->adminSecurity();
+            }
             $records = array();
             $records['data'] = array();
             /** @var Session $session */
@@ -467,43 +455,28 @@ class OffreController extends Controller
                 //filter parameters
                 $this->record_filter = $request->request->has('record_filter') ? $request->request->get('record_filter') : "";
                 $this->code_filter = $request->request->has('code_filter') ? $request->request->get('code_filter') : "";
-                $this->desc_filter = $request->request->has('desc_filter') ? $request->request->get('desc_filter') : "";
+                $this->designation_filter = $request->request->has('desc_filter') ? $request->request->get('desc_filter') : "";
                 $this->boutique_filter = $request->request->has('boutique_filter') ? $request->request->get('boutique_filter') : "";
                 $this->dateFrom_filter = $request->request->has('date_from_filter') ? $request->request->get('date_from_filter') : "";
                 $this->dateTo_filter = $request->request->has('date_to_filter') ? $request->request->get('date_to_filter') : "";
                 $this->etat_filter = $request->request->has('etat_filter') ? $request->request->get('etat_filter') : "";
+                $sEcho = intval($request->request->get('draw'));
                 $iDisplayLength = intval($request->request->get('length'));
                 $iDisplayStart = intval($request->request->get('start'));
-                $sEcho = intval($request->request->get('draw'));
-
                 //-----Source -------
-                /** @var Utilisateur_avm $user */
-                $user = $this->getUser();
+
                 $offres = $user->getOffres();
-                //page paremeters
-                $iTotalRecords = count($offres); // counting
-                $offres = $this->elementsFilter($offres); // filtering
-                $iDisplayLength = $iDisplayLength < 0 ? $iTotalRecords : $iDisplayLength;
-                //------ filtering and paging -----
-                usort(//assortment: descending of date -- du plus recent au plus ancient
-                    $offres, function ($e1, $e2) {
-                    /**
-                     * @var Offre $e1
-                     * @var Offre $e2
-                     */
-                    $dt1 = $e1->getUpdatedAt()->getTimestamp();
-                    $dt2 = $e2->getUpdatedAt()->getTimestamp();
-                    return $dt1 <= $dt2 ? 1 : -1;
-                });
-                $offres = array_slice($offres, $iDisplayStart, $iDisplayLength, true); //slicing, preserve the keys' order
-                //$arr = array();
+                $iTotalRecords = count($offres);
+                // filtering
+                $offres= $this->handleResults($offres, $iTotalRecords, $iDisplayStart, $iDisplayLength);
+                // counting
+                $iFilteredRecords = count($offres);
                 //------------------------------------
                 $id = 0; // identity of rows in the table
                 /** @var Offre $offre */
                 foreach ($offres as $offre) {
                     $id += 1;
                     $session->set('offre_'.$id, $offre->getId()); //convert id before sending them to client
-                    $session->save();
                     $etat = $offre->getEtat();
                     $boutique = $offre->getBoutique();
                     $aboutiqueRoute = "<i>free lance</i>";
@@ -520,18 +493,18 @@ class OffreController extends Controller
                 }
                 $records['draw'] = $sEcho;
                 $records["recordsTotal"] = $iTotalRecords;
-                $records["recordsFiltered"] = $iTotalRecords;
+                $records["recordsFiltered"] = $iFilteredRecords;
                 return $this->json($records);
             } catch (AccessDeniedException $ads) {
                 $session->getFlashBag()->add('danger', "<strong>Action interdite!</strong><br/>Pour jouir de ce service, veuillez consulter nos administrateurs.");
                 return $this->json($records);
             } catch (RuntimeException $rte) {
                 $session->getFlashBag()->add('danger', "<strong>Echec de chargement </strong><br>Une erreur systeme s'est produite. bien vouloir réessayer plutard, svp!");
-                return $this->json(json_encode(["item" => null]));
+                return $this->json($records);
             }
         }
 
-        return new JsonResponse('name');
+        return new JsonResponse();
     }
 
     public function deleteAjaxAction(Request $request)
@@ -593,6 +566,7 @@ class OffreController extends Controller
         if (!$request->isXmlHttpRequest()) return new JsonResponse();
         $em = $this->getDoctrine()->getManager();
         $session = $this->get('session');
+        $json = array();
         $json['item'] = array();
         /** @var Offre $offre */
         $offre = null;
@@ -748,13 +722,18 @@ class OffreController extends Controller
         return new JsonResponse();
     }
 //------------------------ End INDEX ACTION --------------------------------------------
+
     /**
      * @param Collection $offres
+     * @param $iTotalRecords
+     * @param $iDisplayStart
+     * @param $iDisplayLength
      * @return array
      */
-    private function elementsFilter($offres)
+    private function handleResults($offres , $iTotalRecords, $iDisplayStart, $iDisplayLength)
     {
-        if ($offres == null) return array();
+        //filtering
+        if ($offres === null) return array();
 
         if ($this->code_filter != null) {
             $offres = $offres->filter(function ($e) {//filtrage select
@@ -765,7 +744,7 @@ class OffreController extends Controller
         if ($this->etat_filter != null) {
             $offres = $offres->filter(function ($e) {//filtrage select
                 /** @var Offre $e */
-                return $e->getEtat() === $this->etat_filter;
+                return $e->getEtat() === intval($this->etat_filter);
             });
         }
         if ($this->dateFrom_filter != null) {
@@ -793,16 +772,31 @@ class OffreController extends Controller
                 return strncasecmp($str1, $str2, $len) === 0 ? true : false;
             });
         }
-        if ($this->desc_filter != null) {
+        if ($this->designation_filter != null) {
             $offres = $offres->filter(function ($e) {//search for occurences in the text
                 /** @var Offre $e */
                 $subject = $e->getDesignation();
-                $pattern = $this->desc_filter;
+                $pattern = $this->designation_filter;
                 return preg_match('/' . $pattern . '/i', $subject) === 1 ? true : false;
             });
         }
+        $offres = ($offres !== null) ? $offres->toArray() : [];
+        //assortment: descending of date -- du plus recent au plus ancient
+        usort(
+            $offres, function ($e1, $e2) {
+            /**
+             * @var Offre $e1
+             * @var Offre $e2
+             */
+            $dt1 = $e1->getUpdatedAt()->getTimestamp();
+            $dt2 = $e2->getUpdatedAt()->getTimestamp();
+            return $dt1 <= $dt2 ? 1 : -1;
+        });
+        if($iDisplayLength < 0) $iDisplayLength = $iTotalRecords;
+        //paging; slice and preserve keys' order
+        $offres = array_slice($offres, $iDisplayStart, $iDisplayLength, true);
 
-        return ($offres != null) ? $offres->toArray() : [];
+        return $offres;
     }
     /**
      * @param Categorie $categorie
@@ -813,7 +807,7 @@ class OffreController extends Controller
         //---------------------------------security-----------------------------------------------
         // Unable to access the controller unless you have a USERAVM role
         $this->denyAccessUnlessGranted('ROLE_USERAVM', null, 'Unable to access this page!');
-        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY')) {
+        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY') || !$this->getUser() instanceof Utilisateur_avm) {
             throw $this->createAccessDeniedException();
         }
         /* ensure that the user is logged in  # granted even through remembering cookies
@@ -844,7 +838,7 @@ class OffreController extends Controller
         //-----------------------------------security-------------------------------------------
         // Unable to access the controller unless you have a USERAVM role
         $this->denyAccessUnlessGranted('ROLE_USERAVM', null, 'Unable to access this page!');
-        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY')) {
+        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY') || !$this->getUser() instanceof Utilisateur_avm) {
             throw $this->createAccessDeniedException();
         }
         if ($boutique) {
@@ -862,7 +856,7 @@ class OffreController extends Controller
         //---------------------------------security-----------------------------------------------
         // Unable to access the controller unless you have a USERAVM role
         $this->denyAccessUnlessGranted('ROLE_USERAVM', null, 'Unable to access this page!');
-        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY')) {
+        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY') || !$this->getUser() instanceof Utilisateur_avm) {
             throw $this->createAccessDeniedException();
         }
         /* ensure that the user is logged in  # granted even through remembering cookies
@@ -873,4 +867,40 @@ class OffreController extends Controller
         }
         //----------------------------------------------------------------------------------------
     }
+    private function adminSecurity()
+    {
+        //-----------------------------------security-------------------------------------------
+        $this->denyAccessUnlessGranted('ROLE_ADMIN', null, 'Unable to access this page!');
+        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY') || !$this->getUser() instanceof Admin) {
+            throw $this->createAccessDeniedException();
+        }
+        //----------------------------------------------------------------------------------------
+    }
+    /**
+     * @param Offre $offre
+     */
+    private function editAndDeleteSecurity($offre)
+    {
+        //---------------------------------security-----------------------------------------------
+        // Unable to access the controller unless you have a USERAVM role
+        $this->denyAccessUnlessGranted('ROLE_USERAVM', null, 'Unable to access this page!');
+        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY') || !$this->getUser() instanceof Utilisateur_avm) {
+            throw $this->createAccessDeniedException();
+        }
+        /* ensure that the user is logged in  # granted even through remembering cookies
+        *  and that the one is the owner
+        */
+        $boutique = $offre->getBoutique();
+        if ($boutique) {
+            $user = $this->getUser();
+            $gerant = $boutique->getGerant();
+            $proprietaire = $boutique->getProprietaire();
+            if ($user !== $gerant && $user !== $proprietaire) {
+                throw $this->createAccessDeniedException();
+            }
+        }
+        //----------------------------------------------------------------------------------------
+
+    }
+
 }

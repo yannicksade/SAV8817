@@ -102,11 +102,7 @@
             <a href="{{ path('apm_vente_offre_index') }}">Liste mes offres</a>
         </li>
         {% if app.user == offre.vendeur or offre.boutique !=null and offre.boutique.gerant == app.user or offre.boutique !=null and offre.boutique.proprietaire ==app.user %}
-            <li>
-                <a href="{{ path('apm_vente_transaction_produit_new', {'id': offre.id}) }}">Faites une
-                    transaction sur
-                    ce produit</a>
-            </li>
+
             <li>
                 <a href="{{ path('apm_vente_remise_offre_new', {'id': offre.id}) }}">Créer une remise sur
                     l'offre</a>
@@ -130,19 +126,10 @@
                 </li>
             {% endif %}
             <li>
-                <a href="{{ path('apm_vente_remise_offre_index', {'id':offre.id}) }}">liste les remise sur
+                <a href="{{ path('apm_vente_remise_offre_index', {'offre_id':offre.id}) }}">liste les remise sur
                     l'offre</a>
             </li>
-            <li>
-                <a href="{{ path('apm_vente_transaction_produit_offre_index', {'offre_id':offre.id}) }}">liste
-                    les
-                    transactions produits sur cette offre</a>
-            </li>
         {% endif %}
-        <li>
-            <a href="{{ path('apm_vente_transaction_produit_user_index') }}"> retour à la liste de mes
-                transactions produits</a>
-        </li>
         <li>
             <a href="{{ path('apm_core_user-dashboard_index') }}"> Retour à l'accueil</a>
         </li>

@@ -1,10 +1,11 @@
-{% extends ":base/dashboard:layout.html.twig" %}
+{% extends "APMAdminBundle:_Main:layout.html.twig" %}
 
-{% block content_body %}
+{% block body %}
     <h1>Groupe_relationnel list</h1>
 
     <table>
         <thead>
+        <tr>------------------groupe Relationnel ---------------------</tr>
         <tr>
             <th>Code</th>
             <th>Nom</th>
@@ -25,6 +26,9 @@
                 <td>
                     <ul>
                         <li>
+                            <a href="{{ path('apm_user_groupe_individu_index', { 'id': groupe_relationnel.id }) }}">Membres</a>
+                        </li>
+                        <li>
                             <a href="{{ path('apm_user_groupe-relationnel_show', { 'id': groupe_relationnel.id }) }}">Detail</a>
                         </li>
                         <li>
@@ -41,13 +45,50 @@
         </tbody>
     </table>
 
-    <ul>
+    <table>
+        <thead>
+        <tr>------------------ mes groupes conversationnels-membre  ---------------------</tr>
+        <tr>
+            <th>Code</th>
+            <th>Nom</th>
+            <th>Type</th>
+            <th>Conversational Group?</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for groupe_relationnel in groupe_conversationnels %}
+            <tr>
+                <td>
+                    <a href="{{ path('apm_user_groupe-relationnel_show', { 'id': groupe_relationnel.id }) }}">{{ groupe_relationnel.code }}</a>
+                </td>
+                <td> {{ groupe_relationnel }}</td>
+                <td>{{ groupe_relationnel.type }}</td>
+                <td>{% if groupe_relationnel.conversationalGroup %} oui {% else %} non {% endif %} </td>
+                <td>
+                    <ul>
+                        <li>
+                            <a href="{{ path('apm_user_groupe_individu_index', { 'id': groupe_relationnel.id }) }}">Membres</a>
+                        </li>
+                        <li>
+                            <a href="{{ path('apm_user_groupe-relationnel_show', { 'id': groupe_relationnel.id }) }}">Detail</a>
+                        </li>
+                        <li>
+                            <a href="{{ path('apm_user_groupe-relationnel_edit', { 'id': groupe_relationnel.id }) }}">Modifier</a>
+                        </li>
+                        <li>
+                            <a href="{{ path('apm_user_groupe-relationnel_deleteFromList', { 'id': groupe_relationnel.id }) }}">Supprimer</a>
+                        </li>
 
+                    </ul>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    <ul>
         <li>
             <a href="{{ path('apm_user_groupe-relationnel_new') }}">Créer un nouveau groupe</a>
         </li>
-        <li>
-            <a href="{{ path('apm_user_individu-to-groupe_new') }}">Créer une relation</a>
-        </li>
     </ul>
-{% endblock content_body %}
+{% endblock %}

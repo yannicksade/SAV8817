@@ -101,6 +101,12 @@ class Rabais_offre extends TradeFactory
      */
     private $groupe;
 
+    /**
+     * @var \DateTime
+     * @Assert\DateTime
+     * @ORM\Column(name="dateCreation", type="datetime", nullable=false)
+     */
+    private $date;
 
     /**
      * Constructor
@@ -340,5 +346,29 @@ class Rabais_offre extends TradeFactory
         $this->groupe = $groupe;
 
         return $this;
+    }
+
+    /**
+     * Set date
+     *
+     * @param \DateTime $date
+     *
+     * @return Rabais_offre
+     */
+    public function setDate($date)
+    {
+        $this->date = $date;
+
+        return $this;
+    }
+
+    /**
+     * Get date
+     *
+     * @return \DateTime
+     */
+    public function getDate()
+    {
+        return $this->date;
     }
 }

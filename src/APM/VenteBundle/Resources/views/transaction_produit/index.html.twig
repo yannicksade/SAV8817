@@ -6,99 +6,43 @@
         <thead>
         <tr>
             <th>Code</th>
-            {% if boutique %}
-                <th>BoutiqueEmettrice</th>{% endif %}
-            {% if boutique %}
-                <th>BoutiqueBénéficiaire</th>{% endif %}
+            <th>BoutiqueEmettrice</th>
+            <th>BoutiqueBénéficiaire</th>
             <th>Reférence</th>
-            <th>Désignation</th>
+            <th>Produit</th>
+            <th>Quantité</th>
+            <th>Prix unitaire</th>
             <th>Actions</th>
         </tr>
         </thead>
         <tbody>
-        {% if boutique %}<a href="{{ path('apm_vente_boutique_index') }}"><strong>{{ boutique }}</strong></a>{% endif %}
         <p>-----------------------------------Transactions produits effectués---------------------------------------</p>
-        {% for transactions in transactionsEffectues %}
-
-            {% for transaction_produit in transactions.transaction_produits %}
-                <tr>
-                    <td>
-                        <a href="{{ path('apm_vente_transaction_produit_show', { 'id': transaction_produit.id }) }}">{{ transaction_produit.transaction.code }}</a>
-                        {% if boutique %}<td>{{ boutique }}</td>{% endif %}
+        {% for transaction_produit in transactions %}
+            <tr>
+                <td>
+                    <a href="{{ path('apm_vente_transaction_produit_show', { 'id': transaction_produit.id }) }}">{{ transaction_produit.transaction.code }}</a>
                     {% if transaction_produit.transaction.boutiqueBeneficiaire %}
-                        <td>{{ transaction_produit.transaction.boutiqueBeneficiaire }}</td>{% endif %}
-                    <td>{{ transaction_produit.reference }}</td>
-                    <td>{{ transaction_produit.transaction }}</td>
-                    <td>
-                        <a href="{{ path('apm_vente_transaction_produit_liste_index',{'id':transaction_produit.transaction.id}) }}">Liste
-                            les produits</a> |
-                        <a href="{{ path('apm_vente_transaction_produit_show', { 'id': transaction_produit.id }) }}">afficher</a>
-                        |
+                <td>{{ transaction_produit.transaction.boutiqueBeneficiaire }}</td>{% endif %}
+                <td>{{ transaction_produit.reference }}</td>
+                <td>{{ transaction_produit.produit.designation }}</td>
+                <td>{{ transaction_produit.produit.quantite }}</td>
+                <td>{{ transaction_produit.produit.prixUnitaire }}</td>
+                <td>
+                    <a href="{{ path('apm_vente_transaction_produit_show', { 'id': transaction_produit.id }) }}">afficher</a>
+                    |
 
-                        <a href="{{ path('apm_vente_transaction_produit_edit', { 'id': transaction_produit.id }) }}">modifier</a>
-                        |
+                    <a href="{{ path('apm_vente_transaction_produit_edit', { 'id': transaction_produit.id }) }}">modifier</a>
+                    |
 
-                        <a href="{{ path('apm_vente_transaction_produit_deleteFromList', { 'id': transaction_produit.id }) }}">supprimer</a>
+                    <a href="{{ path('apm_vente_transaction_produit_deleteFromList', { 'id': transaction_produit.id }) }}">supprimer</a>
 
-                    </td>
-                </tr>
-            {% endfor %}
+                </td>
+            </tr>
         {% endfor %}
         </tbody>
     </table>
-    <table>
-        <thead>
-        <tr>
-            <th>Code</th>
-            {% if boutique %}
-                <th>Boutique Emettrice</th>{% endif %}
-            {% if boutique %}
-                <th>Boutique Bénéficiaire</th>{% endif %}
-            <th>Reférence</th>
-            <th>Désignation</th>
-            <th>Actions</th>
-        </tr>
-        </thead>
-        <tbody>
-        <p>-----------------------------------Transactions produits Réçus---------------------------------------</p>
-        {% for transactions in transactionsRecues %}
-            {% for transaction_produit in transactions.transaction_produits %}
-                <tr>
-                    <td>
-                        <a href="{{ path('apm_vente_transaction_produit_show', { 'id': transaction_produit.id }) }}">{{ transaction_produit.transaction.code }}</a>
-                    </td>
-                    {% if boutique %}
-                        <td>{{ boutique }}</td>{% endif %}
-                    {% if transaction_produit.transaction.boutiqueBeneficiaire %}
-                        <td>{{ transaction_produit.transaction.boutiqueBeneficiaire }}</td>{% endif %}
-                    <td>{{ transaction_produit.reference }}</td>
-                    <td>{{ transaction_produit.transaction }}</td>
-                    <td>
-                        <a href="{{ path('apm_vente_transaction_produit_liste_index',{'id':transaction_produit.transaction.id}) }}">Liste
-                            les produits</a> |
-                        <a href="{{ path('apm_vente_transaction_produit_show', { 'id': transaction_produit.id }) }}">détail</a>
-                    </td>
-                </tr>
-            {% endfor %}
-        {% endfor %}
-        </tbody>
-    </table>
-
-    <ul>
-        <li>
-            <a href="{{ path('apm_vente_transaction_produit_accueil_new') }}">Créer une transaction produit</a>
-        </li>
-        {% if boutique %}
-            <li>
-                <a href="{{ path('apm_vente_transaction_boutique_index',{'id':boutique.id}) }}">Retour à la liste de
-                    transactions boutique</a>
-            </li>
-        {% endif %}
-        <li>
-            <a href="{{ path('apm_vente_transaction_index') }}">Retour à la liste de mes transactions</a>
-        </li>
-        <li>
-            <a href="{{ path('apm_transport_livraison_new') }}">Créer une livraison</a>
-        </li>
-    </ul>
-{% endblock %}
+    <br>
+    <a href="{{ path('apm_vente_transaction_produit_new', {'id': transaction.id}) }}">Ajouter une
+        offre à cette transaction</a><br>
+    <a href="{{ path('apm_vente_transaction_index') }}">Retour à la liste de mes transactions</a>
+{% endblock body %}

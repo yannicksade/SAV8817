@@ -18,6 +18,12 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
  */
 class Categorie extends TradeFactory
 {
+    /**
+     * @var \DateTime
+     * @Assert\DateTime
+     * @ORM\Column(name="dateCreation", type="datetime", nullable=false)
+     */
+    private $dateCreation;
 
     /**
      * @var string
@@ -109,6 +115,7 @@ class Categorie extends TradeFactory
     {
         $this->offres = new ArrayCollection();
         $this->code = "CA" . $var;
+        $this->dateCreation = new \DateTime('now');
     }
 
     /**
@@ -361,5 +368,29 @@ class Categorie extends TradeFactory
     public function __toString()
     {
         return $this->designation;
+    }
+
+    /**
+     * Set dateCreation
+     *
+     * @param \DateTime $dateCreation
+     *
+     * @return Categorie
+     */
+    public function setDateCreation($dateCreation)
+    {
+        $this->dateCreation = $dateCreation;
+
+        return $this;
+    }
+
+    /**
+     * Get dateCreation
+     *
+     * @return \DateTime
+     */
+    public function getDateCreation()
+    {
+        return $this->dateCreation;
     }
 }

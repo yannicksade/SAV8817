@@ -142,7 +142,7 @@ class Transaction extends TradeFactory
     public function __construct($var)
     {
         $this->transactionProduits = new ArrayCollection();
-        $this->date = new \DateTime();
+        $this->date = new \DateTime('now');
         $this->code = "TX" . $var;
     }
 

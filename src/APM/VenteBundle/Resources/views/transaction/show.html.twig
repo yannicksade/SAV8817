@@ -56,6 +56,10 @@
             <a href="{{ path('apm_vente_transaction_produit_liste_index',{'id':transaction.id}) }}">Liste les offres de
                 cette transaction produits</a>
         </li>
+        <li>
+            <a href="{{ path('apm_vente_transaction_produit_new', {'id': transaction.id}) }}">Ajouter une
+                offre à cette transaction</a>
+        </li>
 
         {% if transaction.auteur == app.user %}
 

@@ -1,7 +1,7 @@
 apm_user_groupe-relationnel_index:
     path:     /
     defaults: { _controller: "APMUserBundle:Groupe_relationnel:index" }
-    methods:  GET
+    methods:  [GET, POST]
 
 apm_user_groupe-relationnel_show:
     path:     /{id}/show
