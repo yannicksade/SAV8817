@@ -189,7 +189,7 @@ class CommentaireController extends Controller
      * Creates a new Commentaire entity.
      * @param Request $request
      * @param Offre $offre
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response | JsonResponse
      */
     public function newAction(Request $request, Offre $offre)
     {
@@ -206,22 +206,16 @@ class CommentaireController extends Controller
                 $commentaire->setUtilisateur($this->getUser());
                 $commentaire->setOffre($offre);
                 $em = $this->getDoctrine()->getManager();
+                $em->persist($commentaire);
+                $em->flush();
                 if ($request->isXmlHttpRequest()) {
-                    $json['item'] = array();
-                    $data = $request->request->get('commentaire');
-                    if (isset($data['publiable'])) $commentaire->setPubliable($data['publiable']);
-                    if (isset($data['contenu'])) $commentaire->setContenu($data['contenu']);
-                    if (isset($data['evaluation'])) $commentaire->setEvaluation($data['evaluation']);
-                    $em->persist($commentaire);
-                    $em->flush();
+                    $json = array();
                     $json["item"] = array(//prevenir le client
                         "action" => 0,
                     );
                     $session->getFlashBag()->add('success', "<strong> rabais d'offre créée. réf:" . $commentaire->getCode() . "</strong><br> Opération effectuée avec succès!");
                     return $this->json(json_encode($json), 200);
                 }
-                $em->persist($commentaire);
-                $em->flush();
                 return $this->redirectToRoute('apm_user_commentaire_show', array('id' => $commentaire->getId()));
             } catch (ConstraintViolationException $cve) {
                 $session->getFlashBag()->add('danger', "<strong>Echec de l'enregistrement. </strong><br>L'enregistrement a échoué dû à une contrainte de données!");

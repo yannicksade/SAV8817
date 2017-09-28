@@ -214,7 +214,7 @@ class RemiseController extends Controller
     /**
      * @param Request $request
      * @param Offre $offre
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response| JsonResponse
      */
     public function newAction(Request $request, Offre $offre)
     {
@@ -229,25 +229,16 @@ class RemiseController extends Controller
             try {
                 $remise->setOffre($offre);
                 $em = $this->getDoctrine()->getManager();
+                $em->persist($remise);
+                $em->flush();
                 if ($request->isXmlHttpRequest()) {
-                    $json['item'] = array();
-                    $data = $request->request->get('remise');
-                    if (isset($data['quantiteMin'])) $remise->setQuantiteMin($data['quantiteMin']);
-                    if (isset($data['dateExpiration'])) $remise->setDateExpiration($data['dateExpiration']);
-                    if (isset($data['valeur'])) $remise->setValeur($data['valeur']);
-                    if (isset($data['nombreUtilisation'])) $remise->setNombreUtilisation($data['nombreUtilisation']);
-                    if (isset($data['restreint'])) $remise->setRestreint($data['restreint']);
-                    if (isset($data['permanence'])) $remise->setPermanence($data['permanence']);
-                    $em->persist($remise);
-                    $em->flush();
+                    $json= array();
                     $json["item"] = array(//prevenir le client
                         "action" => 0,
                     );
                     $session->getFlashBag()->add('success', "<strong> remise créée. réf:" . $remise->getCode() . "</strong><br> Opération effectuée avec succès!");
                     return $this->json(json_encode($json), 200);
                 }
-                $em->persist($remise);
-                $em->flush();
                 return $this->redirectToRoute('apm_vente_remise_show', array('id' => $remise->getId()));
             } catch (ConstraintViolationException $cve) {
                 $session->getFlashBag()->add('danger', "<strong>Echec de l'enregistrement. </strong><br>L'enregistrement a échoué dû à une contrainte de données!");

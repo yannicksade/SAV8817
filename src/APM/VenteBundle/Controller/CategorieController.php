@@ -195,35 +195,24 @@ class CategorieController extends Controller
      * Creates les catégories sont créées uniquement dans les boutiques
      * @param Request $request
      * @param Boutique $boutique
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response | JsonResponse
      */
     public function newAction(Request $request, Boutique $boutique = null)
     {
         $this->createSecurity($boutique);
         /** @var Categorie $categorie */
         $categorie = TradeFactory::getTradeProvider('categorie');
-        $categorie->setBoutique($boutique);
         $form = $this->createForm(CategorieType::class, $categorie);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             try {
-                $this->createSecurity($boutique, $form->get('categorieCourante')->getData());
+                $this->createSecurity($boutique, $categorie->getCategorieCourante());
+                $categorie->setBoutique($boutique);
                 $em = $this->getEM();
+                $em->persist($categorie);
+                $em->flush();
                 if ($request->isXmlHttpRequest()) {
                     $json['item'] = array();
-                    $data = $request->request->get('categorie');
-                    if (isset($data['designation'])) $categorie->setDesignation($data['designation']);
-                    if (isset($data['description'])) $categorie->setDescription($data['description']);
-                    if (isset($data['livrable'])) $categorie->setLivrable($data['livrable']);
-                    if (isset($data['publiable'])) $categorie->setPubliable($data['publiable']);
-                    if (isset($data['etat'])) $categorie->setEtat($data['etat']);
-                    if (isset($data['categorieCourante']) && is_numeric($id = $data['categorieCourante'])) {
-                        /** @var Categorie $categorieCourante */
-                        $categorieCourante = $em->getRepository('APMVenteBundle:Categorie')->find($id);
-                        $categorie->setCategorieCourante($categorieCourante);
-                    }
-                    $em->persist($categorie);
-                    $em->flush();
                     $json["item"] = array(//prevenir le client
                         "action" => 0,
                     );
@@ -231,8 +220,6 @@ class CategorieController extends Controller
                     return $this->json(json_encode($json), 200);
 
                 }
-                $em->persist($categorie);
-                $em->flush();
                 return $this->redirectToRoute('apm_vente_categorie_show', array('id' => $categorie->getId()));
             } catch (ConstraintViolationException $cve) {
                 $session->getFlashBag()->add('danger', "<strong>Echec de l'enregistrement. </strong><br>L'enregistrement a échoué dû à une contrainte de données!");

@@ -23,7 +23,6 @@ class Profile_transporteurType extends AbstractType
                 'multiple' => true,
                 'required' => false
             ])*/
-            ->add('utilisateur')
             ->add('zones', EntityType::class, [
                 'class' => 'APMTransportBundle:Zone_intervention',
                 'multiple' => true,

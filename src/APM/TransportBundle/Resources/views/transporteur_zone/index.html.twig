@@ -1,0 +1,39 @@
+{% extends "APMAdminBundle:_Main:layout.html.twig" %}
+
+{% block body %}
+    <table>
+        <thead>
+        <tr>
+            <th>Transporteur</th>
+            <th>Zone d'intervention</th>
+            <th>Option</th>
+        </tr>
+        </thead>
+        <tbody>
+        <p>--------------------------------Transporteurs - Zones d'interventions
+            --------------------------------</p>
+        {% for transport_zone in transporteurs_zones %}
+            <tr>
+                <td>
+                    <a href="{{ path('apm_zone_intervention_show', { 'id': transporteur_zone.zone_intervention.id }) }}">{{ transporteur_zone.transporteur }}  voir</a>
+                </td>
+                <td>
+                    <a href="{{ path('apm_transport_transporteur_show', { 'id': transporteur_zone.transporteur.id }) }}">{{ transporteur_zonezoneIntervention }}  voir</a>
+                </td>
+                <td><a href="{{ path('apm_zone_transporteur-zone_intervention_delete', { 'id': transporteur_zone.id }) }}">retirer</a></td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <ul>
+        <li>
+            <a href="{{ path('apm_zone_intervention_new') }}">Créer une zone d'intervention</a>
+        </li>
+
+        <li>
+            <a href="{{ path('apm_zone_intervention_index') }}">Liste toutes des zones</a>
+        </li>
+
+    </ul>
+{% endblock %}

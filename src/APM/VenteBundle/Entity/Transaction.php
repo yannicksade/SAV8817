@@ -121,7 +121,7 @@ class Transaction extends TradeFactory
     /**
      * @var Collection
      *
-     * @ORM\OneToMany(targetEntity="APM\VenteBundle\Entity\Transaction_produit", mappedBy="transaction")
+     * @ORM\OneToMany(targetEntity="APM\VenteBundle\Entity\Transaction_produit", mappedBy="transaction", cascade={"persist", "remove"})
      *
      */
     private $transactionProduits;

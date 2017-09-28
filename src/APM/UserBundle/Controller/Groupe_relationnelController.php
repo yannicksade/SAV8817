@@ -237,26 +237,17 @@ class Groupe_relationnelController extends Controller
                 $this->createSecurity();
                 $em = $this->getDoctrine()->getManager();
                 $groupe_relationnel->setProprietaire($this->getUser());
+                $em->persist($groupe_relationnel);
+                $em->flush();
                 if ($request->isXmlHttpRequest()) {
-                    $json['item'] = array();
-                    $data = $request->request->get('groupe_relationnel ');
-                    if (isset($data['designation'])) $groupe_relationnel->setDesignation($data['designation']);
-                    if (isset($data['description'])) $groupe_relationnel->setDescription($data['description']);
-                    if (isset($data['conversationalGroup'])) $groupe_relationnel->setConversationalGroup($data['conversationalGroup']);
-                    if (isset($data['type'])) $groupe_relationnel->setType($data['type']);
-                    $em->persist($groupe_relationnel);
-                    $em->flush();
+                    $json = array();
                     $json["item"] = array(//prevenir le client
                         "action" => 0,
                     );
                     $session->getFlashBag()->add('success', "<strong> rabais d'offre créée. réf:" . $groupe_relationnel->getCode() . "</strong><br> Opération effectuée avec succès!");
                     return $this->json(json_encode($json), 200);
                 }
-                $em->persist($groupe_relationnel);
-                $em->flush();
-                //---
-                //$dist = dirname(__DIR__, 4);
-                //$file = $dist . '/web/' . $this->getParameter('images_url') . '/' . $groupe_relationnel->getImage();
+
                 if (null !== $groupe_relationnel->getImage()) {
                     $this->get('apm_core.crop_image')->liipImageResolver($groupe_relationnel->getImage());
                     return $this->redirectToRoute('apm_user_groupe-relationnel_show-image', array('id' => $groupe_relationnel->getId()));

@@ -21,11 +21,11 @@
             <tr>
                 <td>
                     <a href="{{ path('apm_vente_transaction_produit_show', { 'id': transaction_produit.id }) }}">{{ transaction_produit.transaction.code }}</a>
-                    {% if transaction_produit.transaction.boutiqueBeneficiaire %}
-                <td>{{ transaction_produit.transaction.boutiqueBeneficiaire }}</td>{% endif %}
+                <td>{{ transaction_produit.transaction.boutique }}</td>
+                <td>{{ transaction_produit.transaction.boutiqueBeneficiaire }}</td>
                 <td>{{ transaction_produit.reference }}</td>
                 <td>{{ transaction_produit.produit.designation }}</td>
-                <td>{{ transaction_produit.produit.quantite }}</td>
+                <td>{{ transaction_produit.quantite }}</td>
                 <td>{{ transaction_produit.produit.prixUnitaire }}</td>
                 <td>
                     <a href="{{ path('apm_vente_transaction_produit_show', { 'id': transaction_produit.id }) }}">afficher</a>

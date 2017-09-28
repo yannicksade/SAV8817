@@ -1,16 +1,6 @@
 apm_transport_transporteur_index:
-    path:     /by/{name}/{value}
-    defaults: { _controller: "APMTransportBundle:Profile_transporteur:index" }
-    methods:  GET
-
-apm_transport_transporteur_All_index:
     path:     /
     defaults: { _controller: "APMTransportBundle:Profile_transporteur:index" }
-    methods:  GET
-
-apm_transport_transporteur_zone-intervention_index:
-    path:     /zone/{id}/transporteurs
-    defaults: { _controller: "APMTransportBundle:Transporteur_zoneIntervention:indexTransporteurs" }
     methods:  GET
 
 apm_transport_transporteur_show:
@@ -31,7 +21,4 @@ apm_transport_transporteur_edit:
 apm_transport_transporteur_delete:
     path:     /{id}/delete
     defaults: { _controller: "APMTransportBundle:Profile_transporteur:delete" }
-
-apm_transport_transporteur_deleteFromList:
-    path:     /list/{id}/delete
-    defaults: { _controller: "APMTransportBundle:Profile_transporteur:deleteFromList" }
+    methods:  DELETE

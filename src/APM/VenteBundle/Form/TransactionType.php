@@ -53,7 +53,9 @@ class TransactionType extends AbstractType
                 'class' => 'APMTransportBundle:Livraison',
                 'choice_label' => 'code',
                 'required' => false
-            ]);
+            ])
+
+            ;
     }
 
     /**

@@ -5,6 +5,7 @@ namespace APM\MarketingReseauBundle\Form;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\RadioType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -25,10 +26,24 @@ class Reseau_conseillersType extends AbstractType
                 'required' => false,
                 'placeholder' => 'null'
             ])
-            ->add('remplacer', CheckboxType::class, [
-                'required' => false,
-                'label' => 'Inserer/Remplacer',
-            ]);
+            ->add('modification', ChoiceType::class, [
+                'expanded' => true,
+                'empty_data' => '0',
+                'choices' => [
+                    'Remplacer' => 1,
+                    'Inserer' => 0,
+                ],
+            ])
+            ->add('position', ChoiceType::class, [
+                'choices' => [
+                    'gauche' => 1,
+                    'droite' => 0,
+                ],
+                'expanded' => true,
+                'required' => true,
+                'empty_data' => '1',
+            ])
+        ;
     }
 
 }

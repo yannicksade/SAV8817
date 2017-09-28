@@ -8,13 +8,6 @@ apm_transport_livraison_boutique_index:
     defaults: { _controller: "APMTransportBundle:Livraison:index" }
     methods:  GET
 
-
-apm_transport_livraison_listeOperation_index:
-    path:     /liste-operation/{id}
-    defaults: { _controller: "APMTransportBundle:Livraison:listTransactions" }
-    methods:  GET
-
-
 apm_transport_livraison_show:
     path:     /{id}/show
     defaults: { _controller: "APMTransportBundle:Livraison:show" }
@@ -31,7 +24,7 @@ apm_transport_livraison_new:
     methods:  [GET, POST]
 
 apm_transport_livraison_boutique_new:
-    path:     /boutique/new/{id}
+    path:     /boutique/{id}/new
     defaults: { _controller: "APMTransportBundle:Livraison:new" }
     methods:  [GET, POST]
 

@@ -4,26 +4,22 @@ apm_marketing_reseau_conseiller_index:
     methods:  GET
 
 apm_marketing_reseau_index:
-    path:     /
+    path:     /conseiller
     defaults: { _controller: "APMMarketingReseauBundle:Reseau_conseillers:index" }
-    methods:  GET
-
-apm_marketing_reseau_show:
-    path:     /{id}/show
-    defaults: { _controller: "APMMarketingReseauBundle:Reseau_conseillers:show" }
     methods:  GET
 
 apm_marketing_reseau_new:
     path:     /new
     defaults: { _controller: "APMMarketingReseauBundle:Reseau_conseillers:new" }
+    methods:  PUT
 
-apm_marketing_reseau_left_add:
-    path:     /left-add/{id}
-    defaults: { _controller: "APMMarketingReseauBundle:Reseau_conseillers:addLeftMember" }
+apm_marketing_reseau_add:
+    path:     /member-add/{id}
+    defaults: { _controller: "APMMarketingReseauBundle:Reseau_conseillers:addMember" }
 
-apm_marketing_reseau_right_add:
-    path:     /right-add/{id}
-    defaults: { _controller: "APMMarketingReseauBundle:Reseau_conseillers:addRightMember" }
+#apm_marketing_reseau_right_add:
+ #   path:     /right-add/{id}
+  #  defaults: { _controller: "APMMarketingReseauBundle:Reseau_conseillers:addRightMember" }
 
 
 apm_marketing_reseau_left_promote:

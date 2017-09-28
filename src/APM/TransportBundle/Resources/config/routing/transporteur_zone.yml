@@ -1,0 +1,16 @@
+
+apm_transport_transporteur_zone-intervention_index:
+    path:     /zone/{zone_id}/transporteurs #renvoi les transporteurs de la zone d'intervention
+    defaults: { _controller: "APMTransportBundle:Transporteur_zoneIntervention:index" }
+    methods:  [GET, POST]
+
+
+apm_zone_transporteur-zone_intervention_index:
+    path:     /transporteur/{id}/zones #renvoi les zones d'intervention du transporteur
+    defaults: { _controller: "APMTransportBundle:Transporteur_zoneIntervention:index" }
+    methods:  [GET, POST]
+
+apm_zone_transporteur-zone_intervention_delete:
+    path:     /{id}/delete
+    defaults: { _controller: "APMTransportBundle:Transporteur_zoneIntervention:delete" }
+    methods:  DELETE

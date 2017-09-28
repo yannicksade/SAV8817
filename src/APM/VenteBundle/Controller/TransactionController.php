@@ -2,6 +2,7 @@
 
 namespace APM\VenteBundle\Controller;
 
+use APM\TransportBundle\Entity\Livraison;
 use APM\UserBundle\Entity\Utilisateur_avm;
 use APM\VenteBundle\Entity\Boutique;
 use APM\VenteBundle\Entity\Offre;
@@ -13,6 +14,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Session;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 
 /**
  * Transaction controller.
@@ -31,14 +33,14 @@ class TransactionController extends Controller
     private $transactionProduit_filter;
     private $produit_filter;
 
-
-    /**
+    /** @ParamConverter("livraison", options={"mapping": {"livraison_id":"id"}})
      * Liste les transactions d'un individu; effectuées et recues
      * @param Request $request
      * @param Boutique $boutique
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @param Livraison $livraison
+     * @return \Symfony\Component\HttpFoundation\Response | JsonResponse
      */
-    public function indexAction(Request $request, Boutique $boutique = null)
+    public function indexAction(Request $request, Boutique $boutique = null, Livraison $livraison = null)
     {
         $this->listAndShowSecurity($boutique);
         /** @var Utilisateur_avm $user */
@@ -60,12 +62,12 @@ class TransactionController extends Controller
             $iDisplayLength = $request->request->has('length') ? $request->request->get('length') : -1;
             $iDisplayStart = $request->request->has('start') ? intval($request->request->get('start')) : 0;
             $json = array();
+            $json['items'] = array();
             if ($q === "sent" || $q === "all") {
-                if (null !== $boutique) $transactionsEffectues = $boutique->getTransactions(); else $transactionsEffectues = $user->getTransactionsEffectues();
+                $transactionsEffectues =  (null !== $boutique)? $boutique->getTransactions() : $user->getTransactionsEffectues();
                 $iTotalRecords = count($transactionsEffectues);
                 if ($iDisplayLength < 0) $iDisplayLength = $iTotalRecords;
                 $transactionsEffectues = $this->handleResults($transactionsEffectues, $iTotalRecords, $iDisplayStart, $iDisplayLength);
-                //filtre
                 /** @var Transaction $transaction */
                 foreach ($transactionsEffectues as $transaction) {
                     array_push($json, array(
@@ -75,7 +77,7 @@ class TransactionController extends Controller
                 }
             }
             if ($q === "received" || $q === "all") {
-                if (null !== $boutique) $transactionsRecues = $boutique->getTransactionsRecues(); else $transactionsRecues = $user->getTransactionsRecues();
+                $transactionsRecues = (null !== $boutique)?$boutique->getTransactionsRecues(): $user->getTransactionsRecues();
                 $iTotalRecords = count($transactionsRecues);
                 if ($iDisplayLength < 0) $iDisplayLength = $iTotalRecords;
                 $transactionsRecues = $this->handleResults($transactionsRecues, $iTotalRecords, $iDisplayStart, $iDisplayLength);
@@ -86,13 +88,28 @@ class TransactionController extends Controller
                     ));
                 }
             }
+            if ($q === "done" || $q === "all") {
+                $transactions = $livraison->getOperations();
+                $iTotalRecords = count($transactions);
+                if ($iDisplayLength < 0) $iDisplayLength = $iTotalRecords;
+                $transactions = $this->handleResults($transactions, $iTotalRecords, $iDisplayStart, $iDisplayLength);
+                foreach ($transactions as $transaction) {
+                    array_push($json, array(
+                        'value' => $transaction->getId(),
+                        'text' => $transaction->getNature(),
+                    ));
+                }
+            }
 
-            return $this->json($json, 200);
+            return $this->json(json_encode($json), 200);
         }
         if (null !== $boutique) {
             $transactionsEffectues = $boutique->getTransactions();
             $transactionsRecues = $boutique->getTransactionsRecues();
-        } else {
+        } elseif(null !== $livraison){
+            $transactionsEffectues = $livraison->getOperations();
+            $transactionsRecues = null;
+        }else {
             $transactionsEffectues = $user->getTransactionsEffectues();
             $transactionsRecues = $user->getTransactionsRecues();
         }
@@ -257,7 +274,7 @@ class TransactionController extends Controller
      * Creates a new Transaction entity.
      * @param Request $request
      * @param Boutique $boutique
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response | JsonResponse
      */
     public function newAction(Request $request, Boutique $boutique = null)
     {
@@ -266,50 +283,23 @@ class TransactionController extends Controller
         $session = $request->getSession();
         /** @var Transaction $transaction */
         $transaction = TradeFactory::getTradeProvider('transaction');
-        $transaction->setBoutique($boutique);
         $form = $this->createForm('APM\VenteBundle\Form\TransactionType', $transaction);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             try {
+                $transaction->setBoutique($boutique);
                 $transaction->setAuteur($this->getUser());
                 $em = $this->getDoctrine()->getManager();
+                $em->persist($transaction);
+                $em->flush();
                 if ($request->isXmlHttpRequest()) {
-                    $json['item'] = array();
-                    $data = $request->request->get('transaction');
-                    if (isset($data['etat'])) $transaction->setStatut($data['etat']);
-                    if (isset($data['destinataireNonAvm'])) $transaction->setDestinataireNonAvm($data['destinataireNonAvm']);
-                    if (isset($data['montant'])) $transaction->setMontant($data['montant']);
-                    if (isset($data['nature'])) $transaction->setNature($data['nature']);
-                    if (isset($data['beneficiaire']) && is_numeric($id = $data['beneficiaire'])) {
-                        /** @var Utilisateur_avm $beneficiaire */
-                        $beneficiaire = $em->getRepository('APMUserBundle:Utilisateur_avm')->find($id);
-                        $transaction->setBeneficiaire($beneficiaire);
-                    }
-                    if (isset($data['offres'])) {
-                        $nb = count($data['offres']);
-                        /** @var Offre $offre */
-                        for ($i = 0; $i < $nb; $i++) {
-                            if (is_numeric($id = $offres[$i])) {
-                                $offre = $em->getRepository('APMVenteBundle:Offre')->find($id);
-                                if (null !== $offre) {
-                                    /** @var Transaction_produit $transactionProduit */
-                                    $transactionProduit = TradeFactory::getTradeProvider("transaction_produit");
-                                    $transactionProduit->setProduit($offre);
-                                    $transaction->addTransactionProduit($transactionProduit);
-                                }
-                            }
-                        }
-                    }
-                    $em->persist($transaction);
-                    $em->flush();
+                    $json = array();
                     $json["item"] = array(//prevenir le client
                         "action" => 0,
                     );
                     $session->getFlashBag()->add('success', "<strong> transaction créée. réf:" . $transaction->getCode() . "</strong><br> Opération effectuée avec succès!");
                     return $this->json(json_encode($json), 200);
                 }
-                $em->persist($transaction);
-                $em->flush();
                 return $this->redirectToRoute('apm_vente_transaction_show', array('id' => $transaction->getId()));
             } catch (ConstraintViolationException $cve) {
                 $session->getFlashBag()->add('danger', "<strong>Echec de l'enregistrement. </strong><br>L'enregistrement a échoué dû à une contrainte de données!");

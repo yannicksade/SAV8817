@@ -8,6 +8,11 @@ apm_vente_transaction_boutique_index:
     defaults: { _controller: "APMVenteBundle:Transaction:index" }
     methods:  [GET, POST]
 
+apm_vente_transaction_livraison_index:
+    path:     /livraison/{livraison_id}
+    defaults: { _controller: "APMVenteBundle:Transaction:index" }
+    methods:  [GET, POST]
+
 apm_vente_transaction_show:
     path:     /{id}/show
     defaults: { _controller: "APMVenteBundle:Transaction:show" }

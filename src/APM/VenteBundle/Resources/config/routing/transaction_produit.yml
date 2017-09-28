@@ -8,8 +8,13 @@ apm_vente_transaction_produit_show:
     defaults: { _controller: "APMVenteBundle:Transaction_produit:show" }
     methods:  GET
 
+apm_vente_transaction_produit-transaction_new:
+    path:     /transaction/{id}/new
+    defaults: { _controller: "APMVenteBundle:Transaction_produit:new" }
+    methods:  [GET, POST]
+
 apm_vente_transaction_produit_new:
-    path:     /transaction-produit/{id}/new
+    path:     /transaction-produit/new
     defaults: { _controller: "APMVenteBundle:Transaction_produit:new" }
     methods:  [GET, POST]
 

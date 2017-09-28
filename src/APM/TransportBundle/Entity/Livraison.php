@@ -27,6 +27,14 @@ class Livraison extends TradeFactory
      * @ORM\Column(name="code", type="string", length=255, nullable=false )
      */
     private $code;
+
+    /**
+     * @var \DateTime
+     * @Assert\DateTime
+     * @ORM\Column(name="dateEnregistrement", type="datetime", nullable=false)
+     */
+    private $dateEnregistrement;
+
     /**
      * @var \DateTime
      * @Assert\DateTime
@@ -43,21 +51,18 @@ class Livraison extends TradeFactory
 
     /**
      * @var string
-     * @Assert\Choice({0,1,2,3,4,5})
      * @ORM\Column(name="etatLivraison", type="string", length=255, nullable=true)
      */
     private $etatLivraison;
 
     /**
      * @var string
-     * @Assert\Choice({0,1,2,3})
      * @ORM\Column(name="priorite", type="string", length=255, nullable=true)
      */
     private $priorite;
 
     /**
      * @var boolean
-     * @Assert\Choice({0,1})
      * @ORM\Column(name="valide", type="boolean", nullable=true)
      */
     private $valide;
@@ -115,6 +120,7 @@ class Livraison extends TradeFactory
     {
         $this->operations = new ArrayCollection();
         $this->code = "LV" . $var;
+        $this->dateEnregistrement = new \DateTime('now');
     }
 
     /**
@@ -390,5 +396,29 @@ class Livraison extends TradeFactory
     public function __toString()
     {
         return $this->code;
+    }
+
+    /**
+     * Set dateEnregistrement
+     *
+     * @param \DateTime $dateEnregistrement
+     *
+     * @return Livraison
+     */
+    public function setDateEnregistrement($dateEnregistrement)
+    {
+        $this->dateEnregistrement = $dateEnregistrement;
+
+        return $this;
+    }
+
+    /**
+     * Get dateEnregistrement
+     *
+     * @return \DateTime
+     */
+    public function getDateEnregistrement()
+    {
+        return $this->dateEnregistrement;
     }
 }

@@ -1,68 +1,70 @@
-{#{% extends "APMAdminBundle:_Main:layout.html.twig" %}#}
+{% extends "APMAdminBundle:_Main:layout.html.twig" %}
 
 {% block body %}
-    {% if conseiller %}
-        <h1>Reseau des conseillers</h1>
-        <p>
-            Grand Master: <strong>{{ conseiller.masterConseiller }}</strong><br/>
-            {% if conseiller.masterConseiller %}Code: {{ conseiller.masterConseiller.code }}{% endif %}
-        </p>
+    <h1>Reseau des conseillers</h1>
+    <p>
+        Grand Master: {% if conseiller.masterConseiller %}<strong>{{ conseiller.masterConseiller }}</strong>{% else %}
+        <i>vous n'avez aucun réseau !</i>{% endif %}<br/>
+        {% if conseiller.masterConseiller %}Code: {{ conseiller.masterConseiller.code }}{% endif %}
+    </p>
+    {% set conseillerCourant = app.user.profileConseiller %}
+    <table>
+        <thead>
+        <tr>
+            <th>| Maître</th>
+            <th>| Esclave de gauche </th>
+            <th>| Esclave de droite </th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>| {% if conseiller.masterConseiller %}
+                    <a
+                    href="{{ path('apm_marketing_conseiller_show', { 'id': conseiller.id }) }}">{{ conseiller }}</a>{% else %}-{% endif %}
+                |
+            </td>
+            <td>| {% if conseiller.conseillerGauche %}<a
+                    href="{{ path('apm_marketing_reseau_conseiller_index', {'id':conseiller.conseillerGauche.id}) }}">{{ conseiller.conseillerGauche }}</a>{% else %} - {% endif %}
+                |
+            </td>
+            <td>| {% if conseiller.conseillerDroite %}<a
+                    href="{{ path('apm_marketing_reseau_conseiller_index', {'id':conseiller.conseillerDroite.id}) }}">{{ conseiller.conseillerDroite }}</a>{% else %} - {% endif %}
+                |
+            </td>
+        </tr>
+        </tbody>
+    </table>
 
-        <table>
-            <thead>
-            <tr>
-                <th>Maître</th>
-                <th>Fils de Gauche</th>
-                <th>Fils de Droite</th>
-                <th>Actions</th>
-            </tr>
-            </thead>
-            <tbody>
-
-            <tr>
-                <td>
-                    <a href="{{ path('apm_marketing_conseiller_show', { 'id': conseiller.id }) }}">{{ conseiller }}</a>
-                </td>
-                <td> {% if conseiller.conseillerGauche %}<a
-                            href="{{ path('apm_marketing_reseau_conseiller_index', {'id':conseiller.conseillerGauche.id}) }}">{{ conseiller.conseillerGauche }}{% else %} - {% endif %}</a>
-                </td>
-                <td> {% if conseiller.conseillerDroite %}<a
-                            href="{{ path('apm_marketing_reseau_conseiller_index', {'id':conseiller.conseillerDroite.id}) }}">{{ conseiller.conseillerDroite }}{% else %} - {% endif %}</a>
-                </td>
-                <td>
-                    <a href="{{ path('apm_marketing_reseau_show', { 'id': conseiller.id }) }}">afficher</a>
-                </td>
-            </tr>
-            </tbody>
-        </table>
-
+    {% if conseillerCourant == conseiller and conseiller.masterConseiller %}
         <ul>
-            {# {% if app.user.profileConseiller and app.user.profileConseiller.isConseillerA2 %}#}
             <li>
-                <a href="{{ path('apm_marketing_reseau_new') }}">Créer votre réseau propre</a>
+                <a href="{{ path('apm_marketing_reseau_add', { 'id': conseiller.id }) }}">Ajouter/Modifier un membre</a>
             </li>
-            <li>
-                <a href="{{ path('apm_marketing_reseau_index') }}">Retour à mon réseau</a>
-            </li>
-            {#{% endif %}#}
-
-            <li>
-                <a href="{{ path('apm_marketing_reseau_left_promote', {'id':conseiller.id}) }}">Promotion de gauche</a>
-            </li>
-            <li>
-                <a href="{{ path('apm_marketing_reseau_right_promote', {'id':conseiller.id}) }}">Promotion de droite</a>
-            </li>
-
-            {% if conseiller.masterConseiller %}
+            {% if conseillerCourant == conseiller.masterConseiller.conseillerGauche or conseillerCourant == conseiller.masterConseiller.conseillerDroite %}
                 <li>
-                    <a href="{{ path('apm_marketing_reseau_conseiller_index',{'id':conseiller.masterConseiller.id}) }}">remonter
-                        le réseau du master</a>
+                    <a href="{{ path('apm_marketing_reseau_add', { 'id': conseiller.masterConseiller.id }) }}">Quitter
+                        le
+                        réseau du maitre</a>
                 </li>
-
             {% endif %}
-
         </ul>
-    {% else %}
-        <p><b>Vous n'êtes pas conseiller!</b></p>
+    {% elseif conseiller.masterConseiller %}
+        <ul>
+            <li>
+                <a href="{{ path('apm_marketing_reseau_left_promote', {'id':conseiller.id}) }}">Promouvoir le fils
+                    de
+                    gauche</a>
+            </li>
+            <li>
+                <a href="{{ path('apm_marketing_reseau_right_promote', {'id':conseiller.id}) }}">Promouvoir le fils
+                    de
+                    droite</a>
+            </li>
+            <li>
+                <a href="{{ path('apm_marketing_reseau_index') }}"> Restourner a mon reseau </a>
+            </li>
+        </ul>
     {% endif %}
+    <a href="{{ path('apm_marketing_conseiller_show', { 'id': conseillerCourant.id }) }}"> voir mon profile de
+        conseiller</a>
 {% endblock %}

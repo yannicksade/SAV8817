@@ -27,6 +27,13 @@ class Livreur_boutique extends TradeFactory
     private $id;
 
     /**
+     * @var \DateTime
+     * @Assert\DateTime
+     * @ORM\Column(name="dateEnregistrement", type="datetime", nullable=false)
+     */
+    private $dateEnregistrement;
+
+    /**
      * @var string
      * @Assert\Length(min=2, max=254)
      * @ORM\Column(name="reference", type="string", length=255, nullable=false)
@@ -63,31 +70,8 @@ class Livreur_boutique extends TradeFactory
 
     public function __construct()
     {
+        $this->dateEnregistrement = new \DateTime('now');
         $this->boutiques = new ArrayCollection();
-    }
-
-    /**
-     * Get Transporteur
-     *
-     * @return string
-     */
-    public function getTransporteur()
-    {
-        return $this->transporteur;
-    }
-
-    /**
-     * Set transporteur
-     *
-     * @param string $transporteur
-     *
-     * @return Livreur_boutique
-     */
-    public function setTransporteur($transporteur)
-    {
-        $this->transporteur = $transporteur;
-
-        return $this;
     }
 
     /**
@@ -100,19 +84,6 @@ class Livreur_boutique extends TradeFactory
         return $this->id;
     }
 
-    /**
-     * Set id
-     *
-     * @param Profile_transporteur $id
-     *
-     * @return Livreur_boutique
-     */
-    public function setId(Profile_transporteur $id)
-    {
-        $this->id = $id;
-
-        return $this;
-    }
 
     /**
      * Get reference
@@ -199,5 +170,53 @@ class Livreur_boutique extends TradeFactory
         $this->boutiqueProprietaire = $boutiqueProprietaire;
 
         return $this;
+    }
+
+    /**
+     * Set transporteur
+     *
+     * @param \APM\TransportBundle\Entity\Profile_transporteur $transporteur
+     *
+     * @return Livreur_boutique
+     */
+    public function setTransporteur(\APM\TransportBundle\Entity\Profile_transporteur $transporteur = null)
+    {
+        $this->transporteur = $transporteur;
+
+        return $this;
+    }
+
+    /**
+     * Get transporteur
+     *
+     * @return \APM\TransportBundle\Entity\Profile_transporteur
+     */
+    public function getTransporteur()
+    {
+        return $this->transporteur;
+    }
+
+    /**
+     * Set dateEnregistrement
+     *
+     * @param \DateTime $dateEnregistrement
+     *
+     * @return Livreur_boutique
+     */
+    public function setDateEnregistrement($dateEnregistrement)
+    {
+        $this->dateEnregistrement = $dateEnregistrement;
+
+        return $this;
+    }
+
+    /**
+     * Get dateEnregistrement
+     *
+     * @return \DateTime
+     */
+    public function getDateEnregistrement()
+    {
+        return $this->dateEnregistrement;
     }
 }

@@ -216,7 +216,7 @@ class CommunicationController extends Controller
     /**
      * L'Emetteur Crée et soumet un model de communication
      * @param Request $request
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response | JsonResponse
      */
     public function newAction(Request $request)
     {
@@ -232,33 +232,16 @@ class CommunicationController extends Controller
                 $this->createSecurity();
                 $communication->setEmetteur($this->getUser());
                 $em = $this->getDoctrine()->getManager();
+                $em->persist($communication);
+                $em->flush();
                 if ($request->isXmlHttpRequest()) {
-                    $json['item'] = array();
-                    $em = $this->getDoctrine()->getManager();
-                    $data = $request->request->get('communication');
-                    if (isset($data['dateDeVigueur'])) $communication->setDateDeVigueur($data['dateDeVigueur']);
-                    if (isset($data['contenu'])) $communication->setContenu($data['contenu']);
-                    if (isset($data['reference'])) $communication->setReference($data['reference']);
-                    if (isset($data['dateFin'])) $communication->setDateFin($data['dateFin']);
-                    if (isset($data['etat'])) $communication->setEtat($data['etat']);
-                    if (isset($data['type'])) $communication->setType($data['type']);
-                    if (isset($data['valide'])) $communication->setValide($data['valide']);
-                    if (isset($data['reference'])) $communication->setReference($data['reference']);
-                    if (isset($data['recepteur']) && is_numeric($id = $data['recepteur'])) {
-                        /** @var Utilisateur_avm $recepteur */
-                        $recepteur = $em->getRepository('APMUserBundle:Utilisateur_avm')->find($id);
-                        $communication->setRecepteur($recepteur);
-                    }
-                    $em->persist($communication);
-                    $em->flush();
+                    $json = array();
                     $json["item"] = array(//prevenir le client
                         "action" => 0,
                     );
                     $session->getFlashBag()->add('success', "<strong> rabais d'offre créée. réf:" . $communication->getCode() . "</strong><br> Opération effectuée avec succès!");
                     return $this->json(json_encode($json), 200);
                 }
-                $em->persist($communication);
-                $em->flush();
                 return $this->redirectToRoute('apm_user_communication_show', array('id' => $communication->getId()));
             } catch (ConstraintViolationException $cve) {
                 $session->getFlashBag()->add('danger', "<strong>Echec de l'enregistrement. </strong><br>L'enregistrement a échoué dû à une contrainte de données!");

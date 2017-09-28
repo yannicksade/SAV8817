@@ -91,12 +91,22 @@ class ConseillerController extends Controller
         $this->listAndShowSecurity();
 
         $deleteForm = $this->createDeleteForm($conseiller);
-
+        $reseau_form = $this->createNewForm();
         return $this->render('APMMarketingDistribueBundle:conseiller:show.html.twig', array(
             'conseiller' => $conseiller,
             'delete_form' => $deleteForm->createView(),
+            'reseau_form' => $reseau_form->createView(),
         ));
     }
+
+    private function createNewForm()
+    {
+        return $this->createFormBuilder()
+            ->setAction($this->generateUrl('apm_marketing_reseau_new'))
+            ->setMethod('PUT')
+            ->getForm();
+    }
+
 
     /**
      * Creates a form to delete a Conseiller entity.

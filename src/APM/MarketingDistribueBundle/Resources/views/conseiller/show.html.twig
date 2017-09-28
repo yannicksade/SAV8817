@@ -1,4 +1,4 @@
-{#{% extends "APMAdminBundle:_Main:layout.html.twig" %}#}
+{% extends "APMAdminBundle:_Main:layout.html.twig" %}
 
 {% block body %}
 
@@ -41,8 +41,7 @@
     <ul>
 
     <li>
-        <a href="{{ path('apm_marketing_reseau_conseiller_index',{'id': conseiller.id }) }}"> affiche le réseau du
-            conseiller</a>
+        <a href="{{ path('apm_marketing_reseau_index') }}"> affiche mon réseau </a>
     </li>
     <li>
         <a href="{{ path('apm_marketing_conseiller_index') }}">Retour à la liste des conseillers</a>
@@ -51,19 +50,16 @@
         <li>
             <a href="{{ path('apm_marketing_conseiller_edit', { 'id': conseiller.id }) }}">Modifier</a>
         </li>
-        {% if app.user.profileConseiller.isConseillerA2 %}
-            <li>
-                <a href="{{ path('apm_marketing_reseau_show', { 'id': conseiller.id }) }}">modifier mon réseau de
-                    conseiller</a>
-            </li>
-        {% endif %}
-
         {% if  not app.user.profileConseiller %}
             <li>
                 <a href="{{ path('apm_marketing_conseiller_new') }}">Créer mon profile conseiller</a>
             </li>
         {% endif %}
-
+        {% if app.user.profileConseiller.isConseillerA2 and app.user.profileConseiller.nombreInstanceReseau == 0 %}
+            {{ form_start(reseau_form) }}
+            <input type="submit" value="Créer votre propre réseau">
+            {{ form_end(reseau_form) }}
+        {% endif %}
         <li>
             {{ form_start(delete_form) }}
             <input type="submit" value="Delete">

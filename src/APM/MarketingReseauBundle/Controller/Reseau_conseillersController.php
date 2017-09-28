@@ -6,6 +6,7 @@ use APM\MarketingDistribueBundle\Entity\Conseiller;
 use APM\UserBundle\Entity\Utilisateur_avm;
 use APM\MarketingDistribueBundle\Factory\TradeFactory;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -14,118 +15,179 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class Reseau_conseillersController extends Controller
 {
-    // liste les réseaux
-    public function indexAction(Conseiller $conseiller = null)
+    /** Liste les binômes du réseau du conseiller (2 par 2) pour dessiner l'arbre
+     * @param Request $request
+     * @param Conseiller|null $conseiller
+     * @return \Symfony\Component\HttpFoundation\Response| JsonResponse
+     */
+    public function indexAction(Request $request, Conseiller $conseiller = null)
     {
-        $this->listAndShowSecurity();
-        if (!$conseiller) {
-            /** @var Utilisateur_avm $user */
+        $this->listAndShowSecurity($conseiller);
+        /** @var Utilisateur_avm $user */
+        if (null === $conseiller) {
             $user = $this->getUser();
             $conseiller = $user->getProfileConseiller();
         }
+        if ($request->isXmlHttpRequest()) {
+            $reseau = array();
+            $leftChild = $conseiller->getConseillerGauche();
+            if (null !== $leftChild) {
+                $reseau['gauche'] = array(
+                    'id' => $leftChild->getId(),
+                    'code' => $leftChild->getCode(),
+                );
+            }
+            $rightChild = $conseiller->getConseillerDroite();
+            if (null !== $rightChild) {
+                $reseau['droite'] = array(
+                    'id' => $rightChild->getId(),
+                    'code' => $rightChild->getCode(),
+                );
+            }
+            return $this->json(json_encode($json), 200);
+        }
+
         return $this->render('APMMarketingReseauBundle:reseau_conseillers:index.html.twig', array(
             'conseiller' => $conseiller,
         ));
     }
 
     /**
+     * @param Conseiller $conseiller
      */
-    private function listAndShowSecurity()
+    private function listAndShowSecurity($conseiller)
     {
         //---------------------------------security-----------------------------------------------
 
-        $this->denyAccessUnlessGranted('ROLE_USERAVM', null, 'Unable to access this page!');
+        $this->denyAccessUnlessGranted('ROLE_CONSEILLER', null, 'Unable to access this page!');
         if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY')) {
             throw $this->createAccessDeniedException();
         }
-
         //----------------------------------------------------------------------------------------
+        /** @var Conseiller $selfConseiller */
+        $selfConseiller = $this->getUser()->getProfileConseiller();
+        $master = null !== $selfConseiller ? $selfConseiller->getMasterConseiller() : null;
+        if (null === $selfConseiller || $master === $conseiller) {
+            throw $this->createAccessDeniedException();
+        }
     }
 
-    public function addRightMemberAction(Request $request, Conseiller $conseiller)
+    /**
+     * Ajoute ou modifie le conseiller de droite ou de gauche
+     * @param Request $request
+     * @param Conseiller $conseiller
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     */
+    public function addMemberAction(Request $request, Conseiller $conseiller)
     {
-        /** @var Conseiller $conseiller */
         $this->addSecurity($conseiller);
-        $oldRightAdvisor = $conseiller->getConseillerDroite();
         /** @var Utilisateur_avm $user */
+        $user = $this->getUser();
+        $selfConseiller = $user->getProfileConseiller();
         $form = $this->createForm('APM\MarketingReseauBundle\Form\Reseau_conseillersType');
+        if ($selfConseiller !== $conseiller) {
+            $form->remove('conseiller');
+            $form->remove('modification');
+            $form->remove('position');
+        }
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            /** @var Conseiller $advisorRight */
-            $advisorRight = $form->get('conseiller')->getData();
-            $this->addSecurity($conseiller, $advisorRight);
-            $em = $this->getEM();
-            $remplacer = $form->get('remplacer')->getData();
-            if ($oldRightAdvisor !== $advisorRight) {
-                if (null !== $advisorRight) {//gérer l'ajout ou l'insertion d'un conseiller à gauche
-                    if (null !== $oldRightAdvisor) {
-                        if (null !== $oldRightAdvisor->getUtilisateur()) {
-                            if ($remplacer) {
-                                $oldRightAdvisorChild_left = $oldRightAdvisor->getConseillerGauche();
-                                $oldRightAdvisorChild_right = $oldRightAdvisor->getConseillerDroite();
-                                $oldRightAdvisor->setConseillerGauche(null);
-                                $oldRightAdvisor->setConseillerDroite(null);
-                                $oldRightAdvisor->setMasterConseiller(null);
-                                $advisorRight->setConseillerGauche($oldRightAdvisorChild_left);
-                                $advisorRight->setConseillerDroite($oldRightAdvisorChild_right);
-                                if ($oldRightAdvisorChild_right) $oldRightAdvisorChild_right->setMasterConseiller($advisorRight);
-                                if ($oldRightAdvisorChild_left) $oldRightAdvisorChild_left->setMasterConseiller($advisorRight);
-                            } else {
-                                $oldRightAdvisor->setMasterConseiller($advisorRight);
-                                $advisorRight->setConseillerGauche($oldRightAdvisor);
+            /** @var Conseiller $advisor */
+            $advisor = ($selfConseiller !== $conseiller) ? null : $form->get('conseiller')->getData();
+            $this->addSecurity($conseiller, $advisor);
+            $em = $this->getDoctrine()->getManager();
+            if ($selfConseiller !== $conseiller) {
+                if ($conseiller->getConseillerGauche() === $selfConseiller) {
+                    $oldAdvisor = $conseiller->getConseillerGauche();
+                    $position = 1;
+                } else {
+                    $oldAdvisor = $conseiller->getConseillerDroite();
+                    $position = 0;
+                }
+            } else {
+                $oldAdvisor = ($position = $form->get('position')->getData()) ? $conseiller->getConseillerGauche() : $conseiller->getConseillerDroite();
+            }
+            if ($oldAdvisor !== $advisor) {//changement d'un membre
+                if (null !== $advisor) {//gérer l'ajout ou l'insertion d'un conseiller
+                    if (null !== $oldAdvisor) {
+                        if (null !== $oldAdvisor->getUtilisateur()) { //distinction d'un conseiller fictif
+                            $remplacer = $form->get('modification')->getData();
+                            if ($remplacer) {//remplacement d'un conseiller
+                                $oldAdvisorChild_left = $oldAdvisor->getConseillerGauche();
+                                $oldAdvisorChild_right = $oldAdvisor->getConseillerDroite();
+                                $oldAdvisor->setConseillerGauche(null);
+                                $oldAdvisor->setConseillerDroite(null);
+                                $oldAdvisor->setMasterConseiller(null);
+                                $advisor->setConseillerGauche($oldAdvisorChild_left);
+                                $advisor->setConseillerDroite($oldAdvisorChild_right);
+                                if ($oldAdvisorChild_right) $oldAdvisorChild_right->setMasterConseiller($advisor);
+                                if ($oldAdvisorChild_left) $oldAdvisorChild_left->setMasterConseiller($advisor);
+                            } else { //insertion
+                                $oldAdvisor->setMasterConseiller($advisor);
+                                $advisor->setConseillerGauche($oldAdvisor);
                             }
-                        } else {
-                            $oldRightAdvisorChild_left = $oldRightAdvisor->getConseillerGauche();
-                            $oldRightAdvisorChild_right = $oldRightAdvisor->getConseillerDroite();
-                            $oldRightAdvisor->setConseillerGauche(null);
-                            $oldRightAdvisor->setConseillerDroite(null);
-                            $oldRightAdvisor->setMasterConseiller(null);
-                            $oldRightAdvisor->setNombreInstanceReseau(0);
-                            $advisorRight->setConseillerGauche($oldRightAdvisorChild_left);
-                            $advisorRight->setConseillerDroite($oldRightAdvisorChild_right);
-                            if ($oldRightAdvisorChild_right) $oldRightAdvisorChild_right->setMasterConseiller($advisorRight);
-                            if ($oldRightAdvisorChild_left) $oldRightAdvisorChild_left->setMasterConseiller($advisorRight);
+                        } else {//remplacement d'un conseiller fictif
+                            $oldAdvisorChild_left = $oldAdvisor->getConseillerGauche();
+                            $oldAdvisorChild_right = $oldAdvisor->getConseillerDroite();
+                            $oldAdvisor->setConseillerGauche(null);
+                            $oldAdvisor->setConseillerDroite(null);
+                            $oldAdvisor->setMasterConseiller(null);
+                            $oldAdvisor->setNombreInstanceReseau(0);
+                            $advisor->setConseillerGauche($oldAdvisorChild_left);
+                            $advisor->setConseillerDroite($oldAdvisorChild_right);
+                            if ($oldAdvisorChild_right) $oldAdvisorChild_right->setMasterConseiller($advisor);
+                            if ($oldAdvisorChild_left) $oldAdvisorChild_left->setMasterConseiller($advisor);
                         }
                     }
-                    $advisorRight->setMasterConseiller($conseiller);
-                    if ($conseiller) $conseiller->setConseillerDroite($advisorRight);
+                    $advisor->setMasterConseiller($conseiller);
+                    if ($conseiller) if ($position) $conseiller->setConseillerGauche($advisor); else $conseiller->setConseillerDroite($advisor);
+
                     $em->flush();
-                }//gérer le départ d'un membre de gauche
-                elseif (null !== $oldRightAdvisor && null !== $oldRightAdvisor->getUtilisateur()) {//s'il yavait un conseiller à cette position, le lier au master conseiller supérieur
-                    $oldLeftAdvisorChild = $oldRightAdvisor->getConseillerGauche();
-                    $oldRightAdvisorChild = $oldRightAdvisor->getConseillerDroite();
-                    if (!$oldLeftAdvisorChild && !$oldRightAdvisorChild) {
-                        $conseillerFictifDroite = null;
+
+                } //gérer le départ d'un membre
+                elseif (null !== $oldAdvisor && null !== $oldAdvisor->getUtilisateur()) {//s'il yavait un conseiller à cette position, le lier au maître conseiller supérieur
+                    $oldAdvisorChild_left = $oldAdvisor->getConseillerGauche();
+                    $oldAdvisorChild_right = $oldAdvisor->getConseillerDroite();
+                    if (!$oldAdvisorChild_left && !$oldAdvisorChild_right) {
+                        $conseillerFictif = null;
                     } else {
-                        $conseillerFictifDroite = $em->getRepository('APMMarketingDistribueBundle:Conseiller')
+                        $conseillerFictif = $em->getRepository('APMMarketingDistribueBundle:Conseiller')
                             ->findOneBy(['masterConseiller' => null, 'utilisateur' => null]);
-                        if (null === $conseillerFictifDroite) {
-                            /** @var Conseiller $conseillerFictifDroite */
-                            $conseillerFictifDroite = TradeFactory::getTradeProvider('conseiller');
-                            if (null !== $conseillerFictifDroite) {
-                                $em->persist($conseillerFictifDroite);
+                        if (null === $conseillerFictif) {
+                            /** @var Conseiller $conseillerFictif */
+                            $conseillerFictif = TradeFactory::getTradeProvider('conseiller');
+                            if ($conseillerFictif) {
+                                $em->persist($conseillerFictif);
                                 $em->flush();
                             }
                         }
                     }
-                    if ($conseillerFictifDroite) $conseillerFictifDroite->setMasterConseiller($conseiller);
-                    if (null !== $oldLeftAdvisorChild) {
-                        $oldRightAdvisor->setConseillerGauche(null);
-                        $oldLeftAdvisorChild->setMasterConseiller($conseillerFictifDroite);
-                        if ($conseillerFictifDroite) $conseillerFictifDroite->setConseillerGauche($oldLeftAdvisorChild);
+                    if ($conseillerFictif) $conseillerFictif->setMasterConseiller($conseiller);
+                    if ($position) $conseiller->setConseillerGauche($conseillerFictif); else $conseiller->setConseillerDroite($conseillerFictif);
+                    if (null !== $oldAdvisorChild_left) {
+                        $oldAdvisor->setConseillerGauche(null);
+                        $oldAdvisorChild_left->setMasterConseiller($conseillerFictif);
+                        if ($conseillerFictif) $conseillerFictif->setConseillerGauche($oldAdvisorChild_left);
                     }
-                    if (null !== $oldRightAdvisorChild) {
-                        $oldRightAdvisor->setConseillerDroite(null);
-                        if ($oldRightAdvisorChild) $oldRightAdvisorChild->setMasterConseiller($conseillerFictifDroite);
-                        if ($conseillerFictifDroite) $conseillerFictifDroite->setConseillerDroite($oldRightAdvisorChild);
-                    }
-                    $oldRightAdvisor->setMasterConseiller(null);
 
-                    if ($conseiller) $conseiller->setConseillerDroite($conseillerFictifDroite); //Fils du conseiller de droite sortant
+                    if (null !== $oldAdvisorChild_right) {
+                        $oldAdvisor->setConseillerDroite(null);
+                        $oldAdvisorChild_right->setMasterConseiller($conseillerFictif);
+                        if ($conseillerFictif) $conseillerFictif->setConseillerDroite($oldAdvisorChild_right);
+                    }
+                    $oldAdvisor->setMasterConseiller(null);
+
                     $em->flush();
                 }
-
-                return $this->redirectToRoute('apm_marketing_reseau_show', array('id' => $conseiller->getId()));
+                $conseiller = $user->getProfileConseiller();
+                if (null === $conseiller->getMasterConseiller()) {
+                    $route = 'apm_marketing_conseiller_show';
+                    $param = array('id' => $conseiller->getId());
+                } else {
+                    $route = 'apm_marketing_reseau_index';
+                    $param = [];
+                }
+                return $this->redirectToRoute($route, $param);
             }
         }
         return $this->render('APMMarketingReseauBundle:reseau_conseillers:new.html.twig', array(
@@ -134,11 +196,12 @@ class Reseau_conseillersController extends Controller
         ));
     }
 
+
     /**
-     * @param Conseiller $advisor
+     * @param Conseiller $master
      * @param Conseiller $member
      */
-    private function addSecurity($advisor, $member = null)
+    private function addSecurity($master, $member = null)
     {
         //---------------------------------security-----------------------------------------------
         // Unable to access the controller unless you have a CONSEILLER role
@@ -149,12 +212,13 @@ class Reseau_conseillersController extends Controller
         /** @var Utilisateur_avm $user */
         $user = $this->getUser();
         $conseiller = $user->getProfileConseiller();
-        if (null === $conseiller || $conseiller !== $advisor || !($conseiller->getMasterConseiller() instanceof Conseiller)) {
+        if (null === $conseiller || !$conseiller->getMasterConseiller() instanceof Conseiller || $conseiller !== $master && $conseiller !== $master->getConseillerDroite() && $conseiller !== $master->getConseillerGauche()
+            || $conseiller !== $master && null !== $member
+        ) {
             throw $this->createAccessDeniedException();
         }
         if (null !== $member && null !== $member->getMasterConseiller())
             throw $this->createAccessDeniedException();
-
         //----------------------------------------------------------------------------------------
     }
 
@@ -191,107 +255,6 @@ private function LocateGrandMaster($advisorLeft, $advisorRight)
     }
 */
 
-    /**
-     * Ajoute ou modifie le conseiller de droite ou de gauche
-     * @param Request $request
-     * @param Conseiller $conseiller
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
-     */
-    public function addLeftMemberAction(Request $request, Conseiller $conseiller)
-    {
-        $this->addSecurity($conseiller);
-        $oldLeftAdvisor = $conseiller->getConseillerGauche();
-        /** @var Utilisateur_avm $user */
-        $form = $this->createForm('APM\MarketingReseauBundle\Form\Reseau_conseillersType');
-        $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
-            /** @var Conseiller $advisorLeft */
-            $advisorLeft = $form->get('conseiller')->getData();
-            $this->addSecurity($conseiller, $advisorLeft);
-            $em = $this->getDoctrine()->getManager();
-            $remplacer = $form->get('remplacer')->getData();
-            if ($oldLeftAdvisor !== $advisorLeft) {//changement d'un membre
-                if (null !== $advisorLeft) {//gérer l'ajout ou l'insertion d'un conseiller à gauche
-                    if (null !== $oldLeftAdvisor) {
-                        if (null !== $oldLeftAdvisor->getUtilisateur()) {
-                            if ($remplacer) {//remplacement
-                                $oldLeftAdvisorChild_left = $oldLeftAdvisor->getConseillerGauche();
-                                $oldLeftAdvisorChild_right = $oldLeftAdvisor->getConseillerDroite();
-                                $oldLeftAdvisor->setConseillerGauche(null);
-                                $oldLeftAdvisor->setConseillerDroite(null);
-                                $oldLeftAdvisor->setMasterConseiller(null);
-                                $advisorLeft->setConseillerGauche($oldLeftAdvisorChild_left);
-                                $advisorLeft->setConseillerDroite($oldLeftAdvisorChild_right);
-                                if ($oldLeftAdvisorChild_right) $oldLeftAdvisorChild_right->setMasterConseiller($advisorLeft);
-                                if ($oldLeftAdvisorChild_left) $oldLeftAdvisorChild_left->setMasterConseiller($advisorLeft);
-                            } else { //insertion
-                                $oldLeftAdvisor->setMasterConseiller($advisorLeft);
-                                $advisorLeft->setConseillerGauche($oldLeftAdvisor);
-
-                            }
-                        } else {//remplacement d'un conseiller fictif
-                            $oldLeftAdvisorChild_left = $oldLeftAdvisor->getConseillerGauche();
-                            $oldLeftAdvisorChild_right = $oldLeftAdvisor->getConseillerDroite();
-                            $oldLeftAdvisor->setConseillerGauche(null);
-                            $oldLeftAdvisor->setConseillerDroite(null);
-                            $oldLeftAdvisor->setMasterConseiller(null);
-                            $oldLeftAdvisor->setNombreInstanceReseau(0);
-                            $advisorLeft->setConseillerGauche($oldLeftAdvisorChild_left);
-                            $advisorLeft->setConseillerDroite($oldLeftAdvisorChild_right);
-                            if ($oldLeftAdvisorChild_right) $oldLeftAdvisorChild_right->setMasterConseiller($advisorLeft);
-                            if ($oldLeftAdvisorChild_left) $oldLeftAdvisorChild_left->setMasterConseiller($advisorLeft);
-                        }
-                    }
-                    $advisorLeft->setMasterConseiller($conseiller);
-                    if ($conseiller) $conseiller->setConseillerGauche($advisorLeft);
-
-                    $em->flush();
-
-                } //gérer le départ d'un membre de gauche
-                elseif (null !== $oldLeftAdvisor && null !== $oldLeftAdvisor->getUtilisateur()) {//s'il yavait un conseiller à cette position, le lier au maître conseiller supérieur
-                    $oldLeftAdvisorChild = $oldLeftAdvisor->getConseillerGauche();
-                    $oldRightAdvisorChild = $oldLeftAdvisor->getConseillerDroite();
-                    if (!$oldLeftAdvisorChild && !$oldRightAdvisorChild) {
-                        $conseillerFictifGauche = null;
-                    } else {
-                        $conseillerFictifGauche = $em->getRepository('APMMarketingDistribueBundle:Conseiller')
-                            ->findOneBy(['masterConseiller' => null, 'utilisateur' => null]);
-                        if (null === $conseillerFictifGauche) {
-                            /** @var Conseiller $conseillerFictifGauche */
-                            $conseillerFictifGauche = TradeFactory::getTradeProvider('conseiller');
-                            if ($conseillerFictifGauche) {
-                                $em->persist($conseillerFictifGauche);
-                                $em->flush();
-                            }
-                        }
-                    }
-                    if ($conseillerFictifGauche) $conseillerFictifGauche->setMasterConseiller($conseiller);
-                    $conseiller->setConseillerGauche($conseillerFictifGauche);
-                    if (null !== $oldLeftAdvisorChild) {
-                        $oldLeftAdvisor->setConseillerGauche(null);
-                        $oldLeftAdvisorChild->setMasterConseiller($conseillerFictifGauche);
-                        if ($conseillerFictifGauche) $conseillerFictifGauche->setConseillerGauche($oldLeftAdvisorChild);
-                    }
-
-                    if (null !== $oldRightAdvisorChild) {
-                        $oldLeftAdvisor->setConseillerDroite(null);
-                        $oldRightAdvisorChild->setMasterConseiller($conseillerFictifGauche);
-                        if ($conseillerFictifGauche) $conseillerFictifGauche->setConseillerDroite($oldRightAdvisorChild);
-                    }
-                    $oldLeftAdvisor->setMasterConseiller(null);
-
-                    $em->flush();
-                }
-
-
-                return $this->redirectToRoute('apm_marketing_reseau_show', array('id' => $conseiller->getId()));
-            }
-        }
-        return $this->render('APMMarketingReseauBundle:reseau_conseillers:new.html.twig', array(
-            'conseiller' => $conseiller,
-            'form' => $form->createView(),
-        ));
-    }
 
     public function PromoteLeftMemberAction(Conseiller $advisor)
     {
@@ -328,13 +291,11 @@ private function LocateGrandMaster($advisorLeft, $advisorRight)
                         $leftChild->setConseillerGauche($advisor);
                     }
                     $leftChild->setMasterConseiller($conseiller);
-
-
                     $em->flush();
                 }
             }
         }
-        return $this->redirectToRoute('apm_marketing_reseau_index', array('id' => $conseiller->getId()));
+        return $this->redirectToRoute('apm_marketing_reseau_index');
     }
 
     /**
@@ -399,26 +360,30 @@ private function LocateGrandMaster($advisorLeft, $advisorRight)
                 }
             }
         }
-        return $this->redirectToRoute('apm_marketing_reseau_index', array('id' => $conseiller->getId()));
+        return $this->redirectToRoute('apm_marketing_reseau_index');
     }
 
     /**
      * Activer son profile de manager de réseau conseiller
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @param Request $request
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response |JsonResponse
      */
-    public function newAction()
+    public function newAction(Request $request)
     {
         $this->createSecurity();
         /** @var Utilisateur_avm $user */
         $user = $this->getUser();
         $conseiller = $user->getProfileConseiller();
-        if ($conseiller) {
-            $conseiller->setMasterConseiller($conseiller);
-            $conseiller->setNombreInstanceReseau(1);
-            $em = $this->getEM();
-            $em->flush();
+        $conseiller->setMasterConseiller($conseiller);
+        $conseiller->setNombreInstanceReseau(1);
+        $em = $this->getEM();
+        $em->flush();
+        if ($request->isXmlHttpRequest()) {
+            $json = array();
+            $json['item'] = array();
+            return $this->json(json_encode($json), 200);
         }
-        return $this->redirectToRoute('apm_marketing_reseau_show', array('id' => $conseiller->getId()));
+        return $this->redirectToRoute('apm_marketing_reseau_index');
     }
 
     private function createSecurity()
@@ -432,19 +397,11 @@ private function LocateGrandMaster($advisorLeft, $advisorRight)
         /** @var Utilisateur_avm $user */
         $user = $this->getUser();
         $conseiller = $user->getProfileConseiller();
-        if (null === $conseiller || !($conseiller->isConseillerA2()) || ($conseiller->getNombreInstanceReseau()) >= 1) {
+        if (null === $conseiller || !($conseiller->isConseillerA2()) || ($conseiller->getNombreInstanceReseau()) >= 1 || null !== $conseiller->getMasterConseiller()) {
             throw $this->createAccessDeniedException();
         }
 
         //----------------------------------------------------------------------------------------
     }
 
-    public function showAction(Conseiller $conseiller)
-    {
-        $this->listAndShowSecurity();
-
-        return $this->render('APMMarketingReseauBundle:reseau_conseillers:show.html.twig', array(
-            'conseiller' => $conseiller,
-        ));
-    }
 }

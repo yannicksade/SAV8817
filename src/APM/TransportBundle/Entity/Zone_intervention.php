@@ -75,6 +75,13 @@ class Zone_intervention extends TradeFactory
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id;
+    /**
+     * @var \DateTime
+     * @Assert\DateTime
+     * @ORM\Column(name="dateEnregistrement", type="datetime", nullable=false)
+     */
+    private $dateEnregistrement;
+
 
 
     /**
@@ -101,6 +108,7 @@ class Zone_intervention extends TradeFactory
     {
         $this->code = "ZO" . $var;
         $this->zone_transporteurs =new  ArrayCollection();
+        $this->dateEnregistrement = new \DateTime('now');
     }
 
     /**
@@ -344,5 +352,29 @@ class Zone_intervention extends TradeFactory
     public function __toString()
     {
         return $this->designation;
+    }
+
+    /**
+     * Set dateEnregistrement
+     *
+     * @param \DateTime $dateEnregistrement
+     *
+     * @return Zone_intervention
+     */
+    public function setDateEnregistrement($dateEnregistrement)
+    {
+        $this->dateEnregistrement = $dateEnregistrement;
+
+        return $this;
+    }
+
+    /**
+     * Get dateEnregistrement
+     *
+     * @return \DateTime
+     */
+    public function getDateEnregistrement()
+    {
+        return $this->dateEnregistrement;
     }
 }

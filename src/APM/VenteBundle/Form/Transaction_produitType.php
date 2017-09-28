@@ -2,6 +2,7 @@
 
 namespace APM\VenteBundle\Form;
 
+use APM\VenteBundle\Form\Type\TransactionPromptType;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
@@ -23,6 +24,7 @@ class Transaction_produitType extends AbstractType
                 'class' => 'APMVenteBundle:Offre',
                 'required' => true
             ])
+            ->add('transaction', TransactionType::class)
         ;
     }
 

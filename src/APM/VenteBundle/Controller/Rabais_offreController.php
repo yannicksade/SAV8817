@@ -263,7 +263,7 @@ class Rabais_offreController extends Controller
      * Creates a new Rabais_offre entity.
      * @param Request $request
      * @param Offre $offre
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response | JsonResponse
      */
     public function newAction(Request $request, Offre $offre)
     {
@@ -272,41 +272,24 @@ class Rabais_offreController extends Controller
         $session = $request->getSession();
         /** @var Rabais_offre $rabais_offre */
         $rabais_offre = TradeFactory::getTradeProvider('rabais');
-        $rabais_offre->setOffre($offre);
         $form = $this->createForm('APM\VenteBundle\Form\Rabais_offreType', $rabais_offre);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             try {
                 $this->createSecurity($offre, $rabais);
                 $rabais_offre->setVendeur($this->getUser());
+                $rabais_offre->setOffre($offre);
                 $em = $this->getDoctrine()->getManager();
+                $em->persist($rabais_offre);
+                $em->flush();
                 if ($request->isXmlHttpRequest()) {
-                    $json['item'] = array();
-                    $data = $request->request->get('rabais_offre');
-                    if (isset($data['dateLimite'])) $rabais_offre->setDateLimite($data['dateLimite']);
-                    if (isset($data['nombreDeFois'])) $rabais_offre->setNombreDefois($data['nombreDeFois']);
-                    if (isset($data['prixUpdate'])) $rabais_offre->setPrixUpdate($data['prixUpdate']);
-                    if (isset($data['quantiteMin'])) $rabais_offre->setQuantiteMin($data['quantiteMin']);
-                    if (isset($data['beneficiaire']) && is_numeric($id = $data['beneficiaire'])) {
-                        /** @var Utilisateur_avm $beneficiaire */
-                        $beneficiaire = $em->getRepository('APMUserBundle:Utilisateur_avm')->find($id);
-                        $rabais_offre->setBeneficiaireRabais($beneficiaire);
-                    }
-                    if (isset($data['groupe']) && is_numeric($id = $data['groupe'])) {
-                        /** @var Groupe_relationnel $groupe */
-                        $groupe = $em->getRepository('APMVenteBundle:Groupe_relationnel')->find($id);
-                        $rabais_offre->setGroupe($groupe);
-                    }
-                    $em->persist($rabais_offre);
-                    $em->flush();
+                    $json = array();
                     $json["item"] = array(//prevenir le client
                         "action" => 0,
                     );
                     $session->getFlashBag()->add('success', "<strong> rabais d'offre créée. réf:" . $rabais_offre->getCode() . "</strong><br> Opération effectuée avec succès!");
                     return $this->json(json_encode($json), 200);
                 }
-                $em->persist($rabais_offre);
-                $em->flush();
                 return $this->redirectToRoute('apm_vente_rabais_offre_show', array('id' => $rabais_offre->getId()));
             } catch (ConstraintViolationException $cve) {
                 $session->getFlashBag()->add('danger', "<strong>Echec de l'enregistrement. </strong><br>L'enregistrement a échoué dû à une contrainte de données!");

@@ -52,11 +52,11 @@
                 </li>
             {% endif %}
             <li>
-                <a href="{{ path('apm_transport_livraison_edit', { 'id': livraison.id }) }}">Modifier</a>
+                <a href="{{ path('apm_transport_livraison_edit', { 'id': livraison.id }) }}">Modifier/ajouter operations</a>
             </li>
         {% endif %}
         <li>
-            <a href="{{ path('apm_transport_livraison_listeOperation_index', { 'id': livraison.id }) }}">Liste les
+            <a href="{{ path('apm_vente_transaction_livraison_index', { 'livraison_id': livraison.id }) }}">Liste les
                 opérations de cette livraison</a>
         </li>
         <li>

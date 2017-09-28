@@ -154,8 +154,6 @@ class OffreController extends Controller
                     //--------------
                 }
                 $this->get('apm_core.crop_image')->liipImageResolver($offre->getImage());//resouds tout en créant l'image
-                //$dist = dirname(__DIR__, 4);
-                //$file = $dist . '/web/' . $this->getParameter('images_url') . '/' . $offre->getImage();
                 if (null !== $offre->getImage()) {
                     return $this->redirectToRoute('apm_vente_offre_show-image', array('id' => $offre->getId()));
                 } else {

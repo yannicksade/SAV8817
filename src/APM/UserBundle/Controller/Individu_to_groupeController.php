@@ -8,6 +8,7 @@ use APM\UserBundle\Entity\Utilisateur_avm;
 use APM\UserBundle\Factory\TradeFactory;
 use Doctrine\Common\Collections\Collection;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Session;
 
@@ -187,17 +188,7 @@ class Individu_to_groupeController extends Controller
                 $individu_to_groupe->setGroupeRelationnel($groupe_relationnel);
                 $em = $this->getDoctrine()->getManager();
                 if ($request->isXmlHttpRequest()) {
-                    $json['item'] = array();
-                    $data = $request->request->get('individu_to_groupe');
-                    if (isset($data['propriete'])) $individu_to_groupe->setPropriete($data['propriete']);
-                    if (isset($data['description'])) $individu_to_groupe->setDescription($data['description']);
-                    if (isset($data['individu']) && is_numeric($id = $data['individu'])) {
-                        /** @var Utilisateur_avm $individu */
-                        $individu = $em->getRepository('APMUserBundle:Utilisateur_avm')->find($id);
-                        $individu_to_groupe->setIndividu($individu);
-                    }
-                    $em->persist($individu_to_groupe);
-                    $em->flush();
+                    $json = array();
                     $json["item"] = array(//prevenir le client
                         "action" => 0,
                     );
@@ -369,17 +360,22 @@ class Individu_to_groupeController extends Controller
      * Deletes a Individu_to_groupe entity.
      * @param Request $request
      * @param Individu_to_groupe $individu_to_groupe
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse | JsonResponse
      */
     public function deleteAction(Request $request, Individu_to_groupe $individu_to_groupe)
     {
         $this->editAndDeleteSecurity($individu_to_groupe);
-
+        $em = $this->getDoctrine()->getManager();
+        if ($request->isXmlHttpRequest()) {
+            $json = array();
+            $json['item'] = array();
+            $em->remove($individu_to_groupe);
+            $em->flush();
+            return $this->json($json, 200);
+        }
         $form = $this->createDeleteForm($individu_to_groupe);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            $this->editAndDeleteSecurity($individu_to_groupe);
-            $em = $this->getDoctrine()->getManager();
             $em->remove($individu_to_groupe);
             $em->flush();
         }
@@ -387,17 +383,13 @@ class Individu_to_groupeController extends Controller
         return $this->redirectToRoute('apm_user_individu-to-groupe_index');
     }
 
-    public function deleteFromListAction(Request $request, Individu_to_groupe $individu_to_groupe)
+    public function deleteFromListAction(Individu_to_groupe $individu_to_groupe)
     {
         $this->editAndDeleteSecurity($individu_to_groupe);
 
         $em = $this->getDoctrine()->getManager();
         $em->remove($individu_to_groupe);
         $em->flush();
-        if ($request->isXmlHttpRequest()) {
-            $json = array();
-            return $this->json($json, 200);
-        }
         return $this->redirectToRoute('apm_user_individu-to-groupe_index');
     }
 }

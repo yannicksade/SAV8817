@@ -3,11 +3,6 @@ apm_zone_intervention_index:
     defaults: { _controller: "APMTransportBundle:Zone_intervention:index" }
     methods:  GET
 
-apm_zone_transporteur-zone_intervention_index:
-    path:     /transporteur/{id}/zones
-    defaults: { _controller: "APMTransportBundle:Transporteur_zoneIntervention:index" }
-    methods:  GET
-
 apm_zone_intervention_show:
     path:     /{id}/show
     defaults: { _controller: "APMTransportBundle:Zone_intervention:show" }

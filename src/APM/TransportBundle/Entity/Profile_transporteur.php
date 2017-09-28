@@ -28,6 +28,13 @@ class Profile_transporteur extends TradeFactory
     private $code;
 
     /**
+     * @var \DateTime
+     * @Assert\DateTime
+     * @ORM\Column(name="dateEnregistrement", type="datetime", nullable=false)
+     */
+    private $dateEnregistrement;
+
+    /**
      * @var string
      * @Assert\NotBlank
      * @Assert\Length(min=2, max=205)
@@ -91,6 +98,7 @@ class Profile_transporteur extends TradeFactory
     {
         $this->transporteur_zones = new ArrayCollection();
         $this->zones = new ArrayCollection();
+        $this->dateEnregistrement = new \DateTime('now');
         $this->code = "XP" . $var;
     }
 
@@ -306,5 +314,29 @@ class Profile_transporteur extends TradeFactory
     public function __toString()
     {
         return $this->matricule;
+    }
+
+    /**
+     * Set dateEnregistrement
+     *
+     * @param \DateTime $dateEnregistrement
+     *
+     * @return Profile_transporteur
+     */
+    public function setDateEnregistrement($dateEnregistrement)
+    {
+        $this->dateEnregistrement = $dateEnregistrement;
+
+        return $this;
+    }
+
+    /**
+     * Get dateEnregistrement
+     *
+     * @return \DateTime
+     */
+    public function getDateEnregistrement()
+    {
+        return $this->dateEnregistrement;
     }
 }

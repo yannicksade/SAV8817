@@ -189,45 +189,43 @@ class Transaction_produitController extends Controller
     }
 
     /**
-     * @ParamConverter("offre", options={"mapping": {"offre_id":"id"}})
      * @param Request $request
      * @param Transaction $transaction
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response | JsonResponse
      */
-    public function newAction(Request $request, Transaction $transaction)
+    public function newAction(Request $request, Transaction $transaction = null)
     {
         $this->createSecurity();
         /** @var Session $session */
         $session = $request->getSession();
+        $em = $this->getDoctrine()->getManager();
         /** @var Transaction_produit $transaction_produit */
         $transaction_produit = TradeFactory::getTradeProvider('transaction_produit');
+        $trans = null;
+        if (null === $transaction) {
+            /** @var Transaction $trans */
+            $trans = TradeFactory::getTradeProvider('transaction');
+            $trans->setAuteur($this->getUser());
+            $transaction_produit->setTransaction($trans);
+        }
         $form = $this->createForm('APM\VenteBundle\Form\Transaction_produitType', $transaction_produit);
+        if (null !== $transaction) $form->remove('transaction'); else $transaction = $trans;
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             try {
                 $this->createSecurity($transaction_produit->getProduit());
                 $transaction_produit->setTransaction($transaction);
-                $em = $this->getDoctrine()->getManager();
+                $em->persist($transaction);
+                $em->persist($transaction_produit);
+                $em->flush();
                 if ($request->isXmlHttpRequest()) {
-                    $json['item'] = array();
-                    $data = $request->request->get('transaction_produit');
-                    if (isset($data['quantite'])) $transaction_produit->setQuantite($data['quantite']);
-                    if (isset($data['reference'])) $transaction_produit->setReference($data['reference']);
-                    if (isset($data['produit']) && is_numeric($id = $data['produit'])) {
-                        /** @var Offre $produit */
-                        $produit = $em->getRepository('APMVenteBundle:Offre')->find($id);
-                        $transaction_produit->setProduit($produit);
-                    }
-                    $em->persist($transaction_produit);
-                    $em->flush();
+                    $json = array();
                     $json["item"] = array(//prevenir le client
                         "action" => 0,
                     );
                     $session->getFlashBag()->add('success', "<strong> préparation de la transaction réf:" . $transaction_produit->getReference() . "</strong><br> Opération effectuée avec succès!");
                     return $this->json(json_encode($json), 200);
                 }
-                $em->persist($transaction_produit);
-                $em->flush();
                 return $this->redirectToRoute('apm_vente_transaction_produit_show', array('id' => $transaction_produit->getId()));
             } catch (ConstraintViolationException $cve) {
                 $session->getFlashBag()->add('danger', "<strong>Echec de l'enregistrement. </strong><br>L'enregistrement a échoué dû à une contrainte de données!");
@@ -280,10 +278,11 @@ class Transaction_produitController extends Controller
 
     /**
      * Finds and displays a Transaction_produit entity.
+     * @param Request $request
      * @param Transaction_produit $transaction_produit
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function showAction(Transaction_produit $transaction_produit)
+    public function showAction(Request $request, Transaction_produit $transaction_produit)
     {
         $this->listAndShowSecurity($transaction_produit->getTransaction(), $transaction_produit->getProduit());
         if ($request->isXmlHttpRequest()) {
@@ -388,16 +387,23 @@ class Transaction_produitController extends Controller
      * Deletes a Transaction_produit entity.
      * @param Request $request
      * @param Transaction_produit $transaction_produit
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse | JsonResponse
      */
     public function deleteAction(Request $request, Transaction_produit $transaction_produit)
     {
         $this->editAndDeleteSecurity($transaction_produit);
+        $em = $this->getDoctrine()->getManager();
+        if ($request->isXmlHttpRequest()) {
+            $json = array();
+            $json['item'] = array();
+            $em->remove($transaction_produit);
+            $em->flush();
+            return $this->json($json, 200);
+        }
+
         $form = $this->createDeleteForm($transaction_produit);
         $form->handleRequest($request);
-
         if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
             $em->remove($transaction_produit);
             $em->flush();
         }
@@ -411,10 +417,6 @@ class Transaction_produitController extends Controller
         $em = $this->getDoctrine()->getManager();
         $em->remove($transaction_produit);
         $em->flush();
-        if ($request->isXmlHttpRequest()) {
-            $json = array();
-            return $this->json($json, 200);
-        }
 
         return $this->redirectToRoute('apm_vente_transaction_produit_index', ['id' => $transaction_produit->getTransaction()->getId()]);
     }

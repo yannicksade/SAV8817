@@ -91,8 +91,11 @@
                 la boutique</a>
         </li>
         <li>
-            <a href="{{ path('apm_vente_transaction_boutique_new', {'id':boutique.id}) }}">Créer une transaction
+            <a href="{{ path('apm_vente_transaction_boutique_new', {'id':boutique.id}) }}">Créer une transaction ordinaire a partir de la
                 boutique</a>
+        </li>
+        <li>
+            <a href="{{ path('apm_transport_livraison_boutique_new', {'id':boutique.id}) }}">creer une livraison dans cette boutique</a>
         </li>
         <li>
             <a href="{{ path('apm_transport_livraison_boutique_new', {'id':boutique.id}) }}">Créer une livraison à

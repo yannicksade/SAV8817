@@ -29,6 +29,12 @@ class Transporteur_zoneintervention extends TradeFactory
     private $id;
 
     /**
+     * @var \DateTime
+     * @ORM\Column(name="dateEnregistrement", type="datetime", nullable=false)
+     */
+    private $dateEnregistrement;
+
+    /**
      * @var Profile_transporteur
      * @ORM\ManyToOne(targetEntity="APM\TransportBundle\Entity\Profile_transporteur", inversedBy="transporteur_zones")
      * @ORM\JoinColumns({
@@ -45,6 +51,12 @@ class Transporteur_zoneintervention extends TradeFactory
      * })
      */
     private $zoneIntervention;
+
+    function __construct()
+    {
+        $this->dateEnregistrement = new \DateTime('now');
+    }
+
 
     /**
      * Get id
@@ -102,5 +114,29 @@ class Transporteur_zoneintervention extends TradeFactory
         $this->zoneIntervention = $zoneIntervention;
 
         return $this;
+    }
+
+    /**
+     * Set dateEnregistrement
+     *
+     * @param \DateTime $dateEnregistrement
+     *
+     * @return Transporteur_zoneintervention
+     */
+    public function setDateEnregistrement($dateEnregistrement)
+    {
+        $this->dateEnregistrement = $dateEnregistrement;
+
+        return $this;
+    }
+
+    /**
+     * Get dateEnregistrement
+     *
+     * @return \DateTime
+     */
+    public function getDateEnregistrement()
+    {
+        return $this->dateEnregistrement;
     }
 }

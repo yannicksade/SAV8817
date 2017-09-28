@@ -303,7 +303,7 @@ abstract class Utilisateur extends BaseUser
 
     public function __toString()
     {
-        return $this->prenom ? $this->prenom : $this->username;
+        return $this->username;
     }
 
     /**

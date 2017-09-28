@@ -17,3 +17,7 @@ apm_transport_transporteur:
 apm_transport_zone_intervention:
     resource: "@APMTransportBundle/Resources/config/routing/zone_intervention.yml"
     prefix:   /transport/zone_intervention
+
+apm_transport_Transporteur_zoneIntervention:
+    resource: "@APMTransportBundle/Resources/config/routing/transporteur_zone.yml"
+    prefix:   /transport-zone_intervention

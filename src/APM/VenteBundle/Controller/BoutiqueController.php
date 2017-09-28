@@ -10,6 +10,7 @@ use APM\VenteBundle\Entity\Offre;
 use APM\VenteBundle\Factory\TradeFactory;
 use Doctrine\Common\Collections\Collection;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Session;
 
@@ -113,7 +114,7 @@ class BoutiqueController extends Controller
             });
         }
         if ($this->nationalite_filter != null) {
-            $boutiques = $offres->filter(function ($e) {//filter with the begining of the entering word
+            $boutiques = $boutiques->filter(function ($e) {//filter with the begining of the entering word
                 /** @var Boutique $e */
                 $str1 = $e->getNationalite();
                 $str2 = $this->nationalite_filter;
@@ -152,7 +153,7 @@ class BoutiqueController extends Controller
     /**
      * Creates a new Boutique entity.
      * @param Request $request
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response | JsonResponse
      */
     public function newAction(Request $request)
     {
@@ -167,23 +168,10 @@ class BoutiqueController extends Controller
             try {
                 $boutique->setProprietaire($this->getUser());
                 $em = $this->getEM();
+                $em->persist($boutique);
+                $em->flush();
                 if ($request->isXmlHttpRequest()) {
-                    $json['item'] = array();
-                    $data = $request->request->get('boutique');
-                    $boutique->setDesignation($data['designation']);
-                    if (isset($data['etat'])) $boutique->setEtat($data['etat']);
-                    if (isset($data['description'])) $boutique->setDescription($data['description']);
-                    if (isset($data['raisonSociale'])) $boutique->setRaisonSociale($data['raisonSociale']);
-                    if (isset($data['nationalite'])) $boutique->setNationalite($data['nationalite']);
-                    if (isset($data['publiable'])) $boutique->setPubliable($data['publiable']);
-                    if (isset($data['gerant']) && is_numeric($id = $data['gerant'])) {
-                        $gerant = $em->getRepository('APMUserBundle:Utilisateur_avm')->find($id);
-                        $boutique->setGerant($gerant);
-                    }
-                    if (isset($data['statutSocial'])) $boutique->setStatutSocial($data['statutSocial']);
-                    if (isset($data['imageFile'])) $boutique->setImage($data['imageFile']);
-                    $em->persist($boutique);
-                    $em->flush();
+                    $json = array();
                     $json["item"] = array(//prevenir le client
                         "action" => 0,
                         "id" => null,
@@ -191,8 +179,6 @@ class BoutiqueController extends Controller
                     $session->getFlashBag()->add('success', "<strong> Boutique créée. réf:" . $boutique->getCode() . "</strong><br> Opération effectuée avec succès!");
                     return $this->json(json_encode($json));
                 }
-                $em->persist($boutique);
-                $em->flush();
                 $this->get('apm_core.crop_image')->liipImageResolver($boutique->getImage());
                 //$dist = dirname(__DIR__, 4);
                 //$file = $dist . '/web/' . $this->getParameter('images_url') . '/' . $boutique->getImage();
@@ -219,12 +205,14 @@ class BoutiqueController extends Controller
         ));
     }
 
-    private function getEM()
+    private
+    function getEM()
     {
         return $this->get('doctrine.orm.entity_manager');
     }
 
-    public function showImageAction(Request $request, Boutique $boutique)
+    public
+    function showImageAction(Request $request, Boutique $boutique)
     {
         $this->listAndShowSecurity();
         $form = $this->createCrobForm($boutique);
@@ -242,7 +230,8 @@ class BoutiqueController extends Controller
         ));
     }
 
-    private function createCrobForm(Boutique $boutique)
+    private
+    function createCrobForm(Boutique $boutique)
     {
         return $this->createFormBuilder()
             ->setAction($this->generateUrl('apm_vente_boutique_show-image', array('id' => $boutique->getId())))
@@ -256,7 +245,8 @@ class BoutiqueController extends Controller
      * @param Boutique $boutique
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function showAction(Request $request, Boutique $boutique)
+    public
+    function showAction(Request $request, Boutique $boutique)
     {
         $this->listAndShowSecurity();
         if ($request->isXmlHttpRequest()) {
@@ -291,7 +281,8 @@ class BoutiqueController extends Controller
      *
      * @return \Symfony\Component\Form\Form The form
      */
-    private function createDeleteForm(Boutique $boutique)
+    private
+    function createDeleteForm(Boutique $boutique)
     {
         return $this->createFormBuilder()
             ->setAction($this->generateUrl('apm_vente_boutique_delete', array('id' => $boutique->getId())))
@@ -305,7 +296,8 @@ class BoutiqueController extends Controller
      * @param Boutique $boutique
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function editAction(Request $request, Boutique $boutique)
+    public
+    function editAction(Request $request, Boutique $boutique)
     {
         $this->editAndDeleteSecurity($boutique);
         $oldGerant = $boutique->getGerant();
@@ -389,7 +381,8 @@ class BoutiqueController extends Controller
     /**
      * @param Boutique $boutique
      */
-    private function editAndDeleteSecurity($boutique)
+    private
+    function editAndDeleteSecurity($boutique)
     {
         //---------------------------------security-----------------------------------------------
         // Unable to access the controller unless you have a USERAVM role
@@ -410,7 +403,8 @@ class BoutiqueController extends Controller
      * @param $oldGerant
      * @param $newGerant
      */
-    private function personnelBoutique($boutique, $oldGerant, $newGerant)
+    private
+    function personnelBoutique($boutique, $oldGerant, $newGerant)
     {
         if ($newGerant !== $oldGerant) {
             /** @var Offre $offre */
@@ -428,16 +422,18 @@ class BoutiqueController extends Controller
      * @param Boutique $boutique
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
-    public function deleteAction(Request $request, Boutique $boutique)
+    public
+    function deleteAction(Request $request, Boutique $boutique)
     {
         $this->editAndDeleteSecurity($boutique);
         $em = $this->getEM();
 
-        if ($request->isXmlHttpRequest() && $request->getMethod() === "POST") {
+        if ($request->isXmlHttpRequest()) {
             $em->remove($boutique);
             $em->flush();
             $json = array();
-            return $this->json($json, 200);
+            $json['item'];
+            return $this->json(json_encode($json), 200);
         }
 
         $form = $this->createDeleteForm($boutique);
@@ -452,7 +448,8 @@ class BoutiqueController extends Controller
     /*changer le personnel ayant le droit sur les produits de la
      * changer les droits sur les offres
     */
-    public function deleteFromListAction(Boutique $boutique)
+    public
+    function deleteFromListAction(Boutique $boutique)
     {
         $this->editAndDeleteSecurity($boutique);
         $em = $this->getDoctrine()->getManager();
@@ -463,7 +460,8 @@ class BoutiqueController extends Controller
     }
 
 
-    private function personalSecurity()
+    private
+    function personalSecurity()
     {
         //-----------------------------------security-------------------------------------------
         $this->denyAccessUnlessGranted('ROLE_BOUTIQUE', null, 'Unable to access this page!');
@@ -473,7 +471,8 @@ class BoutiqueController extends Controller
 
     }
 
-    private function adminSecurity()
+    private
+    function adminSecurity()
     {
         //-----------------------------------security-------------------------------------------
         $this->denyAccessUnlessGranted('ROLE_ADMIN', null, 'Unable to access this page!');
@@ -483,7 +482,8 @@ class BoutiqueController extends Controller
         //----------------------------------------------------------------------------------------
     }
 
-    private function listAndShowSecurity()
+    private
+    function listAndShowSecurity()
     {
         //-----------------------------------security-------------------------------------------
         $this->denyAccessUnlessGranted('ROLE_USERAVM', null, 'Unable to access this page!');
@@ -493,7 +493,8 @@ class BoutiqueController extends Controller
         //----------------------------------------------------------------------------------------
     }
 
-    private function createSecurity()
+    private
+    function createSecurity()
     {
         //---------------------------------security-----------------------------------------------
         $this->denyAccessUnlessGranted('ROLE_BOUTIQUE', null, 'Unable to access this page!');

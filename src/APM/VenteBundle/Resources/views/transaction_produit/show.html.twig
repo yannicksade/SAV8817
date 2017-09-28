@@ -32,7 +32,7 @@
 
     <ul>
         <li>
-            <a href="{{ path('apm_vente_transaction_produit_liste_index',{'id': transaction_produit.transaction.id}) }}"> retouner aux transactions</a>
+            <a href="{{ path('apm_vente_transaction_produit_index',{'id': transaction_produit.transaction.id}) }}"> retouner aux transactions</a>
         </li>
 
         {% if transaction_produit.transaction.auteur == app.user %}
@@ -55,8 +55,8 @@
                 <a href="{{ path('apm_vente_transaction_produit_edit', { 'id': transaction_produit.id }) }}">modifier</a>
             </li>
             <li>
-                <a href="{{ path('apm_vente_transaction_produit_new',{'id': transaction_produit.transaction.id}) }}">Préparer une
-                    nouvelle transaction </a>
+                <a href="{{ path('apm_vente_transaction_produit_new',{'id': transaction_produit.transaction.id}) }}">Ajout une
+                    nouveau produit à la transaction </a>
             </li>
         {% endif %}
 
