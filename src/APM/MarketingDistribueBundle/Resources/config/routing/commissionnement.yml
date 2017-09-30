@@ -33,6 +33,7 @@ apm_marketing_commissionnement_delete:
     path:     /{id}/delete
     defaults: { _controller: "APMMarketingDistribueBundle:Commissionnement:delete" }
     methods:  DELETE
+
 apm_marketing_commissionnement_deleteFromList:
     path:     /list/{id}/delete
     defaults: { _controller: "APMMarketingDistribueBundle:Commissionnement:deleteFromList" }

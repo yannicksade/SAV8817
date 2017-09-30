@@ -14,6 +14,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
+use Symfony\Component\HttpFoundation\Session\Session;
 
 
 /**
@@ -22,15 +23,12 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
  */
 class LivraisonController extends Controller
 {
-    private $date_filter;
     private $code_filter;
     private $livreur_boutique;
     private $description_filter;
     private $etat_filter;
     private $priorite_filter;
     private $valide_filter;
-    private $dateFrom_filter;
-    private $dateTo_filter;
     private $dateEnregistrementTo_filter;
     private $dateEnregistrementFrom_filter;
     private $datePrevueFrom_filter;
@@ -56,7 +54,10 @@ class LivraisonController extends Controller
         if ($request->isXmlHttpRequest()) {
             $json = array();
             $json['items'] = array();
-            $this->date_filter = $request->request->has('date_filter') ? $request->request->get('date_filter') : "";
+            $this->datePrevueFrom_filter = $request->request->has('datePrevueFrom_filter') ? $request->request->get('datePrevueFrom_filter') : "";
+            $this->datePrevueTo_filter = $request->request->has('datePrevueTo_filter') ? $request->request->get('datePrevueTo_filter') : "";
+            $this->dateEnregistrementFrom_filter = $request->request->has('dateEnregistrementFrom_filter') ? $request->request->get('dateEnregistrementFrom_filter') : "";
+            $this->dateEnregistrementTo_filter = $request->request->has('dateEnregistrementTo_filter') ? $request->request->get('dateEnregistrementTo_filter') : "";
             $this->code_filter = $request->request->has('code_filter') ? $request->request->get('code_filter') : "";
             $this->livreur_boutique = $request->request->has('livreur_boutique') ? $request->request->get('livreur_boutique') : "";
             $this->description_filter = $request->request->has('description_filter') ? $request->request->get('description_filter') : "";
@@ -119,7 +120,7 @@ class LivraisonController extends Controller
             $livraisons = $livraisons->filter(function ($e) {//start date
                 /** @var Livraison $e */
                 $dt1 = (new \DateTime($e->getDateEtHeureLivraison()->format('d-m-Y H:i')))->getTimestamp();
-                $dt2 = (new \DateTime($this->dateFrom_filter))->getTimestamp();
+                $dt2 = (new \DateTime($this->datePrevueFrom_filter))->getTimestamp();
                 return $dt1 - $dt2 >= 0 ? true : false; //start from the given date 'dateFrom_filter'
             });
         }
@@ -127,7 +128,7 @@ class LivraisonController extends Controller
             $livraisons = $livraisons->filter(function ($e) {//end date
                 /** @var Livraison $e */
                 $dt = (new \DateTime($e->getDateEtHeureLivraison()->format('d-m-Y H:i')))->getTimestamp();
-                $dt2 = (new \DateTime($this->dateTo_filter))->getTimestamp();
+                $dt2 = (new \DateTime($this->datePrevueTo_filter))->getTimestamp();
                 return $dt - $dt2 <= 0 ? true : false;// end from at the given date 'dateTo_filter'
             });
         }
@@ -243,11 +244,9 @@ class LivraisonController extends Controller
             $em = $this->getDoctrine()->getManager();
             $em->persist($livraison);
             $em->flush();
-            
             if($request->isXmlHttpRequest()){
                 $json = array();
                 $json['item'] =array();
-                
                 return $this->json(json_encode($json), 200);
             }
             
@@ -375,9 +374,10 @@ class LivraisonController extends Controller
     public function editAction(Request $request, Livraison $livraison)
     {
         $this->editAndDeleteSecurity($livraison);
-        $deleteForm = $this->createDeleteForm($livraison);
         $editForm = $this->createForm('APM\TransportBundle\Form\LivraisonType', $livraison);
         $editForm->handleRequest($request);
+        /** @var Session $session */
+        $session = $request->getSession();
         if ($editForm->isSubmitted() && $editForm->isValid() 
             || $request->isXmlHttpRequest() && $request->isMethod('POST')) {
             $em = $this->getDoctrine()->getManager();
@@ -438,6 +438,7 @@ class LivraisonController extends Controller
                 return $this->json(json_encode(["item" => null]));
             }
         }
+        $deleteForm = $this->createDeleteForm($livraison);
         return $this->render('APMTransportBundle:livraison:edit.html.twig', array(
             'livraison' => $livraison,
             'edit_form' => $editForm->createView(),

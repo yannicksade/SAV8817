@@ -15,17 +15,17 @@
         </thead>
         <tbody>
         {% for boutique_commissionnements in boutiques_commissionnements %}
-            {% for commissionnement in boutique_commissionnements.commissionnements %}
+            {% for commissionnement in boutique_commissionnements %}
                 <tr>
                     <td>
                         <a href="{{ path('apm_marketing_commissionnement_show', { 'id': commissionnement.id }) }}">{{ commissionnement.code }}</a>
                     </td>
                     <td>
-                        <a href="{{ path('apm_vente_boutique_show', { 'id':boutique_commissionnements.boutique.id }) }}">{{ boutique_commissionnements.boutique }}</a>
+                        <a href="{{ path('apm_vente_boutique_show', { 'id':commissionnement.conseillerBoutique.boutique.id }) }}">{{ commissionnement.conseillerBoutique.boutique }}</a>
                     </td>
                     <td>{{ commissionnement.libelle }}</td>
                     <td>
-                        <a href="{{ path('apm_marketing_conseiller_show', { 'id': boutique_commissionnements.conseiller.id }) }}">{{ boutique_commissionnements.conseiller }}</a>
+                        <a href="{{ path('apm_marketing_conseiller_show', { 'id': commissionnement.conseillerBoutique.conseiller.id }) }}">{{ commissionnement.conseillerBoutique.conseiller }}</a>
                     </td>
                     <td>
                         <ul>

@@ -38,7 +38,7 @@
     {% if conseillerCourant == conseiller and conseiller.masterConseiller %}
         <ul>
             <li>
-                <a href="{{ path('apm_marketing_reseau_add', { 'id': conseiller.id }) }}">Ajouter/Modifier un membre</a>
+                <a href="{{ path('apm_marketing_reseau_add', { 'id': conseiller.id }) }}">Ajouter/Modifier membre/fusionner deux réseaux</a>
             </li>
             {% if conseillerCourant == conseiller.masterConseiller.conseillerGauche or conseillerCourant == conseiller.masterConseiller.conseillerDroite %}
                 <li>
@@ -51,14 +51,8 @@
     {% elseif conseiller.masterConseiller %}
         <ul>
             <li>
-                <a href="{{ path('apm_marketing_reseau_left_promote', {'id':conseiller.id}) }}">Promouvoir le fils
-                    de
-                    gauche</a>
-            </li>
-            <li>
-                <a href="{{ path('apm_marketing_reseau_right_promote', {'id':conseiller.id}) }}">Promouvoir le fils
-                    de
-                    droite</a>
+                <a href="{{ path('apm_marketing_reseau_promote', {'id':conseiller.id}) }}">Promotion d'un fils
+                    en remplacement du conseiller absent</a>
             </li>
             <li>
                 <a href="{{ path('apm_marketing_reseau_index') }}"> Restourner a mon reseau </a>

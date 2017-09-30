@@ -1,7 +1,7 @@
 {% extends "APMAdminBundle:_Main:layout.html.twig" %}
 
 {% block body %}
-    <h1>{% if app.user.profileConseiller == conseiller %} Ajouter un membre à votre réseau {% else %} Quitter le réseau du grand maître {{ conseiller }} {% endif %}</h1>
+    <h1>{% if app.user.profileConseiller == conseiller %} Ajouter un membre à votre réseau {% elseif not conseiller %} Promotion de membre {% else %} Quitter le réseau du grand maître {{ conseiller }} {% endif %}</h1>
     {{ form_start(form) }}
     {{ form_widget(form) }}
     <input type="submit" value="Valider"/>

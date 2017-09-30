@@ -15,17 +15,10 @@ apm_marketing_reseau_new:
 
 apm_marketing_reseau_add:
     path:     /member-add/{id}
-    defaults: { _controller: "APMMarketingReseauBundle:Reseau_conseillers:addMember" }
+    defaults: { _controller: "APMMarketingReseauBundle:Reseau_conseillers:handleNetworkingMembers" }
+    methods:  [GET, POST]
 
-#apm_marketing_reseau_right_add:
- #   path:     /right-add/{id}
-  #  defaults: { _controller: "APMMarketingReseauBundle:Reseau_conseillers:addRightMember" }
-
-
-apm_marketing_reseau_left_promote:
-    path:     /left-promote/{id}
-    defaults: { _controller: "APMMarketingReseauBundle:Reseau_conseillers:promoteLeftMember" }
-
-apm_marketing_reseau_right_promote:
-    path:     /right-promote/{id}
-    defaults: { _controller: "APMMarketingReseauBundle:Reseau_conseillers:promoteRightMember" }
+apm_marketing_reseau_promote:
+    path:     /member-promote/{id}
+    defaults: { _controller: "APMMarketingReseauBundle:Reseau_conseillers:promoteMember" }
+    methods:  [GET, POST]
