@@ -28,7 +28,6 @@ class Reseau_conseillersType extends AbstractType
             ])
             ->add('modification', ChoiceType::class, [
                 'expanded' => true,
-                'empty_data' => '0',
                 'choices' => [
                     'Inserer' => 0,
                     'Remplacer' => 1,
@@ -37,12 +36,11 @@ class Reseau_conseillersType extends AbstractType
             ])
             ->add('position', ChoiceType::class, [
                 'choices' => [
-                    'gauche' => 1,
-                    'droite' => 0,
+                    'gauche' => true,
+                    'droite' => false,
                 ],
                 'expanded' => true,
                 'required' => true,
-                'empty_data' => '1',
             ])
         ;
     }

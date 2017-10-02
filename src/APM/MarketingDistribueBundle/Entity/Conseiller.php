@@ -109,14 +109,14 @@ class Conseiller extends TradeFactory
     /**
      * @var Conseiller
      *
-     * @ORM\OneToOne(targetEntity="APM\MarketingDistribueBundle\Entity\Conseiller")
+     * @ORM\ManyToOne(targetEntity="APM\MarketingDistribueBundle\Entity\Conseiller")
      */
     private $conseillerDroite;
 
     /**
      * @var Conseiller
      *
-     * @ORM\OneToOne(targetEntity="APM\MarketingDistribueBundle\Entity\Conseiller")
+     * @ORM\ManyToOne(targetEntity="APM\MarketingDistribueBundle\Entity\Conseiller")
      */
     private $conseillerGauche;
 

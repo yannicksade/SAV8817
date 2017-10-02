@@ -305,7 +305,6 @@ var GroupeOffrePage = function () {
             tab2.onclick = function () {
                 modal_stk.modalElement = '#stack2';
             };
-
             $('.composer_item').click(function () {
                 modifierImpl($(this).parents('.portlet'));
             });

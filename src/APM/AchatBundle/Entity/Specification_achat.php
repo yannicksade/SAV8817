@@ -53,6 +53,13 @@ class Specification_achat extends TradeFactory
     private $dateLivraisonSouhaite;
 
     /**
+     * @var \DateTime
+     * @Assert\DateTime()
+     * @ORM\Column(name="$dateCreation", type="datetime", nullable=true)
+     */
+    private $dateCreation;
+
+    /**
      * @var boolean
      * @Assert\Choice({0,1})
      * @ORM\Column(name="echantillon", type="boolean", nullable=false)
@@ -100,6 +107,7 @@ class Specification_achat extends TradeFactory
         $this->livraison = false;
         $this->echantillon = false;
         $this->code = "OA" . $var;
+        $this->dateCreation = new \DateTime('now');
 
     }
 
@@ -338,5 +346,29 @@ class Specification_achat extends TradeFactory
     public function __toString()
     {
         return $this->code;
+    }
+
+    /**
+     * Set dateCreation
+     *
+     * @param \DateTime $dateCreation
+     *
+     * @return Specification_achat
+     */
+    public function setDateCreation($dateCreation)
+    {
+        $this->dateCreation = $dateCreation;
+
+        return $this;
+    }
+
+    /**
+     * Get dateCreation
+     *
+     * @return \DateTime
+     */
+    public function getDateCreation()
+    {
+        return $this->dateCreation;
     }
 }

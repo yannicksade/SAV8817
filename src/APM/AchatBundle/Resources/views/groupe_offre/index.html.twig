@@ -45,63 +45,13 @@
                            class="btn btn-primary">edit</a>
                         <a href="{{ path('apm_achat_groupe_delete', { 'id': groupe_offre.id }) }}"
                            class="btn btn-primary">delete</a>
-                        <a href="{{ path('apm_achat_groupe_offres_index', { 'id': groupe_offre.id }) }}"
+                        <a href="{{ path('apm_vente_offre_groupe_index', { 'groupe_id': groupe_offre.id }) }}"
                            class="btn btn-primary">liste tous les produits &raquo</a>
                         <a href="#" class="btn btn-primary fa fa-user"> partager</a>
 
                     </div>
                 </div>
             {% endfor %}
-        </div>
-        <div class="col-lg-3">
-            {{ form_start(form) }}
-            {{ form_errors(form) }}
-            <div class="thumbnail margin-top-10">
-                <h3>Créer ou modifier un groupe pour produits</h3>
-                <i>{{ form_row(form.code, {'attr':{'class':'form-control','readonly':'true'}}) }}</i>
-                <div class="form-group">
-                    {{ form_label(form.designation, 'Désignation', {'attr':{'class':'control-label'}}) }}
-                    {{ form_widget(form.designation, {'attr':{'class':'form-control'}}) }}
-                </div>
-                <div class="form-group">
-                    {{ form_label(form.dateDeVigueur, 'date de l\'operation futur', {'attr':{'class':'control-label'}}) }}
-                    <div class="input-group date datetime form_datetime bs-datetime"
-                         data-date-format="yyyy-dd-mm - hh:ii">
-                        <span class="input-group-addon">
-                            <button class="btn default date-set" type="button">
-                                <i class="fa fa-calendar"></i>
-                            </button>
-                        </span>
-                        {{ form_widget(form.dateDeVigueur, {'attr':{'class':'form-control','readonly':'true'}}) }}
-                        <span class="input-group-addon">
-                            <button class="btn default date-reset" type="button">
-                                <i class="fa fa-times"></i>
-                            </button>
-                        </span>
-                    </div>
-                </div>
-                <div class="form-group">
-                    {{ form_label(form.recurrent, 'Me rapeler un jour avant?', {'attr':{'class':'control-label'}}) }}
-                    {{ form_widget(form.recurrent) }}
-                </div>
-                <div class="form-group">
-                    {{ form_label(form.propriete, 'Action', {'attr':{'class':'control-label'}}) }}
-                    {{ form_widget(form.propriete, {'attr':{'class':'form-control'}}) }}
-                </div>
-                <div class="form-group">
-                    {{ form_label(form.description, 'Description', {'attr':{'class':'control-label'}}) }}
-                    {{ form_widget(form.description, {'attr':{'class':'form-control'}}) }}
-                </div>
-
-                <div class="center-block">
-                    <input type="submit" value="Valider" class="margin-right-10"/>
-                    <input type="reset" value="Reset" class="margin-left-10 margin-right-10"/>
-                    <a href="{{ path('apm_achat_groupe_index') }}">
-                        <button class="margin-left-10">Annuler</button>
-                    </a>
-                </div>
-            </div>
-            {{ form_end(form) }}
         </div>
     </div>
 {% endblock content_body %}

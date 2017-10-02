@@ -28,6 +28,7 @@ class Base_documentaire extends TradeFactory
      * @ORM\Column(name="code", type="string", length=255, nullable=true)
      */
     private $code;
+
     /**
      * @var string
      * @Assert\Length(min=2, max=254)
@@ -99,7 +100,7 @@ class Base_documentaire extends TradeFactory
     public function __construct($var)
     {
         $this->code = "BD" . $var;
-        $this->date = new \DateTime();
+        $this->date = $this->updatedAt =  new \DateTime();
     }
 
     public function getProductFile()

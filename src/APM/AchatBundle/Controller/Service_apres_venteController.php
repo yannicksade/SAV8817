@@ -8,12 +8,14 @@ use APM\UserBundle\Entity\Utilisateur_avm;
 use APM\VenteBundle\Entity\Boutique;
 use APM\VenteBundle\Entity\Offre;
 use APM\VenteBundle\Entity\Transaction_produit;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Exception\ConstraintViolationException;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use SebastianBergmann\CodeCoverage\RuntimeException;
+use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 
@@ -23,81 +25,201 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
  */
 class Service_apres_venteController extends Controller
 {
+    private $offre_filter;
+    private $boutique_filter;
+    private $desc_filter;
+    private $etat_filter;
+    private $dateFrom_filter;
+    private $dateTo_filter;
+    private $affiliation_filter;
+    private $code_filter;
+    private $commentaire_filter;
+    private $client_filter;
 
     /**
      * @ParamConverter("offre", options={"mapping": {"offre_id":"id"}})
      * liste les SAV du clients
+     * @param Request $request
      * @param Boutique $boutique
      * @param Offre $offre
-     * @return \Symfony\Component\HttpFoundation\Response Liste tous les SAV d'un client
+     * @return \Symfony\Component\HttpFoundation\Response| JsonResponse Liste tous les SAV d'un client
      *
-     * Liste tous les SAV enregistrés entant que client et les SAV receptionné en tant que boutique ou les SAV d'une offre
+     * Liste tous les SAV enregistrés entant que client, les SAV receptionnés en tant que boutique ou les SAV d'une offre
      */
     public function indexAction(Request $request, Boutique $boutique = null, Offre $offre = null)
     {
-        if($boutique){
+        $this->listAndShowSecurity();
+        $services = new ArrayCollection();
+        if (null !== $boutique) {
             $this->listAndShowSecurity($boutique, null);
             $offres = $boutique->getOffres();
             /** @var Offre $offre */
-            foreach ($offres as $offre){
-                $service_apres_ventes [] = array(
-                    'offre' => $offre,
-                    'services'=>$offre->getServiceApresVentes(),
-                );
+            foreach ($offres as $offre) {
+                $service_apres_ventes = $offre->getServiceApresVentes();
+                foreach ($service_apres_ventes as $service) {
+                    $services->add($service);
+                }
             }
 
-        }elseif ($offre){
+        } elseif (null !== $offre) {
             $this->listAndShowSecurity(null, $offre);
-            $service_apres_ventes [] = array(
-                'offre' => $offre,
-                'services'=>$offre->getServiceApresVentes(),
-            );
-        }else {
-            $this->listAndShowSecurity();
+            $services = $offre->getServiceApresVentes();
+        } else {// recupérer les sav de toutes les boutiques de l'utilisateur
             /** @var Utilisateur_avm $user */
             $user = $this->getUser();
-            $service_apres_ventes = null;
-            $services = $user->getServicesApresVentes();
-            /** @var Service_apres_vente $service_apres_vente */
-            foreach ($services as $service_apres_vente){
-                $service_apres_ventes [] = array(
-                    'offre' => $service_apres_vente->getOffre(),
-                    'services' => [$service_apres_vente],
-                );
+            if ($request->query->has("q")
+                && $request->query->get("q") === "boutiques"
+            ) {
+                //----------------------------------Boutiques -----------------------------------
+                $boutiques = $user->getBoutiquesGerant();
+                /** @var Boutique $boutique */
+                foreach ($boutiques as $boutique) {
+                    $offres = $boutique->getOffres();
+                    /** @var Offre $offre */
+                    foreach ($offres as $offre) {
+                        $service_apres_ventes = $offre->getServiceApresVentes();
+                        foreach ($service_apres_ventes as $service) {
+                            $services->add($service);
+                        }
+                    }
+                }
+                $boutiques = $user->getBoutiquesProprietaire();
+                /** @var Boutique $boutique */
+                foreach ($boutiques as $boutique) {
+                    $offres = $boutique->getOffres();
+                    /** @var Offre $offre */
+                    foreach ($offres as $offre) {
+                        $service_apres_ventes = $offre->getServiceApresVentes();
+                        foreach ($service_apres_ventes as $service) {
+                            $services->add($service);
+                        }
+                    }
+                }
+            } else {
+                $service_apres_ventes = $user->getServicesApresVentes();
+                foreach ($service_apres_ventes as $service) {
+                    $services->add($service);
+                }
             }
+        }
 
+        if ($request->isXmlHttpRequest() && $request->getMethod() === "POST") {
+            $json = array();
+            $json['data'] = array();
+            $session = $this->get('session');
+            try { //----- Security control  -----
+                //filter parameters
+                $this->code_filter = $request->request->has('code_filter') ? $request->request->get('code_filter') : "";
+                $this->offre_filter = $request->request->has('offre_filter') ? $request->request->get('offre_filter') : "";
+                $this->boutique_filter = $request->request->has('boutique_filter') ? $request->request->get('boutique_filter') : "";
+                $this->desc_filter = $request->request->has('desc_filter') ? $request->request->get('desc_filter') : "";
+                $this->dateFrom_filter = $request->request->has('date_from_filter') ? $request->request->get('date_from_filter') : "";
+                $this->dateTo_filter = $request->request->has('date_to_filter') ? $request->request->get('date_to_filter') : "";
+                $this->etat_filter = $request->request->has('etat_filter') ? $request->request->get('etat_filter') : "";
+                $this->affiliation_filter = $request->request->has('affiliation_filter') ? $request->request->get('affiliation_filter') : "";
+
+                $this->commentaire_filter = $request->request->has('commentaire_filter') ? $request->request->get('commentaire_filter') : "";
+                $this->client_filter = $request->request->has('client_filter') ? $request->request->get('client_filter') : "";
+                $iDisplayLength = intval($request->request->get('length'));
+                $iDisplayStart = intval($request->request->get('start'));
+
+                $sEcho = intval($request->request->get('draw'));
+
+                $status_list = array(
+                    array("danger" => "En panne"), //0
+                    array("success" => "Problème résolu"),//1
+                    array("info" => "En cours de diagnostic"),//2
+                    array("info" => "En cours de dépannage"),//3
+                    array("danger" => "Déclaré hors service"),//4
+                    array("info" => "En observation"),//5
+                    array("warning" => "Frais exigible"),//6
+                    array("danger" => "Demande rejetée"),//7
+                    array("info" => "Problème soumis"),//8
+                );
+                $iTotalRecords = count($services); // counting
+                $services = $this->handleResults($services, $iTotalRecords, $iDisplayStart, $iDisplayLength); // filtering
+                $iFilteredRecords = count($services);
+                //------------------------------------
+                $id = 0; // identity of rows in the table
+                /** @var Service_apres_vente $service_apres_vente */
+                foreach ($services as $service_apres_vente) {
+                    $id += 1;
+                    $etat = $service_apres_vente->getEtat();
+                    $offre = $service_apres_vente->getOffre();
+                    $boutique = $offre->getBoutique();
+                    $panne = $service_apres_vente->getDescriptionPanne();
+                    $json['data'][] = array(
+                        '<label class="mt-checkbox mt-checkbox-single mt-checkbox-outline"><input name="id_' . $service_apres_vente->getId() . '" type="checkbox" class="checkboxes"/><span></span></label>',
+                        '<span><i class="id hidden">' . $service_apres_vente->getId() . '</i><i class="hidden code">' . $service_apres_vente->getCode() . '</i><i class="hidden client">' . $service_apres_vente->getClient() . '</i><i class="hidden clientID">' . $service_apres_vente->getClient()->getId() . '</i><i class="hidden comment">' . $service_apres_vente->getCommentaire() . '</i>' . $id . '</span>',
+                        '<span><i class="hidden offreID">' . $offre->getId() . '</i><i class="offre hidden">' . $offre->getDesignation() . '</i><a href="#">' . $offre->getDesignation() . '</a></span>',
+                        '<span><i class="boutique hidden">' . $boutique->getDesignation() . '</i>' . $boutique->getDesignation() . '</span>',
+                        '<span class="date">' . $service_apres_vente->getDateDue()->format("d/m/Y - H:i") . '</span>',
+                        '<span><i class="hidden desc">' . $panne . '</i>' . $panne . '</span>',
+                        '<span class="etat label label-sm label-' . (key($status_list[$etat])) . '"><input type="hidden" value="' . $etat . '"/>' . (current($status_list[$etat])) . '</span>',
+                    );
+                }
+                $json['draw'] = $sEcho;
+                $json["recordsTotal"] = $iTotalRecords;
+                $json["recordsFiltered"] = $iFilteredRecords;
+                return $this->json($json);
+            } catch (AccessDeniedException $ads) {
+                $session->getFlashBag()->add('danger', "<strong>Opération interdite!</strong><br/>Pour jouir de ce service, veuillez consulter nos administrateurs.");
+                return $this->json($json);
+            } catch (RuntimeException $rte) {
+                $session->getFlashBag()->add('danger', "<strong>Echec de l'opération: </strong><br>Une erreur systeme s'est produite. bien vouloir réessayer plutard, svp!");
+                return $this->json(json_encode(["item" => null]));
+            }
         }
         $session = $request->getSession();
         $session->set('previous_location', $request->getUri());
-        return $this->render('APMAchatBundle:service_apres_vente:index.html.twig', array(
-            'service_apres_ventes' => $service_apres_ventes,
+        $form = $this->createForm('APM\AchatBundle\Form\Service_apres_venteType');
+        $form2 = $this->createForm('APM\AchatBundle\Form\Service_apres_venteType');
+        return $this->render('APMAchatBundle:service_apres_vente:index_ajax.html.twig', array(
+            //'service_apres_ventes' => $services,
+            'form' => $form->createView(),
+            'form2' => $form2->createView(),
         ));
     }
 
     /**
      * @param Request $request
      * @param Offre $offre
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response|JsonResponse
      */
-    public function newAction(Request $request, Offre $offre = null)
+    public
+    function newAction(Request $request, Offre $offre = null)
     {
         $this->createSecurity($offre);
-
+        /** @var Session $session */
+        $session = $request->getSession();
         /** @var Service_apres_vente $service_apres_vente */
         $service_apres_vente = TradeFactory::getTradeProvider("service_apres_vente");
-        if($offre)$service_apres_vente->setOffre($offre);
         $form = $this->createForm('APM\AchatBundle\Form\Service_apres_venteType', $service_apres_vente);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            $this->createSecurity($offre);
-            $service_apres_vente->setClient($this->getUser());
-            $em = $this->getDoctrine()->getManager();
-            $em->persist($service_apres_vente);
-            $em->flush();
-
-            return $this->redirectToRoute('apm_achat_service_apres_vente_show', array('id' => $service_apres_vente->getId()));
+            try {
+                if (null !== $offre) $service_apres_vente->setOffre($offre);
+                $this->createSecurity($service_apres_vente->getOffre());
+                $service_apres_vente->setClient($this->getUser());
+                $em = $this->getDoctrine()->getManager();
+                $em->persist($service_apres_vente);
+                $em->flush();
+                $session->getFlashBag()->add('success', "<strong> Création de l'Offre. réf:" . $offre->getCode() . "</strong><br> Opération effectuée avec succès!");
+                if ($request->isXmlHttpRequest()) {
+                    $json = array();
+                    $json["item"] = array();
+                    return $this->json(json_encode($json), 200);
+                }
+                return $this->redirectToRoute('apm_achat_service_apres_vente_show', array('id' => $service_apres_vente->getId()));
+            } catch (ConstraintViolationException $cve) {
+                $session->getFlashBag()->add('danger', "<strong>Echec de l'enregistrement. </strong><br>L'enregistrement a échoué dû à une contrainte de données!");
+                return $this->json(json_encode(["item" => null]));
+            } catch (AccessDeniedException $ads) {
+                $session->getFlashBag()->add('danger', "<strong>Echec de l'opération. </strong><br>Vous devez avoir achetés l'offre sur WE-TRADE au préalable!!");
+                return $this->json(json_encode(["item" => null]));
+            }
         }
-
+        $session->set('previous_location', $request->getUri());
         return $this->render('APMAchatBundle:service_apres_vente:new.html.twig', array(
             'service_apres_vente' => $service_apres_vente,
             'form' => $form->createView(),
@@ -106,17 +228,30 @@ class Service_apres_venteController extends Controller
 
     /**
      * Finds and displays a Service_apres_vente entity.
+     * @param Request $request
      * @param Service_apres_vente $service_apres_vente
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return \Symfony\Component\HttpFoundation\Response| JsonResponse Afficher ls détails d'une SAV
      *
      * Afficher ls détails d'une SAV
      */
-    public function showAction(Service_apres_vente $service_apres_vente)
+    public function showAction(Request $request, Service_apres_vente $service_apres_vente)
     {
         $this->listAndShowSecurity();
-
+        if ($request->isXmlHttpRequest()) {
+            $json = array();
+            $json['item'] = array(
+                'id' => $service_apres_vente->getId(),
+                'code' => $service_apres_vente->getCode(),
+                'description' => $service_apres_vente->getDescriptionPanne(),
+                'etat' => $service_apres_vente->getEtat(),
+                'commentaire' => $service_apres_vente->getCommentaire(),
+                'date' => $service_apres_vente->getDateDue()->format("d/m/Y H:i"),
+                'client' => $service_apres_vente->getClient()->getUsername(),
+                'offre' => $service_apres_vente->getOffre()->getDesignation(),
+            );
+            return $this->json(json_encode($json), 200);
+        }
         $deleteForm = $this->createDeleteForm($service_apres_vente);
-
         return $this->render('APMAchatBundle:service_apres_vente:show.html.twig', array(
             'service_apres_vente' => $service_apres_vente,
             'delete_form' => $deleteForm->createView(),
@@ -130,7 +265,8 @@ class Service_apres_venteController extends Controller
      *
      * @return \Symfony\Component\Form\Form The form
      */
-    private function createDeleteForm(Service_apres_vente $service_apres_vente)
+    private
+    function createDeleteForm(Service_apres_vente $service_apres_vente)
     {
         return $this->createFormBuilder()
             ->setAction($this->generateUrl('apm_achat_service_apres_vente_delete', array('id' => $service_apres_vente->getId())))
@@ -142,7 +278,7 @@ class Service_apres_venteController extends Controller
      * Displays a form to edit an existing Service_apres_vente entity.
      * @param Request $request
      * @param Service_apres_vente $service_apres_vente
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response |JsonResponse
      */
     public function editAction(Request $request, Service_apres_vente $service_apres_vente)
     {
@@ -150,16 +286,45 @@ class Service_apres_venteController extends Controller
         $deleteForm = $this->createDeleteForm($service_apres_vente);
         $editForm = $this->createForm('APM\AchatBundle\Form\Service_apres_venteType', $service_apres_vente);
         $editForm->handleRequest($request);
-
-        if ($editForm->isSubmitted() && $editForm->isValid()) {
-            $this->editAndDeleteSecurity($service_apres_vente);
-            $em = $this->getDoctrine()->getManager();
-            $em->persist($service_apres_vente);
-            $em->flush();
-
-            return $this->redirectToRoute('apm_achat_service_apres_vente_show', array('id' => $service_apres_vente->getId()));
+        if ($editForm->isSubmitted() && $editForm->isValid()
+            || $request->isXmlHttpRequest() && $request->isMethod('POST')
+        ) {
+            try {
+                $em = $this->getDoctrine()->getManager();
+                if ($request->isXmlHttpRequest()) {
+                    $json = array();
+                    $json["item"] = array();
+                    $property = $request->request->get('name');
+                    $value = $request->request->get('value');
+                    switch ($property) {
+                        case 'etat':
+                            $service_apres_vente->setEtat($value);
+                            break;
+                        case 'description':
+                            $service_apres_vente->setDescriptionPanne($value);
+                            break;
+                        case 'commentaire' :
+                            $service_apres_vente->setCommentaire($value);
+                            break;
+                        default:
+                            $session->getFlashBag()->add('info', "<strong> Aucune mise à jour effectuée </strong>");
+                            return $this->json(json_encode(["item" => null]), 205);
+                    }
+                    $em->flush();
+                    $session->getFlashBag()->add('success', "Mise à jour propriété : <strong>" . $property . "</strong> réf. offre :" . $service_apres_vente->getCode() . "<br> Opération effectuée avec succès!");
+                    return $this->json(json_encode($json), 200);
+                }
+                $em->flush();
+                $session->getFlashBag()->add('success', "Mise à jour propriété : <strong>" . $property . "</strong> réf. offre :" . $service_apres_vente->getCode() . "<br> Opération effectuée avec succès!");
+                return $this->redirectToRoute('apm_achat_service_apres_vente_show', array('id' => $service_apres_vente->getId()));
+            } catch (ConstraintViolationException $cve) {
+                $session->getFlashBag()->add('danger', "Echec de la Modification <br>L'enregistrement a échoué dû à une contrainte de données!");
+                return $this->json(json_encode(["item" => null]));
+            } catch (AccessDeniedException $ads) {
+                $session->getFlashBag()->add('danger', "Action interdite!<br>Vous n'êtes pas autorisés à effectuer cette opération!");
+                return $this->json(json_encode(["item" => null]));
+            }
         }
-
         return $this->render('APMAchatBundle:service_apres_vente:edit.html.twig', array(
             'service_apres_vente' => $service_apres_vente,
             'edit_form' => $editForm->createView(),
@@ -167,30 +332,53 @@ class Service_apres_venteController extends Controller
         ));
     }
 
+
     /**
      * Deletes a Service_apres_vente entity.
      * @param Request $request
      * @param Service_apres_vente $service_apres_vente
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse| JsonResponse
      */
-    public function deleteAction(Request $request, Service_apres_vente $service_apres_vente)
+    public function deleteAction(Request $request, Service_apres_vente $service_apres_vente = null)
     {
         $this->editAndDeleteSecurity($service_apres_vente);
-
+        /** @var Session $session */
+        $session = $request->getSession();
+        $em = $this->getDoctrine()->getManager();
+        if ($request->isXmlHttpRequest()) {
+            /** @var Service_apres_vente $service_apres_vente */
+            $items = $request->request->get('items');
+            $elements = json_decode($items);
+            $json = array();
+            $json['item'] = array();
+            $j = 0;
+            $count = count($elements);
+            for ($i = 0; $i < $count; $i++) {
+                $service_apres_vente = null;
+                $id = $elements[$i];
+                $service_apres_vente = $em->getRepository('APMAchatBundle:Service_apres_vente')->find($id);
+                if (null !== $service_apres_vente) {
+                    $this->editAndDeleteSecurity($service_apres_vente);
+                    $em->remove($service_apres_vente);
+                    $em->flush();
+                    $json['item'] = $id;
+                    $j++;
+                }
+            }
+            $session->getFlashBag()->add('danger', "<strong>" . $j . "</strong> Element(s) supprimé(s)<br> Opération effectuée avec succès!");
+            return $this->json(json_encode($json), 200);
+        }
         $form = $this->createDeleteForm($service_apres_vente);
         $form->handleRequest($request);
-
         if ($form->isSubmitted() && $form->isValid()) {
-            $this->editAndDeleteSecurity($service_apres_vente);
-            $em = $this->getDoctrine()->getManager();
             $em->remove($service_apres_vente);
             $em->flush();
         }
-
         return $this->redirectToRoute('apm_achat_service_apres_vente_index');
     }
 
-    public function deleteFromListAction(Service_apres_vente $service_apres_vente)
+    public
+    function deleteFromListAction(Service_apres_vente $service_apres_vente)
     {
         $this->editAndDeleteSecurity($service_apres_vente);
 
@@ -205,28 +393,30 @@ class Service_apres_venteController extends Controller
      * @param Boutique |null $boutique
      * @param Offre |null $offre
      */
-    private function listAndShowSecurity($boutique = null, $offre = null){
+    private
+    function listAndShowSecurity($boutique = null, $offre = null)
+    {
         //-----------------------------------security-------------------------------------------
         $this->denyAccessUnlessGranted('ROLE_USERAVM', null, 'Unable to access this page!');
         if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
             throw $this->createAccessDeniedException();
         }
         $user = $this->getUser();
-        if($boutique){
+        if ($boutique) {
             $gerant = $boutique->getGerant();
             $proprietaire = $boutique->getProprietaire();
-            if($user !== $gerant && $user !== $proprietaire)throw $this->createAccessDeniedException();
+            if ($user !== $gerant && $user !== $proprietaire) throw $this->createAccessDeniedException();
         }
-        if($offre){
+        if ($offre) {
             $vendeur = $offre->getVendeur();
             $boutique = $offre->getBoutique();
             $gerant = null;
             $proprietaire = null;
-            if($boutique){
+            if ($boutique) {
                 $gerant = $boutique->getGerant();
                 $proprietaire = $boutique->getProprietaire();
             }
-            if($user !== $vendeur && $user !== $gerant && $user !== $proprietaire)throw $this->createAccessDeniedException();
+            if ($user !== $vendeur && $user !== $gerant && $user !== $proprietaire) throw $this->createAccessDeniedException();
         }
 
         //-----------------------------------------------------------------------------------------
@@ -236,7 +426,9 @@ class Service_apres_venteController extends Controller
     /**
      * @param Service_apres_vente $service_apres_vente
      */
-    private function editAndDeleteSecurity($service_apres_vente){
+    private
+    function editAndDeleteSecurity($service_apres_vente)
+    {
         //---------------------------------security-----------------------------------------------
         // Unable to access the controller unless you have a USERAVM role
         $this->denyAccessUnlessGranted('ROLE_USERAVM', null, 'Unable to access this page!');
@@ -244,280 +436,25 @@ class Service_apres_venteController extends Controller
         /* ensure that the user is logged in  # granted even through remembering cookies
         *  and that the one is the owner
         */
-        $client = $service_apres_vente->getClient();
-        $user = $this->getUser();
-        if ((!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY')) || ($client!== $user)) {
-            throw $this->createAccessDeniedException();
+        $client = null;
+        if (null !== $service_apres_vente) {
+            $client = $service_apres_vente->getClient();
+            $user = $this->getUser();
+            if ((!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY')) || ($client !== $user)) {
+                throw $this->createAccessDeniedException();
+            }
         }
         //----------------------------------------------------------------------------------------
     }
-
-
-    /*************************************************** AJAX REQUETS ************************************************/
-    /**
-     * Liste tous les SAV enregistrés entant que client et les SAV receptionné en tant que boutique ou les SAV d'une offre
-     * @param Request $request
-     * @return \Symfony\Component\HttpFoundation\Response | JsonResponse
-     */
-    public function indexAjaxAction(Request $request)
-    {
-        //---------------------------post------------------------
-        if ($request->isXmlHttpRequest() && $request->getMethod() === "POST") {
-
-            $em = $this->getDoctrine()->getManager();
-            $session = $this->get('session');
-            /** @var Service_apres_vente $service_apres_vente */
-            $data = $request->request->get('service_apres_vente');
-            $service_apres_vente = null;
-            $id = intval($data['id']);
-            if (is_numeric($id)) $service_apres_vente = $em->getRepository('APMAchatBundle:Service_apres_vente')->find($id);
-            $json['item'] = array();
-            if (null !== $service_apres_vente) { //Update- Mise à jour
-                try {
-                    //autorisation d'accès
-                    //***---double vérification à l'aide du code ---
-                    if ($data['code'] !== $service_apres_vente->getCode()) {
-                        $session->getFlashBag()->add('danger', "pération! <br>Vous devez au préalable achêté l'offre sur la plateforme!");
-                        return $this->json(json_encode(["item" => null]));
-                    }
-                    //***-----------------------------------------
-                    $client = $service_apres_vente->getClient();
-                    $user = $this->getUser();
-                    //------------------ security: allow only the client, the manger and the owner of the product-----------------------
-                    $this->editSecurity($service_apres_vente->getOffre(), $client, $user);
-                    $description = "undefined";
-                    $commentaire = "undefined";
-                    $etat = "undefined";
-                    if ($client === $user) {//auteur -> faire les mises à jour d'attributs ici
-                        $desc = $data['descriptionPanne'];
-                        if ($service_apres_vente->getDescriptionPanne() !== $desc) { $description = $desc; $service_apres_vente->setDescriptionPanne($description);}
-                    } else {// destinataire -> faire les mises à jour d'attributs ici
-                        $comment = $data['commentaire'];
-                        if ($service_apres_vente->getCommentaire() !== $comment){ $commentaire = $comment; $service_apres_vente->setCommentaire($commentaire);}
-                        $e = $data['etat'];
-                        if ($service_apres_vente->getEtat() !== $e) {$etat = $e; $service_apres_vente->setEtat($etat);}
-                    }
-                    //----------------------------------------------------------------------------------------
-                    //-------- prepareration de la reponse du client ----
-
-                    $json["item"] = array(//preparation de la réponse du client
-                        "descriptionPanne" => $description,
-                        "etat" => $etat,
-                        "commentaire" => $commentaire,
-                        "isNew" => false,
-                        "id" => $service_apres_vente->getId(),
-                    );
-                    // préparation de la notification du client
-                    if ($description !== "undefined" || $commentaire !== "undefined" || $etat !== "undefined") {
-                        $em->flush();
-                        $session->getFlashBag()->add('success', "<strong> Mise à jour, référence:" . $service_apres_vente->getCode() . "</strong><br>Modification effectuée avec succès!");
-                        return $this->json(json_encode($json));
-                    } else {
-                        $session->getFlashBag()->add('info', "<strong> Mise à jour!</strong><br>Aucune modification effectuée.");
-                        return $this->json(json_encode(["item" => null]));
-                    }
-                } catch (ConstraintViolationException $cve) {
-                    $session->getFlashBag()->add('danger', "Echec de l'enregistrement: <br>L'enregistrement a échoué dû à une contrainte de données!");
-                    return $this->json(json_encode(["item" => null]));
-                } catch (RuntimeException $rte) {
-                    $session->getFlashBag()->add('danger', "Echec de l'opération: <br>L'enregistrement a échoué. bien vouloir réessayer plutard, svp!");
-                    return $this->json(json_encode(["item" => null]));
-                } catch (AccessDeniedException $ads) {
-                    $session->getFlashBag()->add('danger', "Vous n'êtes pas autorisé à effectuer cette opération: <br>Vous devez au préalable achêté le produit sur la plateforme!");
-                    return $this->json(json_encode(["item" => null]));
-                }
-            } else {// create a new element
-                try { // valider  le formulaire ici
-                    //---create security 1------//
-                    $this->createSecurity();
-                    /** @var Service_apres_vente $service_apres_vente */
-                    $service_apres_vente = TradeFactory::getTradeProvider("service_apres_vente");
-                    if (null !== $service_apres_vente) {
-                        /** @var Offre $offre */
-                        $offreID = intval($data['offre']);
-                        $offre = null;
-                        if (is_numeric($offreID)) $offre = $em->getRepository('APMVenteBundle:Offre')->find($offreID);
-                        if (null !== $offre) {
-                            //---create security 2------//
-                            $this->createSecurity($offre);
-                            $service_apres_vente->setOffre($offre);
-                            $service_apres_vente->setClient($this->getUser());
-                            $service_apres_vente->setDescriptionPanne($data['descriptionPanne']); //if (isset($data['descriptionPanne']))
-                            $em->persist($service_apres_vente);
-                            $em->flush();
-                            $json["item"]["isNew"] = true;
-                            $session->getFlashBag()->add('success', "<strong> Soumission de votre requête, référence:" . $service_apres_vente->getCode() . "</strong><br>Opération effectuée avec succès!");
-                            return $this->json(json_encode($json));
-                        } else {
-                            $session->getFlashBag()->add('danger', "<strong>Produit non identifié.</strong> <br>Vous devez indiquer le produit!");
-                            return $this->json(json_encode(["item" => null]));
-                        }
-                    }
-                    $session->getFlashBag()->add('danger', "<strong>Echec de l'enregistrement. </strong><br>Un problème est survenu et l'enregistrement a échoué! veuillez réessayer dans un instant!");
-                    return $this->json(json_encode(["item" => null]));
-                } catch (ConstraintViolationException $cve) {
-                    $session->getFlashBag()->add('danger', "<strong>Echec de l'enregistrement. </strong><br>L'enregistrement a échoué dû à une contrainte de données!");
-                    return $this->json(json_encode(["item" => null]));
-                } catch (RuntimeException $rte) {
-                    $session->getFlashBag()->add('danger', "<strong>Echec de l'opération.</strong><br>L'enregistrement a échoué. bien vouloir réessayer plutard, svp!");
-                    return $this->json(json_encode(["item" => null]));
-                } catch (AccessDeniedException $ads) {
-                    $session->getFlashBag()->add('danger', "<strong>Echec de l'opération. </strong><br>Vous devez avoir achetés l'offre sur WE-TRADE au préalable!!");
-                    return $this->json(json_encode(["item" => null]));
-                }
-            }
-        }
-        $session = $request->getSession();
-        $session->set('previous_location', $request->getUri());
-        //------------------ Form---------------
-        $form = $this->createForm('APM\AchatBundle\Form\Service_apres_venteType');
-        $form2 = $this->createForm('APM\AchatBundle\Form\Service_apres_venteType');
-        return $this->render('APMAchatBundle:service_apres_vente:index_ajax.html.twig', array(
-            'form' => $form->createView(),
-            'form2' => $form2->createView(),
-            'url_image' => $this->get('apm_core.packages_maker')->getPackages()->getUrl('/', 'resolve_img'),
-        ));
-
-    }
-
-    private $offre_filter;
-    private $boutique_filter;
-    private $desc_filter;
-    private $etat_filter;
-    private $dateFrom_filter;
-    private $dateTo_filter;
-    private $affiliation_filter;
-
-    //private $code_filter;
-
-    public function loadTableAction(Request $request)
-    {
-        //------------------
-        if ($request->isXmlHttpRequest() && $request->getMethod() === "POST") {
-            $records = array();
-            $records['data'] = array();
-            $session = $this->get('session');
-            try { //----- Security control  -----
-                $this->listAndShowSecurity();
-                //filter parameters
-                //$this->code_filter = $request->request->has('code_filter') ? $request->request->get('code_filter') : "";
-                $this->offre_filter = $request->request->has('offre_filter') ? $request->request->get('offre_filter') : "";
-                $this->boutique_filter = $request->request->has('boutique_filter') ? $request->request->get('boutique_filter') : "";
-                $this->desc_filter = $request->request->has('desc_filter') ? $request->request->get('desc_filter') : "";
-                $this->dateFrom_filter = $request->request->has('date_from_filter') ? $request->request->get('date_from_filter') : "";
-                $this->dateTo_filter = $request->request->has('date_to_filter') ? $request->request->get('date_to_filter') : "";
-                $this->etat_filter = $request->request->has('etat_filter') ? $request->request->get('etat_filter') : "";
-                $this->affiliation_filter = $request->request->has('affiliation_filter') ? $request->request->get('affiliation_filter') : "";
-                $iDisplayLength = intval($request->request->get('length'));
-                $iDisplayStart = intval($request->request->get('start'));
-                $sEcho = intval($request->request->get('draw'));
-
-                $pathInfo = $request->getPathInfo();
-
-                $status_list = array(
-                    array("danger" => "En panne"), //0
-                    array("success" => "Problème résolu"),//1
-                    array("info" => "En cours de diagnostic"),//2
-                    array("info" => "En cours de dépannage"),//3
-                    array("danger" => "Déclaré hors service"),//4
-                    array("info" => "En observation"),//5
-                    array("warning" => "Frais exigible"),//6
-                    array("danger" => "Demande rejetée"),//7
-                    array("info" => "Problème soumis"),//8
-                );
-
-                //-----Source -------
-                /** @var Utilisateur_avm $user */
-                $user = $this->getUser();
-                $services = null;
-                if ($pathInfo === '/apm/achat/service_apres_vente/ajax-table_1') {
-                    $services = $user->getServicesApresVentes();
-                } elseif ($pathInfo === '/apm/achat/service_apres_vente/ajax-table_2') {
-                    //----------------------------------Boutiques -----------------------------------
-                    $boutiques = $user->getBoutiquesGerant();
-                    /** @var Boutique $boutique */
-                    foreach ($boutiques as $boutique) {
-                        $offres = $boutique->getOffres();
-                        /** @var Offre $offre */
-                        foreach ($offres as $offre) {
-                            $services = $offre->getServiceApresVentes();
-                        }
-                    }
-                    $boutiques = $user->getBoutiquesProprietaire();
-                    /** @var Boutique $boutique */
-                    foreach ($boutiques as $boutique) {
-                        $offres = $boutique->getOffres();
-                        /** @var Offre $offre */
-                        foreach ($offres as $offre) {
-                            $services2 = $offre->getServiceApresVentes();
-                            foreach ($services2 as $s2) {
-                                if (null !== $services) $services->add($s2);
-                            }
-                        }
-                    }
-
-                    //---end---
-                }
-                //page paremeters
-                $iTotalRecords = count($services); // counting
-                $services = $this->elementsFilter($services); // filtering
-                $iDisplayLength = $iDisplayLength < 0 ? $iTotalRecords : $iDisplayLength;
-                //------ filtering and paging -----
-                usort(//assortment: descending of date -- du plus recent au plus ancient
-                    $services, function ($e1, $e2) {
-                    /**
-                     * @var Service_apres_vente $e1
-                     * @var Service_apres_vente $e2
-                     */
-                    $dt1 = $e1->getDateDue()->getTimestamp();
-                    $dt2 = $e2->getDateDue()->getTimestamp();
-                    return $dt1 <= $dt2 ? 1 : -1;
-                });
-                $services = array_slice($services, $iDisplayStart, $iDisplayLength, true); //slicing, preserve the keys' order
-                //------------------------------------
-                $id = 0; // identity of rows in the table
-                /** @var Service_apres_vente $service_apres_vente */
-                foreach ($services as $service_apres_vente) {
-                    $id += 1;
-                    $etat = $service_apres_vente->getEtat();
-                    $offre = $service_apres_vente->getOffre();
-                    $boutique = $offre->getBoutique();
-                    $panne = $service_apres_vente->getDescriptionPanne();
-                    $records['data'][] = array(
-                        '<label class="mt-checkbox mt-checkbox-single mt-checkbox-outline"><input name="id_' . $service_apres_vente->getId() . '" type="checkbox" class="checkboxes"/><span></span></label>',
-                        '<span><i class="id hidden">' . $service_apres_vente->getId() . '</i><i class="hidden code">' . $service_apres_vente->getCode() . '</i><i class="hidden client">' . $service_apres_vente->getClient() . '</i><i class="hidden clientID">' . $service_apres_vente->getClient()->getId() . '</i><i class="hidden comment">' . $service_apres_vente->getCommentaire() . '</i>' . $id . '</span>',
-                        '<span><i class="hidden offreID">' . $offre->getId() . '</i><i class="offre hidden">' . $offre->getDesignation() . '</i><a href="#">' . $offre->getDesignation() . '</a></span>',
-                        '<span><i class="boutique hidden">' . $boutique->getDesignation() . '</i>' . $boutique->getDesignation() . '</span>',
-                        '<span class="date">' . $service_apres_vente->getDateDue()->format("d/m/Y - H:i") . '</span>',
-                        '<span><i class="hidden desc">' . $panne . '</i>' . $panne . '</span>',
-                        '<span class="etat label label-sm label-' . (key($status_list[$etat])) . '"><input type="hidden" value="' . $etat . '"/>' . (current($status_list[$etat])) . '</span>',
-                    );
-                }
-                $records['draw'] = $sEcho;
-                $records["recordsTotal"] = $iTotalRecords;
-                $records["recordsFiltered"] = $iTotalRecords;
-                return $this->json($records);
-            } catch (AccessDeniedException $ads) {
-                $session->getFlashBag()->add('danger', "<strong>Opération interdite!</strong><br/>Pour jouir de ce service, veuillez consulter nos administrateurs.");
-                return $this->json($records);
-            } catch (RuntimeException $rte) {
-                $session->getFlashBag()->add('danger', "<strong>Echec de l'opération: </strong><br>Une erreur systeme s'est produite. bien vouloir réessayer plutard, svp!");
-                return $this->json(json_encode(["item" => null]));
-            }
-        }
-
-        return new JsonResponse();
-    }
-
 //------------------------ End INDEX ACTION --------------------------------------------
 
     /**
      * @param Collection $services
      * @return array
      */
-    private function elementsFilter($services)
+    private function handleResults($services, $iTotalRecords, $iDisplayStart, $iDisplayLength)
     {
-        if($services == null) return array();
+        if ($services == null) return array();
 
         if ($this->affiliation_filter === 'P') {
             $services = $services->filter(function ($e) {//filtering per owner
@@ -552,6 +489,14 @@ class Service_apres_venteController extends Controller
                 return $dt - $dt2 <= 0 ? true : false;// end from at the given date 'dateTo_filter'
             });
         }
+        if ($this->client_filter != null) {
+            $services = $services->filter(function ($e) {//filter with the begining of the entering word
+                /** @var Service_apres_vente $e */
+                $str1 = $e->getClient()->getCode();
+                $str2 = $this->client_filter;
+                return strcasecmp($str1, $str2) === 0 ? true : false;
+            });
+        }
         if ($this->boutique_filter != null) {
             $services = $services->filter(function ($e) {//filter with the begining of the entering word
                 /** @var Service_apres_vente $e */
@@ -578,57 +523,39 @@ class Service_apres_venteController extends Controller
                 return preg_match('/' . $pattern . '/i', $subject) === 1 ? true : false;
             });
         }
-        return ($services != null) ? $services->toArray() : [];
-    }
-
-
-    public function deleteAjaxAction(Request $request)
-    {
-        if ($request->isXmlHttpRequest() && $request->getMethod() === "POST") {
-
-            $session = $this->get('session');
-            try {
-                $this->deleteSecurity();
-                /** @var Service_apres_vente $service_apres_vente */
-                $items = $request->request->get('items');
-                $elements = json_decode($items);
-                $em = $this->getDoctrine()->getManager();
-                $json = null;
-                $count = count($elements);
-                for ($i = 0; $i < $count; $i++) {
-                    $service_apres_vente = null;
-                    $id = intval($elements[$i]);
-                    if (is_numeric($id)) $service_apres_vente = $em->getRepository('APMAchatBundle:Service_apres_vente')->find($id);
-                    if ($service_apres_vente !== null) {
-                        //---- Secutity 2 : allow only the autor to delete -------
-                        $this->deleteSecurity($service_apres_vente);
-                        $em->remove($service_apres_vente);
-                        $json[] = $id;
-                        $session->getFlashBag()->add('danger', "<strong> Element de référence:" . $service_apres_vente->getCode() . "</strong><br> Supprimé avec succès!");
-                    }
-                }
-                $em->flush();
-                $json = json_encode(['ids' => $json]);
-                return $this->json($json);
-            } catch (AccessDeniedException $ads) {
-                $session->getFlashBag()->add('danger', "<strong>Opération interdite!</strong><br/>Pour jouir de ce service, veuillez consulter nos administrateurs.");
-                return $this->json($records);
-            } catch (RuntimeException $rte) {
-                $session->getFlashBag()->add('danger', "<strong>Echec de l'opération: </strong><br>Une erreur systeme s'est produite. bien vouloir réessayer plutard, svp!");
-                return $this->json(json_encode(["item" => null]));
-            } catch (ConstraintViolationException $cve) {
-                $session->getFlashBag()->add('danger', "<strong>Echec de la suppression d'un ou plusieurs elements. </strong><br>L'enregistrement a échoué dû à une contrainte de données!");
-                return $this->json(json_encode(["item" => null]));
-            }
+        if ($this->commentaire_filter != null) {
+            $services = $services->filter(function ($e) {//search for occurences in the text
+                /** @var Service_apres_vente $e */
+                $subject = $e->getCommentaire();
+                $pattern = $this->commentaire_filter;
+                return preg_match('/' . $pattern . '/i', $subject) === 1 ? true : false;
+            });
         }
-        return new JsonResponse();
+
+        $services = ($services !== null) ? $services->toArray() : [];
+        //------ filtering and paging -----
+        usort(//assortment: descending of date -- du plus recent au plus ancient
+            $services, function ($e1, $e2) {
+            /**
+             * @var Service_apres_vente $e1
+             * @var Service_apres_vente $e2
+             */
+            $dt1 = $e1->getDateDue()->getTimestamp();
+            $dt2 = $e2->getDateDue()->getTimestamp();
+            return $dt1 <= $dt2 ? 1 : -1;
+        });
+        $iDisplayLength = $iDisplayLength < 0 ? $iTotalRecords : $iDisplayLength;
+        $services = array_slice($services, $iDisplayStart, $iDisplayLength, true); //slicing, preserve the keys' order
+
+        return $services;
     }
 
 
     /**
      * @param Offre|null $offre , il s'agit du produit, figurant dans les transaction du client. (acheté par celui-ci)
      */
-    private function createSecurity($offre = null)
+    private
+    function createSecurity($offre = null)
     {
         //-----------------security: L'utilisateur doit etre le client qui a acheté l'offre -----------------------
         // Unable to access the controller unless you have a USERAVM role
@@ -640,7 +567,7 @@ class Service_apres_venteController extends Controller
 
         if ($offre) {
             $produit_transactions = $offre->getProduitTransactions();
-            if(null !== $produit_transactions) {
+            if (null !== $produit_transactions) {
                 /** @var Transaction_produit $produit_transaction */
                 foreach ($produit_transactions as $produit_transaction) {
                     $produit = $produit_transaction->getProduit();
@@ -660,7 +587,8 @@ class Service_apres_venteController extends Controller
     /**
      * @param Service_apres_vente $service_apres_vente
      */
-    private function deleteSecurity($service_apres_vente = null)
+    private
+    function deleteSecurity($service_apres_vente = null)
     {
         //---------------------------------security-----------------------------------------------
         // Unable to access the controller unless you have a USERAVM role
@@ -679,7 +607,8 @@ class Service_apres_venteController extends Controller
      * @param $client
      * @param $user
      */
-    private function editSecurity($offre, $client, $user)
+    private
+    function editSecurity($offre, $client, $user)
     {
         //-----------------------------------security-------------------------------------------
         $this->denyAccessUnlessGranted('ROLE_USERAVM', null, 'Unable to access this page!');

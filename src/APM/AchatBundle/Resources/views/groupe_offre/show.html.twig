@@ -1,0 +1,42 @@
+{% extends 'APMAdminBundle:_Main:layout.html.twig' %}
+
+{% block body %}
+    <h1>Groupe d'offre</h1>
+
+    <table>
+        <tbody>
+        <tr>
+            <th>Code</th>
+            <td>{{ groupe_offre.code }}</td>
+        </tr>
+        <tr>
+            <th>date de création</th>
+            <td>{{ groupe_offre.dateCreation|date('d-m-Y H:i') }}</td>
+        </tr>
+        <tr>
+            <th>date de vigueur</th>
+            <td>{{ groupe_offre.dateDeVigueur|date('d-m-Y H:i') }}</td>
+        </tr>
+        <tr>
+            <th>Designation</th>
+            <td>{{ groupe_offre.designation }}</td>
+        </tr>
+        <tr>
+            <th>Description</th>
+            <td>{{ groupe_offre.description }}</td>
+        </tr>
+        <tr>
+            <th>Créateur</th>
+            <td>{{ groupe_offre.createur }}</td>
+        </tr>
+        </tbody>
+    </table>
+
+    <ul>
+        <li>
+            {{ form_start(delete_form) }}
+            <input type="submit" value="Delete">
+            {{ form_end(delete_form) }}
+        </li>
+    </ul>
+{% endblock %}

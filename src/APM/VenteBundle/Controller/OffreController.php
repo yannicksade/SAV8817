@@ -2,6 +2,7 @@
 
 namespace APM\VenteBundle\Controller;
 
+use APM\AchatBundle\Entity\Groupe_offre;
 use APM\UserBundle\Entity\Admin;
 use APM\UserBundle\Entity\Utilisateur_avm;
 use Doctrine\Common\Collections\Collection;
@@ -29,14 +30,16 @@ class OffreController extends Controller
     /**
      * @ParamConverter("categorie", options={"mapping": {"categorie_id":"id"}})
      * @ParamConverter("user", options={"mapping": {"user_id":"id"}})
+     * @ParamConverter("groupe_offre", options={"mapping": {"groupe_id":"id"}})
      * Liste les offres de la boutique ou du vendeur
      * @param Request $request
      * @param Boutique $boutique
      * @param Categorie $categorie
      * @param Utilisateur_avm $user
-     * @return Response | JsonResponse
+     * @param Groupe_offre|null $groupe_offre
+     * @return JsonResponse|Response
      */
-    public function indexAction(Request $request, Boutique $boutique = null, Categorie $categorie = null, Utilisateur_avm $user = null)
+    public function indexAction(Request $request, Boutique $boutique = null, Categorie $categorie = null, Utilisateur_avm $user = null, Groupe_offre $groupe_offre = null)
     {
         try {
             /** @var Session $session */
@@ -49,6 +52,8 @@ class OffreController extends Controller
                 } else {
                     $offres = $boutique->getOffres();
                 }
+            }elseif (null !== $groupe_offre){
+                $offres = $groupe_offre->getOffres();
             } else {
                 if (null === $user) {
                     $this->listAndShowSecurity();
@@ -296,7 +301,8 @@ class OffreController extends Controller
             $deleteForm = $this->createDeleteForm($offre);
             $editForm = $this->createForm('APM\VenteBundle\Form\OffreType', $offre);
             $editForm->handleRequest($request);
-            if ($editForm->isSubmitted() && $editForm->isValid() || $request->isXmlHttpRequest() && $request->getMethod() === "POST") {
+            if ($editForm->isSubmitted() && $editForm->isValid()
+                || $request->isXmlHttpRequest() && $request->getMethod() === "POST") {
                 try {
                     $em = $this->getDoctrine()->getManager();
                     if ($request->isXmlHttpRequest()) {
@@ -425,17 +431,14 @@ class OffreController extends Controller
                 }
                 $em->remove($offre);
                 $em->flush();
+                return $this->redirectToRoute('apm_vente_offre_index');
             } catch (AccessDeniedException $ads) {
                 $session->getFlashBag()->add('danger', "<strong>Action interdite!</strong><br/>Pour jouir de ce service, veuillez consulter nos administrateurs.");
-                return $this->json(json_encode(["ids" => null]));
-            } catch (RuntimeException $rte) {
-                $session->getFlashBag()->add('danger', "<strong>Echec de la suppression </strong><br>Une erreur systeme s'est produite. bien vouloir réessayer plutard, svp!");
                 return $this->json(json_encode(["ids" => null]));
             } catch (ConstraintViolationException $cve) {
                 $session->getFlashBag()->add('danger', "<strong>Echec de la suppression</strong><br> <b>" . ($j) . " element(s) supprimé(s); " . ($count - $j) . " échoué(s) </b>, il se peut qu'une d'elle soit utilisée par d'autre ressource");
                 return $this->json(json_encode(['ids' => $json, 'action' => 3]));
             }
-            return $this->redirectToRoute('apm_vente_offre_index');
         }
 
         /********************************************AJAX REQUEST********************************************/

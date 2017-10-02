@@ -92,7 +92,7 @@ class Service_apres_vente extends TradeFactory
     {
         $this->etat = 8;
         $this->code = "SC" . $var;
-        $this->dateDue = new \DateTime();
+        $this->dateDue = new \DateTime("now");
     }
 
     /**

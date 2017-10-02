@@ -64,7 +64,7 @@ var TableDatatablesAjax = function () {
                 ],
                 "pageLength": 10, // default record count per page
                 "ajax": {
-                    "url": "ajax-table_1"  // ajax source
+                    "url": ""  // ajax source
                 },
                 "ordering": false,
                 "order": [],// set first column as a default sort by asc
@@ -161,7 +161,7 @@ var TableDatatablesAjax = function () {
                 ],
                 "pageLength": 10, // default record count per page
                 "ajax": {
-                    "url": "ajax-table_2"  // ajax source
+                    "url": "?q=boutiques"  // ajax source
                 },
                 "ordering": false,
                 "order": [],// set first column as a default sort by asc

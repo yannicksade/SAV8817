@@ -3,17 +3,17 @@
 apm_achat_service_apres_vente_index:
     path:     /
     defaults: { _controller: "APMAchatBundle:Service_apres_vente:index" }
-    methods:  GET
+    methods:  [GET, POST]
 
 apm_achat_service_apres_vente_boutique_index:
     path:     /boutique/{id}
     defaults: { _controller: "APMAchatBundle:Service_apres_vente:index" }
-    methods:  GET
+    methods:  [GET, POST]
 
 apm_achat_service_apres_vente_offre_index:
     path:     /offre/{offre_id}
     defaults: { _controller: "APMAchatBundle:Service_apres_vente:index" }
-    methods:  GET
+    methods:  [GET, POST]
 
 apm_achat_service_apres_vente_show:
     path:     /{id}/show
@@ -41,22 +41,5 @@ apm_achat_service_apres_vente_delete:
     methods:  DELETE
 
 apm_achat_service_apres_vente_deleteFromList:
-    path:     /list/{id}/delete
-    defaults: { _controller: "APMAchatBundle:Service_apres_vente:deleteFromList" }
-
-#------------------------ Ajax routes ------------------------------------------------
-apm_achat_service_apres_vente_index_ajax:
-    path:     /index-ajax
-    defaults: { _controller: "APMAchatBundle:Service_apres_vente:indexAjax" }
-
-apm_achat_service_apres_vente_loader:
-    path:     /ajax-table_1
-    defaults: { _controller: "APMAchatBundle:Service_apres_vente:loadTable" }
-
-apm_achat_service_apres_vente_loader2:
-    path:     /ajax-table_2
-    defaults: { _controller: "APMAchatBundle:Service_apres_vente:loadTable" }
-
-apm_achat_service_apres_vente_delete_ajax:
-    path:     /delete-ajax
+    path:     /delete
     defaults: { _controller: "APMAchatBundle:Service_apres_vente:delete" }

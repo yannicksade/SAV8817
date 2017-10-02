@@ -1,7 +1,7 @@
 
 #---------------------------- routes -----------------------
 apm_vente_offre_index:
-    path:     /ajax-table_1
+    path:     /
     defaults: { _controller: "APMVenteBundle:Offre:index" }
     methods:  [GET,POST]
 
@@ -49,6 +49,11 @@ apm_vente_offre_delete_ajax:
     path:     /delete-ajax
     defaults: { _controller: "APMVenteBundle:Offre:delete" }
     methods: POST
+
+apm_vente_offre_groupe_index:
+    path:     /{groupe_id}/offres
+    defaults: { _controller: "APMVenteBundle:Offre:index" }
+    methods:  [GET, POST]
 
 apm_vente_offre_show-image_ajax:
     path:     /image

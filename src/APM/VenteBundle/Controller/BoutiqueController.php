@@ -56,13 +56,14 @@ class BoutiqueController extends Controller
             $iDisplayStart = $request->request->has('start') ? intval($request->request->get('start')) : 0;
 
             $json = array();
+            $json['items'] = array();
             if (($p === "owner" || $p === "both") && null !== $boutiques) {
                 $iTotalRecords = count($boutiques);
                 if ($iDisplayLength < 0) $iDisplayLength = $iTotalRecords;
                 $boutiques = $this->handleResults($boutiques, $iTotalRecords, $iDisplayStart, $iDisplayLength);
                 //filtre
                 foreach ($boutiques as $boutique) {
-                    array_push($json, array(
+                    array_push($json['items'], array(
                         'value' => $boutique->getId(),
                         'text' => $boutique->getDesignation(),
                     ));
@@ -73,15 +74,14 @@ class BoutiqueController extends Controller
                 if ($iDisplayLength < 0) $iDisplayLength = $iTotalRecords;
                 $boutiquesGerant = $this->handleResults($boutiquesGerant, $iTotalRecords, $iDisplayStart, $iDisplayLength);
                 foreach ($boutiquesGerant as $boutique) {
-                    array_push($json, array(
+                    array_push($json['items'], array(
                         'value' => $boutique->getId(),
                         'text' => $boutique->getDesignation(),
                     ));
                 }
             }
-            return $this->json($json, 200);
+            return $this->json(json_encode($json), 200);
         }
-
         return $this->render('APMVenteBundle:boutique:index.html.twig', array(
             'boutiquesProprietaire' => $boutiques,
             'boutiquesGerant' => $boutiquesGerant,
@@ -243,7 +243,7 @@ class BoutiqueController extends Controller
      * Finds and displays a Boutique entity.
      * @param Request $request
      * @param Boutique $boutique
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return \Symfony\Component\HttpFoundation\Response | JsonResponse
      */
     public
     function showAction(Request $request, Boutique $boutique)
@@ -253,6 +253,7 @@ class BoutiqueController extends Controller
             $json = array();
             $json['item'] = array(
                 'id' => $boutique->getId(),
+                'code' => $boutique->getCode(),
                 'designation' => $boutique->getDesignation(),
                 'nationalite' => $boutique->getNationalite(),
                 'description' => $boutique->getDescription(),
@@ -427,7 +428,6 @@ class BoutiqueController extends Controller
     {
         $this->editAndDeleteSecurity($boutique);
         $em = $this->getEM();
-
         if ($request->isXmlHttpRequest()) {
             $em->remove($boutique);
             $em->flush();
@@ -435,7 +435,6 @@ class BoutiqueController extends Controller
             $json['item'];
             return $this->json(json_encode($json), 200);
         }
-
         $form = $this->createDeleteForm($boutique);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {

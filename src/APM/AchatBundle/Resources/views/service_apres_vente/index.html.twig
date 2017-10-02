@@ -14,14 +14,14 @@
         </tr>
         </thead>
         <tbody>
-        {% for produit_services in service_apres_ventes %}
-            {% for service_apres_vente in produit_services.services %}
+        {% for services in service_apres_ventes %}
+            {% for service_apres_vente in services %}
                 <tr>
                     <td>
                         <a href="{{ path('apm_achat_service_apres_vente_show', { 'id': service_apres_vente.id }) }}">{{ service_apres_vente.code }}</a>
                     </td>
                     <td>{% if service_apres_vente.dateDue %}{{ service_apres_vente.dateDue|date('Y-m-d H:i:s') }}{% endif %}</td>
-                    <td><a href="{{ path('apm_vente_offre_show', { 'id': produit_services.offre.id }) }}">{{ produit_services.offre}}</a></td>
+                    <td><a href="{{ path('apm_vente_offre_show', { 'id': service_apres_vente.offre.id }) }}">{{ service_apres_vente.offre}}</a></td>
                     <td>{{ service_apres_vente.etat }}</td>
                     <td>
                         <ul>
