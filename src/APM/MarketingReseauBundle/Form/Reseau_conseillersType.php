@@ -31,7 +31,7 @@ class Reseau_conseillersType extends AbstractType
                 'choices' => [
                     'Inserer' => 0,
                     'Remplacer' => 1,
-                    'Fusionner' => 2,
+                    'Fusionner/detacher' => 2,
                 ],
             ])
             ->add('position', ChoiceType::class, [

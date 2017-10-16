@@ -19,7 +19,7 @@ class Reseau_conseillersController extends Controller
     /** Liste les binômes du réseau du conseiller (2 par 2) pour dessiner l'arbre
      * @param Request $request
      * @param Conseiller|null $conseiller
-     * @return \Symfony\Component\HttpFoundation\Response| JsonResponse
+     * @return \Symfony\Component\HttpFoundation\Response|JsonResponse
      */
     public function indexAction(Request $request, Conseiller $conseiller = null)
     {
@@ -79,7 +79,7 @@ class Reseau_conseillersController extends Controller
      * Ajoute ou modifie le conseiller de droite ou de gauche
      * @param Request $request
      * @param Conseiller $conseiller maître du reseau courant
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response|JsonResponse
      */
     public function handleNetworkingMembersAction(Request $request, Conseiller $conseiller)
     {
@@ -109,60 +109,59 @@ class Reseau_conseillersController extends Controller
                     $position = false;
                 }
             } else {
-                $position = boolval($form->get('position')->getData());
+                $position = $form->get('position')->getData();
                 $oldAdvisor = ($position) ? $conseiller->getConseillerGauche() : $conseiller->getConseillerDroite();
             }
             if ($oldAdvisor !== $advisor) {//changement d'un membre
-                if (null !== $advisor) {//gérer l'ajout, l'insertion d'un conseiller ou la fussion d'une branche
-                    if (null !== $oldAdvisor) {
-                       // if (null !== $oldAdvisor->getUtilisateur()) { //distinction d'un conseiller fictif
-                            switch ($modification) {
-                                case 0 ://inserer un membre
-                                    $oldAdvisor->setMasterConseiller($advisor);
-                                    $advisor->setConseillerGauche($oldAdvisor);
-                                    break;
-                                case 1 : //remplacer un membre
-                                    $oldAdvisorChild_left = $oldAdvisor->getConseillerGauche();
-                                    $oldAdvisorChild_right = $oldAdvisor->getConseillerDroite();
-                                    $oldAdvisor->setConseillerGauche(null);
-                                    $oldAdvisor->setConseillerDroite(null);
-                                    $oldAdvisor->setMasterConseiller(null);
-                                    $advisor->setConseillerGauche($oldAdvisorChild_left);
-                                    $advisor->setConseillerDroite($oldAdvisorChild_right);
-                                    if ($oldAdvisorChild_right) $oldAdvisorChild_right->setMasterConseiller($advisor);
-                                    if ($oldAdvisorChild_left) $oldAdvisorChild_left->setMasterConseiller($advisor);
-                                    break;
-                                case 2 : //fusionner une branche
-                                    $master = $conseiller->getMasterConseiller();
-                                    if($conseiller !== $master) $master->getConseillerGauche() === $conseiller ? $master->setConseillerGauche(null) : $master->setConseillerDroite(null); //détachement d'une branche
-                                    if ($position) {
-                                        $advisorLeftChild = $advisor->getConseillerGauche();
-                                        $leftChild = $conseiller->getConseillerGauche();
-                                        $conseillerLeftChild = $leftChild;
-                                        while (null !== $leftChild) {
-                                            $conseillerLeftChild = $leftChild;
-                                            $leftChild = $leftChild->getConseillerGauche();
-                                        }
-                                        if($conseillerLeftChild)$conseillerLeftChild->setConseillerGauche($advisorLeftChild);
-                                        if($advisorLeftChild)$advisorLeftChild->setMasterConseiller($conseillerLeftChild);
-                                    } else {
-                                        $advisorRightChild = $advisor->getConseillerDroite();
-                                        $rightChild = $conseiller->getConseillerDroite();
-                                        $conseillerRightChild = $rightChild;
-                                        while (null !== $rightChild) {
-                                            $conseillerRightChild = $rightChild;
-                                            $rightChild = $rightChild->getConseillerDroite();
-                                        }
-                                        if($conseillerRightChild)$conseillerRightChild->setConseillerDroite($advisorRightChild);
-                                        if($advisorRightChild)$advisorRightChild->setMasterConseiller($conseillerRightChild);
-                                    }
-                                    $temp = $conseiller;
-                                    $conseiller = $advisor;
-                                    $advisor = $temp;
+                if (null !== $advisor) {//gérer l'ajout, l'insertion d'un conseiller ou la fusion d'une branche
+                    switch ($modification) {
+                        case 0 ://inserer un membre
+                            if (null === $oldAdvisor) break;
+                            $oldAdvisor->setMasterConseiller($advisor);
+                            $advisor->setConseillerGauche($oldAdvisor);
+                            break;
+                        case 1 : //remplacer un membre
+                            if (null === $oldAdvisor) break;
+                            $oldAdvisorChild_left = $oldAdvisor->getConseillerGauche();
+                            $oldAdvisorChild_right = $oldAdvisor->getConseillerDroite();
+                            $oldAdvisor->setConseillerGauche(null);
+                            $oldAdvisor->setConseillerDroite(null);
+                            $oldAdvisor->setMasterConseiller(null);
+                            $advisor->setConseillerGauche($oldAdvisorChild_left);
+                            $advisor->setConseillerDroite($oldAdvisorChild_right);
+                            if ($oldAdvisorChild_right) $oldAdvisorChild_right->setMasterConseiller($advisor);
+                            if ($oldAdvisorChild_left) $oldAdvisorChild_left->setMasterConseiller($advisor);
+                            break;
+                        case 2 : //fusionner une branche
+                            $master = $conseiller->getMasterConseiller();
+                            if ($conseiller !== $master) $master->getConseillerGauche() === $conseiller ? $master->setConseillerGauche(null) : $master->setConseillerDroite(null); //détachement d'une branche
+                            if ($position) {
+                                $advisorLeftChild = $advisor->getConseillerGauche();
+                                $leftChild = $oldAdvisor;
+                                $conseillerLeftChild = $conseiller;
+                                while (null !== $leftChild) {
+                                    $conseillerLeftChild = $leftChild;
+                                    $leftChild = $leftChild->getConseillerGauche();
+                                }
+                                $conseillerLeftChild->setConseillerGauche($advisorLeftChild);
+                                if ($advisorLeftChild) $advisorLeftChild->setMasterConseiller($conseillerLeftChild);
+                            } else {
+                                $advisorRightChild = $advisor->getConseillerDroite();
+                                $rightChild = $oldAdvisor;
+                                $conseillerRightChild = $conseiller;
+                                while (null !== $rightChild) {
+                                    $conseillerRightChild = $rightChild;
+                                    $rightChild = $rightChild->getConseillerDroite();
+                                }
+                                $conseillerRightChild->setConseillerDroite($advisorRightChild);
+                                if ($advisorRightChild) $advisorRightChild->setMasterConseiller($conseillerRightChild);
                             }
+                            $temp = $conseiller;
+                            $conseiller = $advisor;
+                            $advisor = $temp;
                     }
                     $advisor->setMasterConseiller($conseiller);
-                    if ($conseiller) if ($position) $conseiller->setConseillerGauche($advisor); else $conseiller->setConseillerDroite($advisor);
+                    if ($position) $conseiller->setConseillerGauche($advisor); else $conseiller->setConseillerDroite($advisor);
 
                 } //gérer le départ d'un membre
                 elseif (null !== $oldAdvisor && null !== $oldAdvisor->getUtilisateur()) {//s'il yavait un conseiller à cette position, le lier au maître conseiller supérieur
@@ -178,7 +177,6 @@ class Reseau_conseillersController extends Controller
                             $conseillerFictif = TradeFactory::getTradeProvider('conseiller');
                             if ($conseillerFictif) {
                                 $em->persist($conseillerFictif);
-                                //$em->flush();
                             }
                         }
                     }
@@ -196,11 +194,15 @@ class Reseau_conseillersController extends Controller
                         if ($conseillerFictif) $conseillerFictif->setConseillerDroite($oldAdvisorChild_right);
                     }
                     $oldAdvisor->setMasterConseiller(null);
-
-                   // $em->flush();
+                    $oldAdvisor->setNombreInstanceReseau(0);
                 }
                 $em->flush();
                 $conseiller = $user->getProfileConseiller();
+                if($request->isXmlHttpRequest()){
+                    $json = array();
+                    $json['item'] = array();
+                    return $this->json(json_encode($json), 200);
+                }
                 if (null === $conseiller->getMasterConseiller()) {
                     $route = 'apm_marketing_conseiller_show';
                     $param = array('id' => $conseiller->getId());
@@ -208,6 +210,7 @@ class Reseau_conseillersController extends Controller
                     $route = 'apm_marketing_reseau_index';
                     $param = [];
                 }
+
                 return $this->redirectToRoute($route, $param);
             }
         }
@@ -306,6 +309,11 @@ class Reseau_conseillersController extends Controller
                 $promotingChild->setMasterConseiller($master);
 
                 $em->flush();
+            }
+            if($request->isXmlHttpRequest()){
+                $json = array();
+                $json['item'] = array();
+                return $this->json(json_encode($json), 200);
             }
             return $this->redirectToRoute('apm_marketing_reseau_index');
         }

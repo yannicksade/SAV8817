@@ -46,7 +46,7 @@ apm_vente_offre_delete:
     methods:  DELETE
 
 apm_vente_offre_delete_ajax:
-    path:     /delete-ajax
+    path:     /delete
     defaults: { _controller: "APMVenteBundle:Offre:delete" }
     methods: POST
 
