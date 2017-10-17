@@ -31,6 +31,13 @@ class Remise extends TradeFactory
     private $etat;
 
     /**
+     * @var string
+     *
+     * @ORM\Column(name="description", type="string", nullable=true)
+     */
+    private $description;
+
+    /**
      * @var \DateTime
      * @Assert\DateTime
      * @ORM\Column(name="dateCreation", type="datetime", nullable=false)
@@ -324,6 +331,16 @@ class Remise extends TradeFactory
     }
 
     /**
+     * Get etat
+     *
+     * @return integer
+     */
+    public function getEtat()
+    {
+        return $this->etat;
+    }
+
+    /**
      * Set etat
      *
      * @param integer $etat
@@ -338,13 +355,13 @@ class Remise extends TradeFactory
     }
 
     /**
-     * Get etat
+     * Get date
      *
-     * @return integer
+     * @return \DateTime
      */
-    public function getEtat()
+    public function getDate()
     {
-        return $this->etat;
+        return $this->date;
     }
 
     /**
@@ -362,12 +379,26 @@ class Remise extends TradeFactory
     }
 
     /**
-     * Get date
+     * Get description
      *
-     * @return \DateTime
+     * @return string
      */
-    public function getDate()
+    public function getDescription()
     {
-        return $this->date;
+        return $this->description;
+    }
+
+    /**
+     * Set description
+     *
+     * @param string $description
+     *
+     * @return Remise
+     */
+    public function setDescription($description)
+    {
+        $this->description = $description;
+
+        return $this;
     }
 }

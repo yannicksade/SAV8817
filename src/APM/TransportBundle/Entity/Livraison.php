@@ -50,8 +50,8 @@ class Livraison extends TradeFactory
     private $description;
 
     /**
-     * @var string
-     * @ORM\Column(name="etatLivraison", type="string", length=255, nullable=true)
+     * @var integer
+     * @ORM\Column(name="etatLivraison", type="integer",nullable=true)
      */
     private $etatLivraison;
 
@@ -174,7 +174,7 @@ class Livraison extends TradeFactory
     /**
      * Get etatLivraison
      *
-     * @return string
+     * @return integer
      */
     public function getEtatLivraison()
     {
@@ -184,7 +184,7 @@ class Livraison extends TradeFactory
     /**
      * Set etatLivraison
      *
-     * @param string $etatLivraison
+     * @param integer $etatLivraison
      *
      * @return Livraison
      */
@@ -198,7 +198,7 @@ class Livraison extends TradeFactory
     /**
      * Get priorite
      *
-     * @return string
+     * @return integer
      */
     public function getPriorite()
     {
@@ -208,7 +208,7 @@ class Livraison extends TradeFactory
     /**
      * Set priorite
      *
-     * @param string $priorite
+     * @param integer $priorite
      *
      * @return Livraison
      */
@@ -399,6 +399,16 @@ class Livraison extends TradeFactory
     }
 
     /**
+     * Get dateEnregistrement
+     *
+     * @return \DateTime
+     */
+    public function getDateEnregistrement()
+    {
+        return $this->dateEnregistrement;
+    }
+
+    /**
      * Set dateEnregistrement
      *
      * @param \DateTime $dateEnregistrement
@@ -410,15 +420,5 @@ class Livraison extends TradeFactory
         $this->dateEnregistrement = $dateEnregistrement;
 
         return $this;
-    }
-
-    /**
-     * Get dateEnregistrement
-     *
-     * @return \DateTime
-     */
-    public function getDateEnregistrement()
-    {
-        return $this->dateEnregistrement;
     }
 }

@@ -52,7 +52,8 @@ class Rabais_offreType extends AbstractType
                         ->setParameter('grp_id', $this->groupes);
                 },
 
-            ]);
+            ])
+            ->add('description');
     }
 
     /**

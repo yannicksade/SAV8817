@@ -69,8 +69,9 @@ class Specification_achatController extends Controller
             /** @var Specification_achat $specification */
             foreach ($specification_achats as $specification) {
                 array_push($json['items'], array(
-                    'value' => $specification->getId(),
-                    'text' => $specification->getCode(),
+                    'id' => $specification->getId(),
+                    'code' => $specification->getCode(),
+                    'avis' => substr($specification->getAvis(), 100) . "...",
                 ));
             }
             return $this->json(json_encode($json), 200);
@@ -79,6 +80,35 @@ class Specification_achatController extends Controller
             'specification_achats' => $specification_achats,
             'offre' => $offre,
         ));
+    }
+
+    /**
+     * @param Offre |null $offre
+     */
+    private function listAndShowSecurity($offre = null)
+    {
+        //---------------------------------security-----------------------------------------------
+        // Unable to access the controller unless you have a USERAVM role
+        $this->denyAccessUnlessGranted('ROLE_USERAVM', null, 'Unable to access this page!');
+        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY')) {
+            throw $this->createAccessDeniedException();
+        }
+        if ($offre) {
+            $user = $this->getUser();
+            $vendeur = $offre->getVendeur();
+            $boutique = $offre->getBoutique();
+            $gerant = null;
+            $proprietaire = null;
+            if ($boutique) {
+                $gerant = $boutique->getGerant();
+                $proprietaire = $boutique->getProprietaire();
+            }
+            if ($user !== $vendeur && $user !== $gerant && $user !== $proprietaire) {
+                throw $this->createAccessDeniedException();
+            }
+
+        }
+        //----------------------------------------------------------------------------------------
     }
 
     /**
@@ -193,36 +223,6 @@ class Specification_achatController extends Controller
         return $specifications;
     }
 
-
-    /**
-     * @param Offre |null $offre
-     */
-    private function listAndShowSecurity($offre = null)
-    {
-        //---------------------------------security-----------------------------------------------
-        // Unable to access the controller unless you have a USERAVM role
-        $this->denyAccessUnlessGranted('ROLE_USERAVM', null, 'Unable to access this page!');
-        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY')) {
-            throw $this->createAccessDeniedException();
-        }
-        if ($offre) {
-            $user = $this->getUser();
-            $vendeur = $offre->getVendeur();
-            $boutique = $offre->getBoutique();
-            $gerant = null;
-            $proprietaire = null;
-            if ($boutique) {
-                $gerant = $boutique->getGerant();
-                $proprietaire = $boutique->getProprietaire();
-            }
-            if ($user !== $vendeur && $user !== $gerant && $user !== $proprietaire) {
-                throw $this->createAccessDeniedException();
-            }
-
-        }
-        //----------------------------------------------------------------------------------------
-    }
-
     /**
      * @param Request $request
      * @param Offre $offre
@@ -285,13 +285,13 @@ class Specification_achatController extends Controller
                 'id' => $specification->getId(),
                 'code' => $specification->getCode(),
                 'demandeRabais' => $specification->getDemandeRabais(),
-                'livraison' => $specification->getLivraison(),
+                'livrable' => $specification->getLivraison(),
                 'dateCreation' => $specification->getDateCreation()->format('d-m-Y H:i'),
                 'dateLivraisonSouhaite' => $specification->getDateLivraisonSouhaite()->format('d-m-Y H:i'),
                 'avis' => $specification->getAvis(),
                 'echantillon' => $specification->getEchantillon(),
-                'offre' => $specification->getOffre()->getDesignation(),
-                'utilisateur' => $specification->getUtilisateur()->getUsername(),
+                'offre' => $specification->getOffre()->getId(),
+                'utilisateur' => $specification->getUtilisateur()->getId(),
             );
             return $this->json(json_encode($json), 200);
         }

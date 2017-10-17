@@ -95,8 +95,9 @@ class CommissionnementController extends Controller
             /** @var Commissionnement $commissionnement */
             foreach ($boutiques_commissionnements as $commissionnement) {
                 array_push($json['items'], array(
-                    'value' => $commissionnement->getId(),
-                    'text' => $commissionnement->getCode(),
+                    'id' => $commissionnement->getId(),
+                    'code' => $commissionnement->getCode(),
+                    'description' => $commissionnement->getDescription(),
                 ));
             }
             return $this->json(json_encode($json), 200);
@@ -104,6 +105,39 @@ class CommissionnementController extends Controller
         return $this->render('APMMarketingDistribueBundle:commissionnement:index.html.twig', array(
             'boutiques_commissionnements' => $boutiques_commissionnements,
         ));
+    }
+
+    /**
+     * @param Commissionnement |null $commissionnement
+     * @param Boutique $boutique
+     */
+    private function listAndShowSecurity($commissionnement = null, $boutique = null)
+    {
+        //---------------------------------security-----------------------------------------------
+        $this->denyAccessUnlessGranted(['ROLE_CONSEILLER', 'ROLE_BOUTIQUE'], null, 'Unable to access this page!');
+        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY')) {
+            throw $this->createAccessDeniedException();
+        }
+        $gerant = null;
+        $proprietaire = null;
+        /** @var Utilisateur_avm $user */
+        $user = $this->getUser();
+        $conseiller = $user->getProfileConseiller();
+        if ($conseiller) $conseiller = $conseiller->getUtilisateur();
+        if ($commissionnement) {
+            $boutique = $commissionnement->getCommission()->getBoutiqueProprietaire();
+            $conseiller = $commissionnement->getConseillerBoutique()->getConseiller()->getUtilisateur();
+            $gerant = null;
+            $proprietaire = null;
+        }
+        if ($boutique) {
+            $gerant = $boutique->getGerant();
+            $proprietaire = $boutique->getProprietaire();
+            $conseiller = null;
+        }
+        if ($user !== $conseiller && $user !== $gerant && $user !== $proprietaire) {
+            throw $this->createAccessDeniedException();
+        }
     }
 
     /**
@@ -208,39 +242,6 @@ class CommissionnementController extends Controller
     }
 
     /**
-     * @param Commissionnement |null $commissionnement
-     * @param Boutique $boutique
-     */
-    private function listAndShowSecurity($commissionnement = null, $boutique = null)
-    {
-        //---------------------------------security-----------------------------------------------
-        $this->denyAccessUnlessGranted(['ROLE_CONSEILLER', 'ROLE_BOUTIQUE'], null, 'Unable to access this page!');
-        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY')) {
-            throw $this->createAccessDeniedException();
-        }
-        $gerant = null;
-        $proprietaire = null;
-        /** @var Utilisateur_avm $user */
-        $user = $this->getUser();
-        $conseiller = $user->getProfileConseiller();
-        if ($conseiller) $conseiller = $conseiller->getUtilisateur();
-        if ($commissionnement) {
-            $boutique = $commissionnement->getCommission()->getBoutiqueProprietaire();
-            $conseiller = $commissionnement->getConseillerBoutique()->getConseiller()->getUtilisateur();
-            $gerant = null;
-            $proprietaire = null;
-        }
-        if ($boutique) {
-            $gerant = $boutique->getGerant();
-            $proprietaire = $boutique->getProprietaire();
-            $conseiller = null;
-        }
-        if ($user !== $conseiller && $user !== $gerant && $user !== $proprietaire) {
-            throw $this->createAccessDeniedException();
-        }
-    }
-
-    /**
      * Une boutique créé des commissionnements pour des conseiller de la boutique
      * @param Request $request
      * @param Boutique $boutique
@@ -312,12 +313,12 @@ class CommissionnementController extends Controller
                 'id' => $commissionnement->getId(),
                 'code' => $commissionnement->getCode(),
                 'credit' => $commissionnement->getCreditDepense(),
-                'date' => $commissionnement->getDateCreation()->format("d/m/Y - H:i"),
+                'date' => $commissionnement->getDateCreation()->format("d-m-Y - H:i"),
                 'libelle' => $commissionnement->getLibelle(),
                 'description' => $commissionnement->getDescription(),
                 'quantite' => $commissionnement->getQuantite(),
                 'conseillerBoutique' => $commissionnement->getConseillerBoutique()->getId(),
-                'commission' => $commissionnement->getCommission()->getCode(),
+                'commission' => $commissionnement->getCommission()->getId(),
             );
             return $this->json(json_encode($json), 200);
         }

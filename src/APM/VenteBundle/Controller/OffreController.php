@@ -389,37 +389,30 @@ class OffreController extends Controller
     {
         $this->listAndShowSecurity();
         if ($request->isXmlHttpRequest()) {
-            $mode_vente = array(
-                "Vente Normale", "Vente aux enchères", "Vente en solde", "Vente restreinte"
-            );
-            $type_offre = array(
-                "Article", "Produit", "Service",
-            );
             $json = array();
             $json['item'] = array(
                 'designation' => $offre->getDesignation(),
                 'code' => $offre->getCode(),
-                'categorie' => $offre->getCategorie() ? $offre->getCategorie()->getDesignation() : '',
-                'boutique' => $offre->getBoutique() ? $offre->getBoutique()->getDesignation() : '-',
-                'boutiqueID' => !$offre->getBoutique() ?: $offre->getBoutique()->getId(),
+                'categorie' => $offre->getCategorie()->getId(),
+                'boutiqueID' => !$offre->getBoutique() ? -1 : $offre->getBoutique()->getId(),
                 'dureeGarantie' => $offre->getDureeGarantie(),
                 'remiseProduit' => $offre->getRemiseProduit(),
-                'modeVente' => $mode_vente[$offre->getModeVente()],
+                'modeVente' => $offre->getModeVente(),
                 'modelDeSerie' => $offre->getModelDeSerie(),
                 'prixUnitaire' => $offre->getPrixUnitaire(),
                 'quantite' => $offre->getQuantite(),
                 'unite' => $offre->getUnite(),
                 'rate' => $offre->getEvaluation(),
-                'typeOffre' => $type_offre[$offre->getTypeOffre()],
+                'typeOffre' => $offre->getTypeOffre(),
                 'description' => $offre->getDescription(),
-                'publiable' => $offre->getPubliable() ? "No" : "Yes",
-                'apparenceNeuf' => $offre->getApparenceNeuf() ? "Neuf" : "Occasion",
-                'etat' => current($this->status_list[$offre->getEtat()]),
-                'retourne' => $offre->getRetourne() ? "Oui" : "Non",
+                'publiable' => $offre->getPubliable(),
+                'apparenceNeuf' => $offre->getApparenceNeuf(),
+                'etat' => $offre->getEtat(),
+                'retourne' => $offre->getRetourne(),
                 'updatedAt' => $offre->getUpdatedAt()->format("d/m/Y - H:i"),
                 'dateCreation' => $offre->getDateCreation() ? $offre->getDateCreation()->format("d/m/Y - H:i") : '',
                 'dateExpiration' => $offre->getDateExpiration() ? $offre->getDateExpiration()->format("d/m/Y - H:i") : '',
-                'vendeur' => $offre->getVendeur()->getUsername(),
+                'vendeur' => $offre->getVendeur()->getId(),
             );
             return $this->json(json_encode($json), 200);
         }

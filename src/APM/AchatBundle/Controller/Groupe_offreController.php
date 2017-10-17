@@ -64,8 +64,10 @@ class Groupe_offreController extends Controller
             /** @var Groupe_offre $groupe_offre */
             foreach ($groupe_offres as $groupe_offre) {
                 array_push($json['items'], array(
-                    'value' => $groupe_offre->getId(),
-                    'text' => $groupe_offre->getDesignation(),
+                    'id' => $groupe_offre->getId(),
+                    'code' => $groupe_offre->getCode(),
+                    'designation' => $groupe_offre->getDesignation(),
+                    'description' => $groupe_offre->getDescription()
                 ));
             }
             return $this->json(json_encode($json), 200);
@@ -75,6 +77,22 @@ class Groupe_offreController extends Controller
             'form' => $form->createView(),
             'url_image' => $this->get('apm_core.packages_maker')->getPackages()->getUrl('/', 'resolve_img'),
         ));
+    }
+
+    private function listAndShowSecurity(Groupe_offre $groupe_offre = null)
+    {
+        //-----------------------------------security-------------------------------------------
+        // Unable to access the controller unless you have a USERAVM role
+        $this->denyAccessUnlessGranted('ROLE_USERAVM', null, 'Unable to access this page!');
+        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
+            throw $this->createAccessDeniedException();
+        }
+        if ($groupe_offre !== null) {
+            if ($this->getUser() !== $groupe_offre->getCreateur()) {
+                throw $this->createAccessDeniedException();
+            }
+        }
+        //------------------------------------------------------------------------------
     }
 
     /**
@@ -224,6 +242,18 @@ class Groupe_offreController extends Controller
         ));
     }
 
+    private function createSecurity()
+    {
+        //---------------------------------security-----------------------------------------------
+        // Unable to access the controller unless you have a USERAVM role
+        $this->denyAccessUnlessGranted('ROLE_USERAVM', null, 'Unable to access this page!');
+        /* ensure that the user is logged in
+        */
+        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY')) {
+            throw $this->createAccessDeniedException();
+        }
+        //----------------------------------------------------------------------------------------
+    }
 
     /**
      * @param Request $request
@@ -282,78 +312,6 @@ class Groupe_offreController extends Controller
     }
 
     /**
-     * @param Request $request
-     * @param Groupe_offre $groupe_offre
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
-     */
-    public function showAction(Request $request, Groupe_offre $groupe_offre)
-    {
-        $this->listAndShowSecurity();
-        if ($request->isXmlHttpRequest()) {
-            $json = array();
-            $json['item'] = array(
-                'id' => $groupe_offre->getId(),
-                'designation' => $groupe_offre->getDesignation(),
-                'code' => $groupe_offre->getCode(),
-                'description' => $groupe_offre->getDescription(),
-                'dateDeVigueur' => $groupe_offre->getDateDeVigueur()->format('d-m-Y H:i'),
-                'date' => $groupe_offre->getDateCreation()->format('d-m-Y H:i'),
-                'recurrent' => $groupe_offre->getRecurrent(),
-                'createur' => $groupe_offre->getCreateur()->getUsername(),
-                'propriete' => $groupe_offre->getPropriete(),
-            );
-            return $this->json(json_encode($json), 200);
-        }
-        $deleteForm = $this->createDeleteForm($groupe_offre);
-        return $this->render('APMVenteBundle:groupe_offre:show.html.twig', array(
-            'boutique' => $groupe_offre,
-            'form' => $deleteForm->createView(),
-            'url_image' => $this->get('apm_core.packages_maker')->getPackages()->getUrl('/', 'resolve_img'),
-        ));
-    }
-
-    /**
-     * @param Groupe_offre $groupe_offre
-     * @return \Symfony\Component\Form\Form|\Symfony\Component\Form\FormInterface
-     */
-    private function createDeleteForm(Groupe_offre $groupe_offre)
-    {
-        return $this->createFormBuilder()
-            ->setAction($this->generateUrl('apm_achat_groupe_delete', array('id' => $groupe_offre->getId())))
-            ->setMethod('DELETE')
-            ->getForm();
-    }
-
-    private function listAndShowSecurity(Groupe_offre $groupe_offre = null)
-    {
-        //-----------------------------------security-------------------------------------------
-        // Unable to access the controller unless you have a USERAVM role
-        $this->denyAccessUnlessGranted('ROLE_USERAVM', null, 'Unable to access this page!');
-        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
-            throw $this->createAccessDeniedException();
-        }
-        if ($groupe_offre !== null) {
-            if ($this->getUser() !== $groupe_offre->getCreateur()) {
-                throw $this->createAccessDeniedException();
-            }
-        }
-        //------------------------------------------------------------------------------
-    }
-
-    private function createSecurity()
-    {
-        //---------------------------------security-----------------------------------------------
-        // Unable to access the controller unless you have a USERAVM role
-        $this->denyAccessUnlessGranted('ROLE_USERAVM', null, 'Unable to access this page!');
-        /* ensure that the user is logged in
-        */
-        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY')) {
-            throw $this->createAccessDeniedException();
-        }
-        //----------------------------------------------------------------------------------------
-    }
-
-    /**
      * @param Groupe_offre $groupe_offre
      */
     private function editAndDeleteSecurity($groupe_offre)
@@ -374,6 +332,48 @@ class Groupe_offreController extends Controller
 
     }
 
+    /**
+     * @param Groupe_offre $groupe_offre
+     * @return \Symfony\Component\Form\Form|\Symfony\Component\Form\FormInterface
+     */
+    private function createDeleteForm(Groupe_offre $groupe_offre)
+    {
+        return $this->createFormBuilder()
+            ->setAction($this->generateUrl('apm_achat_groupe_delete', array('id' => $groupe_offre->getId())))
+            ->setMethod('DELETE')
+            ->getForm();
+    }
+
+    /**
+     * @param Request $request
+     * @param Groupe_offre $groupe_offre
+     * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
+     */
+    public function showAction(Request $request, Groupe_offre $groupe_offre)
+    {
+        $this->listAndShowSecurity();
+        if ($request->isXmlHttpRequest()) {
+            $json = array();
+            $json['item'] = array(
+                'id' => $groupe_offre->getId(),
+                'code' => $groupe_offre->getCode(),
+                'designation' => $groupe_offre->getDesignation(),
+                'description' => $groupe_offre->getDescription(),
+                'dateDeVigueur' => $groupe_offre->getDateDeVigueur()->format('d-m-Y H:i'),
+                'date' => $groupe_offre->getDateCreation()->format('d-m-Y H:i'),
+                'recurrent' => $groupe_offre->getRecurrent(),
+                'createur' => $groupe_offre->getCreateur()->getId(),
+                'propriete' => $groupe_offre->getPropriete(),
+            );
+            return $this->json(json_encode($json), 200);
+        }
+        $deleteForm = $this->createDeleteForm($groupe_offre);
+        return $this->render('APMVenteBundle:groupe_offre:show.html.twig', array(
+            'boutique' => $groupe_offre,
+            'form' => $deleteForm->createView(),
+            'url_image' => $this->get('apm_core.packages_maker')->getPackages()->getUrl('/', 'resolve_img'),
+        ));
+    }
 
     /**
      * @param Request $request

@@ -34,7 +34,7 @@ abstract class TradeFactory
         if ($var === "commentaire") {
             $commentaire = null;
             while ($i < $n && $commentaire == null) {
-                $commentaire = new Commentaire(CodeGenerator::getGenerator($length));
+                $commentaire = new Commentaire();
                 $i++;
             }
             return $commentaire;

@@ -28,26 +28,18 @@ class Reseau_conseillersController extends Controller
         if (null === $conseiller) {
             $user = $this->getUser();
             $conseiller = $user->getProfileConseiller();
+            if (null === $conseiller) return $this->json(null, 404);
         }
         if ($request->isXmlHttpRequest()) {
-            $reseau = array();
-            $reseau['gauche'] = array();
-            $reseau['droite'] = array();
-            $leftChild = $conseiller->getConseillerGauche();
-            if (null !== $leftChild) {
-                $reseau['gauche'] = array(
-                    'id' => $leftChild->getId(),
-                    'code' => $leftChild->getCode(),
+            $json = array();
+            $json['item'] = array(
+                'id' => $conseiller->getId(),
+                'code' => $conseiller->getCode(),
+                'leftChild' => $conseiller->getConseillerGauche()->getId(),
+                'rightChild' => $conseiller->getConseillerDroite()->getId(),
+                'nbrInstance' => $conseiller->getNombreInstanceReseau(),
                 );
-            }
-            $rightChild = $conseiller->getConseillerDroite();
-            if (null !== $rightChild) {
-                $reseau['droite'] = array(
-                    'id' => $rightChild->getId(),
-                    'code' => $rightChild->getCode(),
-                );
-            }
-            return $this->json(json_encode($reseau), 200);
+            return $this->json(json_encode($json), 200);
         }
 
         return $this->render('APMMarketingReseauBundle:reseau_conseillers:index.html.twig', array(
@@ -247,12 +239,6 @@ class Reseau_conseillersController extends Controller
         //----------------------------------------------------------------------------------------
     }
 
-    private function getEM()
-    {
-        return $this->getDoctrine()->getManager();
-    }
-
-
     /**
      * @param Request $request
      * @param Conseiller $advisorFictif
@@ -323,7 +309,6 @@ class Reseau_conseillersController extends Controller
         ));
     }
 
-
     /**
      * @param Conseiller $conseiller
      */
@@ -382,6 +367,11 @@ class Reseau_conseillersController extends Controller
         }
 
         //----------------------------------------------------------------------------------------
+    }
+
+    private function getEM()
+    {
+        return $this->getDoctrine()->getManager();
     }
 
 }

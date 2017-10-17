@@ -43,6 +43,12 @@ class Profile_transporteur extends TradeFactory
     private $matricule;
 
     /**
+     * @var string
+     * @ORM\Column(name="description", type="string", length=255, nullable=false)
+     */
+    private $description;
+
+    /**
      * Id
      * @var integer
      *
@@ -317,6 +323,16 @@ class Profile_transporteur extends TradeFactory
     }
 
     /**
+     * Get dateEnregistrement
+     *
+     * @return \DateTime
+     */
+    public function getDateEnregistrement()
+    {
+        return $this->dateEnregistrement;
+    }
+
+    /**
      * Set dateEnregistrement
      *
      * @param \DateTime $dateEnregistrement
@@ -331,12 +347,26 @@ class Profile_transporteur extends TradeFactory
     }
 
     /**
-     * Get dateEnregistrement
+     * Get description
      *
-     * @return \DateTime
+     * @return string
      */
-    public function getDateEnregistrement()
+    public function getDescription()
     {
-        return $this->dateEnregistrement;
+        return $this->description;
+    }
+
+    /**
+     * Set description
+     *
+     * @param string $description
+     *
+     * @return Profile_transporteur
+     */
+    public function setDescription($description)
+    {
+        $this->description = $description;
+
+        return $this;
     }
 }

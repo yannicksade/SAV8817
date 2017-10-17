@@ -34,6 +34,13 @@ class Zone_intervention extends TradeFactory
 
     /**
      * @var string
+     *
+     * @ORM\Column(name="ville", type="string", length=255, nullable=true)
+     */
+    private $ville;
+
+    /**
+     * @var string
      * @Assert\Locale
      * @ORM\Column(name="language", type="string", length=255, nullable=true)
      */
@@ -355,6 +362,16 @@ class Zone_intervention extends TradeFactory
     }
 
     /**
+     * Get dateEnregistrement
+     *
+     * @return \DateTime
+     */
+    public function getDateEnregistrement()
+    {
+        return $this->dateEnregistrement;
+    }
+
+    /**
      * Set dateEnregistrement
      *
      * @param \DateTime $dateEnregistrement
@@ -369,12 +386,26 @@ class Zone_intervention extends TradeFactory
     }
 
     /**
-     * Get dateEnregistrement
+     * Get ville
      *
-     * @return \DateTime
+     * @return string
      */
-    public function getDateEnregistrement()
+    public function getVille()
     {
-        return $this->dateEnregistrement;
+        return $this->ville;
+    }
+
+    /**
+     * Set ville
+     *
+     * @param string $ville
+     *
+     * @return Zone_intervention
+     */
+    public function setVille($ville)
+    {
+        $this->ville = $ville;
+
+        return $this;
     }
 }

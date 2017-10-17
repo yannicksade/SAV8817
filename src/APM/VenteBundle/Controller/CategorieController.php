@@ -59,8 +59,10 @@ class CategorieController extends Controller
                 /** @var Categorie $category */
                 foreach ($categories as $category) {
                     array_push($json, array(
-                        'value' => $category->getId(),
-                        'text' => $category->getDesignation(),
+                        'id' => $category->getId(),
+                        'code' => $category->getCode(),
+                        'designation' => $category->getDesignation(),
+                        'description' => $category->getDescription(),
                     ));
                 }
                 return $this->json($json, 200);
@@ -70,6 +72,28 @@ class CategorieController extends Controller
             'categories' => $categories,
             'boutique' => $boutique
         ));
+    }
+
+    /**
+     * @param Boutique $boutique
+     */
+    private function listAndShowSecurity($boutique = null)
+    {
+        //-----------------------------------security-------------------------------------------
+        // Unable to access the controller unless you have a USERAVM role
+        $this->denyAccessUnlessGranted(['ROLE_BOUTIQUE', 'ROLE_USERAVM'], null, 'Unable to access this page!');
+        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
+            throw $this->createAccessDeniedException();
+        }
+        if ($boutique) {
+            $user = $this->getUser();
+            $proprietaire = $boutique->getProprietaire();
+            $gerant = $boutique->getGerant();
+            if ($user !== $gerant && $user !== $proprietaire) {
+                throw $this->createAccessDeniedException();
+            }
+        }
+        //----------------------------------------------------------------------------------------
     }
 
     /**
@@ -166,29 +190,6 @@ class CategorieController extends Controller
         $categories = array_slice($categories, $iDisplayStart, $iDisplayLength, true);
 
         return $categories;
-    }
-
-
-    /**
-     * @param Boutique $boutique
-     */
-    private function listAndShowSecurity($boutique = null)
-    {
-        //-----------------------------------security-------------------------------------------
-        // Unable to access the controller unless you have a USERAVM role
-        $this->denyAccessUnlessGranted(['ROLE_BOUTIQUE', 'ROLE_USERAVM'], null, 'Unable to access this page!');
-        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
-            throw $this->createAccessDeniedException();
-        }
-        if ($boutique) {
-            $user = $this->getUser();
-            $proprietaire = $boutique->getProprietaire();
-            $gerant = $boutique->getGerant();
-            if ($user !== $gerant && $user !== $proprietaire) {
-                throw $this->createAccessDeniedException();
-            }
-        }
-        //----------------------------------------------------------------------------------------
     }
 
     /**
@@ -292,7 +293,7 @@ class CategorieController extends Controller
                 'description' => $categorie->getDescription(),
                 'etat' => $categorie->getEtat(),
                 'dateCreation' => $categorie->getDateCreation()->format('d-m-Y H:i'),
-                'categorieCourante' => $categorie->getCategorieCourante()->getDesignation(),
+                'categorieCourante' => $categorie->getCategorieCourante()->getId(),
                 'publiable' => $categorie->getPubliable(),
                 'livrable' => $categorie->getLivrable(),
             );

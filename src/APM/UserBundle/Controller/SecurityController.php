@@ -26,7 +26,6 @@ class SecurityController extends Controller
         /** @var $session \Symfony\Component\HttpFoundation\Session\Session */
         $session = $request->getSession();
         $authErrorKey = Security::AUTHENTICATION_ERROR;
-        //$lastUsernameKey = Security::LAST_USERNAME;
 
         // get the error if any (works with forward and redirect -- see below)
         if ($request->attributes->has($authErrorKey)) {

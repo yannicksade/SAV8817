@@ -13,16 +13,9 @@ use Symfony\Component\Validator\Constraints as Assert;
  *
  * @ORM\Table(name="commentaire")
  * @ORM\Entity(repositoryClass="APM\UserBundle\Repository\CommentaireRepository")
- * @UniqueEntity("code")
  */
 class Commentaire extends TradeFactory
 {
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="code", type="string", length=255, nullable=false)
-     */
-    private $code;
 
     /**
      * @var string
@@ -83,12 +76,10 @@ class Commentaire extends TradeFactory
 
     /**
      * Commentaire constructor.
-     * @param string $var
      */
-    public function __construct($var)
+    public function __construct()
     {
         $this->date = new \DateTime('now');
-        $this->code = "DL" . $var;
     }
 
     /**
@@ -221,33 +212,9 @@ class Commentaire extends TradeFactory
         return $this;
     }
 
-    /**
-     * Get code
-     *
-     * @return string
-     */
-    public function getCode()
-    {
-        return $this->code;
-    }
-
-    /**
-     * Set code
-     *
-     * @param string $code
-     *
-     * @return Commentaire
-     */
-    public function setCode($code)
-    {
-        $this->code = $code;
-
-        return $this;
-    }
-
     public function __toString()
     {
-        return $this->code;
+        return substr($this->contenu, 7);
     }
 
     /**
@@ -259,14 +226,6 @@ class Commentaire extends TradeFactory
     }
 
     /**
-     * @param boolean $publiable
-     */
-    public function setPubliable(bool $publiable)
-    {
-        $this->publiable = $publiable;
-    }
-
-    /**
      * Get publiable
      *
      * @return boolean
@@ -274,5 +233,13 @@ class Commentaire extends TradeFactory
     public function getPubliable()
     {
         return $this->publiable;
+    }
+
+    /**
+     * @param boolean $publiable
+     */
+    public function setPubliable(bool $publiable)
+    {
+        $this->publiable = $publiable;
     }
 }

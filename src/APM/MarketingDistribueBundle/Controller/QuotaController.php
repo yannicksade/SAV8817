@@ -61,8 +61,10 @@ class QuotaController extends Controller
             /** @var Quota $commission */
             foreach ($quotas as $commission) {
                 array_push($json['items'], array(
-                    'value' => $commission->getId(),
-                    'text' => $commission->getLibelleQuota(),
+                    'id' => $commission->getId(),
+                    'code' => $commission->getCode(),
+                    'libelle' => $commission->getLibelleQuota(),
+                    'description' => $commission->getDescription(),
                 ));
             }
             return $this->json(json_encode($json), 200);
@@ -71,6 +73,32 @@ class QuotaController extends Controller
             'quotas' => $quotas,
             'boutique' => $boutique,
         ));
+    }
+
+    /**
+     * @param Boutique $boutique
+     */
+    private function listAndShowSecurity($boutique = null)
+    {
+        //-----------------------------------security-----------------------------------------------------------
+        // Unable to access the controller unless are the owner or you have the CONSEILLER role
+        // Le Conseiller et la boutique à le droit de lister tous les quotas
+        $this->denyAccessUnlessGranted(['ROLE_CONSEILLER', 'ROLE_BOUTIQUE'], null, 'Unable to access this page!');
+        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY')) {
+            throw $this->createAccessDeniedException();
+        }
+        /** @var Utilisateur_avm $user */
+        $user = $this->getUser();
+        $conseiller = $user->getProfileConseiller();
+        $gerant = null;
+        $proprietaire = null;
+        if ($boutique) {
+            $gerant = $boutique->getGerant();
+            $proprietaire = $boutique->getProprietaire();
+        }
+        if (null === $conseiller && $user !== $gerant && $user !== $proprietaire) throw $this->createAccessDeniedException();
+
+        //------------------------------------------------------------------------------------------------------
     }
 
     /**
@@ -162,33 +190,6 @@ class QuotaController extends Controller
         return $commissions;
     }
 
-
-    /**
-     * @param Boutique $boutique
-     */
-    private function listAndShowSecurity($boutique = null)
-    {
-        //-----------------------------------security-----------------------------------------------------------
-        // Unable to access the controller unless are the owner or you have the CONSEILLER role
-        // Le Conseiller et la boutique à le droit de lister tous les quotas
-        $this->denyAccessUnlessGranted(['ROLE_CONSEILLER', 'ROLE_BOUTIQUE'], null, 'Unable to access this page!');
-        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY')) {
-            throw $this->createAccessDeniedException();
-        }
-        /** @var Utilisateur_avm $user */
-        $user = $this->getUser();
-        $conseiller = $user->getProfileConseiller();
-        $gerant = null;
-        $proprietaire = null;
-        if ($boutique) {
-            $gerant = $boutique->getGerant();
-            $proprietaire = $boutique->getProprietaire();
-        }
-        if (null === $conseiller && $user !== $gerant && $user !== $proprietaire) throw $this->createAccessDeniedException();
-
-        //------------------------------------------------------------------------------------------------------
-    }
-
     /**
      * Creates a new Quota entity.
      * @param Request $request
@@ -264,7 +265,7 @@ class QuotaController extends Controller
                 'date' => $quotum->getDate()->format("d/m/Y - H:i"),
                 'libelle' => $quotum->getLibelleQuota(),
                 'description' => $quotum->getDescription(),
-                'boutique' => $quotum->getBoutiqueProprietaire()->getDesignation(),
+                'boutique' => $quotum->getBoutiqueProprietaire()->getId(),
             );
             return $this->json(json_encode($json), 200);
         }

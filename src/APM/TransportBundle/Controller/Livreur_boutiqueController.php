@@ -49,8 +49,8 @@ class Livreur_boutiqueController extends Controller
                     /** @var Livreur_boutique $livreur */
                     foreach ($livreurs as $livreur) {
                         array_push($json['items'], array(
-                            'value' => $livreur->getId(),
-                            'text' => $livreur->getReference(),
+                            'id' => $livreur->getId(),
+                            'reference' => $livreur->getReference(),
                         ));
                     }
                 }
@@ -63,8 +63,8 @@ class Livreur_boutiqueController extends Controller
                     $livreurs = $this->handleResults($livreurs, $iTotalRecords, $iDisplayStart, $iDisplayLength);
                     foreach ($livreurs as $livreur) {
                         array_push($json['items'], array(
-                            'value' => $livreur->getId(),
-                            'text' => $livreur->getReference(),
+                            'id' => $livreur->getId(),
+                            'reference' => $livreur->getReference(),
                         ));
                     }
                 }
@@ -81,6 +81,17 @@ class Livreur_boutiqueController extends Controller
             'livreurs_Empruntes' => $livreurs_Empruntes,
             'boutique' => $boutique,
         ));
+    }
+
+    private function listeAndShowSecurity()
+    {
+        //---------------------------------security-----------------------------------------------
+        // Unable to access the controller unless you have the role
+        $this->denyAccessUnlessGranted('ROLE_USERAVM', null, 'Unable to access this page!');
+        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY')) {
+            throw $this->createAccessDeniedException();
+        }
+        //----------------------------------------------------------------------------------------
     }
 
     /**
@@ -132,18 +143,6 @@ class Livreur_boutiqueController extends Controller
         $livreurs = array_slice($livreurs, $iDisplayStart, $iDisplayLength, true);
 
         return $livreurs;
-    }
-
-
-    private function listeAndShowSecurity()
-    {
-        //---------------------------------security-----------------------------------------------
-        // Unable to access the controller unless you have the role
-        $this->denyAccessUnlessGranted('ROLE_USERAVM', null, 'Unable to access this page!');
-        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY')) {
-            throw $this->createAccessDeniedException();
-        }
-        //----------------------------------------------------------------------------------------
     }
 
     // les boutiques sont responsables de la création des livreur_boutiques
@@ -219,8 +218,9 @@ class Livreur_boutiqueController extends Controller
             $json['item'] = array(
                 'id' => $livreur_boutique->getId(),
                 'reference' => $livreur_boutique->getReference(),
-                'transporteur' => $livreur_boutique->getTransporteur()->getUtilisateur()->getUsername(),
-                'boutiqueProprietaire' => $livreur_boutique->getBoutiqueProprietaire()->getDesignation(),
+                'transporteur' => $livreur_boutique->getTransporteur()->getId(),
+                'boutiqueProprietaire' => $livreur_boutique->getBoutiqueProprietaire()->getId(),
+                'dateEnregistrement' => $livreur_boutique->getDateEnregistrement()->format('d-m-Y H:i'),
             );
             return $this->json(json_encode($json), 200);
         }

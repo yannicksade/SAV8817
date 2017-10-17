@@ -50,11 +50,16 @@ class Transaction extends TradeFactory
     private $montant;
 
     /**
-     * @var string
-     * @Assert\Choice({0,1,2,3,4})
-     * @ORM\Column(name="nature", type="string", length=255, nullable=true)
+     * @var integer
+     * @ORM\Column(name="nature", type="integer", length=255, nullable=true)
      */
     private $nature;
+
+    /**
+     * @var string
+     * @ORM\Column(name="description", type="string", length=255, nullable=true)
+     */
+    private $description;
 
     /**
      * @var boolean
@@ -65,7 +70,6 @@ class Transaction extends TradeFactory
 
     /**
      * @var integer
-     * @Assert\Choice({0,1,2,3,4,5})
      * @ORM\Column(name="statut", type="integer", nullable=true)
      */
     private $statut;
@@ -221,7 +225,7 @@ class Transaction extends TradeFactory
     /**
      * Get nature
      *
-     * @return string
+     * @return int
      */
     public function getNature()
     {
@@ -231,7 +235,7 @@ class Transaction extends TradeFactory
     /**
      * Set nature
      *
-     * @param string $nature
+     * @param integer $nature
      *
      * @return Transaction
      */
@@ -245,7 +249,7 @@ class Transaction extends TradeFactory
     /**
      * Get statut
      *
-     * @return string
+     * @return integer
      */
     public function getStatut()
     {
@@ -468,6 +472,16 @@ class Transaction extends TradeFactory
     }
 
     /**
+     * Get shipped
+     *
+     * @return boolean
+     */
+    public function getShipped()
+    {
+        return $this->shipped;
+    }
+
+    /**
      * @param boolean $shipped
      */
     public function setShipped(bool $shipped)
@@ -476,12 +490,26 @@ class Transaction extends TradeFactory
     }
 
     /**
-     * Get shipped
+     * Get description
      *
-     * @return boolean
+     * @return string
      */
-    public function getShipped()
+    public function getDescription()
     {
-        return $this->shipped;
+        return $this->description;
+    }
+
+    /**
+     * Set description
+     *
+     * @param string $description
+     *
+     * @return Transaction
+     */
+    public function setDescription($description)
+    {
+        $this->description = $description;
+
+        return $this;
     }
 }

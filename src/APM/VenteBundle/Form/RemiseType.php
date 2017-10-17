@@ -27,6 +27,7 @@ class RemiseType extends AbstractType
             ->add('valeur', MoneyType::class, [
                 'grouping' => true,
                 'required' => false])
+            ->add('description')
             ;
     }
 

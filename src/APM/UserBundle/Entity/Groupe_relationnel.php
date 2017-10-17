@@ -208,7 +208,7 @@ class Groupe_relationnel extends TradeFactory
     /**
      * Get type
      *
-     * @return string
+     * @return integer
      */
     public function getType()
     {
@@ -218,7 +218,7 @@ class Groupe_relationnel extends TradeFactory
     /**
      * Set type
      *
-     * @param string $type
+     * @param integer $type
      *
      * @return Groupe_relationnel
      */
@@ -454,6 +454,30 @@ class Groupe_relationnel extends TradeFactory
     public function setUpdatedAt($updatedAt)
     {
         $this->updatedAt = $updatedAt;
+
+        return $this;
+    }
+
+    /**
+     * Get dateCreation
+     *
+     * @return \DateTime
+     */
+    public function getDateCreation()
+    {
+        return $this->dateCreation;
+    }
+
+    /**
+     * Set dateCreation
+     *
+     * @param \DateTime $dateCreation
+     *
+     * @return Groupe_relationnel
+     */
+    public function setDateCreation($dateCreation)
+    {
+        $this->dateCreation = $dateCreation;
 
         return $this;
     }

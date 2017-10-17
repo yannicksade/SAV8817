@@ -63,8 +63,11 @@ class Groupe_relationnelController extends Controller
                 /** @var Groupe_relationnel $groupe */
                 foreach ($groupes as $groupe) {
                     array_push($json['items'], array(
-                        'value' => $groupe->getId(),
-                        'text' => $groupe->getDesignation(),
+                        'id' => $groupe->getId(),
+                        'designation' => $groupe->getDesignation(),
+                        'code' => $groupe->getCode(),
+                        'image' => $groupe->getImage(),
+                        'description' => $groupe->getDescription(),
                     ));
                 }
             }
@@ -85,8 +88,11 @@ class Groupe_relationnelController extends Controller
                     $groupes = $this->handleResults($groupesConversationnel, $iTotalRecords, $iDisplayStart, $iDisplayLength);
                     foreach ($groupes as $groupe) {
                         array_push($json['items'], array(
-                            'value' => $groupe->getId(),
-                            'text' => $groupe->getDesignation(),
+                            'id' => $groupe->getId(),
+                            'designation' => $groupe->getDesignation(),
+                            'code' => $groupe->getCode(),
+                            'image' => $groupe->getImage(),
+                            'description' => $groupe->getDescription(),
                         ));
                     }
                 }
@@ -113,6 +119,17 @@ class Groupe_relationnelController extends Controller
             'groupe_conversationnels' => $groupesConversationnel,
             'url_image' => $this->get('apm_core.packages_maker')->getPackages()->getUrl('/', 'resolve_img'),
         ));
+    }
+
+    private function listAndShowSecurity()
+    {
+        //-----------------------------------security-------------------------------------------
+        // Unable to access the controller unless you have a USERAVM role
+        $this->denyAccessUnlessGranted('ROLE_USERAVM', null, 'Unable to access this page!');
+        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
+            throw $this->createAccessDeniedException();
+        }
+        //----------------------------------------------------------------------------------------
     }
 
     /**
@@ -203,18 +220,6 @@ class Groupe_relationnelController extends Controller
         $groupes = array_slice($groupes, $iDisplayStart, $iDisplayLength, true);
 
         return $groupes;
-    }
-
-
-    private function listAndShowSecurity()
-    {
-        //-----------------------------------security-------------------------------------------
-        // Unable to access the controller unless you have a USERAVM role
-        $this->denyAccessUnlessGranted('ROLE_USERAVM', null, 'Unable to access this page!');
-        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
-            throw $this->createAccessDeniedException();
-        }
-        //----------------------------------------------------------------------------------------
     }
 
     /**

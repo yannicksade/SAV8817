@@ -193,7 +193,7 @@ class Communication extends TradeFactory
     /**
      * Get etat
      *
-     * @return string
+     * @return integer
      */
     public function getEtat()
     {
@@ -203,7 +203,7 @@ class Communication extends TradeFactory
     /**
      * Set etat
      *
-     * @param string $etat
+     * @param integer $etat
      *
      * @return Communication
      */
@@ -217,7 +217,7 @@ class Communication extends TradeFactory
     /**
      * Get type
      *
-     * @return string
+     * @return integer
      */
     public function getType()
     {
@@ -227,7 +227,7 @@ class Communication extends TradeFactory
     /**
      * Set type
      *
-     * @param string $type
+     * @param integer $type
      *
      * @return Communication
      */

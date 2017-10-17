@@ -52,8 +52,10 @@ class Individu_to_groupeController extends Controller
             /** @var Individu_to_groupe $individu_groupe */
             foreach ($individu_to_groupes as $individu_groupe) {
                 array_push($json['items'], array(
-                    'value' => $individu_groupe->getId(),
-                    'text' => $individu_groupe->getIndividu()->getUsername(),
+                    'id' => $individu_groupe->getId(),
+                    'individu' => $individu_groupe->getIndividu()->getId(),
+                    'groupe' => $individu_groupe->getGroupeRelationnel()->getId(),
+                    'propriete' => $individu_groupe->getPropriete()
                 ));
             }
             return $this->json(json_encode($json), 200);
@@ -66,6 +68,35 @@ class Individu_to_groupeController extends Controller
             ]
         );
     }
+
+    /**
+     * @param Groupe_relationnel $groupe
+     */
+    private function listeAndShowSecurity($groupe)
+    {
+        //---------------------------------security-----------------------------------------------
+        // Liste tous les groupes auxquels l'utilisateur appartient
+        $this->denyAccessUnlessGranted('ROLE_USERAVM', null, 'Unable to access this page!');
+        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
+            throw $this->createAccessDeniedException();
+        }
+        if ($groupe) {
+            $isGroupMember = false;
+            /** @var Utilisateur_avm $user */
+            $user = $this->getUser();
+            $groupe_individus = $groupe->getGroupeIndividus();
+            /** @var Individu_to_groupe $groupe_individu */
+            foreach ($groupe_individus as $groupe_individu) {
+                if ($groupe_individu->getIndividu() === $user) $isGroupMember = true;
+            }
+
+            if ($user !== $groupe->getProprietaire() && !$isGroupMember) {
+                throw $this->createAccessDeniedException();
+            }
+        }
+        //-----------------------------------------------------------------------------------------
+    }
+    //liste les offres d'une individu_to_groupe de produit
 
     /**
      * @param Collection $individu_to_groupes
@@ -111,14 +142,6 @@ class Individu_to_groupeController extends Controller
                 return preg_match('/' . $pattern . '/i', $subject) === 1 ? true : false;
             });
         }
-        if ($this->description_filter != null) {
-            $individu_to_groupes = $individu_to_groupes->filter(function ($e) {//search for occurences in the text
-                /** @var Individu_to_groupe $e */
-                $subject = $e->getDescription();
-                $pattern = $this->description_filter;
-                return preg_match('/' . $pattern . '/i', $subject) === 1 ? true : false;
-            });
-        }
         $individu_to_groupes = ($individu_to_groupes !== null) ? $individu_to_groupes->toArray() : [];
         //assortment: descending of date -- du plus recent au plus ancient
         usort(
@@ -136,35 +159,6 @@ class Individu_to_groupeController extends Controller
         $individu_to_groupes = array_slice($individu_to_groupes, $iDisplayStart, $iDisplayLength, true);
 
         return $individu_to_groupes;
-    }
-    //liste les offres d'une individu_to_groupe de produit
-
-    /**
-     * @param Groupe_relationnel $groupe
-     */
-    private function listeAndShowSecurity($groupe)
-    {
-        //---------------------------------security-----------------------------------------------
-        // Liste tous les groupes auxquels l'utilisateur appartient
-        $this->denyAccessUnlessGranted('ROLE_USERAVM', null, 'Unable to access this page!');
-        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
-            throw $this->createAccessDeniedException();
-        }
-        if ($groupe) {
-            $isGroupMember = false;
-            /** @var Utilisateur_avm $user */
-            $user = $this->getUser();
-            $groupe_individus = $groupe->getGroupeIndividus();
-            /** @var Individu_to_groupe $groupe_individu */
-            foreach ($groupe_individus as $groupe_individu) {
-                if ($groupe_individu->getIndividu() === $user) $isGroupMember = true;
-            }
-
-            if ($user !== $groupe->getProprietaire() && !$isGroupMember) {
-                throw $this->createAccessDeniedException();
-            }
-        }
-        //-----------------------------------------------------------------------------------------
     }
 
     /**
@@ -260,10 +254,10 @@ class Individu_to_groupeController extends Controller
             $json = array();
             $json['item'] = array(
                 'id' => $individu_to_groupe->getId(),
+                'date' => $individu_to_groupe->getDateInsertion(),
                 'propriete' => $individu_to_groupe->getPropriete(),
-                'description' => $individu_to_groupe->getDescription(),
-                'individu' => $individu_to_groupe->getIndividu()->getUsername(),
-                'groupe' => $individu_to_groupe->getGroupeRelationnel()->getDesignation(),
+                'individu' => $individu_to_groupe->getIndividu()->getId(),
+                'groupe' => $individu_to_groupe->getGroupeRelationnel()->getId(),
             );
             return $this->json(json_encode($json), 200);
         }
@@ -310,8 +304,8 @@ class Individu_to_groupeController extends Controller
                 case 'designation':
                     $individu_to_groupe->setPropriete($value);
                     break;
-                case 'description' :
-                    $individu_to_groupe->setDescription($value);
+                case 'propriete' :
+                    $individu_to_groupe->setPropriete($value);
                     break;
                 default:
                     $session->getFlashBag()->add('info', "<strong> Aucune mis à jour effectuée</strong>");

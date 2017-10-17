@@ -22,7 +22,9 @@ class Individu_to_groupeType extends AbstractType
                 'choices' => array(
                     'A SUIVRE' => 0,
                     'A CONTACTER' => 1,
-                    'Autre action' => 2
+                    'Autre action' => 2,
+                    'Administrateur' => 3,
+                    'Membre' => 4,
                 )))
             ->add('groupeRelationnel', EntityType::class, [
                 'class' => 'APMUserBundle:Groupe_relationnel',

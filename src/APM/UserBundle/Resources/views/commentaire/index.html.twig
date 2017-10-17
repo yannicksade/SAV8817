@@ -5,7 +5,7 @@
     <table>
         <thead>
         <tr>
-            <th>Code</th>
+            <th>Contenu</th>
             <th>Date</th>
             <th>Evaluation</th>
             <th>Utilisateur</th>
@@ -16,7 +16,7 @@
         {% for commentaire in commentaires %}
             <tr>
                 <td>
-                    <a href="{{ path('apm_user_commentaire_show', { 'id': commentaire.id }) }}">{{ commentaire.code }}</a>
+                    <a href="{{ path('apm_user_commentaire_show', { 'id': commentaire.id }) }}">{{ commentaire }}</a>
                 </td>
                 <td>{% if commentaire.date %}{{ commentaire.date|date('Y-m-d H:i:s') }}{% endif %}</td>
                 <td>{{ commentaire.evaluation }}</td>

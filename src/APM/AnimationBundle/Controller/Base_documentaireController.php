@@ -55,8 +55,10 @@ class Base_documentaireController extends Controller
             /** @var Base_documentaire $document */
             foreach ($documents as $document) {
                 array_push($json['items'], array(
-                    'value' => $document->getId(),
-                    'text' => $document->getObjet(),
+                    'id' => $document->getId(),
+                    'code' => $document->getCode(),
+                    'objet' => $document->getObjet(),
+                    'description' => $document->getDescription()
                 ));
             }
             return $this->json(json_encode($json), 200);
@@ -229,7 +231,7 @@ class Base_documentaireController extends Controller
                 'date' => $document->getDate()->format("d/m/Y - H:i"),
                 'description' => $document->getDescription(),
                 'updatedAt' => $document->getUpdatedAt()->format("d/m/Y - H:i"),
-                'proprietaire' => $document->getProprietaire()->getUsername(),
+                'proprietaire' => $document->getProprietaire()->getId(),
                 'brochure' => $document->getBrochure(),
             );
             return $this->json(json_encode($json), 200);

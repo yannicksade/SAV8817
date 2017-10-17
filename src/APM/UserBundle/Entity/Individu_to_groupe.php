@@ -31,12 +31,6 @@ class Individu_to_groupe extends TradeFactory
     private $propriete;
 
     /**
-     * @var string
-     * @ORM\Column(name="description", type= "string", nullable=true)
-     */
-    private $description;
-
-    /**
      * @var integer
      *
      * @ORM\Column(name="id", type="integer", nullable=false)
@@ -74,7 +68,7 @@ class Individu_to_groupe extends TradeFactory
     /**
      * Get propriete
      *
-     * @return string
+     * @return integer
      */
     public function getPropriete()
     {
@@ -84,7 +78,7 @@ class Individu_to_groupe extends TradeFactory
     /**
      * Set propriete
      *
-     * @param string $propriete
+     * @param integer $propriete
      *
      * @return Individu_to_groupe
      */
@@ -156,29 +150,14 @@ class Individu_to_groupe extends TradeFactory
     }
 
     /**
-     * Get description
+     * Get dateInsertion
      *
-     * @return string
+     * @return \DateTime
      */
-    public function getDescription()
+    public function getDateInsertion()
     {
-        return $this->description;
+        return $this->dateInsertion;
     }
-
-    /**
-     * Set description
-     *
-     * @param string $description
-     *
-     * @return Individu_to_groupe
-     */
-    public function setDescription($description)
-    {
-        $this->description = $description;
-
-        return $this;
-    }
-
 
     /**
      * Set dateInsertion
@@ -192,15 +171,5 @@ class Individu_to_groupe extends TradeFactory
         $this->dateInsertion = $dateInsertion;
 
         return $this;
-    }
-
-    /**
-     * Get dateInsertion
-     *
-     * @return \DateTime
-     */
-    public function getDateInsertion()
-    {
-        return $this->dateInsertion;
     }
 }

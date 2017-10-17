@@ -64,7 +64,6 @@ class Categorie extends TradeFactory
 
     /**
      * @var integer
-     * @Assert\Choice({0,1,2,3})
      * @ORM\Column(name="etat", type="integer", nullable=true)
      */
     private $etat;
@@ -203,7 +202,7 @@ class Categorie extends TradeFactory
     /**
      * Get etat
      *
-     * @return string
+     * @return integer
      */
     public function getEtat()
     {
@@ -213,7 +212,7 @@ class Categorie extends TradeFactory
     /**
      * Set etat
      *
-     * @param string $etat
+     * @param integer $etat
      *
      * @return Categorie
      */
@@ -371,6 +370,16 @@ class Categorie extends TradeFactory
     }
 
     /**
+     * Get dateCreation
+     *
+     * @return \DateTime
+     */
+    public function getDateCreation()
+    {
+        return $this->dateCreation;
+    }
+
+    /**
      * Set dateCreation
      *
      * @param \DateTime $dateCreation
@@ -382,15 +391,5 @@ class Categorie extends TradeFactory
         $this->dateCreation = $dateCreation;
 
         return $this;
-    }
-
-    /**
-     * Get dateCreation
-     *
-     * @return \DateTime
-     */
-    public function getDateCreation()
-    {
-        return $this->dateCreation;
     }
 }

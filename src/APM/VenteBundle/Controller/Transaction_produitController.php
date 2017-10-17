@@ -57,8 +57,9 @@ class Transaction_produitController extends Controller
             /** @var Transaction_produit $transaction_produit */
             foreach ($transaction_produits as $transaction_produit) {
                 array_push($json['items'], array(
-                    'value' => $transaction_produit->getId(),
-                    'text' => $transaction_produit->getProduit()->getDesignation(),
+                    'id' => $transaction_produit->getId(),
+                    'offre' => $transaction_produit->getProduit()->getId(),
+                    'reference' => $transaction_produit->getReference(),
                 ));
             }
             return $this->json(json_encode($json), 200);
@@ -69,6 +70,42 @@ class Transaction_produitController extends Controller
             'transaction' => $transaction
         ));
     }
+
+    /**
+     * @param Transaction $transaction
+     * @param Offre $offre
+     * @internal param Transaction_produit $transaction_produit
+     */
+    private function listAndShowSecurity($transaction, $offre)
+    {
+        //-----------------------------------security-------------------------------------------
+        $this->denyAccessUnlessGranted('ROLE_USERAVM', null, 'Unable to access this page!');
+        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
+            throw $this->createAccessDeniedException();
+        }
+
+        $user = $this->getUser();
+        $vendeur = null;
+        $gerant = null;
+        $proprietaire = null;
+        if (null !== $offre) {
+            $vendeur = $offre->getVendeur();
+            $boutique = $offre->getBoutique();
+            if (null !== $boutique) {
+                $gerant = $boutique->getGerant();
+                $proprietaire = $boutique->getProprietaire();
+                $vendeur = null;
+            }
+        }
+        $auteur = $transaction->getAuteur();
+        if ($user !== $auteur && $user !== $gerant && $user !== $proprietaire && $user !== $vendeur && $user !== $transaction->getBeneficiaire()) {
+            throw $this->createAccessDeniedException();
+        }
+        //----------------------------------------------------------------------------------------
+    }
+
+
+    //liste les offres d'une transaction de produit
 
     /**
      * @param Collection $transactions
@@ -150,42 +187,6 @@ class Transaction_produitController extends Controller
         $transactions = array_slice($transactions, $iDisplayStart, $iDisplayLength, true);
 
         return $transactions;
-    }
-
-
-    //liste les offres d'une transaction de produit
-
-    /**
-     * @param Transaction $transaction
-     * @param Offre $offre
-     * @internal param Transaction_produit $transaction_produit
-     */
-    private function listAndShowSecurity($transaction, $offre)
-    {
-        //-----------------------------------security-------------------------------------------
-        $this->denyAccessUnlessGranted('ROLE_USERAVM', null, 'Unable to access this page!');
-        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
-            throw $this->createAccessDeniedException();
-        }
-
-        $user = $this->getUser();
-        $vendeur = null;
-        $gerant = null;
-        $proprietaire = null;
-        if (null !== $offre) {
-            $vendeur = $offre->getVendeur();
-            $boutique = $offre->getBoutique();
-            if (null !== $boutique) {
-                $gerant = $boutique->getGerant();
-                $proprietaire = $boutique->getProprietaire();
-                $vendeur = null;
-            }
-        }
-        $auteur = $transaction->getAuteur();
-        if ($user !== $auteur && $user !== $gerant && $user !== $proprietaire && $user !== $vendeur && $user !== $transaction->getBeneficiaire()) {
-            throw $this->createAccessDeniedException();
-        }
-        //----------------------------------------------------------------------------------------
     }
 
     /**
@@ -289,10 +290,11 @@ class Transaction_produitController extends Controller
             $json = array();
             $json['item'] = array(
                 'id' => $transaction_produit->getId(),
+                'offre' => $transaction_produit->getProduit()->getId(),
                 'code' => $transaction_produit->getTransaction()->getCode(),
                 'reference' => $transaction_produit->getReference(),
                 'quantite' => $transaction_produit->getQuantite(),
-                'produit' => $transaction_produit->getProduit()->getDesignation(),
+
             );
             return $this->json(json_encode($json), 200);
         }

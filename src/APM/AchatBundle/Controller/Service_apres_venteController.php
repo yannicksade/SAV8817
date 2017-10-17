@@ -105,7 +105,7 @@ class Service_apres_venteController extends Controller
 
         if ($request->isXmlHttpRequest() && $request->getMethod() === "POST") {
             $json = array();
-            $json['data'] = array();
+            $json['items'] = array();
             $session = $this->get('session');
             try { //----- Security control  -----
                 //filter parameters
@@ -122,46 +122,22 @@ class Service_apres_venteController extends Controller
                 $this->client_filter = $request->request->has('client_filter') ? $request->request->get('client_filter') : "";
                 $iDisplayLength = intval($request->request->get('length'));
                 $iDisplayStart = intval($request->request->get('start'));
-
-                $sEcho = intval($request->request->get('draw'));
-
-                $status_list = array(
-                    array("danger" => "En panne"), //0
-                    array("success" => "Problème résolu"),//1
-                    array("info" => "En cours de diagnostic"),//2
-                    array("info" => "En cours de dépannage"),//3
-                    array("danger" => "Déclaré hors service"),//4
-                    array("info" => "En observation"),//5
-                    array("warning" => "Frais exigible"),//6
-                    array("danger" => "Demande rejetée"),//7
-                    array("info" => "Problème soumis"),//8
-                );
                 $iTotalRecords = count($services); // counting
                 $services = $this->handleResults($services, $iTotalRecords, $iDisplayStart, $iDisplayLength); // filtering
                 $iFilteredRecords = count($services);
                 //------------------------------------
-                $id = 0; // identity of rows in the table
+
                 /** @var Service_apres_vente $service_apres_vente */
                 foreach ($services as $service_apres_vente) {
-                    $id += 1;
-                    $etat = $service_apres_vente->getEtat();
-                    $offre = $service_apres_vente->getOffre();
-                    $boutique = $offre->getBoutique();
-                    $panne = $service_apres_vente->getDescriptionPanne();
-                    $json['data'][] = array(
-                        '<label class="mt-checkbox mt-checkbox-single mt-checkbox-outline"><input name="id_' . $service_apres_vente->getId() . '" type="checkbox" class="checkboxes"/><span></span></label>',
-                        '<span><i class="id hidden">' . $service_apres_vente->getId() . '</i><i class="hidden code">' . $service_apres_vente->getCode() . '</i><i class="hidden client">' . $service_apres_vente->getClient() . '</i><i class="hidden clientID">' . $service_apres_vente->getClient()->getId() . '</i><i class="hidden comment">' . $service_apres_vente->getCommentaire() . '</i>' . $id . '</span>',
-                        '<span><i class="hidden offreID">' . $offre->getId() . '</i><i class="offre hidden">' . $offre->getDesignation() . '</i><a href="#">' . $offre->getDesignation() . '</a></span>',
-                        '<span><i class="boutique hidden">' . $boutique->getDesignation() . '</i>' . $boutique->getDesignation() . '</span>',
-                        '<span class="date">' . $service_apres_vente->getDateDue()->format("d/m/Y - H:i") . '</span>',
-                        '<span><i class="hidden desc">' . $panne . '</i>' . $panne . '</span>',
-                        '<span class="etat label label-sm label-' . (key($status_list[$etat])) . '"><input type="hidden" value="' . $etat . '"/>' . (current($status_list[$etat])) . '</span>',
-                    );
+                    array_push($json['items'], array(
+                        'id' => $service_apres_vente->getId(),
+                        'code' => $service_apres_vente->getCode(),
+                        'description' => substr($service_apres_vente->getDescriptionPanne(), 100) . "...",
+                    ));
                 }
-                $json['draw'] = $sEcho;
                 $json["recordsTotal"] = $iTotalRecords;
                 $json["recordsFiltered"] = $iFilteredRecords;
-                return $this->json($json);
+                return $this->json(json_encode($json), 200);
             } catch (AccessDeniedException $ads) {
                 $session->getFlashBag()->add('danger', "<strong>Opération interdite!</strong><br/>Pour jouir de ce service, veuillez consulter nos administrateurs.");
                 return $this->json($json);
@@ -179,214 +155,6 @@ class Service_apres_venteController extends Controller
             'form' => $form->createView(),
             'form2' => $form2->createView(),
         ));
-    }
-
-    /**
-     * @param Request $request
-     * @param Offre $offre
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response|JsonResponse
-     */
-    public
-    function newAction(Request $request, Offre $offre = null)
-    {
-        $this->createSecurity($offre);
-        /** @var Session $session */
-        $session = $request->getSession();
-        /** @var Service_apres_vente $service_apres_vente */
-        $service_apres_vente = TradeFactory::getTradeProvider("service_apres_vente");
-        $form = $this->createForm('APM\AchatBundle\Form\Service_apres_venteType', $service_apres_vente);
-        $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
-            try {
-                if (null !== $offre) $service_apres_vente->setOffre($offre);
-                $this->createSecurity($service_apres_vente->getOffre());
-                $service_apres_vente->setClient($this->getUser());
-                $em = $this->getDoctrine()->getManager();
-                $em->persist($service_apres_vente);
-                $em->flush();
-                $session->getFlashBag()->add('success', "<strong> Création de l'Offre. réf:" . $offre->getCode() . "</strong><br> Opération effectuée avec succès!");
-                if ($request->isXmlHttpRequest()) {
-                    $json = array();
-                    $json["item"] = array();
-                    return $this->json(json_encode($json), 200);
-                }
-                return $this->redirectToRoute('apm_achat_service_apres_vente_show', array('id' => $service_apres_vente->getId()));
-            } catch (ConstraintViolationException $cve) {
-                $session->getFlashBag()->add('danger', "<strong>Echec de l'enregistrement. </strong><br>L'enregistrement a échoué dû à une contrainte de données!");
-                return $this->json(json_encode(["item" => null]));
-            } catch (AccessDeniedException $ads) {
-                $session->getFlashBag()->add('danger', "<strong>Echec de l'opération. </strong><br>Vous devez avoir achetés l'offre sur WE-TRADE au préalable!!");
-                return $this->json(json_encode(["item" => null]));
-            }
-        }
-        $session->set('previous_location', $request->getUri());
-        return $this->render('APMAchatBundle:service_apres_vente:new.html.twig', array(
-            'service_apres_vente' => $service_apres_vente,
-            'form' => $form->createView(),
-        ));
-    }
-
-    /**
-     * Finds and displays a Service_apres_vente entity.
-     * @param Request $request
-     * @param Service_apres_vente $service_apres_vente
-     * @return \Symfony\Component\HttpFoundation\Response| JsonResponse Afficher ls détails d'une SAV
-     *
-     * Afficher ls détails d'une SAV
-     */
-    public function showAction(Request $request, Service_apres_vente $service_apres_vente)
-    {
-        $this->listAndShowSecurity();
-        if ($request->isXmlHttpRequest()) {
-            $json = array();
-            $json['item'] = array(
-                'id' => $service_apres_vente->getId(),
-                'code' => $service_apres_vente->getCode(),
-                'description' => $service_apres_vente->getDescriptionPanne(),
-                'etat' => $service_apres_vente->getEtat(),
-                'commentaire' => $service_apres_vente->getCommentaire(),
-                'date' => $service_apres_vente->getDateDue()->format("d/m/Y H:i"),
-                'client' => $service_apres_vente->getClient()->getUsername(),
-                'offre' => $service_apres_vente->getOffre()->getDesignation(),
-            );
-            return $this->json(json_encode($json), 200);
-        }
-        $deleteForm = $this->createDeleteForm($service_apres_vente);
-        return $this->render('APMAchatBundle:service_apres_vente:show.html.twig', array(
-            'service_apres_vente' => $service_apres_vente,
-            'delete_form' => $deleteForm->createView(),
-        ));
-    }
-
-    /**
-     * Creates a form to delete a Service_apres_vente entity.
-     *
-     * @param Service_apres_vente $service_apres_vente The Service_apres_vente entity
-     *
-     * @return \Symfony\Component\Form\Form The form
-     */
-    private
-    function createDeleteForm(Service_apres_vente $service_apres_vente)
-    {
-        return $this->createFormBuilder()
-            ->setAction($this->generateUrl('apm_achat_service_apres_vente_delete', array('id' => $service_apres_vente->getId())))
-            ->setMethod('DELETE')
-            ->getForm();
-    }
-
-    /**
-     * Displays a form to edit an existing Service_apres_vente entity.
-     * @param Request $request
-     * @param Service_apres_vente $service_apres_vente
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response |JsonResponse
-     */
-    public function editAction(Request $request, Service_apres_vente $service_apres_vente)
-    {
-        $this->editAndDeleteSecurity($service_apres_vente);
-        $deleteForm = $this->createDeleteForm($service_apres_vente);
-        $editForm = $this->createForm('APM\AchatBundle\Form\Service_apres_venteType', $service_apres_vente);
-        $editForm->handleRequest($request);
-        if ($editForm->isSubmitted() && $editForm->isValid()
-            || $request->isXmlHttpRequest() && $request->isMethod('POST')
-        ) {
-            try {
-                $em = $this->getDoctrine()->getManager();
-                if ($request->isXmlHttpRequest()) {
-                    $json = array();
-                    $json["item"] = array();
-                    $property = $request->request->get('name');
-                    $value = $request->request->get('value');
-                    switch ($property) {
-                        case 'etat':
-                            $service_apres_vente->setEtat($value);
-                            break;
-                        case 'description':
-                            $service_apres_vente->setDescriptionPanne($value);
-                            break;
-                        case 'commentaire' :
-                            $service_apres_vente->setCommentaire($value);
-                            break;
-                        default:
-                            $session->getFlashBag()->add('info', "<strong> Aucune mise à jour effectuée </strong>");
-                            return $this->json(json_encode(["item" => null]), 205);
-                    }
-                    $em->flush();
-                    $session->getFlashBag()->add('success', "Mise à jour propriété : <strong>" . $property . "</strong> réf. offre :" . $service_apres_vente->getCode() . "<br> Opération effectuée avec succès!");
-                    return $this->json(json_encode($json), 200);
-                }
-                $em->flush();
-                $session->getFlashBag()->add('success', "Mise à jour propriété : <strong>" . $property . "</strong> réf. offre :" . $service_apres_vente->getCode() . "<br> Opération effectuée avec succès!");
-                return $this->redirectToRoute('apm_achat_service_apres_vente_show', array('id' => $service_apres_vente->getId()));
-            } catch (ConstraintViolationException $cve) {
-                $session->getFlashBag()->add('danger', "Echec de la Modification <br>L'enregistrement a échoué dû à une contrainte de données!");
-                return $this->json(json_encode(["item" => null]));
-            } catch (AccessDeniedException $ads) {
-                $session->getFlashBag()->add('danger', "Action interdite!<br>Vous n'êtes pas autorisés à effectuer cette opération!");
-                return $this->json(json_encode(["item" => null]));
-            }
-        }
-        return $this->render('APMAchatBundle:service_apres_vente:edit.html.twig', array(
-            'service_apres_vente' => $service_apres_vente,
-            'edit_form' => $editForm->createView(),
-            'delete_form' => $deleteForm->createView(),
-        ));
-    }
-
-
-    /**
-     * Deletes a Service_apres_vente entity.
-     * @param Request $request
-     * @param Service_apres_vente $service_apres_vente
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse| JsonResponse
-     */
-    public function deleteAction(Request $request, Service_apres_vente $service_apres_vente = null)
-    {
-        $this->editAndDeleteSecurity($service_apres_vente);
-        /** @var Session $session */
-        $session = $request->getSession();
-        $em = $this->getDoctrine()->getManager();
-        if ($request->isXmlHttpRequest()) {
-            /** @var Service_apres_vente $service_apres_vente */
-            $items = $request->request->get('items');
-            $elements = json_decode($items);
-            $json = array();
-            $json['item'] = array();
-            $j = 0;
-            $count = count($elements);
-            for ($i = 0; $i < $count; $i++) {
-                $service_apres_vente = null;
-                $id = $elements[$i];
-                $service_apres_vente = $em->getRepository('APMAchatBundle:Service_apres_vente')->find($id);
-                if (null !== $service_apres_vente) {
-                    $this->editAndDeleteSecurity($service_apres_vente);
-                    $em->remove($service_apres_vente);
-                    $em->flush();
-                    $json['item'] = $id;
-                    $j++;
-                }
-            }
-            $session->getFlashBag()->add('danger', "<strong>" . $j . "</strong> Element(s) supprimé(s)<br> Opération effectuée avec succès!");
-            return $this->json(json_encode($json), 200);
-        }
-        $form = $this->createDeleteForm($service_apres_vente);
-        $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
-            $em->remove($service_apres_vente);
-            $em->flush();
-        }
-        return $this->redirectToRoute('apm_achat_service_apres_vente_index');
-    }
-
-    public
-    function deleteFromListAction(Service_apres_vente $service_apres_vente)
-    {
-        $this->editAndDeleteSecurity($service_apres_vente);
-
-        $em = $this->getDoctrine()->getManager();
-        $em->remove($object);
-        $em->flush();
-
-        return $this->redirectToRoute('apm_achat_service_apres_vente_index');
     }
 
     /**
@@ -421,32 +189,6 @@ class Service_apres_venteController extends Controller
 
         //-----------------------------------------------------------------------------------------
     }
-
-
-    /**
-     * @param Service_apres_vente $service_apres_vente
-     */
-    private
-    function editAndDeleteSecurity($service_apres_vente)
-    {
-        //---------------------------------security-----------------------------------------------
-        // Unable to access the controller unless you have a USERAVM role
-        $this->denyAccessUnlessGranted('ROLE_USERAVM', null, 'Unable to access this page!');
-
-        /* ensure that the user is logged in  # granted even through remembering cookies
-        *  and that the one is the owner
-        */
-        $client = null;
-        if (null !== $service_apres_vente) {
-            $client = $service_apres_vente->getClient();
-            $user = $this->getUser();
-            if ((!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY')) || ($client !== $user)) {
-                throw $this->createAccessDeniedException();
-            }
-        }
-        //----------------------------------------------------------------------------------------
-    }
-//------------------------ End INDEX ACTION --------------------------------------------
 
     /**
      * @param Collection $services
@@ -550,6 +292,50 @@ class Service_apres_venteController extends Controller
         return $services;
     }
 
+    /**
+     * @param Request $request
+     * @param Offre $offre
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response|JsonResponse
+     */
+    public
+    function newAction(Request $request, Offre $offre = null)
+    {
+        $this->createSecurity($offre);
+        /** @var Session $session */
+        $session = $request->getSession();
+        /** @var Service_apres_vente $service_apres_vente */
+        $service_apres_vente = TradeFactory::getTradeProvider("service_apres_vente");
+        $form = $this->createForm('APM\AchatBundle\Form\Service_apres_venteType', $service_apres_vente);
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            try {
+                if (null !== $offre) $service_apres_vente->setOffre($offre);
+                $this->createSecurity($service_apres_vente->getOffre());
+                $service_apres_vente->setClient($this->getUser());
+                $em = $this->getDoctrine()->getManager();
+                $em->persist($service_apres_vente);
+                $em->flush();
+                $session->getFlashBag()->add('success', "<strong> Création de l'Offre. réf:" . $offre->getCode() . "</strong><br> Opération effectuée avec succès!");
+                if ($request->isXmlHttpRequest()) {
+                    $json = array();
+                    $json["item"] = array();
+                    return $this->json(json_encode($json), 200);
+                }
+                return $this->redirectToRoute('apm_achat_service_apres_vente_show', array('id' => $service_apres_vente->getId()));
+            } catch (ConstraintViolationException $cve) {
+                $session->getFlashBag()->add('danger', "<strong>Echec de l'enregistrement. </strong><br>L'enregistrement a échoué dû à une contrainte de données!");
+                return $this->json(json_encode(["item" => null]));
+            } catch (AccessDeniedException $ads) {
+                $session->getFlashBag()->add('danger', "<strong>Echec de l'opération. </strong><br>Vous devez avoir achetés l'offre sur WE-TRADE au préalable!!");
+                return $this->json(json_encode(["item" => null]));
+            }
+        }
+        $session->set('previous_location', $request->getUri());
+        return $this->render('APMAchatBundle:service_apres_vente:new.html.twig', array(
+            'service_apres_vente' => $service_apres_vente,
+            'form' => $form->createView(),
+        ));
+    }
 
     /**
      * @param Offre|null $offre , il s'agit du produit, figurant dans les transaction du client. (acheté par celui-ci)
@@ -583,6 +369,192 @@ class Service_apres_venteController extends Controller
         //----------------------------------------------------------------------------------------
     }
 
+    /**
+     * Finds and displays a Service_apres_vente entity.
+     * @param Request $request
+     * @param Service_apres_vente $service_apres_vente
+     * @return \Symfony\Component\HttpFoundation\Response| JsonResponse Afficher ls détails d'une SAV
+     *
+     * Afficher ls détails d'une SAV
+     */
+    public function showAction(Request $request, Service_apres_vente $service_apres_vente)
+    {
+        $this->listAndShowSecurity();
+        if ($request->isXmlHttpRequest()) {
+            $json = array();
+            $json['item'] = array(
+                'id' => $service_apres_vente->getId(),
+                'code' => $service_apres_vente->getCode(),
+                'description' => $service_apres_vente->getDescriptionPanne(),
+                'etat' => $service_apres_vente->getEtat(),
+                'commentaire' => $service_apres_vente->getCommentaire(),
+                'date' => $service_apres_vente->getDateDue()->format("d/m/Y H:i"),
+                'client' => $service_apres_vente->getClient()->getId(),
+                'offre' => $service_apres_vente->getOffre()->getId(),
+            );
+            return $this->json(json_encode($json), 200);
+        }
+        $deleteForm = $this->createDeleteForm($service_apres_vente);
+        return $this->render('APMAchatBundle:service_apres_vente:show.html.twig', array(
+            'service_apres_vente' => $service_apres_vente,
+            'delete_form' => $deleteForm->createView(),
+        ));
+    }
+
+    /**
+     * Creates a form to delete a Service_apres_vente entity.
+     *
+     * @param Service_apres_vente $service_apres_vente The Service_apres_vente entity
+     *
+     * @return \Symfony\Component\Form\Form The form
+     */
+    private
+    function createDeleteForm(Service_apres_vente $service_apres_vente)
+    {
+        return $this->createFormBuilder()
+            ->setAction($this->generateUrl('apm_achat_service_apres_vente_delete', array('id' => $service_apres_vente->getId())))
+            ->setMethod('DELETE')
+            ->getForm();
+    }
+
+    /**
+     * Displays a form to edit an existing Service_apres_vente entity.
+     * @param Request $request
+     * @param Service_apres_vente $service_apres_vente
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response |JsonResponse
+     */
+    public function editAction(Request $request, Service_apres_vente $service_apres_vente)
+    {
+        $this->editAndDeleteSecurity($service_apres_vente);
+        $deleteForm = $this->createDeleteForm($service_apres_vente);
+        $editForm = $this->createForm('APM\AchatBundle\Form\Service_apres_venteType', $service_apres_vente);
+        $editForm->handleRequest($request);
+        if ($editForm->isSubmitted() && $editForm->isValid()
+            || $request->isXmlHttpRequest() && $request->isMethod('POST')
+        ) {
+            try {
+                $em = $this->getDoctrine()->getManager();
+                if ($request->isXmlHttpRequest()) {
+                    $json = array();
+                    $json["item"] = array();
+                    $property = $request->request->get('name');
+                    $value = $request->request->get('value');
+                    switch ($property) {
+                        case 'etat':
+                            $service_apres_vente->setEtat($value);
+                            break;
+                        case 'description':
+                            $service_apres_vente->setDescriptionPanne($value);
+                            break;
+                        case 'commentaire' :
+                            $service_apres_vente->setCommentaire($value);
+                            break;
+                        default:
+                            $session->getFlashBag()->add('info', "<strong> Aucune mise à jour effectuée </strong>");
+                            return $this->json(json_encode(["item" => null]), 205);
+                    }
+                    $em->flush();
+                    $session->getFlashBag()->add('success', "Mise à jour propriété : <strong>" . $property . "</strong> réf. offre :" . $service_apres_vente->getCode() . "<br> Opération effectuée avec succès!");
+                    return $this->json(json_encode($json), 200);
+                }
+                $em->flush();
+                $session->getFlashBag()->add('success', "Mise à jour propriété : <strong>" . $property . "</strong> réf. offre :" . $service_apres_vente->getCode() . "<br> Opération effectuée avec succès!");
+                return $this->redirectToRoute('apm_achat_service_apres_vente_show', array('id' => $service_apres_vente->getId()));
+            } catch (ConstraintViolationException $cve) {
+                $session->getFlashBag()->add('danger', "Echec de la Modification <br>L'enregistrement a échoué dû à une contrainte de données!");
+                return $this->json(json_encode(["item" => null]));
+            } catch (AccessDeniedException $ads) {
+                $session->getFlashBag()->add('danger', "Action interdite!<br>Vous n'êtes pas autorisés à effectuer cette opération!");
+                return $this->json(json_encode(["item" => null]));
+            }
+        }
+        return $this->render('APMAchatBundle:service_apres_vente:edit.html.twig', array(
+            'service_apres_vente' => $service_apres_vente,
+            'edit_form' => $editForm->createView(),
+            'delete_form' => $deleteForm->createView(),
+        ));
+    }
+
+    /**
+     * @param Service_apres_vente $service_apres_vente
+     */
+    private
+    function editAndDeleteSecurity($service_apres_vente)
+    {
+        //---------------------------------security-----------------------------------------------
+        // Unable to access the controller unless you have a USERAVM role
+        $this->denyAccessUnlessGranted('ROLE_USERAVM', null, 'Unable to access this page!');
+
+        /* ensure that the user is logged in  # granted even through remembering cookies
+        *  and that the one is the owner
+        */
+        $client = null;
+        if (null !== $service_apres_vente) {
+            $client = $service_apres_vente->getClient();
+            $user = $this->getUser();
+            if ((!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY')) || ($client !== $user)) {
+                throw $this->createAccessDeniedException();
+            }
+        }
+        //----------------------------------------------------------------------------------------
+    }
+//------------------------ End INDEX ACTION --------------------------------------------
+
+    /**
+     * Deletes a Service_apres_vente entity.
+     * @param Request $request
+     * @param Service_apres_vente $service_apres_vente
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse| JsonResponse
+     */
+    public function deleteAction(Request $request, Service_apres_vente $service_apres_vente = null)
+    {
+        $this->editAndDeleteSecurity($service_apres_vente);
+        /** @var Session $session */
+        $session = $request->getSession();
+        $em = $this->getDoctrine()->getManager();
+        if ($request->isXmlHttpRequest()) {
+            /** @var Service_apres_vente $service_apres_vente */
+            $items = $request->request->get('items');
+            $elements = json_decode($items);
+            $json = array();
+            $json['item'] = array();
+            $j = 0;
+            $count = count($elements);
+            for ($i = 0; $i < $count; $i++) {
+                $service_apres_vente = null;
+                $id = $elements[$i];
+                $service_apres_vente = $em->getRepository('APMAchatBundle:Service_apres_vente')->find($id);
+                if (null !== $service_apres_vente) {
+                    $this->editAndDeleteSecurity($service_apres_vente);
+                    $em->remove($service_apres_vente);
+                    $em->flush();
+                    $json['item'] = $id;
+                    $j++;
+                }
+            }
+            $session->getFlashBag()->add('danger', "<strong>" . $j . "</strong> Element(s) supprimé(s)<br> Opération effectuée avec succès!");
+            return $this->json(json_encode($json), 200);
+        }
+        $form = $this->createDeleteForm($service_apres_vente);
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $em->remove($service_apres_vente);
+            $em->flush();
+        }
+        return $this->redirectToRoute('apm_achat_service_apres_vente_index');
+    }
+
+    public
+    function deleteFromListAction(Service_apres_vente $service_apres_vente)
+    {
+        $this->editAndDeleteSecurity($service_apres_vente);
+
+        $em = $this->getDoctrine()->getManager();
+        $em->remove($object);
+        $em->flush();
+
+        return $this->redirectToRoute('apm_achat_service_apres_vente_index');
+    }
 
     /**
      * @param Service_apres_vente $service_apres_vente

@@ -72,8 +72,8 @@ class Offre extends TradeFactory
     private $designation;
 
     /**
-     * @var string
-     * @ORM\Column(name="dureeGarantie", type="string", nullable=true)
+     * @var integer
+     * @ORM\Column(name="dureeGarantie", type="integer", nullable=true)
      */
     private $dureeGarantie;
 
@@ -1160,6 +1160,16 @@ class Offre extends TradeFactory
     }
 
     /**
+     * Get apparenceNeuf
+     *
+     * @return integer
+     */
+    public function getApparenceNeuf()
+    {
+        return $this->apparenceNeuf;
+    }
+
+    /**
      * @param integer $apparenceNeuf
      *  @return Offre
      */
@@ -1172,19 +1182,19 @@ class Offre extends TradeFactory
     }
 
     /**
-     * Get apparenceNeuf
+     * Get dureeGarantie
      *
      * @return integer
      */
-    public function getApparenceNeuf()
+    public function getDureeGarantie()
     {
-        return $this->apparenceNeuf;
+        return $this->dureeGarantie;
     }
 
     /**
      * Set dureeGarantie
      *
-     * @param string $dureeGarantie
+     * @param integer $dureeGarantie
      * @return Offre
      */
     public function setDureeGarantie($dureeGarantie)
@@ -1196,13 +1206,13 @@ class Offre extends TradeFactory
     }
 
     /**
-     * Get dureeGarantie
+     * Get etat
      *
-     * @return string
+     * @return integer
      */
-    public function getDureeGarantie()
+    public function getEtat()
     {
-        return $this->dureeGarantie;
+        return $this->etat;
     }
 
     /**
@@ -1217,15 +1227,5 @@ class Offre extends TradeFactory
         $this->etat = $etat;
         $this->updatedAt = new \DateTime('now');
         return $this;
-    }
-
-    /**
-     * Get etat
-     *
-     * @return integer
-     */
-    public function getEtat()
-    {
-        return $this->etat;
     }
 }

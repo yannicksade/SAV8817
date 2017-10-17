@@ -69,8 +69,8 @@ class CommunicationController extends Controller
                 /** @var Communication $communication */
                 foreach ($communicationsSent as $communication) {
                     array_push($json, array(
-                        'value' => $communication->getId(),
-                        'text' => $communication->getObjet(),
+                        'id' => $communication->getId(),
+                        'objet' => $communication->getObjet(),
                     ));
                 }
             }
@@ -81,8 +81,9 @@ class CommunicationController extends Controller
                 $communicationsReceived = $this->handleResults($communicationsReceived, $iTotalRecords, $iDisplayStart, $iDisplayLength);
                 foreach ($communicationsReceived as $communication) {
                     array_push($json, array(
-                        'value' => $communication->getId(),
-                        'text' => $communication->getObjet(),
+                        'id' => $communication->getId(),
+                        'code' => $communication->getCode(),
+                        'object' => $communication->getObjet(),
                     ));
                 }
             }
@@ -96,6 +97,17 @@ class CommunicationController extends Controller
             'communicationsSent' => $communicationsSent,
             'communicationsReceived' => $communicationsReceived,
         ));
+    }
+
+    private function listAndShowSecurity()
+    {
+        //-----------------------------------security-------------------------------------------
+        // Unable to access the controller unless you have a USERAVM role
+        $this->denyAccessUnlessGranted('ROLE_USERAVM', null, 'Unable to access this page!');
+        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
+            throw $this->createAccessDeniedException();
+        }
+        //----------------------------------------------------------------------------------------
     }
 
     /**
@@ -202,17 +214,6 @@ class CommunicationController extends Controller
         return $communications;
     }
 
-    private function listAndShowSecurity()
-    {
-        //-----------------------------------security-------------------------------------------
-        // Unable to access the controller unless you have a USERAVM role
-        $this->denyAccessUnlessGranted('ROLE_USERAVM', null, 'Unable to access this page!');
-        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
-            throw $this->createAccessDeniedException();
-        }
-        //----------------------------------------------------------------------------------------
-    }
-
     /**
      * L'Emetteur Crée et soumet un model de communication
      * @param Request $request
@@ -286,14 +287,16 @@ class CommunicationController extends Controller
             $json = array();
             $json['item'] = array(
                 'id' => $communication->getId(),
+                'code' => $communication->getCode(),
+                'objet' => $communication->getObjet(),
                 'dateDeVigueur' => $communication->getDateDeVigueur()->format('d-m-Y H:i'),
                 'dateFin' => $communication->getDateFin()->format('d-m-Y H:i'),
                 'contenu' => $communication->getContenu(),
                 'date' => $communication->getDate()->format('d-m-Y H:i'),
                 'reference' => $communication->getReference(),
                 'etat' => $communication->getEtat(),
-                'emetteur' => $communication->getEmetteur()->getUsername(),
-                'recepteur' => $communication->getRecepteur()->getUsername(),
+                'emetteur' => $communication->getEmetteur()->getId(),
+                'recepteur' => $communication->getRecepteur()->getId(),
                 'type' => $communication->getType(),
                 'valide' => $communication->getValide(),
             );

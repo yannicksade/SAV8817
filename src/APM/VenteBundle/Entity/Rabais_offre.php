@@ -47,6 +47,13 @@ class Rabais_offre extends TradeFactory
     private $prixUpdate;
 
     /**
+     * @var string
+     *
+     * @ORM\Column(name="$description", type="string",nullable=true)
+     */
+    private $description;
+
+    /**
      * @var integer
      * @Assert\GreaterThan(0)
      * @ORM\Column(name="quantiteMin", type="integer", nullable=true)
@@ -349,6 +356,16 @@ class Rabais_offre extends TradeFactory
     }
 
     /**
+     * Get date
+     *
+     * @return \DateTime
+     */
+    public function getDate()
+    {
+        return $this->date;
+    }
+
+    /**
      * Set date
      *
      * @param \DateTime $date
@@ -363,12 +380,26 @@ class Rabais_offre extends TradeFactory
     }
 
     /**
-     * Get date
+     * Get description
      *
-     * @return \DateTime
+     * @return string
      */
-    public function getDate()
+    public function getDescription()
     {
-        return $this->date;
+        return $this->description;
+    }
+
+    /**
+     * Set description
+     *
+     * @param string $description
+     *
+     * @return Rabais_offre
+     */
+    public function setDescription($description)
+    {
+        $this->description = $description;
+
+        return $this;
     }
 }

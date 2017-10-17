@@ -52,8 +52,11 @@ class Profile_transporteurController extends Controller
             /** @var Profile_transporteur $transporteur */
             foreach ($profile_transporteurs as $transporteur) {
                 array_push($json['items'], array(
-                    'value' => $transporteur->getId(),
-                    'text' => $transporteur->getMatricule(),
+                    'id' => $transporteur->getId(),
+                    'code' => $transporteur->getCode(),
+                    'matricule' => $transporteur->getMatricule(),
+                    'description' => $transporteur->getDescription(),
+
                 ));
             }
             return $this->json(json_encode($json),200);
@@ -62,6 +65,17 @@ class Profile_transporteurController extends Controller
             'profile_transporteurs' => $profile_transporteurs,
             'zone' => null,
         ));
+    }
+
+    private function listeAndShowSecurity()
+    {
+        //---------------------------------security-----------------------------------------------
+        // Unable to access the controller unless you have a USERAVM role
+        $this->denyAccessUnlessGranted('ROLE_USERAVM', null, 'Unable to access this page!');
+        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY')) {
+            throw $this->createAccessDeniedException();
+        }
+        //----------------------------------------------------------------------------------------
     }
 
     /**
@@ -113,17 +127,6 @@ class Profile_transporteurController extends Controller
         $transporteurs = array_slice($transporteurs, $iDisplayStart, $iDisplayLength, true);
 
         return $transporteurs;
-    }
-
-    private function listeAndShowSecurity()
-    {
-        //---------------------------------security-----------------------------------------------
-        // Unable to access the controller unless you have a USERAVM role
-        $this->denyAccessUnlessGranted('ROLE_USERAVM', null, 'Unable to access this page!');
-        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY')) {
-            throw $this->createAccessDeniedException();
-        }
-        //----------------------------------------------------------------------------------------
     }
 
     /**
@@ -198,6 +201,11 @@ class Profile_transporteurController extends Controller
                 'id' => $profile_transporteur->getId(),
                 'matricule' => $profile_transporteur->getMatricule(),
                 'code' => $profile_transporteur->getCode(),
+                'description' => $profile_transporteur->getDescription(),
+                'dateEnregistrement' => $profile_transporteur->getDateEnregistrement()->format('d-m-Y H:i'),
+                'utilisateur' => $profile_transporteur->getUtilisateur()->getId(),
+                'livreur' => $profile_transporteur->getLivreurBoutique()->getId(),
+
             );
             return $this->json(json_encode($json), 200);
         }

@@ -72,8 +72,9 @@ class LivraisonController extends Controller
             /** @var Livraison $livraison */
             foreach ($livraisons as $livraison) {
                 array_push($json['items'], array(
-                    'value' => $livraison->getId(),
-                    'text' => $livraison->getCode(),
+                    'id' => $livraison->getId(),
+                    'code' => $livraison->getCode(),
+                    'description' => $livraison->getDescription(),
                 ));
             }
             return $this->json(json_encode($json), 200);
@@ -82,6 +83,35 @@ class LivraisonController extends Controller
             'livraisons' => $livraisons,
             'boutique' => $boutique,
         ));
+    }
+
+    /**
+     * @param Boutique $boutique
+     * @param Utilisateur_avm |null $beneficiaire
+     */
+    private function listeAndShowSecurity($boutique, $beneficiaire = null)
+    {
+        //-----------------------------------security-------------------------------------------
+        $this->denyAccessUnlessGranted('ROLE_USERAVM', null, 'Unable to access this page!');
+        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY')) {
+            throw $this->createAccessDeniedException();
+        }
+        $user = $this->getUser();
+        if ($boutique) {
+            $gerant = $boutique->getGerant();
+            $proprietaire = $boutique->getProprietaire();
+            if ($user !== $gerant && $user !== $proprietaire) {
+                throw $this->createAccessDeniedException();
+            }
+        } else {//donne la possibilité au bénéficiaire de voir les détails de la livraison
+            if ($beneficiaire) {
+                if ($user !== $beneficiaire) {
+                    throw $this->createAccessDeniedException();
+                }
+            }
+        }
+
+        //------------------------------------------------------------------------------------------
     }
 
     /**
@@ -177,37 +207,6 @@ class LivraisonController extends Controller
 
         return $livraisons;
     }
-
-
-    /**
-     * @param Boutique $boutique
-     * @param Utilisateur_avm |null $beneficiaire
-     */
-    private function listeAndShowSecurity($boutique, $beneficiaire = null)
-    {
-        //-----------------------------------security-------------------------------------------
-        $this->denyAccessUnlessGranted('ROLE_USERAVM', null, 'Unable to access this page!');
-        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY')) {
-            throw $this->createAccessDeniedException();
-        }
-        $user = $this->getUser();
-        if ($boutique) {
-            $gerant = $boutique->getGerant();
-            $proprietaire = $boutique->getProprietaire();
-            if ($user !== $gerant && $user !== $proprietaire) {
-                throw $this->createAccessDeniedException();
-            }
-        } else {//donne la possibilité au bénéficiaire de voir les détails de la livraison
-            if ($beneficiaire) {
-                if ($user !== $beneficiaire) {
-                    throw $this->createAccessDeniedException();
-                }
-            }
-        }
-
-        //------------------------------------------------------------------------------------------
-    }
-
 
     /**
      * @ParamConverter("transaction", options={"mapping":{"transaction_id":"id"}})
@@ -316,7 +315,7 @@ class LivraisonController extends Controller
                 'etat' => $livraison->getEtatLivraison(),
                 'priorite' => $livraison->getPriorite(),
                 'valide' => $livraison->isValide(),
-                'livreur' => $livraison->getLivreur()->getMatricule()
+                'livreur' => $livraison->getLivreur()->getId()
             );
             return $this->json(json_encode($json), 200);
         }

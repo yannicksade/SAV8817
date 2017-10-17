@@ -10,7 +10,6 @@ namespace APM\UserBundle\Controller;
 
 use APM\UserBundle\Entity\Admin;
 use APM\UserBundle\Entity\Utilisateur;
-use APM\UserBundle\Entity\Utilisateur_avm;
 use FOS\UserBundle\Event\FilterUserResponseEvent;
 use FOS\UserBundle\Event\FormEvent;
 use FOS\UserBundle\FOSUserEvents;
@@ -47,7 +46,6 @@ class ProfileController extends Controller
                     'prenom' => $user->getPrenom(),
                     'email' => $user->getEmail(),
                     'username' => $user->getUsername(),
-                    'enabled' => $user->isEnabled(),
                     'profession' => $user->getProfession(),
                     'dateNaissance' => $user->getDateNaissance(),
                     'pays' => $user->getPays(),

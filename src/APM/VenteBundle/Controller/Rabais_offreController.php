@@ -71,8 +71,9 @@ class Rabais_offreController extends Controller
                     /** @var Rabais_offre $rabai */
                     foreach ($rabais_offres as $rabai) {
                         array_push($json, array(
-                            'value' => $rabai->getId(),
-                            'text' => $rabai->getCode(),
+                            'id' => $rabai->getId(),
+                            'code' => $rabai->getCode(),
+                            'description' => $rabai->getDescription()
                         ));
                     }
                 }
@@ -87,8 +88,9 @@ class Rabais_offreController extends Controller
                     //filtre
                     foreach ($rabais_recus as $rabai) {
                         array_push($json, array(
-                            'value' => $rabai->getId(),
-                            'text' => $rabai->getCode(),
+                            'id' => $rabai->getId(),
+                            'code' => $rabai->getCode(),
+                            'description' => $rabai->getDescription()
                         ));
                     }
                 }
@@ -102,8 +104,9 @@ class Rabais_offreController extends Controller
                     $rabais_accordes = $this->handleResults($rabais_accordes, $iTotalRecords, $iDisplayStart, $iDisplayLength);
                     foreach ($rabais_accordes as $rabai) {
                         array_push($json, array(
-                            'value' => $rabai->getId(),
-                            'text' => $rabai->getCode(),
+                            'id' => $rabai->getId(),
+                            'code' => $rabai->getCode(),
+                            'description' => $rabai->getDescription()
                         ));
                     }
                 }
@@ -119,6 +122,40 @@ class Rabais_offreController extends Controller
             'rabais_accordes' => $rabais_accordes,
             'offre' => $offre,
         ));
+    }
+
+    /**
+     * @param Rabais_offre|null $rabais
+     * @param Offre $offre
+     */
+    private function listAndShowSecurity($offre = null, $rabais = null)
+    {
+        //-----------------------------------security-------------------------------------------
+        // Unable to access the controller unless you have a USERAVM role
+        $this->denyAccessUnlessGranted('ROLE_USERAVM', null, 'Unable to access this page!');
+        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
+            throw $this->createAccessDeniedException();
+        }
+
+        if ($offre) { /// N'autorise que le vendeur, le gerant ou le proprietaire ou le bénéficiare à pouvoir afficher des rabais sur l'offre
+            $user = $this->getUser();
+            $boutique = $offre->getBoutique();
+            $gerant = null;
+            $proprietaire = null;
+            $beneficiaire = null;
+            if ($boutique) {
+                $gerant = $boutique->getGerant();
+                $proprietaire = $boutique->getProprietaire();
+            }
+            $vendeur = $offre->getVendeur();
+            if ($rabais) {//beneficiare
+                $beneficiaire = $rabais->getBeneficiaireRabais();
+            }
+            if ($user !== $gerant && $user !== $proprietaire && $user !== $vendeur && $user !== $beneficiaire) {
+                throw $this->createAccessDeniedException();
+            }
+        }
+        //----------------------------------------------------------------------------------------
     }
 
     /**
@@ -226,40 +263,6 @@ class Rabais_offreController extends Controller
     }
 
     /**
-     * @param Rabais_offre|null $rabais
-     * @param Offre $offre
-     */
-    private function listAndShowSecurity($offre = null, $rabais = null)
-    {
-        //-----------------------------------security-------------------------------------------
-        // Unable to access the controller unless you have a USERAVM role
-        $this->denyAccessUnlessGranted('ROLE_USERAVM', null, 'Unable to access this page!');
-        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
-            throw $this->createAccessDeniedException();
-        }
-
-        if ($offre) { /// N'autorise que le vendeur, le gerant ou le proprietaire ou le bénéficiare à pouvoir afficher des rabais sur l'offre
-            $user = $this->getUser();
-            $boutique = $offre->getBoutique();
-            $gerant = null;
-            $proprietaire = null;
-            $beneficiaire = null;
-            if ($boutique) {
-                $gerant = $boutique->getGerant();
-                $proprietaire = $boutique->getProprietaire();
-            }
-            $vendeur = $offre->getVendeur();
-            if ($rabais) {//beneficiare
-                $beneficiaire = $rabais->getBeneficiaireRabais();
-            }
-            if ($user !== $gerant && $user !== $proprietaire && $user !== $vendeur && $user !== $beneficiaire) {
-                throw $this->createAccessDeniedException();
-            }
-        }
-        //----------------------------------------------------------------------------------------
-    }
-
-    /**
      * Creates a new Rabais_offre entity.
      * @param Request $request
      * @param Offre $offre
@@ -354,14 +357,16 @@ class Rabais_offreController extends Controller
             $json = array();
             $json['item'] = array(
                 'id' => $rabais_offre->getId(),
+                'code' => $rabais_offre->getCode(),
+                'description' => $rabais_offre->getDescription(),
                 'dateLimite' => $rabais_offre->getDateLimite()->format('d-m-Y H:i'),
                 'nombreDeFois' => $rabais_offre->getNombreDefois(),
                 'prixUpdate' => $rabais_offre->getPrixUpdate(),
-                'beneficiaire' => $rabais_offre->getBeneficiaireRabais()->getUsername(),
-                'vendeur' => $rabais_offre->getVendeur()->getUsername(),
+                'beneficiaire' => $rabais_offre->getBeneficiaireRabais()->getId(),
+                'vendeur' => $rabais_offre->getVendeur()->getId(),
                 'quantiteMin' => $rabais_offre->getQuantiteMin(),
-                'groupe' => $rabais_offre->getGroupe()->getDesignation(),
-                'offre' => $rabais_offre->getOffre()->getDesignation(),
+                'groupe' => $rabais_offre->getGroupe()->getId(),
+                'offre' => $rabais_offre->getOffre()->getId(),
                 'date' => $rabais_offre->getDate()->format('d-m-Y H:i'),
             );
             return $this->json(json_encode($json), 200);

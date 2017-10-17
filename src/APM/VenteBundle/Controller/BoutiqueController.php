@@ -24,6 +24,7 @@ class BoutiqueController extends Controller
     private $code_filter;
     private $etat_filter;
     private $nationalite_filter;
+    private $description_filter;
     #private $dateTo_filter;
     #private $dateFrom_filter;
 
@@ -161,6 +162,14 @@ class BoutiqueController extends Controller
                 /** @var Boutique $e */
                 $subject = $e->getDesignation();
                 $pattern = $this->designation_filter;
+                return preg_match('/' . $pattern . '/i', $subject) === 1 ? true : false;
+            });
+        }
+        if ($this->description_filter != null) {
+            $boutiques = $boutiques->filter(function ($e) {//search for occurences in the text
+                /** @var Boutique $e */
+                $subject = $e->getDescription();
+                $pattern = $this->description_filter;
                 return preg_match('/' . $pattern . '/i', $subject) === 1 ? true : false;
             });
         }

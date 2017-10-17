@@ -71,8 +71,9 @@ class TransactionController extends Controller
                 /** @var Transaction $transaction */
                 foreach ($transactionsEffectues as $transaction) {
                     array_push($json, array(
-                        'value' => $transaction->getId(),
-                        'text' => $transaction->getNature(),
+                        'id' => $transaction->getId(),
+                        'code' => $transaction->getCode(),
+                        'nature' => $transaction->getNature(),
                     ));
                 }
             }
@@ -83,8 +84,9 @@ class TransactionController extends Controller
                 $transactionsRecues = $this->handleResults($transactionsRecues, $iTotalRecords, $iDisplayStart, $iDisplayLength);
                 foreach ($transactionsRecues as $transaction) {
                     array_push($json, array(
-                        'value' => $transaction->getId(),
-                        'text' => $transaction->getNature(),
+                        'id' => $transaction->getId(),
+                        'code' => $transaction->getCode(),
+                        'nature' => $transaction->getNature(),
                     ));
                 }
             }
@@ -118,6 +120,42 @@ class TransactionController extends Controller
             'transactionsRecues' => $transactionsRecues,
             'boutique' => $boutique,
         ));
+    }
+
+    /**
+     * @param Boutique $boutique
+     * @param Transaction $transaction
+     */
+    private function listAndShowSecurity($boutique, $transaction = null)
+    {
+        //-----------------------------------security-------------------------------------------
+
+        $this->denyAccessUnlessGranted('ROLE_USERAVM', null, 'Unable to access this page!');
+        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
+            throw $this->createAccessDeniedException();
+        }
+        $gerant = null;
+        $proprietaire = null;
+        $auteur = null;
+        $beneficiaire = null;
+        $vendeur = null;
+        $user = $this->getUser();
+        if ($boutique) {//autoriser un ayant droit à consulter ses transactions de droit
+            $gerant = $boutique->getGerant();
+            $proprietaire = $boutique->getProprietaire();
+            if ($beneficiaire) $beneficiaire = $transaction->getBeneficiaire();
+        } else {
+            if (null !== $transaction) {//s'il ne s'agit pas de la boutique, il peut s'agit de l'auteur ou du bénéficiaire qui veut avoir des informations
+                $auteur = $transaction->getAuteur();
+                if ($beneficiaire) $beneficiaire = $transaction->getBeneficiaire();
+            } else {
+                $vendeur = $user; //autoriser l'utilisateur AVM si l'objet ne porte pas sur ressource dédiée: boutique
+            }
+        }
+        if ($user !== $gerant && $user !== $proprietaire && $user !== $auteur && $user !== $beneficiaire && !$vendeur) {
+            throw $this->createAccessDeniedException();
+        }
+        //----------------------------------------------------------------------------------------
     }
 
     /**
@@ -235,42 +273,6 @@ class TransactionController extends Controller
     }
 
     /**
-     * @param Boutique $boutique
-     * @param Transaction $transaction
-     */
-    private function listAndShowSecurity($boutique, $transaction = null)
-    {
-        //-----------------------------------security-------------------------------------------
-
-        $this->denyAccessUnlessGranted('ROLE_USERAVM', null, 'Unable to access this page!');
-        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
-            throw $this->createAccessDeniedException();
-        }
-        $gerant = null;
-        $proprietaire = null;
-        $auteur = null;
-        $beneficiaire = null;
-        $vendeur = null;
-        $user = $this->getUser();
-        if ($boutique) {//autoriser un ayant droit à consulter ses transactions de droit
-            $gerant = $boutique->getGerant();
-            $proprietaire = $boutique->getProprietaire();
-            if ($beneficiaire) $beneficiaire = $transaction->getBeneficiaire();
-        } else {
-            if (null !== $transaction) {//s'il ne s'agit pas de la boutique, il peut s'agit de l'auteur ou du bénéficiaire qui veut avoir des informations
-                $auteur = $transaction->getAuteur();
-                if ($beneficiaire) $beneficiaire = $transaction->getBeneficiaire();
-            } else {
-                $vendeur = $user; //autoriser l'utilisateur AVM si l'objet ne porte pas sur ressource dédiée: boutique
-            }
-        }
-        if ($user !== $gerant && $user !== $proprietaire && $user !== $auteur && $user !== $beneficiaire && !$vendeur) {
-            throw $this->createAccessDeniedException();
-        }
-        //----------------------------------------------------------------------------------------
-    }
-
-    /**
      * Creates a new Transaction entity.
      * @param Request $request
      * @param Boutique $boutique
@@ -356,12 +358,15 @@ class TransactionController extends Controller
             $json = array();
             $json['item'] = array(
                 'id' => $transaction->getId(),
+                'code' => $transaction->getCode(),
                 'nature' => $transaction->getNature(),
+                'description' => $transaction->getDescription(),
                 'etat' => $transaction->getStatut(),
                 'montant' => $transaction->getMontant(),
-                'beneficiaire' => $transaction->getBeneficiaire()->getUsername(),
-                'auteur' => $transaction->getAuteur()->getUsername(),
+                'beneficiaire' => $transaction->getBeneficiaire()->getId(),
+                'auteur' => $transaction->getAuteur()->getId(),
                 'destinataireNonAvm' => $transaction->getDestinataireNonAvm(),
+                'date' => $transaction->getDate()->format('d-m-Y H:i')
             );
             return $this->json(json_encode($json), 200);
         }

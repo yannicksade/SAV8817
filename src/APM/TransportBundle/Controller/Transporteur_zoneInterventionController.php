@@ -38,10 +38,8 @@ class Transporteur_zoneInterventionController extends Controller
         $this->listeAndShowSecurity();
         if (null !== $transporteur) {
             $transporteurs_zones = $transporteur->getTransporteurZones();
-            $isZone = true;
         } else if (null !== $zone_intervention) {
             $transporteurs_zones = $zone_intervention->getZoneTransporteurs();
-            $isZone = false;
         }
         if ($request->isXmlHttpRequest()) {
             $json = array();
@@ -56,8 +54,9 @@ class Transporteur_zoneInterventionController extends Controller
             /** @var Transporteur_zoneintervention $transporteur_zone */
             foreach ($transporteurs_zones as $transporteur_zone) {
                 array_push($json['items'], array(
-                    'value' => $transporteur_zone->getId(),
-                    'text' => $isZone ? $transporteur_zone->getZoneIntervention()->getDesignation() : $transporteur_zone->getTransporteur()->getMatricule(),
+                    'id' => $transporteur_zone->getId(),
+                    'transporteur' => $transporteur_zone->getTransporteur()->getId(),
+                    'zoneIntervention' => $transporteur_zone->getZoneIntervention()->getId(),
                 ));
             }
             return $this->json(json_encode($json),200);
@@ -66,6 +65,17 @@ class Transporteur_zoneInterventionController extends Controller
                 'transporteurs_zones' => $transporteurs_zones,
             )
         );
+    }
+
+    private function listeAndShowSecurity()
+    {
+        //---------------------------------security-----------------------------------------------
+        // Unable to access the controller unless you have a USERAVM role
+        $this->denyAccessUnlessGranted('ROLE_USERAVM', null, 'Unable to access this page!');
+        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY')) {
+            throw $this->createAccessDeniedException();
+        }
+        //-----------------------------------------------------------------------------------------
     }
 
     /**
@@ -112,18 +122,6 @@ class Transporteur_zoneInterventionController extends Controller
         $transporteurs_zones = array_slice($transporteurs_zones, $iDisplayStart, $iDisplayLength, true);
 
         return $transporteurs_zones;
-    }
-
-
-    private function listeAndShowSecurity()
-    {
-        //---------------------------------security-----------------------------------------------
-        // Unable to access the controller unless you have a USERAVM role
-        $this->denyAccessUnlessGranted('ROLE_USERAVM', null, 'Unable to access this page!');
-        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY')) {
-            throw $this->createAccessDeniedException();
-        }
-        //-----------------------------------------------------------------------------------------
     }
 
 
@@ -197,8 +195,9 @@ class Transporteur_zoneInterventionController extends Controller
             $json = array();
             $json['item'] = array(
                 'id' => $transporteur_zoneintervention->getId(),
-                'transporteur' => $transporteur_zoneintervention->getTransporteur()->getUtilisateur()->getUsername(),
-                'zoneIntervention' => $transporteur_zoneintervention->getZoneIntervention()->getDesignation(),
+                'transporteur' => $transporteur_zoneintervention->getTransporteur()->getId(),
+                'zoneIntervention' => $transporteur_zoneintervention->getZoneIntervention()->getId(),
+                'dateEnregistrement' => $transporteur_zoneintervention->getDateEnregistrement()->format('d-m-Y H:i')
             );
             return $this->json(json_encode($json), 200);
         }

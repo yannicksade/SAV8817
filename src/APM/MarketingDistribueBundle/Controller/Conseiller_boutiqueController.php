@@ -43,10 +43,8 @@ class Conseiller_boutiqueController extends Controller
             /** @var Utilisateur_avm $user */
             $user = $this->getUser();
             $boutiques_conseillers = $user->getProfileConseiller()->getConseillerBoutiques();
-            $isBoutique = true;
         } else {
             $boutiques_conseillers = $boutique->getBoutiqueConseillers();
-            $isBoutique = false;
         }
 
         if ($request->isXmlHttpRequest()) {
@@ -67,8 +65,10 @@ class Conseiller_boutiqueController extends Controller
             /** @var Conseiller_boutique $boutique_conseiller */
             foreach ($boutiques_conseillers as $boutique_conseiller) {
                 array_push($json['items'], array(
-                    'value' => $boutique_conseiller->getId(),
-                    'text' => $isBoutique ? $boutique_conseiller->getBoutique()->getDesignation() : $boutique_conseiller->getConseiller()->getMatricule(),
+                    'id' => $boutique_conseiller->getId(),
+                    'conseillerBoutique' => $boutique_conseiller->getId(),
+                    'conseiller' => $boutique_conseiller->getConseiller()->getId(),
+                    'boutique' => $boutique_conseiller->getBoutique()->getId(),
                 ));
             }
             return $this->json(json_encode($json), 200);
@@ -96,6 +96,33 @@ class Conseiller_boutiqueController extends Controller
             );
         }
         return $this->render($template, $data);
+    }
+
+    /**
+     * @param Conseiller_boutique $conseiller_boutique
+     */
+    private function listAndShowSecurity($conseiller_boutique = null)
+    {
+        //---------------------------------security-----------------------------------------------
+        // Unable to access the controller unless you have a CONSEILLER or BOUTIQUE role
+        $this->denyAccessUnlessGranted(['ROLE_CONSEILLER', 'ROLE_BOUTIQUE'], null, 'Unable to access this page!');
+        /* ensure that the user is logged in  # granted even through remembering cookies
+        *  and that the one is the owner
+        */
+        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
+            throw $this->createAccessDeniedException();
+        }
+        //Pour afficher les details des boutique affiliés
+        if (null !== $conseiller_boutique) {
+            $user = $this->getUser();
+            $conseiller = $conseiller_boutique->getConseiller()->getUtilisateur();
+            $proprietaire = $conseiller_boutique->getBoutique()->getProprietaire();
+            $gerant = $conseiller_boutique->getBoutique()->getGerant();
+            if ($conseiller !== $user && $user !== $gerant && $user !== $proprietaire) {
+                throw $this->createAccessDeniedException();
+            }
+        }
+        //----------------------------------------------------------------------------------------
     }
 
     /**
@@ -157,34 +184,6 @@ class Conseiller_boutiqueController extends Controller
         $boutiques_conseillers = array_slice($boutiques_conseillers, $iDisplayStart, $iDisplayLength, true);
 
         return $boutiques_conseillers;
-    }
-
-
-    /**
-     * @param Conseiller_boutique $conseiller_boutique
-     */
-    private function listAndShowSecurity($conseiller_boutique = null)
-    {
-        //---------------------------------security-----------------------------------------------
-        // Unable to access the controller unless you have a CONSEILLER or BOUTIQUE role
-        $this->denyAccessUnlessGranted(['ROLE_CONSEILLER', 'ROLE_BOUTIQUE'], null, 'Unable to access this page!');
-        /* ensure that the user is logged in  # granted even through remembering cookies
-        *  and that the one is the owner
-        */
-        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
-            throw $this->createAccessDeniedException();
-        }
-        //Pour afficher les details des boutique affiliés
-        if (null !== $conseiller_boutique) {
-            $user = $this->getUser();
-            $conseiller = $conseiller_boutique->getConseiller()->getUtilisateur();
-            $proprietaire = $conseiller_boutique->getBoutique()->getProprietaire();
-            $gerant = $conseiller_boutique->getBoutique()->getGerant();
-            if ($conseiller !== $user && $user !== $gerant && $user !== $proprietaire) {
-                throw $this->createAccessDeniedException();
-            }
-        }
-        //----------------------------------------------------------------------------------------
     }
 
     /**
@@ -263,8 +262,8 @@ class Conseiller_boutiqueController extends Controller
                 'id' => $conseiller_boutique->getId(),
                 'date' => $conseiller_boutique->getDate()->format('d-m-Y H:i'),
                 'gainValeur' => $conseiller_boutique->getGainValeur(),
-                'conseiller' => $conseiller_boutique->getConseiller()->getMatricule(),
-                'boutique' => $conseiller_boutique->getBoutique()->getDesignation(),
+                'conseiller' => $conseiller_boutique->getConseiller()->getId(),
+                'boutique' => $conseiller_boutique->getBoutique()->getId(),
             );
             return $this->json(json_encode($json), 200);
         }

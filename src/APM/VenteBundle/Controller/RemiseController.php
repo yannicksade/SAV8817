@@ -87,8 +87,9 @@ class RemiseController extends Controller
             /** @var Remise $remise */
             foreach ($remises as $remise) {
                 array_push($json['items'], array(
-                    'value' => $remise->getId(),
-                    'text' => $remise->getCode(),
+                    'id' => $remise->getId(),
+                    'code' => $remise->getCode(),
+                    'description' => $remise->getDescription(),
                 ));
             }
             return $this->json(json_encode($json), 200);
@@ -100,6 +101,36 @@ class RemiseController extends Controller
                 "boutique" => $boutique,
             ]
         );
+    }
+
+    /**
+     * @param Offre $offre
+     * @param Boutique $boutique
+     */
+    private function listAndShowSecurity($offre = null, $boutique = null)
+    {
+        //-----------------------------------security-------------------------------------------
+        // Unable to access the controller unless you have a USERAVM role
+        $this->denyAccessUnlessGranted('ROLE_BOUTIQUE', null, 'Unable to access this page!');
+        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
+            throw $this->createAccessDeniedException();
+        }
+        $user = $this->getUser();
+        $vendeur = $user;
+        $gerant = null;
+        $proprietaire = null;
+        if ($offre) {//autorise le vendeur de l'offre
+            $vendeur = $offre->getVendeur();
+        }
+        if ($boutique) {//autorise le gerant ou le proprietaire
+            $gerant = $boutique->getGerant();
+            $proprietaire = $boutique->getProprietaire();
+        }
+        //si ni vendeur, ni gerant ou proprietaire, autorise l'utilisateur pour ses propres offres
+        if ($user !== $vendeur && $user !== $gerant && $proprietaire !== $user) {
+            throw $this->createAccessDeniedException();
+        }
+        //----------------------------------------------------------------------------------------
     }
 
     /**
@@ -181,37 +212,6 @@ class RemiseController extends Controller
     }
 
     /**
-     * @param Offre $offre
-     * @param Boutique $boutique
-     */
-    private function listAndShowSecurity($offre = null, $boutique = null)
-    {
-        //-----------------------------------security-------------------------------------------
-        // Unable to access the controller unless you have a USERAVM role
-        $this->denyAccessUnlessGranted('ROLE_BOUTIQUE', null, 'Unable to access this page!');
-        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
-            throw $this->createAccessDeniedException();
-        }
-        $user = $this->getUser();
-        $vendeur = $user;
-        $gerant = null;
-        $proprietaire = null;
-        if ($offre) {//autorise le vendeur de l'offre
-            $vendeur = $offre->getVendeur();
-        }
-        if ($boutique) {//autorise le gerant ou le proprietaire
-            $gerant = $boutique->getGerant();
-            $proprietaire = $boutique->getProprietaire();
-        }
-        //si ni vendeur, ni gerant ou proprietaire, autorise l'utilisateur pour ses propres offres
-        if ($user !== $vendeur && $user !== $gerant && $proprietaire !== $user) {
-            throw $this->createAccessDeniedException();
-        }
-        //----------------------------------------------------------------------------------------
-    }
-
-
-    /**
      * @param Request $request
      * @param Offre $offre
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response| JsonResponse
@@ -281,14 +281,29 @@ class RemiseController extends Controller
     /**
      * Finds and displays a Remise entity.
      * @param Remise $remise
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return \Symfony\Component\HttpFoundation\Response | JsonResponse
      */
     public function showAction(Remise $remise)
     {
         $this->listAndShowSecurity($remise->getOffre());
-
+        if ($request->isXmlHttpRequest()) {
+            $json = array();
+            $json['item'] = array(
+                'id' => $remise->getId(),
+                'code' => $remise->getCode(),
+                'description' => $remise->getDescription(),
+                'offre' => $remise->getOffre()->getId(),
+                'date' => $remise->getDate()->format('d-m-Y H:i'),
+                'dateExpiration' => $remise->getDateExpiration()->format('d-m-Y H:i'),
+                'etat' => $remise->getEtat(),
+                'quantiteMin' => $remise->getQuantiteMin(),
+                'valeur' => $remise->getValeur(),
+                'nombreUtilisation' => $remise->getNombreUtilisation(),
+                'restreint' => $remise->getRestreint(),
+            );
+            return $this->json(json_encode($json), 200);
+        }
         $deleteForm = $this->createDeleteForm($remise);
-
         return $this->render('APMVenteBundle:remise:show.html.twig', array(
             'remise' => $remise,
             'delete_form' => $deleteForm->createView(),

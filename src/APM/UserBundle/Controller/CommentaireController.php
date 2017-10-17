@@ -20,7 +20,6 @@ use Symfony\Component\HttpFoundation\Session\Session;
 class CommentaireController extends Controller
 {
     private $contenu_filter;
-    private $code_filter;
     private $dateLimiteFrom_filter;
     private $dateLimiteTo_filter;
     private $publiable_filter;
@@ -65,7 +64,6 @@ class CommentaireController extends Controller
 
         if ($request->isXmlHttpRequest() && $request->getMethod() === "POST") {
             $this->contenu_filter = $request->request->has('contenu_filter') ? $request->request->get('contenu_filter') : "";
-            $this->code_filter = $request->request->has('code_filter') ? $request->request->get('code_filter') : "";
             $this->dateLimiteFrom_filter = $request->request->has('dateLimiteFrom_filter') ? $request->request->get('dateLimiteFrom_filter') : "";
             $this->dateLimiteTo_filter = $request->request->has('dateLimiteTo_filter') ? $request->request->get('dateLimiteTo_filter') : "";
             $this->publiable_filter = $request->request->has('publiable_filter') ? $request->request->get('publiable_filter') : "";
@@ -81,8 +79,8 @@ class CommentaireController extends Controller
             /** @var Commentaire offre $commentaire */
             foreach ($commentaires as $commentaire) {
                 array_push($json, array(
-                    'value' => $commentaire->getId(),
-                    'text' => $commentaire->getCode(),
+                    'id' => $commentaire->getId(),
+                    'enonceContenu' => substr($commentaire->getContenu(), 10),
                 ));
             }
             return $this->json($json, 200);
@@ -91,6 +89,20 @@ class CommentaireController extends Controller
             'commentaires' => $commentaires,
             'offre' => $offre,
         ));
+    }
+
+    /**
+     *
+     * @internal param bool $access
+     */
+    private function listAndShowSecurity()
+    {
+        //-----------------------------------security-------------------------------------------
+        $this->denyAccessUnlessGranted('ROLE_USERAVM', null, 'Unable to access this page!');
+        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
+            throw $this->createAccessDeniedException();
+        }
+        //----------------------------------------------------------------------------------------
     }
 
     /**
@@ -104,14 +116,6 @@ class CommentaireController extends Controller
     {
         //filtering
         if ($commentaires === null) return array();
-
-        if ($this->code_filter != null) {
-            $commentaires = $commentaires->filter(function ($e) {//filtrage select
-                /** @var Commentaire $e */
-                return $e->getCode() === $this->code_filter;
-            });
-        }
-
         if ($this->evaluationMin_filter != null) {
             $commentaires = $commentaires->filter(function ($e) {//filtrage select
                 /** @var Commentaire $e */
@@ -170,21 +174,6 @@ class CommentaireController extends Controller
         return $commentaires;
     }
 
-
-    /**
-     *
-     * @internal param bool $access
-     */
-    private function listAndShowSecurity()
-    {
-        //-----------------------------------security-------------------------------------------
-        $this->denyAccessUnlessGranted('ROLE_USERAVM', null, 'Unable to access this page!');
-        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
-            throw $this->createAccessDeniedException();
-        }
-        //----------------------------------------------------------------------------------------
-    }
-
     /**
      * Creates a new Commentaire entity.
      * @param Request $request
@@ -213,7 +202,7 @@ class CommentaireController extends Controller
                     $json["item"] = array(//prevenir le client
                         "action" => 0,
                     );
-                    $session->getFlashBag()->add('success', "<strong> rabais d'offre créée. réf:" . $commentaire->getCode() . "</strong><br> Opération effectuée avec succès!");
+                    $session->getFlashBag()->add('success', "<strong> rabais d'offre créée. réf:" . substr($commentaire->getContenu(), 5) . "</strong><br> Opération effectuée avec succès!");
                     return $this->json(json_encode($json), 200);
                 }
                 return $this->redirectToRoute('apm_user_commentaire_show', array('id' => $commentaire->getId()));
@@ -262,11 +251,12 @@ class CommentaireController extends Controller
         if ($request->isXmlHttpRequest()) {
             $json = array();
             $json['item'] = array(
+                'id' => $commentaire->getId(),
                 'date' => $commentaire->getDate()->format('d-m-Y H:i'),
                 'contenu' => $commentaire->getContenu(),
                 'publiable' => $commentaire->getPubliable(),
                 'evaluation' => $commentaire->getEvaluation(),
-                'utilisateur' => $commentaire->getUtilisateur()->getUsername(),
+                'utilisateur' => $commentaire->getUtilisateur()->getId(),
             );
             return $this->json(json_encode($json), 200);
         }
@@ -321,7 +311,7 @@ class CommentaireController extends Controller
                     return $this->json(json_encode(["item" => null]), 205);
             }
             $em->flush();
-            $session->getFlashBag()->add('success', "Mis à jour propriété : <strong>" . $property . "</strong> réf. commentaire :" . $commentaire->getCode() . "<br> Opération effectuée avec succès!");
+            $session->getFlashBag()->add('success', "Mis à jour propriété : <strong>" . $property . "</strong> réf. commentaire :" . substr($commentaire->getContenu(), 5) . "<br> Opération effectuée avec succès!");
             return $this->json(json_encode($json), 200);
         }
         $deleteForm = $this->createDeleteForm($commentaire);

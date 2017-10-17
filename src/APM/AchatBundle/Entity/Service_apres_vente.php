@@ -41,9 +41,9 @@ class Service_apres_vente extends TradeFactory
     private $descriptionPanne;
 
     /**
-     * @var string
+     * @var integer
      * @Assert\Choice({0,1,2,3})
-     * @ORM\Column(name="etat", type="string", length=255, nullable=true)
+     * @ORM\Column(name="etat", type="integer", nullable=true)
      */
     private $etat;
 
@@ -170,7 +170,7 @@ class Service_apres_vente extends TradeFactory
     /**
      * Get etat
      *
-     * @return string
+     * @return  integer
      */
     public function getEtat()
     {
@@ -180,7 +180,7 @@ class Service_apres_vente extends TradeFactory
     /**
      * Set etat
      *
-     * @param string $etat
+     * @param integer $etat
      *
      * @return Service_apres_vente
      */
