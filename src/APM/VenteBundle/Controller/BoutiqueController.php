@@ -61,24 +61,36 @@ class BoutiqueController extends Controller
                 $iTotalRecords = count($boutiques);
                 if ($iDisplayLength < 0) $iDisplayLength = $iTotalRecords;
                 $boutiques = $this->handleResults($boutiques, $iTotalRecords, $iDisplayStart, $iDisplayLength);
+                $iFilteredRecords = count($boutiques);
                 //filtre
                 foreach ($boutiques as $boutique) {
                     array_push($json['items'], array(
-                        'value' => $boutique->getId(),
-                        'text' => $boutique->getDesignation(),
+                        'id' => $boutique->getId(),
+                        'code' => $boutique->getCode(),
+                        'designation' => $boutique->getDesignation(),
+                        'description' => $boutique->getDescription(),
+                        'image' => $boutique->getImage()
                     ));
                 }
+                $json['totalRecordsOwner'] = $iTotalRecords;
+                $json['filteredRecordsOwner'] = $iFilteredRecords;
             }
             if (($p === "shopkeeper" || $p === "both") && null !== $boutiquesGerant) {
                 $iTotalRecords = count($boutiquesGerant);
                 if ($iDisplayLength < 0) $iDisplayLength = $iTotalRecords;
                 $boutiquesGerant = $this->handleResults($boutiquesGerant, $iTotalRecords, $iDisplayStart, $iDisplayLength);
+                $iFilteredRecords = count($boutiques);
                 foreach ($boutiquesGerant as $boutique) {
                     array_push($json['items'], array(
-                        'value' => $boutique->getId(),
-                        'text' => $boutique->getDesignation(),
+                        'id' => $boutique->getId(),
+                        'code' => $boutique->getCode(),
+                        'designation' => $boutique->getDesignation(),
+                        'description' => $boutique->getDescription(),
+                        'image' => $boutique->getImage()
                     ));
                 }
+                $json['totalRecordsShopkeeper'] = $iTotalRecords;
+                $json['filteredRecordsShopkeeper'] = $iFilteredRecords;
             }
             return $this->json(json_encode($json), 200);
         }
@@ -87,6 +99,28 @@ class BoutiqueController extends Controller
             'boutiquesGerant' => $boutiquesGerant,
             'url_image' => $this->get('apm_core.packages_maker')->getPackages()->getUrl('/', 'resolve_img'),
         ));
+    }
+
+    private
+    function personalSecurity()
+    {
+        //-----------------------------------security-------------------------------------------
+        $this->denyAccessUnlessGranted('ROLE_BOUTIQUE', null, 'Unable to access this page!');
+        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_REMEMBERED') || !$this->getUser() instanceof Utilisateur) {
+            throw $this->createAccessDeniedException();
+        }
+
+    }
+
+    private
+    function adminSecurity()
+    {
+        //-----------------------------------security-------------------------------------------
+        $this->denyAccessUnlessGranted('ROLE_ADMIN', null, 'Unable to access this page!');
+        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY') || !$this->getUser() instanceof Admin) {
+            throw $this->createAccessDeniedException();
+        }
+        //----------------------------------------------------------------------------------------
     }
 
     /**
@@ -206,6 +240,19 @@ class BoutiqueController extends Controller
     }
 
     private
+    function createSecurity()
+    {
+        //---------------------------------security-----------------------------------------------
+        $this->denyAccessUnlessGranted('ROLE_BOUTIQUE', null, 'Unable to access this page!');
+        /* ensure that the user is logged in
+        */
+        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY') || !$this->getUser() instanceof Utilisateur) {
+            throw $this->createAccessDeniedException();
+        }
+        //----------------------------------------------------------------------------------------
+    }
+
+    private
     function getEM()
     {
         return $this->get('doctrine.orm.entity_manager');
@@ -228,6 +275,17 @@ class BoutiqueController extends Controller
             'crop_form' => $form->createView(),
             'url_image' => $this->get('apm_core.packages_maker')->getPackages()->getUrl('/', 'resolve_img'),
         ));
+    }
+
+    private
+    function listAndShowSecurity()
+    {
+        //-----------------------------------security-------------------------------------------
+        $this->denyAccessUnlessGranted('ROLE_USERAVM', null, 'Unable to access this page!');
+        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_REMEMBERED') || !$this->getUser() instanceof Utilisateur) {
+            throw $this->createAccessDeniedException();
+        }
+        //----------------------------------------------------------------------------------------
     }
 
     private
@@ -290,6 +348,10 @@ class BoutiqueController extends Controller
             ->setMethod('DELETE')
             ->getForm();
     }
+
+    /*changer le personnel ayant le droit sur les produits de la
+     * changer les droits sur les offres
+    */
 
     /**
      * Displays a form to edit an existing Boutique entity.
@@ -444,9 +506,6 @@ class BoutiqueController extends Controller
         return $this->redirectToRoute('apm_vente_boutique_index');
     }
 
-    /*changer le personnel ayant le droit sur les produits de la
-     * changer les droits sur les offres
-    */
     public
     function deleteFromListAction(Boutique $boutique)
     {
@@ -456,52 +515,5 @@ class BoutiqueController extends Controller
         $em->flush();
 
         return $this->redirectToRoute('apm_vente_boutique_index');
-    }
-
-
-    private
-    function personalSecurity()
-    {
-        //-----------------------------------security-------------------------------------------
-        $this->denyAccessUnlessGranted('ROLE_BOUTIQUE', null, 'Unable to access this page!');
-        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_REMEMBERED') || !$this->getUser() instanceof Utilisateur) {
-            throw $this->createAccessDeniedException();
-        }
-
-    }
-
-    private
-    function adminSecurity()
-    {
-        //-----------------------------------security-------------------------------------------
-        $this->denyAccessUnlessGranted('ROLE_ADMIN', null, 'Unable to access this page!');
-        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY') || !$this->getUser() instanceof Admin) {
-            throw $this->createAccessDeniedException();
-        }
-        //----------------------------------------------------------------------------------------
-    }
-
-    private
-    function listAndShowSecurity()
-    {
-        //-----------------------------------security-------------------------------------------
-        $this->denyAccessUnlessGranted('ROLE_USERAVM', null, 'Unable to access this page!');
-        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_REMEMBERED') || !$this->getUser() instanceof Utilisateur) {
-            throw $this->createAccessDeniedException();
-        }
-        //----------------------------------------------------------------------------------------
-    }
-
-    private
-    function createSecurity()
-    {
-        //---------------------------------security-----------------------------------------------
-        $this->denyAccessUnlessGranted('ROLE_BOUTIQUE', null, 'Unable to access this page!');
-        /* ensure that the user is logged in
-        */
-        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY') || !$this->getUser() instanceof Utilisateur) {
-            throw $this->createAccessDeniedException();
-        }
-        //----------------------------------------------------------------------------------------
     }
 }
