@@ -9,6 +9,7 @@
 namespace APM\UserBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
@@ -19,10 +20,11 @@ class SecurityController extends Controller
     /**
      * @param Request $request
      *
-     * @return Response
+     * @return JsonResponse
      */
     public function loginAction(Request $request)
     {
+
         /** @var $session \Symfony\Component\HttpFoundation\Session\Session */
         $session = $request->getSession();
         $authErrorKey = Security::AUTHENTICATION_ERROR;
@@ -42,36 +44,23 @@ class SecurityController extends Controller
         }
 
         // last username entered by the user
-        $lastUsername =  (null !== $session) && $session->has('username')?$session->get('username'):'';
-        $image = (null !== $session) && $session->has('image')?$session->get('image'):'';
-        $email = (null !== $session) && $session->has('email')?$session->get('email'):'';
+        $lastUsername = (null !== $session) && $session->has('username') ? $session->get('username') : '';
+        $image = (null !== $session) && $session->has('image') ? $session->get('image') : '';
+        $email = (null !== $session) && $session->has('email') ? $session->get('email') : '';
 
         $csrfToken = $this->has('security.csrf.token_manager')
             ? $this->get('security.csrf.token_manager')->getToken('authenticate')->getValue()
             : null;
 
-        return $this->renderLogin($lastUsername, array(
-            'last_username' => $lastUsername,
-            'image' => $image,
-            'email' => $email,
-            'error' => $error,
-            'csrf_token' => $csrfToken,
-            'url_image' => $this->get('apm_core.packages_maker')->getPackages()->getUrl('/', 'resolve_img'),
+        $json = array();
+        $json['items'] = array();
+        array_push($json ['items'], array(
+            'token' => $csrfToken,
         ));
-    }
 
-    /**
-     * Renders the login template with the given parameters. Overwrite this function in
-     * an extended controller to provide additional data for the login template.
-     *
-     * @param $lastUsername
-     * @param array $data
-     * @return Response
-     */
-    protected function renderLogin($lastUsername, array $data)
-    {
-        $template = $lastUsername?'@FOSUser/Security/locked-screen.html.twig':'@FOSUser/Security/login.html.twig';
-        return $this->render($template, $data);
+        $response = $this->json(json_encode($json), 200);
+        $response->headers->set('Access-Control-Allow-Origin', 'http://localhost:4200');
+        return $response;
     }
 
     public function checkAction()

@@ -40,18 +40,6 @@ class OffreController extends Controller
         $dateFrom_filter;
     private
         $dateTo_filter;
-    private
-        $status_list = array(
-        array("success" => "Disponible en stock"), //0
-        array("danger" => "Non disponible en stock"),//1
-        array("info" => "Vente sur commande"),//2
-        array("danger" => "Vente suspendue"),//3
-        array("danger" => "Vente annulée"),//4
-        array("warning" => "Stock limité"),//5
-        array("warning" => "Article en panne"),//6
-        array("info" => "Disponible uniquement en région"),//7
-        array("danger" => "Vente interdite"),//8
-    );
 
     /**
      * @ParamConverter("categorie", options={"mapping": {"categorie_id":"id"}})
@@ -387,35 +375,37 @@ class OffreController extends Controller
     public
     function showAction(Request $request, Offre $offre)
     {
-        $this->listAndShowSecurity();
-        if ($request->isXmlHttpRequest()) {
+        $request->headers->set('Access-Control-Allow-Origin', '*');
+        //$this->listAndShowSecurity();
+        //if ($request->isXmlHttpRequest()) {
             $json = array();
-            $json['item'] = array(
+        $json[] = array(
+            'id' => $offre->getId(),
                 'designation' => $offre->getDesignation(),
                 'code' => $offre->getCode(),
-                'categorie' => $offre->getCategorie()->getId(),
-                'boutiqueID' => !$offre->getBoutique() ? -1 : $offre->getBoutique()->getId(),
-                'dureeGarantie' => $offre->getDureeGarantie(),
-                'remiseProduit' => $offre->getRemiseProduit(),
-                'modeVente' => $offre->getModeVente(),
-                'modelDeSerie' => $offre->getModelDeSerie(),
-                'prixUnitaire' => $offre->getPrixUnitaire(),
-                'quantite' => $offre->getQuantite(),
-                'unite' => $offre->getUnite(),
-                'rate' => $offre->getEvaluation(),
-                'typeOffre' => $offre->getTypeOffre(),
-                'description' => $offre->getDescription(),
-                'publiable' => $offre->getPubliable(),
-                'apparenceNeuf' => $offre->getApparenceNeuf(),
-                'etat' => $offre->getEtat(),
-                'retourne' => $offre->getRetourne(),
-                'updatedAt' => $offre->getUpdatedAt()->format("d/m/Y - H:i"),
-                'dateCreation' => $offre->getDateCreation() ? $offre->getDateCreation()->format("d/m/Y - H:i") : '',
-                'dateExpiration' => $offre->getDateExpiration() ? $offre->getDateExpiration()->format("d/m/Y - H:i") : '',
-                'vendeur' => $offre->getVendeur()->getId(),
+            /*'categorie' => $offre->getCategorie()->getId(),
+            'boutiqueID' => !$offre->getBoutique() ? -1 : $offre->getBoutique()->getId(),
+            'dureeGarantie' => $offre->getDureeGarantie(),
+            'remiseProduit' => $offre->getRemiseProduit(),
+            'modeVente' => $offre->getModeVente(),
+            'modelDeSerie' => $offre->getModelDeSerie(),
+            'prixUnitaire' => $offre->getPrixUnitaire(),
+            'quantite' => $offre->getQuantite(),
+            'unite' => $offre->getUnite(),
+            'rate' => $offre->getEvaluation(),
+            'typeOffre' => $offre->getTypeOffre(),
+            'description' => $offre->getDescription(),
+            'publiable' => $offre->getPubliable(),
+            'apparenceNeuf' => $offre->getApparenceNeuf(),
+            'etat' => $offre->getEtat(),
+            'retourne' => $offre->getRetourne(),
+            'updatedAt' => $offre->getUpdatedAt()->format("d/m/Y - H:i"),
+            'dateCreation' => $offre->getDateCreation() ? $offre->getDateCreation()->format("d/m/Y - H:i") : '',
+            'dateExpiration' => $offre->getDateExpiration() ? $offre->getDateExpiration()->format("d/m/Y - H:i") : '',
+            'vendeur' => $offre->getVendeur()->getId(),*/
             );
-            return $this->json(json_encode($json), 200);
-        }
+        return $this->json($json, 200);
+        //  }
         $deleteForm = $this->createDeleteForm($offre);
         return $this->render('APMVenteBundle:offre:show.html.twig', array(
             'offre' => $offre,

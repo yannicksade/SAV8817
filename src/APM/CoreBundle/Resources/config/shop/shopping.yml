@@ -8,9 +8,9 @@ easy_t_cart_add:
 
 easy_t_cart_remove:
     path:     /cart/remove/{id_prod}
-    defaults: { _controller:APMCoreBundle:Shop/Shopping:removeCart}
+    defaults: { _controller: APMCoreBundle:Shop/Shopping:removeCart}
 
 easy_t_cart_update:
     path:     /cart/update
-    defaults: { _controller:APMCoreBundle:Shop/Shopping:updateCart}
+    defaults: { _controller: APMCoreBundle:Shop/Shopping:updateCart}
 
