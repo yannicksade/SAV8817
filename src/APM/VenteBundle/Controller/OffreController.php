@@ -19,7 +19,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Symfony\Component\HttpFoundation\Session\Session;
-
+use Symfony\Component\Security\Core\Authentication\AuthenticationProviderManager;
 
 /**
  * Offre controller.
@@ -51,7 +51,7 @@ class OffreController extends Controller
      * @param Categorie $categorie
      * @param Utilisateur_avm $user
      * @param Groupe_offre|null $groupe_offre
-     * @return JsonResponse|Response
+     * @return JsonResponse
      */
     public function indexAction(Request $request, Boutique $boutique = null, Categorie $categorie = null, Utilisateur_avm $user = null, Groupe_offre $groupe_offre = null)
     {
@@ -73,64 +73,58 @@ class OffreController extends Controller
                     $this->listAndShowSecurity();
                     $user = $this->getUser();
                 } else {
-                    $this->adminSecurity();
+                    //$this->adminSecurity();
                 }
                 /** @var Collection $offres */
                 $offres = $user->getOffres();
-                $vendeur = $user;
             }
             $form = $this->createForm('APM\VenteBundle\Form\OffreType');
             $form->handleRequest($request);
             /** @var Session $session */
             $session = $request->getSession();
-            if ($request->isXmlHttpRequest() && $request->getMethod() === "POST") {
-                $json = array();
-                $json['items'] = array();
-                //filter parameters
-                $this->code_filter = $request->request->has('code_filter') ? $request->request->get('code_filter') : "";
-                $this->designation_filter = $request->request->has('desc_filter') ? $request->request->get('desc_filter') : "";
-                $this->boutique_filter = $request->request->has('boutique_filter') ? $request->request->get('boutique_filter') : "";
-                $this->dateFrom_filter = $request->request->has('date_from_filter') ? $request->request->get('date_from_filter') : "";
-                $this->dateTo_filter = $request->request->has('date_to_filter') ? $request->request->get('date_to_filter') : "";
-                $this->etat_filter = $request->request->has('etat_filter') ? $request->request->get('etat_filter') : "";
-                $iDisplayLength = intval($request->request->get('length'));
-                $iDisplayStart = intval($request->request->get('start'));
-                //-----Source -------
-                $iTotalRecords = count($offres);
-                // filtering
-                $offres = $this->handleResults($offres, $iTotalRecords, $iDisplayStart, $iDisplayLength);
-                $iFilteredRecords = count($offres);
-                //------------------------------------
-                //$id = 0; // identity of rows in the table
-                /** @var Offre $offre */
-                foreach ($offres as $offre) {
-                    //$id += 1;
-                    //$session->set('offre_'.$id, $offre->getId()); //convert id before sending them to client
-                    array_push($json['items'], array(
-                        'id' => $offre->getId(),
-                        'code' => $offre->getCode(),
-                        'designation' => $offre->getDesignation(),
-                        'description' => $offre->getDescription(),
-                        'image' => $offre->getImage()
-                    ));
-                }
-                $json['totalRecords'] = $iTotalRecords;
-                $json['filteredRecords'] = $iFilteredRecords; //nbre d'unité
-                return $this->json(json_encode($json), 200);
+            //if ($request->isXmlHttpRequest() && $request->getMethod() === "POST") {
+            $json = array();
+            $json['items'] = array();
+            //filter parameters
+            $this->code_filter = $request->request->has('code_filter') ? $request->request->get('code_filter') : "";
+            $this->designation_filter = $request->request->has('desc_filter') ? $request->request->get('desc_filter') : "";
+            $this->boutique_filter = $request->request->has('boutique_filter') ? $request->request->get('boutique_filter') : "";
+            $this->dateFrom_filter = $request->request->has('date_from_filter') ? $request->request->get('date_from_filter') : "";
+            $this->dateTo_filter = $request->request->has('date_to_filter') ? $request->request->get('date_to_filter') : "";
+            $this->etat_filter = $request->request->has('etat_filter') ? $request->request->get('etat_filter') : "";
+            $iDisplayLength = intval($request->request->has('length') ? $request->request->get('length') : -1);
+            $iDisplayStart = intval($request->request->has('start') ? $request->request->get('start') : 0);
+            //-----Source -------
+            $iTotalRecords = count($offres);
+            // filtering
+            $iDisplayLength = $iDisplayLength < 0 ? $iTotalRecords : $iDisplayLength;
+            $offres = $this->handleResults($offres, $iTotalRecords, $iDisplayStart, $iDisplayLength);
+            $iFilteredRecords = count($offres);
+            //------------------------------------
+            //$id = 0; // identity of rows in the table
+            $url_image = $this->get('apm_core.packages_maker')->getPackages()->getUrl('/', 'resolve_img');
+            /** @var Offre $offre */
+            foreach ($offres as $offre) {
+                //$id += 1;
+                //$session->set('offre_'.$id, $offre->getId()); //convert id before sending them to client
+                array_push($json['items'], array(
+                    'id' => $offre->getId(),
+                    'code' => $offre->getCode(),
+                    'designation' => $offre->getDesignation(),
+                    'description' => $offre->getDescription(),
+                    'image' => $url_image . $offre->getImage(),
+                ));
             }
+            $json['totalRecords'] = $iTotalRecords;
+            $json['filteredRecords'] = $iFilteredRecords; //nbre d'unité
+            return $this->json(json_encode($json), 200);
+            // }
         } catch (AccessDeniedException $ads) {
             $session->getFlashBag()->add('danger', "<strong>Action interdite!</strong><br/>Pour jouir de ce service, veuillez consulter nos administrateurs.");
             return $this->json($json);
         }
-        $session->set('previous_location', $request->getUri());
-        return $this->render('APMVenteBundle:offre:index_ajax.html.twig', array(
-            'offres' => $offres,
-            'boutique' => $boutique,
-            'categorie' => $categorie,
-            'vendeur' => $vendeur,
-            'form' => $form->createView(),
-            'url_image' => $this->get('apm_core.packages_maker')->getPackages()->getUrl('/', 'img'),
-        ));
+        //$session->set('previous_location', $request->getUri());
+
     }
 
     /**
@@ -151,17 +145,6 @@ class OffreController extends Controller
             if ($user !== $gerant && $user !== $proprietaire) {
                 throw $this->createAccessDeniedException();
             }
-        }
-        //----------------------------------------------------------------------------------------
-    }
-
-    private
-    function adminSecurity()
-    {
-        //-----------------------------------security-------------------------------------------
-        $this->denyAccessUnlessGranted('ROLE_ADMIN', null, 'Unable to access this page!');
-        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY') || !$this->getUser() instanceof Admin) {
-            throw $this->createAccessDeniedException();
         }
         //----------------------------------------------------------------------------------------
     }
@@ -370,20 +353,19 @@ class OffreController extends Controller
      * Tout utilisateur AVM peut voir une offre
      * @param Request $request
      * @param Offre $offre
-     * @return Response | JsonResponse
+     * @return JsonResponse
      */
     public
     function showAction(Request $request, Offre $offre)
     {
-        $request->headers->set('Access-Control-Allow-Origin', '*');
-        //$this->listAndShowSecurity();
-        //if ($request->isXmlHttpRequest()) {
-            $json = array();
-        $json[] = array(
+        $this->listAndShowSecurity();
+        $json = array();
+        $json['item'] = array(
             'id' => $offre->getId(),
-                'designation' => $offre->getDesignation(),
-                'code' => $offre->getCode(),
-            /*'categorie' => $offre->getCategorie()->getId(),
+            'designation' => $offre->getDesignation(),
+            'code' => $offre->getCode(),
+            'image' => $this->get('apm_core.packages_maker')->getPackages()->getUrl('/', 'resolve_img') . $offre->getImage(),
+            'categorie' => $offre->getCategorie()->getId(),
             'boutiqueID' => !$offre->getBoutique() ? -1 : $offre->getBoutique()->getId(),
             'dureeGarantie' => $offre->getDureeGarantie(),
             'remiseProduit' => $offre->getRemiseProduit(),
@@ -402,34 +384,9 @@ class OffreController extends Controller
             'updatedAt' => $offre->getUpdatedAt()->format("d/m/Y - H:i"),
             'dateCreation' => $offre->getDateCreation() ? $offre->getDateCreation()->format("d/m/Y - H:i") : '',
             'dateExpiration' => $offre->getDateExpiration() ? $offre->getDateExpiration()->format("d/m/Y - H:i") : '',
-            'vendeur' => $offre->getVendeur()->getId(),*/
-            );
-        return $this->json($json, 200);
-        //  }
-        $deleteForm = $this->createDeleteForm($offre);
-        return $this->render('APMVenteBundle:offre:show.html.twig', array(
-            'offre' => $offre,
-            'delete_form' => $deleteForm->createView(),
-            'url_image' => $this->get('apm_core.packages_maker')->getPackages()->getUrl('/', 'resolve_img'),
-        ));
-    }
-
-//------------------------ End INDEX ACTION --------------------------------------------
-
-    /**
-     * Creates a form to delete a Offre entity.
-     *
-     * @param Offre $offre The Offre entity
-     *
-     * @return \Symfony\Component\Form\Form The form
-     */
-    private
-    function createDeleteForm(Offre $offre)
-    {
-        return $this->createFormBuilder()
-            ->setAction($this->generateUrl('apm_vente_offre_delete', array('id' => $offre->getId())))
-            ->setMethod('DELETE')
-            ->getForm();
+            'vendeur' => $offre->getVendeur()->getId(),
+        );
+        return $this->json(json_encode($json), 200);
     }
 
     /**
@@ -539,6 +496,8 @@ class OffreController extends Controller
         ));
     }
 
+//------------------------ End INDEX ACTION --------------------------------------------
+
     /**
      * @param Offre $offre
      */
@@ -564,6 +523,22 @@ class OffreController extends Controller
         }
         //----------------------------------------------------------------------------------------
 
+    }
+
+    /**
+     * Creates a form to delete a Offre entity.
+     *
+     * @param Offre $offre The Offre entity
+     *
+     * @return \Symfony\Component\Form\Form The form
+     */
+    private
+    function createDeleteForm(Offre $offre)
+    {
+        return $this->createFormBuilder()
+            ->setAction($this->generateUrl('apm_vente_offre_delete', array('id' => $offre->getId())))
+            ->setMethod('DELETE')
+            ->getForm();
     }
 
     /**
@@ -684,6 +659,17 @@ class OffreController extends Controller
 
         }
         return new JsonResponse();
+    }
+
+    private
+    function adminSecurity()
+    {
+        //-----------------------------------security-------------------------------------------
+        $this->denyAccessUnlessGranted('ROLE_ADMIN', null, 'Unable to access this page!');
+        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY') || !$this->getUser() instanceof Admin) {
+            throw $this->createAccessDeniedException();
+        }
+        //----------------------------------------------------------------------------------------
     }
 
 }

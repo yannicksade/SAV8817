@@ -3,7 +3,7 @@
 apm_vente_offre_index:
     path:     /
     defaults: { _controller: "APMVenteBundle:Offre:index" }
-    methods:  [GET,POST]
+    methods:  POST
 
 apm_vente_offre_boutique-categorie_index:
     path:     /boutique/{id}/categorie/{categorie_id}
@@ -16,14 +16,19 @@ apm_vente_offre_boutique_index:
     methods:  [GET,POST]
 
 apm_vente_offre_user_index:
-    path:     /user/{id}
+    path:     /user/{user_id}
     defaults: { _controller: "APMVenteBundle:Offre:index" }
-    methods:  [GET,POST]
+    methods:  [POST, GET]
+
+apm_vente_offre_groupe_index:
+    path:     /groupe/{groupe_id}
+    defaults: { _controller: "APMVenteBundle:Offre:index" }
+    methods:  [GET, POST]
 
 apm_vente_offre_show:
     path:     /{id}/show
     defaults: { _controller: "APMVenteBundle:Offre:show" }
-    #methods:  GET
+    methods:  GET
 
 apm_vente_offre_show-image:
     path:     /{id}/show-image
@@ -49,11 +54,6 @@ apm_vente_offre_delete_ajax:
     path:     /delete
     defaults: { _controller: "APMVenteBundle:Offre:delete" }
     methods: POST
-
-apm_vente_offre_groupe_index:
-    path:     /{groupe_id}/offres
-    defaults: { _controller: "APMVenteBundle:Offre:index" }
-    methods:  [GET, POST]
 
 apm_vente_offre_show-image_ajax:
     path:     /image

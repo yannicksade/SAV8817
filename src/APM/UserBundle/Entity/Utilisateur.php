@@ -9,6 +9,8 @@ use Symfony\Component\Validator\Constraints as Assert;
 use Vich\UploaderBundle\Mapping\Annotation as Vich;
 use Symfony\Component\Validator\Constraints\Date;
 
+/*use Symfony\Component\Security\Http\Authentication\AuthenticationUtils */
+
 /**
  * @ORM\Entity(repositoryClass="APM\UserBundle\Repository\UtilisateurRepository")
  * @Vich\Uploadable
@@ -33,6 +35,11 @@ abstract class Utilisateur extends BaseUser
      */
     protected $dateEnregistrement;
 
+    /**
+     * @var boolean
+     * @ORM\Column(name="isLoggedIn", type="boolean", nullable=false)
+     */
+    protected $isLoggedIn;
 
     /**
      * @ORM\Id
@@ -446,6 +453,30 @@ abstract class Utilisateur extends BaseUser
     public function setAdresse($adresse)
     {
         $this->adresse = $adresse;
+
+        return $this;
+    }
+
+    /**
+     * Get isLoggedIn
+     *
+     * @return boolean
+     */
+    public function getIsLoggedIn()
+    {
+        return $this->isLoggedIn;
+    }
+
+    /**
+     * Set isLoggedIn
+     *
+     * @param boolean $isLoggedIn
+     *
+     * @return Utilisateur
+     */
+    public function setIsLoggedIn($isLoggedIn)
+    {
+        $this->isLoggedIn = $isLoggedIn;
 
         return $this;
     }
