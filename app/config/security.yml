@@ -46,15 +46,17 @@ security:
                 #always_remember_me: true
             pattern: ^/
             form_login:
-                check_path:                     /login_check
-                provider: fos_userbundle
-                csrf_token_generator: security.csrf.token_manager
+                login_path:                     fos_user_security_login
+                check_path:                     fos_user_security_check
+                provider:                       fos_userbundle
                 # login success redirecting options (read further below)
                 always_use_default_target_path: true
                 default_target_path:            /easy-trade/user/dashboard/
                 target_path_parameter:          _target_path
                 use_referer:                    false
             logout:       true
+                path:     fos_user_security_logout
+                target:   /login
             anonymous:    true
             #http_basic:   ~
 

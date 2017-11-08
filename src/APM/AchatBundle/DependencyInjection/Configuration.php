@@ -19,23 +19,9 @@ class Configuration implements ConfigurationInterface
     public function getConfigTreeBuilder()
     {
         $treeBuilder = new TreeBuilder();
-        $rootNode = $treeBuilder->root('apm_achat');
 
-        // Here you should define the parameters that are allowed to
-        // configure your bundle. See the documentation linked above for
-        // more information on that topic.
-
-        $this->apmContinentConfig($rootNode);
 
         return $treeBuilder;
     }
 
-    private function apmContinentConfig(ArrayNodeDefinition $rootNode)
-    {
-        $rootNode
-            ->children()
-            ->integerNode("nombre1")->end()
-            ->integerNode("nombre2")->end()
-            ->end();
-    }
 }
