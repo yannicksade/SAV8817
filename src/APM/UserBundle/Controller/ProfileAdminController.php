@@ -10,11 +10,20 @@ namespace APM\UserBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
+use FOS\RestBundle\Controller\Annotations\RouteResource;
+use FOS\RestBundle\Controller\Annotations\Patch;
+use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
-
+/**
+ * Class ProfileAdminController
+ * @RouteResource("profile", pluralize=false)
+ */
 class ProfileAdminController extends Controller
 {
-
+    /**
+     * @param Request $request
+     * @Patch("/edit/profile/staff")
+     */
     public function editAction(Request $request)
     {
         $this->security();

@@ -18,10 +18,17 @@ use SebastianBergmann\CodeCoverage\RuntimeException;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
+use FOS\RestBundle\Controller\Annotations\RouteResource;
+use FOS\RestBundle\Controller\Annotations\Get;
+use FOS\RestBundle\Controller\Annotations\Post;
+use FOS\RestBundle\Controller\Annotations\Delete;
+use FOS\RestBundle\Controller\Annotations\Put;
+use FOS\RestBundle\Controller\Annotations\Patch;
+use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
 /**
  * Service_apres_vente controller.
- *
+ * @RouteResource("sav", pluralize=false)
  */
 class Service_apres_venteController extends Controller
 {
@@ -37,6 +44,7 @@ class Service_apres_venteController extends Controller
     private $client_filter;
 
     /**
+     * Liste tous les SAV enregistrés entant que client, les SAV receptionnés en tant que boutique ou les SAV d'une offre
      * @ParamConverter("offre", options={"mapping": {"offre_id":"id"}})
      * liste les SAV du clients
      * @param Request $request
@@ -44,9 +52,11 @@ class Service_apres_venteController extends Controller
      * @param Offre $offre
      * @return \Symfony\Component\HttpFoundation\Response| JsonResponse Liste tous les SAV d'un client
      *
-     * Liste tous les SAV enregistrés entant que client, les SAV receptionnés en tant que boutique ou les SAV d'une offre
+     * @Get("/services", name="s")
+     * @Get("/services/boutique/{id}", name="s_boutique")
+     * @Get("/services/offres/{offre_id}", name="s_offre")
      */
-    public function indexAction(Request $request, Boutique $boutique = null, Offre $offre = null)
+    public function getAction(Request $request, Boutique $boutique = null, Offre $offre = null)
     {
         $this->listAndShowSecurity();
         $services = new ArrayCollection();
@@ -296,6 +306,9 @@ class Service_apres_venteController extends Controller
      * @param Request $request
      * @param Offre $offre
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response|JsonResponse
+     *
+     * @Post("/new/sav")
+     * @Post("/new/sav/offres{id}", name="_offre")
      */
     public
     function newAction(Request $request, Offre $offre = null)
@@ -375,7 +388,7 @@ class Service_apres_venteController extends Controller
      * @param Service_apres_vente $service_apres_vente
      * @return \Symfony\Component\HttpFoundation\Response| JsonResponse Afficher ls détails d'une SAV
      *
-     * Afficher ls détails d'une SAV
+     * @Get("/show/sav/{id}")
      */
     public function showAction(Request $request, Service_apres_vente $service_apres_vente)
     {
@@ -422,6 +435,8 @@ class Service_apres_venteController extends Controller
      * @param Request $request
      * @param Service_apres_vente $service_apres_vente
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response |JsonResponse
+     *
+     * @Put("/edit/sav/{id}")
      */
     public function editAction(Request $request, Service_apres_vente $service_apres_vente)
     {
@@ -505,8 +520,10 @@ class Service_apres_venteController extends Controller
      * @param Request $request
      * @param Service_apres_vente $service_apres_vente
      * @return \Symfony\Component\HttpFoundation\RedirectResponse| JsonResponse
+     *
+     * @Delete("/delete/sav/{id}")
      */
-    public function deleteAction(Request $request, Service_apres_vente $service_apres_vente = null)
+    public function deleteAction(Request $request, Service_apres_vente $service_apres_vente)
     {
         $this->editAndDeleteSecurity($service_apres_vente);
         /** @var Session $session */
@@ -544,17 +561,6 @@ class Service_apres_venteController extends Controller
         return $this->redirectToRoute('apm_achat_service_apres_vente_index');
     }
 
-    public
-    function deleteFromListAction(Service_apres_vente $service_apres_vente)
-    {
-        $this->editAndDeleteSecurity($service_apres_vente);
-
-        $em = $this->getDoctrine()->getManager();
-        $em->remove($object);
-        $em->flush();
-
-        return $this->redirectToRoute('apm_achat_service_apres_vente_index');
-    }
 
     /**
      * @param Service_apres_vente $service_apres_vente

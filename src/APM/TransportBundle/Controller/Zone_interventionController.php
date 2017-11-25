@@ -15,10 +15,17 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Session;
+use FOS\RestBundle\Controller\Annotations\RouteResource;
+use FOS\RestBundle\Controller\Annotations\Get;
+use FOS\RestBundle\Controller\Annotations\Post;
+use FOS\RestBundle\Controller\Annotations\Delete;
+use FOS\RestBundle\Controller\Annotations\Put;
+use FOS\RestBundle\Controller\Annotations\Patch;
+use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
 /**
  * Zone_intervention controller.
- *
+ * @RouteResource("zoneintervention")
  */
 class Zone_interventionController extends Controller
 {
@@ -29,13 +36,14 @@ class Zone_interventionController extends Controller
     private $pays_filter;
     private $transporteur_filter;
 
-
     /**
      * liste toutes les zones d'intervention
      * @param Request $request
      * @return Response | JsonResponse
+     *
+     * @Get("/zoneinterventions")
      */
-    public function indexAction(Request $request)
+    public function getAction(Request $request)
     {
         $this->listeAndShowSecurity();
         $em = $this->getDoctrine()->getManager();
@@ -208,6 +216,7 @@ class Zone_interventionController extends Controller
     /**
      * @param Request $request
      * @return \Symfony\Component\HttpFoundation\JsonResponse|RedirectResponse|Response
+     * @Post("/new/zoneintervention/{id}")
      */
     public function newAction(Request $request)
     {
@@ -270,6 +279,8 @@ class Zone_interventionController extends Controller
      * @param Request $request
      * @param Zone_intervention $zone_intervention
      * @return Response | JsonResponse
+     *
+     * @Get("/show/zoneintervention/{id}")
      */
     public function showAction(Request $request, Zone_intervention $zone_intervention)
     {
@@ -318,6 +329,7 @@ class Zone_interventionController extends Controller
      * @param Request $request
      * @param Zone_intervention $zone_intervention
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response|JsonResponse
+     * @Put("/edit/zoneintervention/{id}")
      */
     public function editAction(Request $request, Zone_intervention $zone_intervention)
     {
@@ -415,6 +427,8 @@ class Zone_interventionController extends Controller
      * @param Request $request
      * @param Zone_intervention $zone_intervention
      * @return \Symfony\Component\HttpFoundation\RedirectResponse | JsonResponse
+     *
+     * @Delete("/delete/zoneintervention/{id}")
      */
     public function deleteAction(Request $request, Zone_intervention $zone_intervention)
     {
@@ -439,14 +453,4 @@ class Zone_interventionController extends Controller
         return $this->redirectToRoute('apm_zone_intervention_index');
     }
 
-    public function deleteFromListAction(Zone_intervention $zone_intervention)
-    {
-        $this->editAndDeleteSecurity($zone_intervention);
-
-        $em = $this->getDoctrine()->getManager();
-        $em->remove($zone_intervention);
-        $em->flush();
-
-        return $this->redirectToRoute('apm_zone_intervention_index');
-    }
 }

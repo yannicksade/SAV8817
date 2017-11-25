@@ -12,10 +12,17 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Session;
+use FOS\RestBundle\Controller\Annotations\RouteResource;
+use FOS\RestBundle\Controller\Annotations\Get;
+use FOS\RestBundle\Controller\Annotations\Post;
+use FOS\RestBundle\Controller\Annotations\Put;
+use FOS\RestBundle\Controller\Annotations\Patch;
+use FOS\RestBundle\Controller\Annotations\Delete;
+use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
 /**
  * Rabais_offre controller.
- *
+ * @RouteResource("discount", pluralize=false)
  */
 class Rabais_offreController extends Controller
 {
@@ -38,27 +45,30 @@ class Rabais_offreController extends Controller
      * @param Request $request
      * @param Offre $offre
      * @return \Symfony\Component\HttpFoundation\Response
+     *
+     * @Get("/utilisateur", name="s")
+     * @Get("/offre/{id}", name="s_offre")
      */
-    public function indexAction(Request $request, Offre $offre = null)
+    public function getAction(Request $request, Offre $offre = null)
     {
         $this->listAndShowSecurity($offre);
         /** @var Utilisateur_avm $user */
         $user = $this->getUser();
         if ($request->isXmlHttpRequest() && $request->getMethod() === "POST") {
             $q = $request->get('q');
-            $this->beneficiaire_filter = $request->request->has('beneficiaire_filter') ? $request->request->get('beneficiaire_filter') : "";
-            $this->code_filter = $request->request->has('code_filter') ? $request->request->get('code_filter') : "";
-            $this->dateLimiteFrom_filter = $request->request->has('dateLimiteFrom_filter') ? $request->request->get('dateLimiteFrom_filter') : "";
-            $this->dateLimiteTo_filter = $request->request->has('dateLimiteTo_filter') ? $request->request->get('dateLimiteTo_filter') : "";
-            $this->nombreDefois_filter = $request->request->has('nombreDefois_filter') ? $request->request->get('nombreDefois_filter') : "";
-            $this->prixUpdateMin_filter = $request->request->has('prixUpdateMin_filter') ? $request->request->get('prixUpdateMin_filter') : "";
-            $this->prixUpdateMax_filter = $request->request->has('prixUpdateMax_filter') ? $request->request->get('prixUpdateMax_filter') : "";
-            $this->quantite_filter = $request->request->has('quantite_filter') ? $request->request->get('quantite_filter') : "";
-            $this->vendeur_filter = $request->request->has('vendeur_filter') ? $request->request->get('vendeur_filter') : "";
-            $this->offre_filter = $request->request->has('offre_filter') ? $request->request->get('offre_filter') : "";
-            $this->groupe_filter = $request->request->has('groupe_filter') ? $request->request->get('groupe_filter') : "";
-            $iDisplayLength = $request->request->has('length') ? $request->request->get('length') : -1;
-            $iDisplayStart = $request->request->has('start') ? intval($request->request->get('start')) : 0;
+            $this->beneficiaire_filter = $request->query->has('beneficiaire_filter') ? $request->query->get('beneficiaire_filter') : "";
+            $this->code_filter = $request->query->has('code_filter') ? $request->query->get('code_filter') : "";
+            $this->dateLimiteFrom_filter = $request->query->has('dateLimiteFrom_filter') ? $request->query->get('dateLimiteFrom_filter') : "";
+            $this->dateLimiteTo_filter = $request->query->has('dateLimiteTo_filter') ? $request->query->get('dateLimiteTo_filter') : "";
+            $this->nombreDefois_filter = $request->query->has('nombreDefois_filter') ? $request->query->get('nombreDefois_filter') : "";
+            $this->prixUpdateMin_filter = $request->query->has('prixUpdateMin_filter') ? $request->query->get('prixUpdateMin_filter') : "";
+            $this->prixUpdateMax_filter = $request->query->has('prixUpdateMax_filter') ? $request->query->get('prixUpdateMax_filter') : "";
+            $this->quantite_filter = $request->query->has('quantite_filter') ? $request->query->get('quantite_filter') : "";
+            $this->vendeur_filter = $request->query->has('vendeur_filter') ? $request->query->get('vendeur_filter') : "";
+            $this->offre_filter = $request->query->has('offre_filter') ? $request->query->get('offre_filter') : "";
+            $this->groupe_filter = $request->query->has('groupe_filter') ? $request->query->get('groupe_filter') : "";
+            $iDisplayLength = $request->query->has('length') ? $request->query->get('length') : -1;
+            $iDisplayStart = $request->query->has('start') ? intval($request->query->get('start')) : 0;
             $json = array();
             $rabais_offres = null;
             if ($q === "fromProduct" || $q === "all") {
@@ -267,6 +277,8 @@ class Rabais_offreController extends Controller
      * @param Request $request
      * @param Offre $offre
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response | JsonResponse
+     *
+     * @Post("/new/rabaioffre/{id}")
      */
     public function newAction(Request $request, Offre $offre)
     {
@@ -349,6 +361,8 @@ class Rabais_offreController extends Controller
      * Finds and displays a Rabais_offre entity.
      * @param Rabais_offre $rabais_offre
      * @return \Symfony\Component\HttpFoundation\Response
+     *
+     * @Get("/show/rabaioffre/{id}")
      */
     public function showAction(Rabais_offre $rabais_offre)
     {
@@ -398,6 +412,8 @@ class Rabais_offreController extends Controller
      * @param Request $request
      * @param Rabais_offre $rabais_offre
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     *
+     * @Put("/edit/rabaioffre/{id}")
      */
     public function editAction(Request $request, Rabais_offre $rabais_offre)
     {
@@ -500,6 +516,8 @@ class Rabais_offreController extends Controller
      * @param Request $request
      * @param Rabais_offre $rabais_offre
      * @return \Symfony\Component\HttpFoundation\RedirectResponse | JsonResponse
+     *
+     * @Delete("/delete/rabaioffre/{id}")
      */
     public function deleteAction(Request $request, Rabais_offre $rabais_offre)
     {
@@ -518,17 +536,6 @@ class Rabais_offreController extends Controller
             $em->remove($rabais_offre);
             $em->flush();
         }
-
-        return $this->redirectToRoute('apm_vente_rabais_offre_index', ['id' => $rabais_offre->getOffre()->getId()]);
-    }
-
-    public function deleteFromListAction(Rabais_offre $rabais_offre)
-    {
-        $this->editAndDeleteSecurity($rabais_offre);
-
-        $em = $this->getDoctrine()->getManager();
-        $em->remove($rabais_offre);
-        $em->flush();
 
         return $this->redirectToRoute('apm_vente_rabais_offre_index', ['id' => $rabais_offre->getOffre()->getId()]);
     }

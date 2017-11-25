@@ -1,23 +1,25 @@
 apm_transport_livraison:
-    resource: "@APMTransportBundle/Resources/config/routing/livraison.yml"
-    prefix:   /transport/livraison
-
-apm_transport_homepage:
-    path:     /transport
-    defaults: { _controller: APMTransportBundle:Default:index }
+    type: rest
+    resource: APM\TransportBundle\Controller\LivraisonController
+    name_prefix: api_transport_
 
 apm_transport_livreur_boutique:
-    resource: "@APMTransportBundle/Resources/config/routing/livreur_boutique.yml"
-    prefix:   /transport/livreur_boutique
+    type: rest
+    resource: APM\TransportBundle\Controller\Livreur_boutiqueController
+    name_prefix: api_transport_
+
 
 apm_transport_transporteur:
-    resource: "@APMTransportBundle/Resources/config/routing/profile_transporteur.yml"
-    prefix:   /transport/transporteur
+    type: rest
+    resource: APM\TransportBundle\Controller\Profile_transporteurController
+    name_prefix: api_transport_
 
 apm_transport_zone_intervention:
-    resource: "@APMTransportBundle/Resources/config/routing/zone_intervention.yml"
-    prefix:   /transport/zone_intervention
+    type: rest
+    resource: APM\TransportBundle\Controller\Zone_interventionController
+    name_prefix: api_transport_
 
-apm_transport_Transporteur_zoneIntervention:
-    resource: "@APMTransportBundle/Resources/config/routing/transporteur_zone.yml"
-    prefix:   /transport-zone_intervention
+apm_transport_transporteur_zoneIntervention:
+    type: rest
+    resource: APM\TransportBundle\Controller\Transporteur_zoneInterventionController
+    name_prefix: api_transport_

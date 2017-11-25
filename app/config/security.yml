@@ -16,7 +16,8 @@ security:
 
     #--------------------------------------------
     #---Rôle du  super administrateur
-        ROLE_SUPER_ADMIN: [ROLE_ADMIN]
+        ROLE_GESTIONNAIRE: ROLE_USER # manage staff registration
+        ROLE_SUPER_ADMIN: [ROLE_ADMIN, ROLE_GESTIONNAIRE]
     #--------------------------------------------
     #---Rôle des utilisateurs avm
         ROLE_USERAVM:       ROLE_USER
@@ -28,80 +29,107 @@ security:
     providers:
         fos_userbundle:
             id: fos_user.user_provider.username_email
+
     firewalls:
         # disables authentication for assets and the profiler, adapt it according to your needs
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
 
-        main:
-            #remember_me:
-                #secret:   '%secret%'
-                #lifetime: 100 # in seconds
-                #path:     /
+        healthcheck:
+            pattern: ^/ping$
+            anonymous: true
 
-                        # by default, the feature is enabled by checking a
-                        # checkbox in the login form (see below), uncomment the
-                        # following line to always enable it.
-                #always_remember_me: true
-            pattern: ^/
+
+        api_user_register:
+            pattern: ^/user/register
+            anonymous: true
+
+
+        api_staff_register:
+            pattern: ^/staff/register
+            anonymous: true
+
+
+        api_docs:
+            pattern: ^/doc
+            anonymous: true
+
+
+        api_password_reset:
+            pattern: ^/reset-password
+            anonymous: true
+
+
+        api_login:
+            pattern:  ^/login
+            stateless: true
+            anonymous: true
             form_login:
-                login_path:                     fos_user_security_login
-                check_path:                     fos_user_security_check
-                provider:                       fos_userbundle
-                # login success redirecting options (read further below)
-                always_use_default_target_path: true
-                default_target_path:            /easy-trade/user/dashboard/
-                target_path_parameter:          _target_path
-                use_referer:                    false
-            logout:       true
-                path:     fos_user_security_logout
-                target:   /login
-            anonymous:    true
-            #http_basic:   ~
+                check_path:               /login
+                require_previous_session: false
+                use_forward: true
+                username_parameter:       username
+                password_parameter:       password
+                success_handler:          lexik_jwt_authentication.handler.authentication_success
+                failure_handler:          lexik_jwt_authentication.handler.authentication_failure
+
+
+        main:
+            pattern: ^/
+            stateless: true
+            #lexik_jwt: ~
+            logout:
+                path:                 /logout
+                target:               /test
+                invalidate_session:   true
+                #success_handler:      ~
+            guard:
+                 authenticators:
+                     - lexik_jwt_authentication.jwt_token_authenticator
+            #provider: fos_userbundle # optional
+            #anonymous: ~
+
 
     access_control:
 
     #     pages accessibles aux utilisateurs anonymes
-        - { path: ^/login, role: IS_AUTHENTICATED_ANONYMOUSLY } # This is for All users logged in or anonymous
-        - { path: ^/relogin, role: IS_AUTHENTICATED_ANONYMOUSLY } # This is for All users logged in or anonymous
-        - { path: ^/logout, role: IS_AUTHENTICATED_REMEMBERED }  # This is for users logged in even with a remembered me cokie
-        - { path: ^/change-password, role: IS_AUTHENTICATED_FULLY } # This is strictly for users who have successfully logged in and not via remembered me cookie
-        - { path: ^/profile, role: IS_AUTHENTICATED_FULLY }
-        - { path: ^/lock-dashboard, role: IS_AUTHENTICATED_FULLY }
-        - { path: ^/register/utilisateur-avm, role: IS_AUTHENTICATED_ANONYMOUSLY }
-        - { path: ^/resetting, role: IS_AUTHENTICATED_ANONYMOUSLY }
-        - { path: ^/easy-trade/costumer, role: IS_AUTHENTICATED_ANONYMOUSLY}
+        - { path: ^/ping, role: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/doc, role: IS_AUTHENTICATED_ANONYMOUSLY }
 
+        - { path: ^/login, role: IS_AUTHENTICATED_ANONYMOUSLY } # This is for All users logged in or anonymous
+        - { path: ^/user/register, role: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/reset-password, role: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/apm/core/anonymous, role: IS_AUTHENTICATED_ANONYMOUSLY}
+
+        - { path: ^/change-password, role: IS_AUTHENTICATED_FULLY } # This is strictly for users who have successfully logged in and not via remembered me cookie
+        - { path: ^/, role: IS_AUTHENTICATED_FULLY }
+
+
+        - { path: ^/staff/register, role: ROLE_GESTIONNAIRE}
     #     pages accessibles aux utilisateurs avm authentifiés
-        - { path: ^/easy-trade/user, role: ROLE_USERAVM }
+        - { path: ^/apm/core/user, role: ROLE_USERAVM }
     #     pages accessibles aux Gérants Boutiques et aux propriétaires
-        - { path: ^/easy-trade/gerant-boutique, role: ROLE_BOUTIQUE }
+        - { path: ^/apm/core/gerant-boutique, role: ROLE_BOUTIQUE }
     #     pages accessibles aux Transporteurs
-        - { path: ^/easy-trade/transport, role: ROLE_TRANSPORTEUR }
+        - { path: ^/apm/core/transport, role: ROLE_TRANSPORTEUR }
     #     pages accessibles aux Conseillers des Réseaux
-        - { path: ^/easy-trade/conseiller, role: ROLE_CONSEILLER }
+        - { path: ^/apm/core/conseiller, role: ROLE_CONSEILLER }
     #     pages accessibles aux administrateurs
           #  pages accessibles aux administrateurs spécialisés
                 #  ex: controleurs, analystes, comptables etc.
                   #  pages accessibles aux controleurs
-        - { path: ^/easy-trade/staff/auditeur, role: ROLE_AUDIT}
+        - { path: ^/apm/core/staff/auditeur, role: ROLE_AUDIT}
                   #  pages accessibles aux analystes
-        - { path: ^/easy-trade/staff/analyste, role: ROLE_ANALYSE}
+        - { path: ^/apm/core/staff/analyste, role: ROLE_ANALYSE}
                   #  pages accessibles aux comptables
-        - { path: ^/easy-trade/staff/comptable, role: ROLE_COMP}
+        - { path: ^/apm/core/staff/comptable, role: ROLE_COMP}
                   #  pages accessibles au service d'exploitation
-        - { path: ^/easy-trade/staff/explorateur, role: ROLE_EXP}
+        - { path: ^/apm/core/staff/explorateur, role: ROLE_EXP}
                   #  pages accessibles aux administrateurs
-        - { path: ^/apm/gestionnaire, role: ROLE_ADMIN} #gestion du business
+        - { path: ^/apm/core/gestionnaire, role: ROLE_ADMIN} #gestion du business
           #   pages accessibles au super admin
-#        - { path: ^/register-admin, role: ROLE_SUPER_ADMIN }
 
-        - { path: ^/apm, role: ROLE_USERAVM }
-        #Preventing from any access
-        - { path: /apm, role: ROLE_SUPER_ADMIN } # Everything that is below or above this path belong to the super user
-
-        - { path: /easy-trade, role: ROLE_SUPER_ADMIN}
         - { path: ^/, role: ROLE_SUPER_ADMIN} # Everything that has not been included in any careful path belong to the super user
 
 

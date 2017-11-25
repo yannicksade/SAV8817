@@ -22,7 +22,12 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use FOS\RestBundle\Controller\Annotations\Get;
+use FOS\RestBundle\Controller\Annotations\Post;
 
+/**
+ * ProfileController
+ */
 class ProfileController extends Controller
 {
     /**
@@ -69,6 +74,8 @@ class ProfileController extends Controller
     /**
      * @param Request $request
      * @return \Symfony\Component\HttpFoundation\JsonResponse|RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     *
+     * @Post("/edit")
      */
     public function editAction(Request $request)
     {

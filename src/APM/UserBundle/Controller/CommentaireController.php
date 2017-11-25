@@ -10,12 +10,20 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Session;
+use FOS\RestBundle\Controller\Annotations\RouteResource;
+use FOS\RestBundle\Controller\Annotations\Get;
+use FOS\RestBundle\Controller\Annotations\Post;
+use FOS\RestBundle\Controller\Annotations\Patch;
+use FOS\RestBundle\Controller\Annotations\Delete;
+use FOS\RestBundle\Controller\Annotations\Put;
+use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
 /**
  * Commentaire controller.
  * Tout utilisateur peut éditer, modifier ou supprimer des commentaires sur n'importe qu'elle offre; mais seul le proprietaire
  * de l'offre peut les publier
  *
+ * @RouteResource("commentaire", pluralize=false)
  */
 class CommentaireController extends Controller
 {
@@ -36,8 +44,10 @@ class CommentaireController extends Controller
      * @param Request $request
      * @param Offre $offre
      * @return \Symfony\Component\HttpFoundation\Response
+     *
+     * @Get("/commentaires/offre/{id}", name="s_offre")
      */
-    public function indexAction(Request $request, Offre $offre)
+    public function getAction(Request $request, Offre $offre)
     {
         $this->listAndShowSecurity();
         $vendeur = $offre->getVendeur();
@@ -179,6 +189,8 @@ class CommentaireController extends Controller
      * @param Request $request
      * @param Offre $offre
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response | JsonResponse
+     *
+     * @Post("/new/communication/offre/{id}", name="_offre")
      */
     public function newAction(Request $request, Offre $offre)
     {
@@ -244,6 +256,8 @@ class CommentaireController extends Controller
      * @param Request $request
      * @param Commentaire $commentaire
      * @return \Symfony\Component\HttpFoundation\Response
+     *
+     * @Get("/show/commentaire/{id}")
      */
     public function showAction(Request $request, Commentaire $commentaire)
     {
@@ -287,6 +301,8 @@ class CommentaireController extends Controller
      * @param Request $request
      * @param Commentaire $commentaire
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     *
+     * @Put("/edit/commentaire/{id}")
      */
     public function editAction(Request $request, Commentaire $commentaire)
     {
@@ -359,6 +375,8 @@ class CommentaireController extends Controller
      * @param Request $request
      * @param Commentaire $commentaire
      * @return \Symfony\Component\HttpFoundation\RedirectResponse | JsonResponse
+     *
+     * @Delete("/delete/commentaire/{id}")
      */
     public function deleteAction(Request $request, Commentaire $commentaire)
     {
@@ -377,16 +395,6 @@ class CommentaireController extends Controller
             $em->remove($commentaire);
             $em->flush();
         }
-        return $this->redirectToRoute('apm_user_commentaire_index');
-    }
-
-    public function deleteFromListAction(Commentaire $commentaire)
-    {
-        $this->editAndDeleteSecurity($commentaire);
-        $em = $this->getDoctrine()->getManager();
-        $em->remove($commentaire);
-        $em->flush();
-
         return $this->redirectToRoute('apm_user_commentaire_index');
     }
 }

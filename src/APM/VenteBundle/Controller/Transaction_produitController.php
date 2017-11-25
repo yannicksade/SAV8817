@@ -12,10 +12,16 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Symfony\Component\HttpFoundation\Session\Session;
-
+use FOS\RestBundle\Controller\Annotations\RouteResource;
+use FOS\RestBundle\Controller\Annotations\Get;
+use FOS\RestBundle\Controller\Annotations\Post;
+use Nelmio\ApiDocBundle\Annotation\ApiDoc;
+use FOS\RestBundle\Controller\Annotations\Put;
+use FOS\RestBundle\Controller\Annotations\Patch;
+use FOS\RestBundle\Controller\Annotations\Delete;
 /**
  * Transaction_produit controller.
- *
+ * @RouteResource("transaction_produit", pluralize=false)
  */
 class Transaction_produitController extends Controller
 {
@@ -34,8 +40,10 @@ class Transaction_produitController extends Controller
      * @param Request $request
      * @param Transaction $transaction
      * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
+     *
+     * Get("/transaction-produits/transaction/{id}", name="s")
      */
-    public function indexAction(Request $request, Transaction $transaction)
+    public function getAction(Request $request, Transaction $transaction)
     {
         $this->listAndShowSecurity($transaction, null);
         $transaction_produits = $transaction->getTransactionProduits();
@@ -193,6 +201,9 @@ class Transaction_produitController extends Controller
      * @param Request $request
      * @param Transaction $transaction
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response | JsonResponse
+     *
+     * @Post("/new/transaction-produit")
+     * @Post("/new/transaction-produit/transaction/{id}", name="_transaction")
      */
     public function newAction(Request $request, Transaction $transaction = null)
     {
@@ -282,6 +293,8 @@ class Transaction_produitController extends Controller
      * @param Request $request
      * @param Transaction_produit $transaction_produit
      * @return \Symfony\Component\HttpFoundation\Response
+     *
+     * @Get("/show/transaction-produit/{id}")
      */
     public function showAction(Request $request, Transaction_produit $transaction_produit)
     {
@@ -325,6 +338,8 @@ class Transaction_produitController extends Controller
      * @param Request $request
      * @param Transaction_produit $transaction_produit
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     *
+     * @Put("/edit/transaction-produit/{id}")
      */
     public function editAction(Request $request, Transaction_produit $transaction_produit)
     {
@@ -390,6 +405,8 @@ class Transaction_produitController extends Controller
      * @param Request $request
      * @param Transaction_produit $transaction_produit
      * @return \Symfony\Component\HttpFoundation\RedirectResponse | JsonResponse
+     *
+     * @Delete("/delete/transaction-produit/{id}")
      */
     public function deleteAction(Request $request, Transaction_produit $transaction_produit)
     {
@@ -409,16 +426,6 @@ class Transaction_produitController extends Controller
             $em->remove($transaction_produit);
             $em->flush();
         }
-
-        return $this->redirectToRoute('apm_vente_transaction_produit_index', ['id' => $transaction_produit->getTransaction()->getId()]);
-    }
-
-    public function deleteFromListAction(Transaction_produit $transaction_produit)
-    {
-        $this->editAndDeleteSecurity($transaction_produit);
-        $em = $this->getDoctrine()->getManager();
-        $em->remove($transaction_produit);
-        $em->flush();
 
         return $this->redirectToRoute('apm_vente_transaction_produit_index', ['id' => $transaction_produit->getTransaction()->getId()]);
     }

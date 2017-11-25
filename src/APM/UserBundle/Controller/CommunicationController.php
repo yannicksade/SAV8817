@@ -10,10 +10,17 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Session;
+use FOS\RestBundle\Controller\Annotations\RouteResource;
+use FOS\RestBundle\Controller\Annotations\Get;
+use FOS\RestBundle\Controller\Annotations\Post;
+use FOS\RestBundle\Controller\Annotations\Patch;
+use FOS\RestBundle\Controller\Annotations\Delete;
+use FOS\RestBundle\Controller\Annotations\Put;
+use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
 /**
  * Communication controller.
- *
+ * @RouteResource("communication", pluralize=false)
  */
 class CommunicationController extends Controller
 {
@@ -35,8 +42,10 @@ class CommunicationController extends Controller
      * Lister les communication reçues et envoyées par un utilisateur
      * @param Request $request
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
+     *
+     * @Get("/", name="s")
      */
-    public function indexAction(Request $request)
+    public function getAction(Request $request)
     {
         $this->listAndShowSecurity();
         /** @var Utilisateur_avm $user */
@@ -218,6 +227,8 @@ class CommunicationController extends Controller
      * L'Emetteur Crée et soumet un model de communication
      * @param Request $request
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response | JsonResponse
+     *
+     * @Post("/new/communication")
      */
     public function newAction(Request $request)
     {
@@ -279,6 +290,8 @@ class CommunicationController extends Controller
      * Finds and displays a Communication entity.
      * @param Communication $communication
      * @return \Symfony\Component\HttpFoundation\Response
+     *
+     * @Get("/show/communication/{id}")
      */
     public function showAction(Communication $communication)
     {
@@ -329,6 +342,8 @@ class CommunicationController extends Controller
      * @param Request $request
      * @param Communication $communication
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     *
+     * @Put("/edit/communication/{id}")
      */
     public function editAction(Request $request, Communication $communication)
     {
@@ -409,6 +424,8 @@ class CommunicationController extends Controller
      * @param Request $request
      * @param Communication $communication
      * @return \Symfony\Component\HttpFoundation\RedirectResponse | JsonResponse
+     *
+     * @Delete("/delete/communication/{id}")
      */
     public function deleteAction(Request $request, Communication $communication)
     {
@@ -427,16 +444,6 @@ class CommunicationController extends Controller
             $em->remove($communication);
             $em->flush();
         }
-
-        return $this->redirectToRoute('apm_user_communication_index');
-    }
-
-    public function deleteFromListAction(Communication $communication)
-    {
-        $this->editAndDeleteSecurity($communication);
-        $em = $this->getDoctrine()->getManager();
-        $em->remove($communication);
-        $em->flush();
 
         return $this->redirectToRoute('apm_user_communication_index');
     }

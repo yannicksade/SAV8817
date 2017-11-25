@@ -4,9 +4,18 @@ namespace APM\UserBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
+use FOS\RestBundle\Controller\Annotations\Post;
+use FOS\RestBundle\Controller\Annotations\RouteResource;
 
+/**
+ * Class RegistrationAdminController
+ * @RouteResource("register")
+ */
 class RegistrationAdminController extends Controller
 {
+    /**
+     * @Post("/register/staff", name="_staff")
+     */
     public function registerAction(Request $request)
     { //accessible uniquement au super-administrateur
         $this->security();
@@ -21,7 +30,7 @@ class RegistrationAdminController extends Controller
     {
         //---------------------------------security-----------------------------------------------
         // Access reserve au super admin
-        $this->denyAccessUnlessGranted('ROLE_SUPER_ADMIN', null, 'Unable to access this page!');
+        $this->denyAccessUnlessGranted('ROLE_GESTIONNAIRE', null, 'Unable to access this page!');
         if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY')) {
             throw $this->createAccessDeniedException();
         }

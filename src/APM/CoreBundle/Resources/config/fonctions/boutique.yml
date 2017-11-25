@@ -1,34 +1,34 @@
 #----------------------------- Handle offers --------------------------------------
 #------Insertion/desinsertion une offre dans une boutique----
-apm_vente_boutique_inserer_offre:
-    path:     /{id}/inserer-offre/{boutique_id}
-    defaults: { _controller: "APMVenteBundle:Trade:insererOffreDansBoutique" }
-#    methods:  [GET]
-apm_vente_boutique_desinserer_offre:
-    path:     /{id}/desinserer-offre/{boutique_id}
-    defaults: { _controller: "APMVenteBundle:Trade:desinsererOffreDansBoutique" }
-    #methods:  POST
+#apm_vente_boutique_inserer_offre:
+#    path:     /{id}/inserer-offre/{boutique_id}
+#    defaults: { _controller: "APMVenteBundle:Trade:insererOffreDansBoutique" }
+#    methods:  [G"ET]
+#apm_vente_boutique_desinserer_offre:
+#   path:     /{id}/desinserer-offre/{boutique_id}
+#    defaults: { _controller: "APMVenteBundle:Trade:desinsererOffreDansBoutique" }
+
 #------Insertion/desinsertion un groupe d'offres(ou catégorie) dans une boutique----
-apm_vente_boutique_inserer_categorie:
-    path:     /{id}/inserer-categorie/{boutique_id}
-    defaults: { _controller: "APMVenteBundle:Trade:insererCategorieDansBoutique" }
+#apm_vente_boutique_inserer_categorie:
+#    path:     /{id}/inserer-categorie/{boutique_id}
+#    defaults: { _controller: "APMVenteBundle:Trade:insererCategorieDansBoutique" }
 #    methods:  [GET]
-apm_vente_boutique_desinserer_categorie:
-    path:     /{id}/desinserer-categorie/{boutique_id}
-    defaults: { _controller: "APMVenteBundle:Trade:desinsererCategorieDansBoutique" }
+#apm_vente_boutique_desinserer_categorie:
+#    path:     /{id}/desinserer-categorie/{boutique_id}
+#    defaults: { _controller: "APMVenteBundle:Trade:desinsererCategorieDansBoutique" }
 #    methods:  [GET]
 #-------Publication/depublication Tout le monde pourra voir(ou non) la boutique et son contenu----
-apm_vente_boutique_publier:
-    path:     /{id}/publier-boutique
-    defaults: { _controller: "APMVenteBundle:Trade:publierBoutique" }
-#    methods:  [GET]
-apm_vente_boutique_depublier:
-    path:     /{id}/depublier-boutique
-    defaults: { _controller: "APMVenteBundle:Trade:depublierBoutique" }
-#   methods:  [GET]
+#apm_vente_boutique_publier:
+#    path:     /{id}/publier-boutique
+#    defaults: { _controller: "APMVenteBundle:Trade:publierBoutique" }
+
+#apm_vente_boutique_depublier:
+#    path:     /{id}/depublier-boutique
+#    defaults: { _controller: "APMVenteBundle:Trade:depublierBoutique" }
+
 #-------------------------- Handle Boutique ---------------------------------------------------
 # Lien cliqué après avoir rempli le formulaire de transfert >>>soumettre
-apm_vente_boutique_transferer:
-    path:     /{id}/transferer-boutique/{source_id}/{destinataire_id}/{ordre_id}/{livraison_id}
-    defaults: { _controller: "APMVenteBundle:Trade:transfererBoutique" }
+#apm_vente_boutique_transferer:
+#    path:     /{id}/transferer-boutique/{source_id}/{destinataire_id}/{ordre_id}/{livraison_id}
+#    defaults: { _controller: "APMVenteBundle:Trade:transfererBoutique" }
 

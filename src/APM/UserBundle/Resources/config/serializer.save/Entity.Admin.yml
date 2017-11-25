@@ -1,0 +1,9 @@
+APM\UserBundle\Entity\Admin
+    exclusion_policy: ALL
+    properties:
+        code:
+            expose: true
+        username:
+            expose: true
+        email:
+            expose: true

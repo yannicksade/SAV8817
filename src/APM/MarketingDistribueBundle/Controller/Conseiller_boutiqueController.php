@@ -8,16 +8,22 @@ use APM\MarketingDistribueBundle\Entity\Conseiller_boutique;
 use APM\MarketingDistribueBundle\Factory\TradeFactory;
 use APM\UserBundle\Entity\Utilisateur_avm;
 use APM\VenteBundle\Entity\Boutique;
-use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
+use FOS\RestBundle\Controller\Annotations\RouteResource;
+use FOS\RestBundle\Controller\Annotations\Get;
+use FOS\RestBundle\Controller\Annotations\Post;
+use FOS\RestBundle\Controller\Annotations\Delete;
+use FOS\RestBundle\Controller\Annotations\Put;
+use FOS\RestBundle\Controller\Annotations\Patch;
+use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
 /**
  * Conseiller_boutique controller.
- *
+ * @RouteResource("conseillerboutique")
  */
 class Conseiller_boutiqueController extends Controller
 {
@@ -29,14 +35,16 @@ class Conseiller_boutiqueController extends Controller
     private $boutique_filter;
 
     /**
-     * Liste les boutiques du conseiller ou les conseillers liés à une boutique donnée
+     * operation du conseiller courant
      * @param Request $request
      * @param Boutique $boutique
      * @return \Symfony\Component\HttpFoundation\Response | JsonResponse Lister les boutique du conseiller
      *
      * Lister les boutique du conseiller
+     * @Get("/conseiller-boutiques", name="s")
+     * @Get("/conseillers-boutique/{id}", name="s_boutique")
      */
-    public function indexAction(Request $request, Boutique $boutique = null)
+    public function getAction(Request $request, Boutique $boutique = null)
     {
         $this->listAndShowSecurity();
         if (null === $boutique) {
@@ -191,6 +199,9 @@ class Conseiller_boutiqueController extends Controller
      * @param Request $request
      * @param Boutique $boutique
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response | JsonResponse
+     *
+     * @Post("/new/conseiller-boutique")
+     * @Post("/new/conseiller-boutique/{id}", name="_boutique")
      */
     public function newAction(Request $request, Boutique $boutique = null)
     {
@@ -253,6 +264,8 @@ class Conseiller_boutiqueController extends Controller
      * @param Request $request
      * @param Conseiller_boutique $conseiller_boutique
      * @return \Symfony\Component\HttpFoundation\Response | JsonResponse
+     *
+     * @Get("/show/conseiller-boutique/{id}")
      */
     public function showAction(Request $request, Conseiller_boutique $conseiller_boutique)
     {
@@ -294,6 +307,8 @@ class Conseiller_boutiqueController extends Controller
      * @param Request $request
      * @param Conseiller_boutique $conseiller_boutique
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response | JsonResponse
+     *
+     * @Patch("/edit/conseiller-boutique/{id}")
      */
     public function editAction(Request $request, Conseiller_boutique $conseiller_boutique)
     {
@@ -381,6 +396,8 @@ class Conseiller_boutiqueController extends Controller
      * @param Request $request
      * @param Conseiller_boutique $conseiller_boutique
      * @return \Symfony\Component\HttpFoundation\RedirectResponse | JsonResponse
+     *
+     * @Delete("/delete/conseiller-boutique/{id}")
      */
     public function deleteAction(Request $request, Conseiller_boutique $conseiller_boutique)
     {
@@ -401,33 +418,6 @@ class Conseiller_boutiqueController extends Controller
             $em->flush();
         }
 
-        return $this->redirectToRoute('apm_marketing_conseiller_boutique_index');
-    }
-
-    /**
-     * @ParamConverter("conseiller", options={"mapping": {"conseiller_id":"id"}})
-     * @ParamConverter("boutique", options={"mapping": {"boutique_id":"id"}})
-     * @param Conseiller_boutique|null $conseiller_boutique
-     * @param Boutique|null $boutique
-     * @param Conseiller|null $conseiller
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse | JsonResponse
-     */
-    public function deleteFromListAction(Conseiller_boutique $conseiller_boutique = null,
-                                         Conseiller $conseiller = null, Boutique $boutique = null)
-    {
-        $this->editAndDeleteSecurity($conseiller_boutique, $conseiller);
-        $em = $this->getDoctrine()->getManager();
-        if (!$conseiller_boutique && $boutique && $conseiller) {
-            $conseiller_boutique = $em->getRepository('APMMarketingDistribueBundle:Conseiller_boutique')
-                ->findOneBy(['conseiller' => $conseiller, 'boutique' => $boutique]);
-        }
-        $em->remove($conseiller_boutique);
-        $em->flush();
-        if ($request->isXmlHttpRequest()) {
-            $json = array();
-            $json['item'] = array();
-            return $this->json(json_encode($json), 200);
-        }
         return $this->redirectToRoute('apm_marketing_conseiller_boutique_index');
     }
 }

@@ -12,10 +12,18 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use FOS\RestBundle\Controller\Annotations\RouteResource;
+use FOS\RestBundle\Controller\Annotations\Get;
+use FOS\RestBundle\Controller\Annotations\Post;
+use FOS\RestBundle\Controller\Annotations\Delete;
+use FOS\RestBundle\Controller\Annotations\Put;
+use FOS\RestBundle\Controller\Annotations\Patch;
+use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
 /**
  * Groupe_offre controller.
  * Liste les Groupe d'offre crees par l'utilisateur
+ * @RouteResource("groupeoffre",  pluralize=false)
  */
 class Groupe_offreController extends Controller
 {
@@ -34,8 +42,10 @@ class Groupe_offreController extends Controller
     /**
      * @param Request $request
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response | JsonResponse
+     *
+     * @Get("/collectionoffre")
      */
-    public function indexAction(Request $request)
+    public function getAction(Request $request)
     {
         $this->listAndShowSecurity();
 
@@ -204,6 +214,8 @@ class Groupe_offreController extends Controller
     /**
      * @param Request $request
      * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     *
+     * @Post("/new/collectionoffre")
      */
     public function newAction(Request $request)
     {
@@ -259,6 +271,7 @@ class Groupe_offreController extends Controller
      * @param Request $request
      * @param Groupe_offre $groupe_offre
      * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
+     * @Patch("/edit/collectionoffre/{id}")
      */
     public function editAction(Request $request, Groupe_offre $groupe_offre)
     {
@@ -348,6 +361,7 @@ class Groupe_offreController extends Controller
      * @param Request $request
      * @param Groupe_offre $groupe_offre
      * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
+     * @Get("/show/collectionoffre/{id}")
      */
     public function showAction(Request $request, Groupe_offre $groupe_offre)
     {
@@ -379,6 +393,7 @@ class Groupe_offreController extends Controller
      * @param Request $request
      * @param Groupe_offre $groupe_offre
      * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
+     * @Delete("/delete/collectionoffre/{id}")
      */
     public function deleteAction(Request $request, Groupe_offre $groupe_offre)
     {

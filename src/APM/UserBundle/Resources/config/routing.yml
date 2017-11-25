@@ -1,28 +1,31 @@
-apm_user_homepage:
-    path:     /user
-    defaults: { _controller: APMUserBundle:Default:index }
-    
-apm_admin_registration:
-    path:  /register-staff
-    defaults: { _controller: APMUserBundle:RegistrationAdmin:register }
-
-#Gestion des ressources utilisateurs
 apm_user_communication:
-    resource: "@APMUserBundle/Resources/config/routing/communication.yml"
-    prefix:   /user/communication
+    type: rest
+    resource: APM\UserBundle\Controller\CommunicationController
+    name_prefix: api_user_
 
 apm_user_commentaire:
-    resource: "@APMUserBundle/Resources/config/routing/commentaire.yml"
-    prefix:   /user/commentaire
+    type: rest
+    resource: APM\UserBundle\Controller\CommentaireController
+    name_prefix: api_user_
 
 apm_user_groupe-relationnel:
-    resource: "@APMUserBundle/Resources/config/routing/groupe_relationnel.yml"
-    prefix:   /user/groupe-relationnel
+    type: rest
+    resource: APM\UserBundle\Controller\Groupe_relationnelController
+    name_prefix: api_user_
 
 apm_user_individu-to-groupe:
-    resource: "@APMUserBundle/Resources/config/routing/individu_to_groupe.yml"
-    prefix:   /user/individu-to-groupe
+    type: rest
+    resource: APM\UserBundle\Controller\Individu_to_groupeController
+    name_prefix: api_user_
+
+#---------- FOS/APM security--------
 
 apm_user_profile:
-    resource: "@APMUserBundle/Resources/config/routing/utilisateur.yml"
-    prefix:   /user/system
+    type:  rest
+    resource: APM\UserBundle\Controller\ProfileUtilisateurAVMController
+    name_prefix: api_user_
+
+apm_user_change_password:
+    type:  rest
+    resource: APM\UserBundle\Controller\ChangePasswordController
+    name_prefix: api_user_

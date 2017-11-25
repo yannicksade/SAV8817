@@ -10,9 +10,18 @@ namespace APM\UserBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
+use FOS\RestBundle\Controller\Annotations\RouteResource;
+use FOS\RestBundle\Controller\Annotations\Patch;
 
+/**
+ * Class ProfileUtilisateurAVMController
+ * @RouteResource("profile", pluralize=false)
+ */
 class ProfileUtilisateurAVMController extends Controller
 {
+    /**
+     * @Patch("/edit/profile/user")
+     */
     public function editAction()
     {
         $this->security();

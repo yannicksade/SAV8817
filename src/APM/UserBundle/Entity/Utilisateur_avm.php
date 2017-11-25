@@ -19,11 +19,13 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
+use PUGX\MultiUserBundle\Validator\Constraints\UniqueEntity;
 
 /**
  * @ORM\Entity
  * @ORM\Table(name="utilisateur_avm")
- *
+ * @UniqueEntity(fields = "username", targetClass = "APM\UserBundle\Entity\Utilisateur", message="fos_user.username.already_used")
+ * @UniqueEntity(fields = "email", targetClass = "APM\UserBundle\Entity\Utilisateur", message="fos_user.email.already_used")
  */
 class Utilisateur_avm extends Utilisateur
 {
@@ -223,6 +225,7 @@ class Utilisateur_avm extends Utilisateur
     public function __construct()
     {
         parent::__construct();
+
         $this->dateEnregistrement = new \DateTime("now");
         $this->roles = array('ROLE_USERAVM');
         $this->enabled = true;

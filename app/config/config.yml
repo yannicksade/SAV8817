@@ -3,105 +3,105 @@ imports:
     - { resource: security.yml }
     - { resource: services.yml }
 
-# Put parameters here that don't need to change on each machine where the app is deployed
+# Put parameters here that dont need to change on each machine where the app is deployed
 # http://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
 parameters:
     locale: fr
     images_url: dashboard/assets/entity/images
     docs_url: dashboard/assets/brochure/files
-    resolve_images_url: 'http://localhost/SAV8817.git/web/app_dev.php/media/cache/resolve/basic_filter600x600/%images_url%'
-    basic_filter: "basic_filter600x600"
+    resolve_images_url: http://localhost/SAV8817.git/web/app_dev.php/media/cache/resolve/basic_filter600x600/%images_url%
+    basic_filter: basic_filter600x600
+
+    #nelmio api docs
+    api_name: we-trade
+    api_description: The World Electronic Trade for every one
+    cors_allow_origin: http://localhost:[0-9]+
+
+    # lexik jwt bundle
+    jwt_private_key_path: %kernel.root_dir%/var/jwt/private.pem   # ssh private key path
+    jwt_public_key_path:  %kernel.root_dir%/var/jwt/public.pem    # ssh public key path
+    jwt_key_pass_phrase:  anderson                              # ssh key pass phrase
+    jwt_token_ttl:        86400
+
 
 framework:
     validation:  { enable_annotations: true }
 
     #esi:             ~
-    translator:      ~
-    secret:          "%secret%"
+    #translator:      { fallbacks: [%locale%] }
+    secret:          %secret%
     router:
-        resource: "%kernel.root_dir%/config/routing.yml"
+        resource: %kernel.root_dir%/config/routing.yml
         strict_requirements: ~
     form:            ~
     csrf_protection: ~
    #serializer:      { enable_annotations: true }
     templating:
-        engines: ['twig']
+        engines: [twig]
         #assets_version: SomeVersionScheme
-    default_locale:  "%locale%"
+    default_locale:  %locale%
     trusted_hosts:   ~
     trusted_proxies: ~
     session:
         # handler_id set to null will use default session handler from php.ini
         handler_id:  ~
+        save_path:   %kernel.root_dir%/../var/sessions/%kernel.environment%
     fragments:       ~
     http_method_override: true
+    assets: ~
+
+# sensio
+sensio_framework_extra:
+    view: { annotations: true }
+    router: { annotations: true  }
 
 # Twig Configuration
 twig:
-    debug:            "%kernel.debug%"
-    strict_variables: "%kernel.debug%"
+    debug:            %kernel.debug%
+    strict_variables: %kernel.debug%
 
 # Doctrine Configuration
 doctrine:
     dbal:
         driver:   pdo_mysql
-        host:     "%database_host%"
-        port:     "%database_port%"
-        dbname:   "%database_name%"
-        user:     "%database_user%"
-        password: "%database_password%"
+        host:     %database_host%
+        port:     %database_port%
+        dbname:   %database_name%
+        user:     %database_user%
+        password: %database_password%
         charset:  UTF8
-        # if using pdo_sqlite as your database driver:
-        #   1. add the path in parameters.yml
-        #     e.g. database_path: "%kernel.root_dir%/data/data.db3"
-        #   2. Uncomment database_path in parameters.yml.dist
-        #   3. Uncomment next line:
-        #     path:     "%database_path%"
 
     orm:
-        auto_generate_proxy_classes: "%kernel.debug%"
+        auto_generate_proxy_classes: %kernel.debug%
         naming_strategy: doctrine.orm.naming_strategy.underscore
         auto_mapping: true
 
-assetic:
-    debug: '%kernel.debug%'
-    use_controller: '%kernel.debug%'
-    filters:
-        cssrewrite: ~
+#assetic:
+#    debug: %kernel.debug%
+#    use_controller: %kernel.debug%
+#    filters:
+#        cssrewrite: ~
+   # bundles: [ FOSCommentBundle ]
 
 # Swiftmailer Configuration
 swiftmailer:
-    transport: "%mailer_transport%"
-    username:  "%mailer_user%"
-    password:  "%mailer_password%"
+    transport: %mailer_transport%
+    username:  %mailer_user%
+    password:  %mailer_password%
+    host:      %mailer_host%
 
-# disable use_username_form_type; don't use  the fos form type and remove them from the container
+# Fos user
 fos_user:
     db_driver: orm
     firewall_name: main
     user_class: APM\UserBundle\Entity\Utilisateur
     service:
         user_manager: pugx_user_manager
-        mailer: fos_user.mailer.twig_swift
-    use_username_form_type: true
     from_email:
-        address:           webmaster@esay-trade.com
+        address:           noreply@esay-trade.com
         sender_name:       webmaster
-    registration:
-        confirmation:
-            enabled: true
-            from_email:
-                address:     registration@esay-trade.com
-                sender_name: Easy Trade Team
-            template:   '@FOSUser/Registration/email.txt.twig'
-    resetting:
-        email:
-            from_email:
-                address:    resetting-password@esay-trade.com
-                sender_name: Easy Trade Team
-            template:   '@FOSUser/Resetting/email.txt.twig'
 
-# Configuratio de PUGXMultiuserBundle pour  utilisateur-avm et admin
+# PUGXMultiuserBundle
 pugx_multi_user:
     users:
         utilisateur_avm:
@@ -113,13 +113,11 @@ pugx_multi_user:
                     type: APM\UserBundle\Form\Type\Utilisateur_avmType
                     name: apm_utilisateur_avm_registration
                     validation_groups:  [Registration, Default]
-                template: FOSUserBundle:Registration:utilisateur_avm.form.html.twig
             profile:
                 form:
                     type: APM\UserBundle\Form\Type\ProfileUtilisateur_avmFormType
                     name: apm_utilisateur_avm_profile
                     validation_groups:  [Profile, Default]
-                template: FOSUserBundle:profile:utilisateur_avm.form.html.twig
         admin:
             entity:
                 class: APM\UserBundle\Entity\Admin
@@ -129,13 +127,12 @@ pugx_multi_user:
                      type: APM\UserBundle\Form\Type\RegistrationAdminFormType
                      name: apm_admin_registration
                      validation_groups:  [Registration, Default]
-                 template: FOSUserBundle:Registration:admin.form.html.twig
             profile:
                  form:
                      type: APM\UserBundle\Form\Type\ProfileAdminFormType
                      name: apm_admin_profile
                      validation_groups:  [Profile, Default]
-                 template: FOSUserBundle:profile:admin.form.html.twig
+
 
 web_profiler :
     intercept_redirects : false
@@ -144,13 +141,13 @@ vich_uploader:
     db_driver: orm # or mongodb or propel or phpcr
     mappings:
         entity_images:
-            uri_prefix:         "%images_url%"
-            upload_destination: '%kernel.root_dir%/../web/%images_url%'
+            uri_prefix:         %images_url%
+            upload_destination: %kernel.root_dir%/../web/%images_url%
             namer:               vich_uploader.namer_uniqid
 
         brochures:
-            uri_prefix:         "%docs_url%"
-            upload_destination: '%kernel.root_dir%/../web/%docs_url%'
+            uri_prefix:         %docs_url%
+            upload_destination: %kernel.root_dir%/../web/%docs_url%
             namer:              vich_uploader.namer_uniqid
 
 liip_imagine :
@@ -167,9 +164,9 @@ liip_imagine :
         basic_filter600x600 :
 # adjust the image quality to 75%
             #quality : 75
- # list of transformations to apply (the "filters")
+ # list of transformations to apply (the filters)
             #filters
- # use and setup the "crop" filter
+ # use and setup the crop filter
                 #crop:
 
                     # set the size of the cropping area
@@ -177,29 +174,145 @@ liip_imagine :
 
                     # set the starting coordinates of the crop
                     #start: [ %_x_%, %_y_% ]
-
-#
+# Nelmio  Cors
 nelmio_cors:
     defaults:
-        allow_credentials: false
-        allow_origin: []
-        allow_headers: []
-        allow_methods: []
-        expose_headers: []
-        max_age: 0
-        hosts: []
-        origin_regex: false
-        forced_allow_origin_value: ~
-        paths:
-            '^/api/':
-                allow_origin: ['http://localhost:4200']
-                allow_headers: ['X-Custom-Auth']
-                allow_methods: ['POST', 'PUT', 'GET', 'DELETE']
-                max_age: 3600
-            '^/':
-                origin_regex: true
-                allow_origin: ['^http://localhost:[0-9]+']
-                allow_headers: ['X-Custom-Auth']
-                allow_methods: ['POST', 'PUT', 'GET', 'DELETE']
-                max_age: 3600
-                hosts: ['^api\.']
+        allow_origin: [%cors_allow_origin%]
+        allow_methods: [POST, PUT, GET, DELETE, OPTIONS, LOCK, PATCH]
+        allow_headers: [content-type, authorization]
+        origin_regex: true
+        max_age:      3600
+        #allow_credentials: true
+        #hosts: [^api\.]
+
+    #allow_origin: [] ex: [^http://localhost:[0-9]+] with regex
+    #allow_headers: []
+    #allow_methods: []
+    #expose_headers: []
+    #max_age: 0
+    #hosts: [] ex: [^api\.]  with regex
+    #origin_regex: false
+    #forced_allow_origin_value: ~
+    paths:
+        ^/: ~
+       # ^/apm/: ~
+
+
+# Nelmio API Doc
+nelmio_api_doc:
+     sandbox:
+        authentication:
+          delivery: http
+          type:     basic # or bearer
+#    sandbox:
+#        accept_type:          application/json
+#        body_format:
+#            formats:           [json]
+#            default_format:    json # One of form; json
+#        request_format:
+#            formats:
+#                json:           application/json
+
+# FOS REST Bundle
+fos_rest:
+    #versioning:   true
+    #access_denied_listener: true
+    #decoding the request content in the request
+    body_listener: true
+    #disable_csrf_role: ROLE_API
+    #determining the correct response format
+    format_listener:
+        enabled: true
+        rules:
+            - { path: ^/, priorities: [ json, jsonp ], fallback_format: ~, prefer_extension: true }
+    #prefer_extension: false
+    #reading parameters from the request
+    param_fetcher_listener: true
+    view:
+    #formatting the response either
+    #with a template engine like twig or to e.g. xml or json using a serializer
+        view_response_listener: true #force
+        formats:
+            json: true
+            jsonp: true
+            xml: false
+            rss: false
+        force_redirects:
+            json: true
+            jsonp: true
+    # allows registering additional mime types in the ``Request`` class
+        mime_types:
+            json: [application/json, application/x-json]
+    #request_body_converter_listener: true
+    allowed_methods_listener: true
+    routing_loader:
+            default_format:  json
+            include_format:  false
+    # Activates the FOSRestBundle exception controller
+    exception:
+            enabled: true
+            #exception_controller: Acme\DemoBundle\Controller\ExceptionController::showAction
+
+# Lexik JWT Auth
+lexik_jwt_authentication:
+    # ssh private key path
+    private_key_path:    %jwt_private_key_path%
+    # ssh public key path
+    public_key_path:     %jwt_public_key_path%
+    # ssh key pass phrase
+    pass_phrase:         %jwt_key_pass_phrase%
+    # token ttl
+    token_ttl:           %jwt_token_ttl%
+    # key under which the user identity will be stored in the token payload
+    #user_identity_field: username
+
+    # token encoding/decoding settings
+    #encoder:
+        # token encoder/decoder service - default implementation based on the namshi/jose library
+        #service:            lexik_jwt_authentication.encoder.default
+        # crypto engine used by the encoder service
+        #crypto_engine:  openssl
+        # encryption algorithm used by the encoder service
+        #signature_algorithm: RS256
+
+    # token extraction settings
+    #token_extractors:
+        #authorization_header:      # look for a token as Authorization Header
+            #enabled: true
+            #prefix:  Bearer
+           # name:    Authorization
+        #cookie:                    # check token in a cookie
+         #   enabled: false
+          #  name:    BEARER
+        #query_parameter:           # check token in query string parameter
+        #    enabled: false
+         #   name:    bearer
+
+
+# CSA Guzzle
+csa_guzzle:
+    profiler: %kernel.debug%
+
+
+# JMS Serializer
+jms_serializer: ~
+    #metadata:
+        #directories:
+        #    FOSUB:
+        #        namespace_prefix: FOS\\UserBundle
+        #        path: %kernel.cache_dir%/serializer/FOSUB
+        #        path: @MyBarBundle/Resources/config/serializer
+
+        # Using auto-detection, the mapping files for each bundle will be
+        # expected in the Resources/config/serializer directory.
+        # Example:
+        # class: My\FooBundle\Entity\User
+        # expected path: @MyFooBundle/Resources/config/serializer/Entity.User.(yml|xml|php)
+        #auto_detection: true
+
+#fos_comment:
+ #   db_driver: orm
+  #  class:
+   #     model:
+    #        comment: APM\CoreBundle\Entity\Comment
+     #       thread: APM\CoreBundle\Entity\Thread

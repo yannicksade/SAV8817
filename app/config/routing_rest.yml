@@ -1,0 +1,54 @@
+apm_core:
+    type: rest
+    resource: "@APMCoreBundle/Resources/config/routing.yml"
+    prefix:   /core
+
+apm_analyse_et_traitement:
+    type: rest
+    resource: "@APMAnalyseEtTraitementBundle/Resources/config/routing.yml"
+    prefix:   /traitement
+
+apm_controle_et_securite:
+    type: rest
+    resource: "@APMControleEtSecuriteBundle/Resources/config/routing.yml"
+    prefix:   /audit-securite
+
+apm_animation:
+    type: rest
+    resource: "@APMAnimationBundle/Resources/config/routing.yml"
+    prefix:   /animation
+
+apm_utilisateur:
+    type: rest
+    resource: "@APMUserBundle/Resources/config/routing.yml"
+    prefix:   /user
+
+apm_staff:
+    type: rest
+    resource: "@APMAdminBundle/Resources/config/routing.yml"
+    prefix:   /staff
+
+apm_marketing_reseau:
+    type: rest
+    resource: "@APMMarketingReseauBundle/Resources/config/routing.yml"
+    prefix:   /marketing/network
+
+apm_marketing_dristribue:
+    type: rest
+    resource: "@APMMarketingDistribueBundle/Resources/config/routing.yml"
+    prefix:   /marketing
+
+apm_transport:
+    type: rest
+    resource: "@APMTransportBundle/Resources/config/routing.yml"
+    prefix:   /transport
+
+apm_vente:
+    type: rest
+    resource: "@APMVenteBundle/Resources/config/routing.yml"
+    prefix:   /vente
+
+apm_achat:
+    type: rest
+    resource: "@APMAchatBundle/Resources/config/routing.yml"
+    prefix:   /achat

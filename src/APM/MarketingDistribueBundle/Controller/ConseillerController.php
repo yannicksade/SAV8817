@@ -13,10 +13,16 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
-
+use FOS\RestBundle\Controller\Annotations\RouteResource;
+use FOS\RestBundle\Controller\Annotations\Get;
+use FOS\RestBundle\Controller\Annotations\Post;
+use FOS\RestBundle\Controller\Annotations\Delete;
+use FOS\RestBundle\Controller\Annotations\Put;
+use FOS\RestBundle\Controller\Annotations\Patch;
+use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 /**
  * Conseiller controller.
- *
+ * @RouteResource("conseiller", pluralize=false)
  */
 class ConseillerController extends Controller
 {
@@ -33,8 +39,10 @@ class ConseillerController extends Controller
     /**
      * Liste tous les conseillers
      * @return \Symfony\Component\HttpFoundation\Response
+     *
+     * @Get("/conseiller")
      */
-    public function indexAction()
+    public function getAction()
     {
         $this->listAndShowSecurity();
         $em = $this->getDoctrine()->getManager();
@@ -181,6 +189,8 @@ class ConseillerController extends Controller
      * Creates a new Conseiller entity.
      * @param Request $request
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response | JsonResponse
+     *
+     * @Post("/new")
      */
     public function newAction(Request $request)
     {
@@ -229,6 +239,8 @@ class ConseillerController extends Controller
      * @param Request $request
      * @param Conseiller $conseiller
      * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
+     *
+     * @Get("/show/{id}")
      */
     public function showAction(Request $request, Conseiller $conseiller)
     {
@@ -285,6 +297,8 @@ class ConseillerController extends Controller
      * @param Request $request
      * @param Conseiller $conseiller
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response | JsonResponse
+     *
+     * @Get("/edit/conseiller/{id}")
      */
     public function editAction(Request $request, Conseiller $conseiller)
     {
@@ -382,6 +396,8 @@ class ConseillerController extends Controller
      * @param Request $request
      * @param Conseiller $conseiller
      * @return \Symfony\Component\HttpFoundation\RedirectResponse | JsonResponse
+     *
+     * @Delete("/delete/profile-conseiller/{id}")
      */
     public function deleteAction(Request $request, Conseiller $conseiller)
     {
@@ -406,13 +422,4 @@ class ConseillerController extends Controller
         return $this->redirectToRoute('apm_marketing_conseiller_index');
     }
 
-    public function deleteFromListAction(Conseiller $conseiller)
-    {
-        $this->editAndDeleteSecurity($conseiller);
-        $em = $this->getDoctrine()->getManager();
-        $em->remove($conseiller);
-        $em->flush();
-
-        return $this->redirectToRoute('apm_marketing_conseiller_index');
-    }
 }

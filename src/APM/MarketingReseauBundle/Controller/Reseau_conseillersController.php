@@ -9,10 +9,18 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use FOS\RestBundle\Controller\Annotations\RouteResource;
+use FOS\RestBundle\Controller\Annotations\Get;
+use FOS\RestBundle\Controller\Annotations\Post;
+use FOS\RestBundle\Controller\Annotations\Delete;
+use FOS\RestBundle\Controller\Annotations\Put;
+use FOS\RestBundle\Controller\Annotations\Patch;
+use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
 /**
  * Reseau_conseillers controller.
- * Liste le réseau du conseiller
+ *
+ * @RouteResource("network", pluralize=false)
  */
 class Reseau_conseillersController extends Controller
 {
@@ -20,8 +28,11 @@ class Reseau_conseillersController extends Controller
      * @param Request $request
      * @param Conseiller|null $conseiller
      * @return \Symfony\Component\HttpFoundation\Response|JsonResponse
+     *
+     * @Get("/network")
+     * @Put("/new-network/conseiller{id}", name="_conseiller")
      */
-    public function indexAction(Request $request, Conseiller $conseiller = null)
+    public function getAction(Request $request, Conseiller $conseiller = null)
     {
         $this->listAndShowSecurity($conseiller);
         /** @var Utilisateur_avm $user */
@@ -72,6 +83,8 @@ class Reseau_conseillersController extends Controller
      * @param Request $request
      * @param Conseiller $conseiller maître du reseau courant
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response|JsonResponse
+     *
+     * @Post("/network/add-member/conseiller/{id}", name="_conseiller")
      */
     public function handleNetworkingMembersAction(Request $request, Conseiller $conseiller)
     {
@@ -243,6 +256,8 @@ class Reseau_conseillersController extends Controller
      * @param Request $request
      * @param Conseiller $advisorFictif
      * @return \Symfony\Component\HttpFoundation\RedirectResponse | JsonResponse | Response
+     *
+     * @Put("/network/promote-member/conseiller/{id}", name="_conseiller")
      */
     public function PromoteMemberAction(Request $request, Conseiller $advisorFictif)
     {
@@ -332,6 +347,8 @@ class Reseau_conseillersController extends Controller
      * Activer son profile de manager de réseau conseiller
      * @param Request $request
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response |JsonResponse
+     *
+     * @Post("/new/network")
      */
     public function newAction(Request $request)
     {

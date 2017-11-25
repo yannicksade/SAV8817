@@ -11,9 +11,17 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Session;
+use FOS\RestBundle\Controller\Annotations\RouteResource;
+use FOS\RestBundle\Controller\Annotations\Get;
+use FOS\RestBundle\Controller\Annotations\Post;
+use FOS\RestBundle\Controller\Annotations\Put;
+use FOS\RestBundle\Controller\Annotations\Patch;
+use FOS\RestBundle\Controller\Annotations\Delete;
+use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
 /**
  * Categorie controller.
+ * @RouteResource("boutique", pluralize=false)
  *
  */
 class CategorieController extends Controller
@@ -34,24 +42,26 @@ class CategorieController extends Controller
      * @param Request $request
      * @param Boutique $boutique
      * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
+     *
+     * @Get("/boutique/{id}", name="s")
      */
-    public function indexAction(Request $request, Boutique $boutique)
+    public function getAction(Request $request, Boutique $boutique)
     {
         $this->listAndShowSecurity($boutique);
         $categories = $boutique->getCategories();
         if($request->isXmlHttpRequest()){
-            $this->code_filter = $request->request->has('code_filter') ? $request->request->get('code_filter') : "";
-            $this->designation_filter = $request->request->has('designation_filter') ? $request->request->get('designation_filter') : "";
-            $this->description_filter = $request->request->has('description_filter') ? $request->request->get('description_filter') : "";
-            $this->livrable_filter = $request->request->has('livrable_filter') ? $request->request->get('livrable_filter') : "";
-            $this->publiable_filter = $request->request->has('publiable_filter') ? $request->request->get('publiable_filter') : "";
-            $this->etat_filter = $request->request->has('etat_filter') ? $request->request->get('etat_filter') : "";
-            $this->categorieCourante_filter = $request->request->has('categorieCourante_filter') ? $request->request->get('categorieCourante_filter') : "";
-            $this->dateFrom_filter = $request->request->has('date_from_filter') ? $request->request->get('date_from_filter') : "";
-            $this->dateTo_filter = $request->request->has('date_to_filter') ? $request->request->get('date_to_filter') : "";
-            
-            $iDisplayLength = $request->request->has('length') ? $request->request->get('length') : -1;
-            $iDisplayStart = $request->request->has('start') ? intval($request->request->get('start')) : 0;
+            $this->code_filter = $request->query->has('code_filter') ? $request->query->get('code_filter') : "";
+            $this->designation_filter = $request->query->has('designation_filter') ? $request->query->get('designation_filter') : "";
+            $this->description_filter = $request->query->has('description_filter') ? $request->query->get('description_filter') : "";
+            $this->livrable_filter = $request->query->has('livrable_filter') ? $request->query->get('livrable_filter') : "";
+            $this->publiable_filter = $request->query->has('publiable_filter') ? $request->query->get('publiable_filter') : "";
+            $this->etat_filter = $request->query->has('etat_filter') ? $request->query->get('etat_filter') : "";
+            $this->categorieCourante_filter = $request->query->has('categorieCourante_filter') ? $request->query->get('categorieCourante_filter') : "";
+            $this->dateFrom_filter = $request->query->has('date_from_filter') ? $request->query->get('date_from_filter') : "";
+            $this->dateTo_filter = $request->query->has('date_to_filter') ? $request->query->get('date_to_filter') : "";
+
+            $iDisplayLength = $request->query->has('length') ? $request->query->get('length') : -1;
+            $iDisplayStart = $request->query->has('start') ? intval($request->query->get('start')) : 0;
             $json = array();
             $iTotalRecords = count($categories);
             if ($iDisplayLength < 0) $iDisplayLength = $iTotalRecords;
@@ -197,6 +207,9 @@ class CategorieController extends Controller
      * @param Request $request
      * @param Boutique $boutique
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response | JsonResponse
+     *
+     * @Post("/new/categorie")
+     * @Post("/new/categorie/boutique/{id}", name="_boutique")
      */
     public function newAction(Request $request, Boutique $boutique = null)
     {
@@ -280,6 +293,8 @@ class CategorieController extends Controller
      * @param Request $request
      * @param Categorie $categorie
      * @return \Symfony\Component\HttpFoundation\Response
+     *
+     * @Get("/show/categorie/{id}")
      */
     public function showAction(Request $request, Categorie $categorie)
     {
@@ -326,6 +341,8 @@ class CategorieController extends Controller
      * @param Request $request
      * @param Categorie $categorie
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     *
+     * @Put("/edit/categorie/{id}")
      */
     public function editAction(Request $request, Categorie $categorie)
     {
@@ -416,6 +433,8 @@ class CategorieController extends Controller
      * @param Request $request
      * @param Categorie $categorie
      * @return \Symfony\Component\HttpFoundation\RedirectResponse| JsonResponse
+     *
+     * @Delete("/delete/categorie/{id}")
      */
     public function deleteAction(Request $request, Categorie $categorie)
     {
@@ -437,14 +456,4 @@ class CategorieController extends Controller
         return $this->redirectToRoute('apm_vente_categorie_index', ['id' =>$categorie->getBoutique()->getId()]);
     }
 
-    public function deleteFromListAction(Categorie $categorie)
-    {
-        $this->editAndDeleteSecurity($categorie);
-
-        $em = $this->getDoctrine()->getManager();
-        $em->remove($object);
-        $em->flush();
-
-        return $this->redirectToRoute('apm_vente_categorie_index', ['id' =>$categorie->getBoutique()->getId()]);
-    }
 }

@@ -15,11 +15,17 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Symfony\Component\HttpFoundation\Session\Session;
+use FOS\RestBundle\Controller\Annotations\RouteResource;
+use FOS\RestBundle\Controller\Annotations\Get;
+use FOS\RestBundle\Controller\Annotations\Post;
+use FOS\RestBundle\Controller\Annotations\Delete;
+use FOS\RestBundle\Controller\Annotations\Patch;
+use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
 
 /**
  * Livraison controller.
- *
+ * @RouteResource("livraison", pluralize=false)
  */
 class LivraisonController extends Controller
 {
@@ -40,8 +46,11 @@ class LivraisonController extends Controller
      * @param Request $request
      * @param Boutique $boutique
      * @return \Symfony\Component\HttpFoundation\Response| JsonResponse
+     *
+     * @Get("/livraisons", name="s")
+     * @Get("/livraisons/boutique/{id}", name="s_boutique")
      */
-    public function indexAction(Request $request, Boutique $boutique = null)
+    public function getAction(Request $request, Boutique $boutique = null)
     {
         $this->listeAndShowSecurity($boutique);
         if (null !== $boutique) {
@@ -215,6 +224,11 @@ class LivraisonController extends Controller
      * @param Boutique $boutique
      * @param Transaction $transaction
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response| JsonResponse
+     *
+     * @Post("/new/livraison")
+     * @Post("/new/livraison/boutique/{id}", name="_boutique")
+     * @Post("/new/livraison/transaction/{transaction_id}", name="_transaction")
+     * @Post("/new/livraison/boutique/{id}/transaction/{transaction_id}", name="_boutique_transaction")
      */
     public function newAction(Request $request, Boutique $boutique = null, Transaction $transaction = null)
     {
@@ -296,6 +310,8 @@ class LivraisonController extends Controller
      * @param Livraison $livraison
      * @param Transaction $transaction
      * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
+     *
+     * @Get("/show/livraison{id}")
      */
     public function showAction(Request $request, Livraison $livraison, Transaction $transaction = null)
     {
@@ -369,6 +385,8 @@ class LivraisonController extends Controller
      * @param Request $request
      * @param Livraison $livraison
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response| JsonResponse
+     *
+     * @Get("/edit/livraison/{id}")
      */
     public function editAction(Request $request, Livraison $livraison)
     {
@@ -450,6 +468,8 @@ class LivraisonController extends Controller
      * @param Request $request
      * @param Livraison $livraison
      * @return \Symfony\Component\HttpFoundation\RedirectResponse | JsonResponse
+     *
+     * @Delete("/delete/livraison/{id}")
      */
     public function deleteAction(Request $request, Livraison $livraison)
     {
@@ -472,13 +492,4 @@ class LivraisonController extends Controller
         return $this->redirectToRoute('apm_transport_livraison_index');
     }
 
-    public function deleteFromListAction(Livraison $livraison)
-    {
-        $this->editAndDeleteSecurity($livraison);
-        $em = $this->getDoctrine()->getManager();
-        $em->remove($livraison);
-        $em->flush();
-
-        return $this->redirectToRoute('apm_transport_livraison_index');
-    }
 }

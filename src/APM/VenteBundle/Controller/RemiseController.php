@@ -14,10 +14,17 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Symfony\Component\HttpFoundation\Session\Session;
+use FOS\RestBundle\Controller\Annotations\RouteResource;
+use FOS\RestBundle\Controller\Annotations\Get;
+use FOS\RestBundle\Controller\Annotations\Post;
+use Nelmio\ApiDocBundle\Annotation\ApiDoc;
+use FOS\RestBundle\Controller\Annotations\Put;
+use FOS\RestBundle\Controller\Annotations\Patch;
+use FOS\RestBundle\Controller\Annotations\Delete;
 
 /**
  * Remise controller.
- *
+ * @RouteResource("remise", pluralize=false)
  */
 class RemiseController extends Controller
 {
@@ -32,14 +39,19 @@ class RemiseController extends Controller
     private $permanence_filter;
     private $restreint_filter;
 
-    /** @ParamConverter("offre", options={"mapping": {"offre_id":"id"}})
+    /**
+     * @ParamConverter("offre", options={"mapping": {"offre_id":"id"}})
      * Liste toutes les remises appliquées sur une offre ou les remises créées par un vendeurs
      * @param Request $request
      * @param Boutique|null $boutique
      * @param Offre $offre
      * @return \Symfony\Component\HttpFoundation\Response
+     *
+     * @Get("/remises", name="s")
+     * @Get("/remises/boutique/{id}", name="s_boutique")
+     * @Get("/remises/{offre_id}", name="s_offre")
      */
-    public function indexAction(Request $request, Boutique $boutique = null, Offre $offre = null)
+    public function getAction(Request $request, Boutique $boutique = null, Offre $offre = null)
     {
         /** @var Session $session */
         $session = $request->getSession();
@@ -66,18 +78,18 @@ class RemiseController extends Controller
             }
         }
         if ($request->isXmlHttpRequest()) {
-            $this->dateExpiration_filter = $request->request->has('dateExpiration_filter') ? $request->request->get('dateExpiration_filter') : "";
-            $this->code_filter = $request->request->has('code_filter') ? $request->request->get('code_filter') : "";
-            $this->offre_filter = $request->request->has('offre_filter') ? $request->request->get('offre_filter') : "";
-            $this->etat_filter = $request->request->has('etat_filter') ? $request->request->get('etat_filter') : "";
-            $this->valeurMin_filter = $request->request->has('valeurMin_filter') ? $request->request->get('valeurMin_filter') : "";
-            $this->valeurMax_filter = $request->request->has('valeurMax_filter') ? $request->request->get('valeurMax_filter') : "";
-            $this->nombreUtilisation_filter = $request->request->has('nombreUtilisation_filter') ? $request->request->get('nombreUtilisation_filter') : "";
-            $this->quantiteMin_filter = $request->request->has('quantiteMin_filter') ? $request->request->get('quantiteMin_filter') : "";
-            $this->permanence_filter = $request->request->has('permanence_filter') ? $request->request->get('permanence_filter') : "";
-            $this->restreint_filter = $request->request->has('restreint_filter') ? $request->request->get('restreint_filter') : "";
-            $iDisplayLength = $request->request->has('length') ? $request->request->get('length') : -1;
-            $iDisplayStart = $request->request->has('start') ? intval($request->request->get('start')) : 0;
+            $this->dateExpiration_filter = $request->query->has('dateExpiration_filter') ? $request->query->get('dateExpiration_filter') : "";
+            $this->code_filter = $request->query->has('code_filter') ? $request->query->get('code_filter') : "";
+            $this->offre_filter = $request->query->has('offre_filter') ? $request->query->get('offre_filter') : "";
+            $this->etat_filter = $request->query->has('etat_filter') ? $request->query->get('etat_filter') : "";
+            $this->valeurMin_filter = $request->query->has('valeurMin_filter') ? $request->query->get('valeurMin_filter') : "";
+            $this->valeurMax_filter = $request->query->has('valeurMax_filter') ? $request->query->get('valeurMax_filter') : "";
+            $this->nombreUtilisation_filter = $request->query->has('nombreUtilisation_filter') ? $request->query->get('nombreUtilisation_filter') : "";
+            $this->quantiteMin_filter = $request->query->has('quantiteMin_filter') ? $request->query->get('quantiteMin_filter') : "";
+            $this->permanence_filter = $request->query->has('permanence_filter') ? $request->query->get('permanence_filter') : "";
+            $this->restreint_filter = $request->query->has('restreint_filter') ? $request->query->get('restreint_filter') : "";
+            $iDisplayLength = $request->query->has('length') ? $request->query->get('length') : -1;
+            $iDisplayStart = $request->query->has('start') ? intval($request->query->get('start')) : 0;
             $json = array();
             $json['items'] = array();
             $iTotalRecords = count($remisesEffectues);
@@ -215,6 +227,8 @@ class RemiseController extends Controller
      * @param Request $request
      * @param Offre $offre
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response| JsonResponse
+     *
+     * @Post("/new/remise/offre/{id}", name="_offre")
      */
     public function newAction(Request $request, Offre $offre)
     {
@@ -282,6 +296,8 @@ class RemiseController extends Controller
      * Finds and displays a Remise entity.
      * @param Remise $remise
      * @return \Symfony\Component\HttpFoundation\Response | JsonResponse
+     *
+     * @Get("/show/remise/{id}")
      */
     public function showAction(Remise $remise)
     {
@@ -330,6 +346,8 @@ class RemiseController extends Controller
      * @param Request $request
      * @param Remise $remise
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     *
+     * @Put("/edit/remise/{id}")
      */
     public function editAction(Request $request, Remise $remise)
     {
@@ -419,6 +437,8 @@ class RemiseController extends Controller
      * @param Request $request
      * @param Remise $remise
      * @return \Symfony\Component\HttpFoundation\RedirectResponse | JsonResponse
+     *
+     * @Delete("/delete/remise/{id}")
      */
     public function deleteAction(Request $request, Remise $remise)
     {
@@ -437,17 +457,6 @@ class RemiseController extends Controller
             $em->remove($remise);
             $em->flush();
         }
-        return $this->redirectToRoute('apm_vente_remise_index', ['id' => $remise->getOffre()->getId()]);
-    }
-
-    public function deleteFromListAction(Remise $remise)
-    {
-        $this->editAndDeleteSecurity($remise);
-
-        $em = $this->getDoctrine()->getManager();
-        $em->remove($object);
-        $em->flush();
-
         return $this->redirectToRoute('apm_vente_remise_index', ['id' => $remise->getOffre()->getId()]);
     }
 }

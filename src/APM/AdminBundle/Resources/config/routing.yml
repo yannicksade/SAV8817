@@ -1,7 +1,14 @@
-apm_admin:
-    resource: "@APMAdminBundle/Resources/config/routing/admin.yml"
-    prefix:   /general
+apm_staff_admin:
+    type: rest
+    resource: APM\AdminBundle\Controller\AdminController
+    name_prefix: api_staff_
 
-apm_gestionnaire:
-    resource: "@APMAdminBundle/Resources/config/routing/gestion.yml"
-    prefix:   /gestionnaire
+apm_staff_gestionnaire:
+    type: rest
+    resource: APM\AdminBundle\Controller\GestionController
+    name_prefix: api_staff_
+
+apm_staff_profile:
+    type:  rest
+    resource: APM\UserBundle\Controller\ProfileAdminController
+    name_prefix: api_staff_

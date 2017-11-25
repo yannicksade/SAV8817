@@ -185,7 +185,8 @@ class OffreType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(array(
-            'data_class' => 'APM\VenteBundle\Entity\Offre'
+            'data_class' => 'APM\VenteBundle\Entity\Offre',
+            'allow_extra_fields' => true,
         ));
     }
 }

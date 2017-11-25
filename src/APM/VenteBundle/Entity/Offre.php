@@ -16,7 +16,12 @@ use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Vich\UploaderBundle\Mapping\Annotation as Vich;
-
+use JMS\Serializer\Annotation\ExclusionPolicy;
+use JMS\Serializer\Annotation\Expose;
+use JMS\Serializer\Annotation\Exclude;
+use JMS\Serializer\Annotation\Groups;
+use JMS\Serializer\Annotation\MaxDepth;
+use JMS\Serializer\Annotation\Type;
 /**
  * Offre
  *
@@ -24,25 +29,33 @@ use Vich\UploaderBundle\Mapping\Annotation as Vich;
  * @ORM\Entity(repositoryClass="APM\VenteBundle\Repository\OffreRepository")
  * @Vich\Uploadable
  * @UniqueEntity("code", message="impossible de creer l'offre, veuillez ressayer plus tard! ")
+ * @ExclusionPolicy("all")
  */
 class Offre extends TradeFactory
 {
-
     /**
+     * @Expose
+     * @Type("string")
+     * @Groups({"list","offre_details"})
      * @var string
-     *
      * @ORM\Column(name="code", type="string", length=255, nullable=false)
      */
     private $code;
 
     /**
+     * @Expose
+     * @Groups({"offre_details"})
      * @var string
+     * @Type("string")
      * @Assert\Url
      * @ORM\Column(name="dataSheet", type="string", length=255, nullable=true)
      */
     private $dataSheet;
 
     /**
+     * @Expose
+     * @Type("DateTime<'Y-m-d'>")
+     * @Groups({"offre_details"})
      * @var \DateTime
      * @Assert\DateTime
      * @ORM\Column(name="dateCreation", type="datetime", nullable=false)
@@ -50,6 +63,9 @@ class Offre extends TradeFactory
     private $dateCreation;
 
     /**
+     * @Expose
+     * @Type("DateTime<'Y-m-d'>")
+     * @Groups({"offre_details"})
      * @var \DateTime
      * @Assert\DateTime
      * @ORM\Column(name="dateExpiration", type="datetime", nullable=true)
@@ -57,7 +73,10 @@ class Offre extends TradeFactory
     private $dateExpiration;
 
     /**
+     * @Expose
+     * @Groups({"list", "offre_details"})
      * @var string
+     * @Type("string")
      * @Assert\Length(min=2, max=254)
      * @ORM\Column(name="description", type="string", length=255, nullable=true)
      */
@@ -65,6 +84,9 @@ class Offre extends TradeFactory
 
     /**
      * @var string
+     * @Type("string")
+     * @Expose
+     * @Groups({"list", "offre_details"})
      * @Assert\NotNull
      * @Assert\Length(min=2)
      * @ORM\Column(name="designation", type="string", length=255, nullable=false)
@@ -72,18 +94,27 @@ class Offre extends TradeFactory
     private $designation;
 
     /**
+     * @Expose
+     * @Groups({"offre_details"})
      * @var integer
+     * @Type("integer")
      * @ORM\Column(name="dureeGarantie", type="integer", nullable=true)
      */
     private $dureeGarantie;
 
     /**
+     * @Expose
+     * @Groups({"offre_details"})
      * @var boolean
+     * @Type("bool")
      * @ORM\Column(name="estRetourne", type="boolean", nullable=true)
      */
     private $retourne;
 
     /**
+     * @Expose
+     * @Groups({"offre_details"})
+     * @Type("string")
      * @var string
      * @Assert\length(min=2, max=254)
      * @ORM\Column(name="unite", type="string", length=255, nullable=true)
@@ -91,24 +122,34 @@ class Offre extends TradeFactory
     private $unite;
 
     /**
+     * @Expose
+     * @Groups({"list", "offre_details"})
      * @var integer
+     * @Type("integer")
      * @ORM\Column(name="etat", type="integer", nullable=false)
      */
     private $etat;
 
     /**
+     * @Expose
+     * @Groups({"offre_details"})
+     * @Type("int")
      * @var integer
      * @ORM\Column(name="apparenceNeuf", type="integer", nullable=true)
      */
     private $apparenceNeuf;
 
     /**
+     * @Expose
+     * @Groups({"offre_details"})
      * @var string
+     * @Type("string")
      * @ORM\Column(name="image", type="string", nullable=true)
      */
     private $image;
 
     /**
+     * @Exclude
      * @Assert\Image()
      * @Vich\UploadableField(mapping="entity_images", fileNameProperty="image")
      * @var File
@@ -116,103 +157,166 @@ class Offre extends TradeFactory
     private $imageFile;
 
     /**
+     * @Expose
+     * @Type("DateTime<'Y-m-d'>")
+     * @Groups({"offre_details"})
      * @ORM\Column(name="updatedAt", type="datetime", nullable= false)
      * @var \DateTime
      */
     private $updatedAt;
+
     /**
+     * @Expose
+     * @Groups({"offre_details"})
      * @var integer
+     * @Type("int")
      * @ORM\Column(name="modeVente", type="integer", nullable=false)
      */
     private $modeVente;
+
     /**
+     * @Expose
+     * @Groups({"offre_details"})
      * @var string
+     * @Type("string")
      * @Assert\length(min=2, max=254)
      * @ORM\Column(name="modelDeSerie", type="string", length=255, nullable=true)
      */
     private $modelDeSerie;
+
     /**
+     * @Expose
+     * @Groups({"offre_details"})
      * @var string
+     * @Type("string")
      * @ORM\Column(name="prixUnitaire", type="decimal", nullable=true)
      */
     private $prixUnitaire;
+
     /**
+     * @Expose
+     * @Groups({"offre_details"})
      * @var integer
+     * @Type("int")
      * @Assert\GreaterThan(0)
      * @ORM\Column(name="quantite", type="integer", nullable=true)
      */
     private $quantite;
+
     /**
+     * @Expose
+     * @Groups({"offre_details"})
      * @var integer
+     * @Type("int")
      * @Assert\Range(min=0)
      * @ORM\Column(name="credit", type="integer", nullable=true)
      */
     private $credit;
+
     /**
+     * @Expose
+     * @Groups({"offre_details"})
      * @var integer
+     * @Type("int")
      * @Assert\Range(min=0, max=10)
      * @ORM\Column(name="rateEvaluation", type="smallint", nullable=true)
      */
     private $evaluation;
 
     /**
+     * @Expose
+     * @Groups({"offre_details"})
      * @var string
-     *
+     * @Type("string")
      * @ORM\Column(name="remiseProduit", type="decimal", nullable=true)
      */
     private $remiseProduit;
+
     /**
+     * @Expose
+     * @Groups({"offre_details"})
      * @var integer
+     * @Type("int")
      * @ORM\Column(name="typeOffre", type="integer", nullable=false)
      */
     private $typeOffre;
+
     /**
+     * @Expose
+     * @Groups({"offre_details"})
      * @var boolean
      * @ORM\Column(name="valide", type="boolean", nullable=true)
      */
     private $valide;
 
     /**
-     * @var integer
-     * @ORM\Column(name="publiable", type="integer", nullable=true)
+     * @Expose
+     * @Groups({"offre_details"})
+     * @var boolean
+     * @Type("bool")
+     * @ORM\Column(name="publiable", type="boolean", nullable=true)
      */
     private $publiable;
 
     /**
      * @var integer
-     *
-     * @ORM\Column(name="id", type="integer", nullable=false)
+     * @Type("integer")
      * @ORM\Id
+     * @Expose
+     * @Groups({"test", "list", "offre_details"})
+     * @ORM\Column(name="id", type="integer", nullable=false)
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id;
+
     /**
      * @var Categorie
-     *
+     * @Type("APM\VenteBundle\Entity\Categorie")
+     * @Expose
+     * @Groups({"test", "offre_details"})
      * @ORM\ManyToOne(targetEntity="APM\VenteBundle\Entity\Categorie", inversedBy="offres")
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="categorie_id", referencedColumnName="id")
      * })
      */
     private $categorie;
+
     /**
      * @var Boutique
-     *
+     * @Type("APM\VenteBundle\Entity\Boutique")
+     * @Expose
+     * @Groups({"test", "offre_details"})
      * @ORM\ManyToOne(targetEntity="APM\VenteBundle\Entity\Boutique", inversedBy="offres")
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="boutique_id", referencedColumnName="id")
      * })
      */
     private $boutique;
+
     /**
      * @var Utilisateur_avm
-     *
+     * @Type("APM\UserBundle\Entity\Utilisateur_avm")
+     * @Expose
+     * @Groups({"test","offre_details"})
      * @ORM\ManyToOne(targetEntity="APM\UserBundle\Entity\Utilisateur_avm", inversedBy="offres")
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="vendeur_id", referencedColumnName="id", nullable=true)
      * })
      */
     private $vendeur;
+
+    /**
+     * @var Base_documentaire
+     * @Type("APM\AnimationBundle\Entity\Base_documentaire")
+     * @Expose
+     * @Groups({"test","offre_details"})
+     * @ORM\ManyToOne(targetEntity="APM\AnimationBundle\Entity\Base_documentaire", inversedBy="produits")
+     * @ORM\JoinColumns({
+     *   @ORM\JoinColumn(name="document_id", referencedColumnName="id", nullable=true)
+     * })
+     */
+    private $document;
+
     /**
      * @var Collection
      * @ORM\OneToMany(targetEntity="APM\AchatBundle\Entity\Service_apres_vente", mappedBy="offre")
@@ -247,21 +351,12 @@ class Offre extends TradeFactory
      * @ORM\OneToMany(targetEntity="APM\VenteBundle\Entity\Rabais_offre", mappedBy="offre")
      */
     private $rabais;
-    /**
-     * @var Base_documentaire
-     *
-     * @ORM\ManyToOne(targetEntity="APM\AnimationBundle\Entity\Base_documentaire", inversedBy="produits")
-     * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="document_id", referencedColumnName="id", nullable=true)
-     * })
-     */
-    private $document;
 
     /**
      * Constructor
      * @param string $var
      */
-    public function __construct($var = null)
+    public function __construct($var)
     {
         $this->service_apres_ventes = new ArrayCollection();
         $this->commentaires = new ArrayCollection();
@@ -270,7 +365,7 @@ class Offre extends TradeFactory
         $this->specifications = new ArrayCollection();
         $this->communications = new ArrayCollection();
         $this->rabais = new ArrayCollection();
-        $this->updatedAt = $this->dateCreation =  new \DateTime('now');
+        $this->updatedAt = $this->dateCreation = new \DateTime('now');
     }
 
     public function getImageFile()
@@ -280,14 +375,14 @@ class Offre extends TradeFactory
 
     public function setImageFile(File $image = null)
     {
-        $image !== ''?:$image=null;
+        $image !== '' ?: $image = null;
         $this->imageFile = $image;
 
         // VERY IMPORTANT:
         // It is required that at least one field changes if you are using Doctrine,
         // otherwise the event listeners won't be called and the file is lost
-            // if 'updatedAt' is not defined in your entity, use another property
-            $this->updatedAt = new \DateTime('now');
+        // if 'updatedAt' is not defined in your entity, use another property
+        $this->updatedAt = new \DateTime('now');
     }
 
     /**
@@ -309,7 +404,7 @@ class Offre extends TradeFactory
      */
     public function setDataSheet($dataSheet)
     {
-        $dataSheet!== ''?:$dataSheet=null;
+        $dataSheet !== '' ?: $dataSheet = null;
         $this->dataSheet = $dataSheet;
         $this->updatedAt = new \DateTime('now');
 
@@ -359,7 +454,7 @@ class Offre extends TradeFactory
      */
     public function setDateExpiration($dateExpiration)
     {
-        $dateExpiration !== ''?:$dateExpiration=null;
+        $dateExpiration !== '' ?: $dateExpiration = null;
         $this->dateExpiration = $dateExpiration;
         $this->updatedAt = new \DateTime('now');
         return $this;
@@ -384,7 +479,7 @@ class Offre extends TradeFactory
      */
     public function setDescription($description)
     {
-        $description !== ''?:$description=null;
+        $description !== '' ?: $description = null;
         $this->description = $description;
         $this->updatedAt = new \DateTime('now');
         return $this;
@@ -409,7 +504,7 @@ class Offre extends TradeFactory
      */
     public function setDesignation($designation)
     {
-        $designation !== ''?:$designation=null;
+        $designation !== '' ?: $designation = null;
         $this->designation = $designation;
         $this->updatedAt = new \DateTime('now');
         return $this;
@@ -444,7 +539,7 @@ class Offre extends TradeFactory
      */
     public function setRetourne($estRetourne)
     {
-        $estRetourne !== ''?:$estRetourne=null;
+        $estRetourne !== '' ?: $estRetourne = null;
         $this->retourne = $estRetourne;
         $this->updatedAt = new \DateTime('now');
         return $this;
@@ -518,7 +613,7 @@ class Offre extends TradeFactory
      */
     public function setModelDeSerie($modelDeSerie)
     {
-        $modelDeSerie !== ''?:$modelDeSerie=null;
+        $modelDeSerie !== '' ?: $modelDeSerie = null;
         $this->modelDeSerie = $modelDeSerie;
         $this->updatedAt = new \DateTime('now');
         return $this;
@@ -543,7 +638,7 @@ class Offre extends TradeFactory
      */
     public function setPrixUnitaire($prixUnitaire)
     {
-        $prixUnitaire !== ''?:$prixUnitaire=null;
+        $prixUnitaire !== '' ?: $prixUnitaire = null;
         $this->prixUnitaire = $prixUnitaire;
         $this->updatedAt = new \DateTime('now');
         return $this;
@@ -568,7 +663,7 @@ class Offre extends TradeFactory
      */
     public function setQuantite($quantite)
     {
-        $quantite !== ''?:$quantite=null;
+        $quantite !== '' ?: $quantite = null;
         $this->quantite = $quantite;
         $this->updatedAt = new \DateTime('now');
         return $this;
@@ -593,7 +688,7 @@ class Offre extends TradeFactory
      */
     public function setEvaluation($evaluation)
     {
-        $evaluation !== ''?:$evaluation=null;
+        $evaluation !== '' ?: $evaluation = null;
         $this->evaluation = $evaluation;
         return $this;
     }
@@ -617,7 +712,7 @@ class Offre extends TradeFactory
      */
     public function setRemiseProduit($remiseProduit)
     {
-        $remiseProduit !== ''?:$remiseProduit=null;
+        $remiseProduit !== '' ?: $remiseProduit = null;
         $this->remiseProduit = $remiseProduit;
         $this->updatedAt = new \DateTime('now');
         return $this;
@@ -642,7 +737,7 @@ class Offre extends TradeFactory
      */
     public function setTypeOffre($typeOffre)
     {
-        $typeOffre !== ''?:$typeOffre = null;
+        $typeOffre !== '' ?: $typeOffre = null;
         $this->typeOffre = $typeOffre;
         $this->updatedAt = new \DateTime('now');
         return $this;
@@ -677,7 +772,7 @@ class Offre extends TradeFactory
      */
     public function setValide($estValide)
     {
-        $estValide !== ''?:$estValide=null;
+        $estValide !== '' ?: $estValide = null;
         $this->valide = $estValide;
         $this->updatedAt = new \DateTime('now');
         return $this;
@@ -713,7 +808,7 @@ class Offre extends TradeFactory
     public function setCategorie(Categorie $categorie = null)
     {
         $this->categorie = $categorie;
-        if($categorie)$this->updatedAt = new \DateTime('now');
+        if ($categorie) $this->updatedAt = new \DateTime('now');
         return $this;
     }
 
@@ -738,7 +833,7 @@ class Offre extends TradeFactory
     public function setBoutique(Boutique $boutique = null)
     {
         $this->boutique = $boutique;
-       if($boutique) $this->updatedAt = new \DateTime('now');
+        if ($boutique) $this->updatedAt = new \DateTime('now');
         return $this;
     }
 
@@ -762,7 +857,7 @@ class Offre extends TradeFactory
     public function setVendeur(Utilisateur_avm $vendeur)
     {
         $this->vendeur = $vendeur;
-        if($vendeur)$this->updatedAt = new \DateTime('now');
+        if ($vendeur) $this->updatedAt = new \DateTime('now');
         return $this;
     }
 
@@ -878,7 +973,7 @@ class Offre extends TradeFactory
      */
     public function setCredit($credit)
     {
-        $credit !== ''?:$credit=null;
+        $credit !== '' ?: $credit = null;
         $this->credit = $credit;
 
         return $this;
@@ -903,7 +998,7 @@ class Offre extends TradeFactory
      */
     public function setUnite($unite)
     {
-        $unite !== ''?:$unite=null;
+        $unite !== '' ?: $unite = null;
         $this->unite = $unite;
         $this->updatedAt = new \DateTime('now');
         return $this;
@@ -912,7 +1007,7 @@ class Offre extends TradeFactory
     /**
      * Get publiable
      *
-     * @return int
+     * @return boolean
      */
     public function getPubliable()
     {
@@ -922,13 +1017,13 @@ class Offre extends TradeFactory
     /**
      * Set publiable
      *
-     * @param integer $publiable
+     * @param bool $publiable
      *
      * @return Offre
      */
     public function setPubliable($publiable)
     {
-        $publiable !== ''?:$publiable=null;
+        $publiable !== '' ?: $publiable = null;
         $this->publiable = $publiable;
         $this->updatedAt = new \DateTime('now');
         return $this;
@@ -1171,11 +1266,11 @@ class Offre extends TradeFactory
 
     /**
      * @param integer $apparenceNeuf
-     *  @return Offre
+     * @return Offre
      */
     public function setApparenceNeuf($apparenceNeuf)
     {
-        $apparenceNeuf !== ''?:$apparenceNeuf=null;
+        $apparenceNeuf !== '' ?: $apparenceNeuf = null;
         $this->apparenceNeuf = $apparenceNeuf;
         $this->updatedAt = new \DateTime('now');
         return $this;
@@ -1199,7 +1294,7 @@ class Offre extends TradeFactory
      */
     public function setDureeGarantie($dureeGarantie)
     {
-        $dureeGarantie !== ''?:$dureeGarantie=null;
+        $dureeGarantie !== '' ?: $dureeGarantie = null;
         $this->dureeGarantie = $dureeGarantie;
         $this->updatedAt = new \DateTime('now');
         return $this;

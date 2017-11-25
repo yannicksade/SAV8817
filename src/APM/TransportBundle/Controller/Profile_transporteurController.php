@@ -13,10 +13,17 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use FOS\RestBundle\Controller\Annotations\RouteResource;
+use FOS\RestBundle\Controller\Annotations\Get;
+use FOS\RestBundle\Controller\Annotations\Post;
+use FOS\RestBundle\Controller\Annotations\Delete;
+use FOS\RestBundle\Controller\Annotations\Put;
+use FOS\RestBundle\Controller\Annotations\Patch;
+use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
 /**
  * Profile_transporteur controller.
- *
+ * @RouteResource("transporteur", pluralize=false)
  */
 class Profile_transporteurController extends Controller
 {
@@ -28,10 +35,10 @@ class Profile_transporteurController extends Controller
     /**
      * @param Request $request
      * @return \Symfony\Component\HttpFoundation\Response | JsonResponse
-     * @internal param string $name
-     * @internal param $value
+     *
+     * @Get("/transporteurs", name="s")
      */
-    public function indexAction(Request $request)
+    public function getAction(Request $request)
     {
         $this->listeAndShowSecurity();
         $em = $this->getDoctrine()->getManager();
@@ -133,6 +140,8 @@ class Profile_transporteurController extends Controller
      * Creates a new Profile_transporteur entity.
      * @param Request $request
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response| JsonResponse
+     *
+     * @Post("/new/transporteur")
      */
     public function newAction(Request $request)
     {
@@ -191,6 +200,8 @@ class Profile_transporteurController extends Controller
      * @param Request $request
      * @param Profile_transporteur $profile_transporteur
      * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
+     *
+     * @Get("/show/transporteur/{id}")
      */
     public function showAction(Request $request, Profile_transporteur $profile_transporteur)
     {
@@ -236,6 +247,8 @@ class Profile_transporteurController extends Controller
      * @param Request $request
      * @param Profile_transporteur $profile_transporteur
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response | JsonResponse
+     *
+     * @Post("/edit/transporteur/{id}")
      */
     public function editAction(Request $request, Profile_transporteur $profile_transporteur)
     {
@@ -310,6 +323,8 @@ class Profile_transporteurController extends Controller
      * @param Request $request
      * @param Profile_transporteur $profile_transporteur
      * @return \Symfony\Component\HttpFoundation\RedirectResponse | JsonResponse
+     *
+     * @Delete("/delete/transporteur/{id}")
      */
     public function deleteAction(Request $request, Profile_transporteur $profile_transporteur)
     {

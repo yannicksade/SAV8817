@@ -16,6 +16,11 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Validator\Constraints as Assert;
 use Vich\UploaderBundle\Mapping\Annotation as Vich;
+use JMS\Serializer\Annotation\ExclusionPolicy;
+use JMS\Serializer\Annotation\Expose;
+use JMS\Serializer\Annotation\Groups;
+use JMS\Serializer\Annotation\Type;
+use JMS\Serializer\Annotation\Exclude;
 
 /**
  * Boutique
@@ -23,31 +28,51 @@ use Vich\UploaderBundle\Mapping\Annotation as Vich;
  * @ORM\Entity(repositoryClass="APM\VenteBundle\Repository\BoutiqueRepository")
  * @Vich\Uploadable
  * @UniqueEntity("code")
+ * @ExclusionPolicy("all")
  */
 class Boutique extends TradeFactory
 {
     /**
      * @var string
-     *
+     * @Type("string")
+     * @Expose
+     * @Groups({"list", "details"})
      * @ORM\Column(name="code", type="string", length=255, nullable=false)
      */
     private $code;
 
     /**
      * @var integer
+     * @Type("int")
+     * @Expose
+     * @Groups({"details"})
      * @ORM\Column(name="etat", type="integer", nullable=false)
      */
     private $etat;
 
     /**
      * @var \DateTime
-     * @Assert\DateTime
+     * @Type("DateTimeImmutable<'Y-m-d'>")
+     * @Expose
+     * @Groups({"details"})
      * @ORM\Column(name="dateCreation", type="datetime", nullable=false)
      */
     private $dateCreation;
 
     /**
+     * @Type("DateTimeImmutable<'Y-m-d'>")
+     * @Expose
+     * @Groups({"details"})
+     * @ORM\Column(name="updatedAt", type="datetime", nullable= true)
+     * @var \DateTime
+     */
+    private $updatedAt;
+
+    /**
      * @var string
+     * @Type("string")
+     * @Expose
+     * @Groups({"details"})
      * @Assert\Length(min=2, max=254)
      * @ORM\Column(name="description", type="string", length=255, nullable=true)
      */
@@ -55,6 +80,9 @@ class Boutique extends TradeFactory
 
     /**
      * @var string
+     * @Type("string")
+     * @Expose
+     * @Groups({"details"})
      * @Assert\Country
      * @ORM\Column(name="nationalite", type="string", length=255, nullable=true)
      */
@@ -62,6 +90,9 @@ class Boutique extends TradeFactory
 
     /**
      * @var boolean
+     * @Type("bool")
+     * @Expose
+     * @Groups({"details"})
      * @Assert\Choice({0,1})
      * @ORM\Column(name="publiable", type="boolean", nullable=true)
      */
@@ -69,6 +100,9 @@ class Boutique extends TradeFactory
 
     /**
      * @var string
+     * @Type("string")
+     * @Expose
+     * @Groups({"details"})
      * @Assert\NotBlank
      * @Assert\Length(min=2, max=105)
      * @ORM\Column(name="designation", type="string", length=255, nullable=true)
@@ -77,6 +111,9 @@ class Boutique extends TradeFactory
 
     /**
      * @var string
+     * @Type("string")
+     * @Expose
+     * @Groups({"details"})
      * @Assert\Length(min=2, max=105)
      * @ORM\Column(name="raisonSociale", type="string", length=255, nullable=true)
      */
@@ -84,7 +121,9 @@ class Boutique extends TradeFactory
 
     /**
      * @var string
-     * @Assert\Choice({0,1,2,3,4,5})
+     * @Type("string")
+     * @Expose
+     * @Groups({"details"})
      * @ORM\Column(name="statutSocial", type="string", length=255, nullable=true)
      */
     private $statutSocial;
@@ -92,7 +131,9 @@ class Boutique extends TradeFactory
     /**
      * Id
      * @var integer
-     *
+     * @Type("int")
+     * @Expose
+     * @Groups({"test", "list", "details"})
      * @ORM\Column(name="id", type="integer", nullable=false)
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
@@ -101,7 +142,9 @@ class Boutique extends TradeFactory
 
     /**
      * @var Utilisateur_avm
-     *
+     * @Type("APM\UserBundle\Entity\Utilisateur_avm")
+     * @Expose
+     * @Groups({"details"})
      * @ORM\ManyToOne(targetEntity="APM\UserBundle\Entity\Utilisateur_avm", inversedBy="boutiquesGerant")
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="gerant_id", referencedColumnName="id")
@@ -111,13 +154,24 @@ class Boutique extends TradeFactory
 
     /**
      * @var Utilisateur_avm
-     *
+     * @Type("APM\UserBundle\Entity\Utilisateur_avm")
+     * @Expose
+     * @Groups({"details"})
      * @ORM\ManyToOne(targetEntity="APM\UserBundle\Entity\Utilisateur_avm", inversedBy="boutiquesProprietaire")
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="proprietaire_id", referencedColumnName="id", nullable=false)
      * })
      */
     private $proprietaire;
+
+    /**
+     * @var string
+     * @Type("string")
+     * @Expose
+     * @Groups({"details"})
+     * @ORM\Column(name="image", type="string", nullable=true)
+     */
+    private $image;
 
     /**
      * @var Collection
@@ -186,23 +240,12 @@ class Boutique extends TradeFactory
     private $transactionsRecues;
 
     /**
-     * @var string
-     * @ORM\Column(name="image", type="string", nullable=true)
-     */
-    private $image;
-
-    /**
+     * @Exclude
      * @Assert\Image()
      * @Vich\UploadableField(mapping="entity_images", fileNameProperty="image")
      * @var File
      *     */
     private $imageFile;
-
-    /**
-     * @ORM\Column(name="updatedAt", type="datetime", nullable= true)
-     * @var \DateTime
-     */
-    private $updatedAt;
 
     /**
      * Constructor
@@ -222,6 +265,11 @@ class Boutique extends TradeFactory
         $this->livreurBoutiques = new ArrayCollection();
         $this->code = "BQ" . $var;
         $this->updatedAt = $this->dateCreation =  new \DateTime('now');
+    }
+
+    public function __toString()
+    {
+        return $this->designation;
     }
 
     public function getImageFile()
@@ -713,11 +761,6 @@ class Boutique extends TradeFactory
         return $this->livraisons;
     }
 
-    public function __toString()
-    {
-        return $this->designation;
-    }
-
     /**
      * Add groupesRelationnel
      *
@@ -869,6 +912,16 @@ class Boutique extends TradeFactory
     }
 
     /**
+     * Get etat
+     *
+     * @return integer
+     */
+    public function getEtat()
+    {
+        return $this->etat;
+    }
+
+    /**
      * Set etat
      *
      * @param integer $etat
@@ -883,13 +936,13 @@ class Boutique extends TradeFactory
     }
 
     /**
-     * Get etat
+     * Get dateCreation
      *
-     * @return integer
+     * @return \DateTime
      */
-    public function getEtat()
+    public function getDateCreation()
     {
-        return $this->etat;
+        return $this->dateCreation;
     }
 
     /**
@@ -904,15 +957,5 @@ class Boutique extends TradeFactory
         $this->dateCreation = $dateCreation;
 
         return $this;
-    }
-
-    /**
-     * Get dateCreation
-     *
-     * @return \DateTime
-     */
-    public function getDateCreation()
-    {
-        return $this->dateCreation;
     }
 }

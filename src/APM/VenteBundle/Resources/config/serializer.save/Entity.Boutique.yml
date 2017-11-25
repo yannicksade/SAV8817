@@ -1,0 +1,7 @@
+APM\VenteBundle\Entity\Boutique
+    exclusion_policy: ALL
+    properties:
+        code:
+            expose: true
+        designation:
+            expose: true

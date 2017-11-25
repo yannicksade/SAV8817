@@ -12,11 +12,17 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
-
+use FOS\RestBundle\Controller\Annotations\RouteResource;
+use FOS\RestBundle\Controller\Annotations\Get;
+use FOS\RestBundle\Controller\Annotations\Post;
+use FOS\RestBundle\Controller\Annotations\Delete;
+use FOS\RestBundle\Controller\Annotations\Put;
+use FOS\RestBundle\Controller\Annotations\Patch;
+use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
 /**
  * Quota controller.
- *
+ * @RouteResource("commission")
  */
 class QuotaController extends Controller
 {
@@ -37,8 +43,10 @@ class QuotaController extends Controller
      * @param Request $request
      * @param Boutique $boutique
      * @return \Symfony\Component\HttpFoundation\Response
+     *
+     * @Get("/commissions/boutique/{id}", name="s_boutique")
      */
-    public function indexAction(Request $request, Boutique $boutique)
+    public function getAction(Request $request, Boutique $boutique)
     {
         $this->listAndShowSecurity($boutique);
         $quotas = $boutique->getCommissionnements();
@@ -195,6 +203,8 @@ class QuotaController extends Controller
      * @param Request $request
      * @param Boutique $boutique
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response | JsonResponse
+     *
+     * @Post("/new/commission/boutique/{id}", name="_boutique")
      */
     public function newAction(Request $request, Boutique $boutique)
     {
@@ -252,6 +262,8 @@ class QuotaController extends Controller
      * @param Request $request
      * @param Quota $quotum
      * @return \Symfony\Component\HttpFoundation\Response | JsonResponse
+     *
+     * @Get("/show/commission/{id}")
      */
     public function showAction(Request $request, Quota $quotum)
     {
@@ -296,6 +308,8 @@ class QuotaController extends Controller
      * @param Request $request
      * @param Quota $quotum
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response| JsonResponse
+     *
+     * @Patch("/edit/commission/{id}")
      */
     public function editAction(Request $request, Quota $quotum)
     {
@@ -374,6 +388,8 @@ class QuotaController extends Controller
      * @param Request $request
      * @param Quota $quotum
      * @return \Symfony\Component\HttpFoundation\RedirectResponse| JsonResponse
+     *
+     * @delete("/delete/commission/{id}")
      */
     public function deleteAction(Request $request, Quota $quotum)
     {
@@ -393,17 +409,6 @@ class QuotaController extends Controller
             $em->remove($quotum);
             $em->flush();
         }
-
-        return $this->redirectToRoute('apm_marketing_quota_index', ['id' => $quotum->getBoutiqueProprietaire()->getId()]);
-    }
-
-    public function deleteFromListAction(Quota $quotum)
-    {
-        $this->editAndDeleteSecurity($quotum);
-
-        $em = $this->getDoctrine()->getManager();
-        $em->remove($quotum);
-        $em->flush();
 
         return $this->redirectToRoute('apm_marketing_quota_index', ['id' => $quotum->getBoutiqueProprietaire()->getId()]);
     }

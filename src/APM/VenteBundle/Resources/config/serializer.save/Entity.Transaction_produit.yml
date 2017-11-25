@@ -1,0 +1,7 @@
+APM\VenteBundle\Entity\Transaction_produit
+    exclusion_policy: ALL
+    properties:
+        code:
+            expose: true
+        designation:
+            expose: true

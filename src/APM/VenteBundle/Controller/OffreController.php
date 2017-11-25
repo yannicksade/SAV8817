@@ -5,27 +5,39 @@ namespace APM\VenteBundle\Controller;
 use APM\AchatBundle\Entity\Groupe_offre;
 use APM\UserBundle\Entity\Admin;
 use APM\UserBundle\Entity\Utilisateur_avm;
+use APM\VenteBundle\Entity\Transaction;
+use APM\VenteBundle\Entity\Transaction_produit;
 use Doctrine\Common\Collections\Collection;
 use APM\VenteBundle\Entity\Boutique;
 use APM\VenteBundle\Entity\Categorie;
 use APM\VenteBundle\Entity\Offre;
 use APM\VenteBundle\Factory\TradeFactory;
 use Doctrine\DBAL\Exception\ConstraintViolationException;
+use FOS\RestBundle\Controller\FOSRestController;
+use FOS\RestBundle\Routing\ClassResourceInterface;
+use FOS\RestBundle\View\View;
 use SebastianBergmann\CodeCoverage\RuntimeException;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Symfony\Component\HttpFoundation\Session\Session;
-use Symfony\Component\Security\Core\Authentication\AuthenticationProviderManager;
+use FOS\RestBundle\Controller\Annotations\RouteResource;
+use FOS\RestBundle\Controller\Annotations\Get;
+use FOS\RestBundle\Controller\Annotations\Post;
+use FOS\RestBundle\Controller\Annotations\Patch;
+use FOS\RestBundle\Controller\Annotations\Delete;
+use FOS\RestBundle\Controller\Annotations\Put;
+use Nelmio\ApiDocBundle\Annotation\ApiDoc;
+use Doctrine\Common\Collections\ArrayCollection;
 
 /**
  * Offre controller.
- *
+ * @RouteResource("offre", pluralize=false)
  */
-class OffreController extends Controller
+class OffreController extends FOSRestController implements ClassResourceInterface
 {
     /********************************************AJAX REQUEST********************************************/
     private
@@ -45,21 +57,35 @@ class OffreController extends Controller
      * @ParamConverter("categorie", options={"mapping": {"categorie_id":"id"}})
      * @ParamConverter("user", options={"mapping": {"user_id":"id"}})
      * @ParamConverter("groupe_offre", options={"mapping": {"groupe_id":"id"}})
+     * @ParamConverter("transaction", options={"mapping": {"transaction_id":"id"}})
      * Liste les offres de la boutique ou du vendeur
      * @param Request $request
      * @param Boutique $boutique
      * @param Categorie $categorie
      * @param Utilisateur_avm $user
      * @param Groupe_offre|null $groupe_offre
+     * @param Transaction|null $transaction
      * @return JsonResponse
+     *
+     * @Get("/offres", name="s")
+     * @Get("/offres/boutique/{id}", name="s_boutique")
+     * @Get("/offres/boutique/{id}/categorie/{categorie_id}", name="s_categorie")
+     * @Get("/offres/user/{user_id}", name="s_ByAdmin")
+     * @Get("/offres/groupe/{groupe_id}", name="s_groupeOffre")
+     * @Get("/offres/transaction/{transaction_id}", name="s_transaction")
+     * @Get("/offres/boutique/{id}/transaction/{transaction_id}", name="s_transaction_boutique")
      */
-    public function indexAction(Request $request, Boutique $boutique = null, Categorie $categorie = null, Utilisateur_avm $user = null, Groupe_offre $groupe_offre = null)
+    public function getAction(Request $request, Boutique $boutique = null, Categorie $categorie = null, Utilisateur_avm $user = null, Groupe_offre $groupe_offre = null, Transaction $transaction = null)
     {
         try {
             /** @var Session $session */
             $session = $request->getSession();
             $vendeur = null;
-            if (null !== $boutique) {
+            if (null !== $transaction) {
+                //security
+                $this->listOfrresSecurity($boutique, $transaction);
+                $offres = $this->listOffres($transaction);
+            } elseif (null !== $boutique) {
                 $this->listAndShowSecurity($boutique);
                 if ($categorie) {
                     $offres = $categorie->getOffres();
@@ -73,7 +99,7 @@ class OffreController extends Controller
                     $this->listAndShowSecurity();
                     $user = $this->getUser();
                 } else {
-                    //$this->adminSecurity();
+                    $this->adminSecurity();
                 }
                 /** @var Collection $offres */
                 $offres = $user->getOffres();
@@ -86,14 +112,14 @@ class OffreController extends Controller
             $json = array();
             $json['items'] = array();
             //filter parameters
-            $this->code_filter = $request->request->has('code_filter') ? $request->request->get('code_filter') : "";
-            $this->designation_filter = $request->request->has('desc_filter') ? $request->request->get('desc_filter') : "";
-            $this->boutique_filter = $request->request->has('boutique_filter') ? $request->request->get('boutique_filter') : "";
-            $this->dateFrom_filter = $request->request->has('date_from_filter') ? $request->request->get('date_from_filter') : "";
-            $this->dateTo_filter = $request->request->has('date_to_filter') ? $request->request->get('date_to_filter') : "";
-            $this->etat_filter = $request->request->has('etat_filter') ? $request->request->get('etat_filter') : "";
-            $iDisplayLength = intval($request->request->has('length') ? $request->request->get('length') : -1);
-            $iDisplayStart = intval($request->request->has('start') ? $request->request->get('start') : 0);
+            $this->code_filter = $request->query->has('code_filter') ? $request->query->get('code_filter') : "";
+            $this->designation_filter = $request->query->has('desc_filter') ? $request->query->get('desc_filter') : "";
+            $this->boutique_filter = $request->query->has('boutique_filter') ? $request->query->get('boutique_filter') : "";
+            $this->dateFrom_filter = $request->query->has('date_from_filter') ? $request->query->get('date_from_filter') : "";
+            $this->dateTo_filter = $request->query->has('date_to_filter') ? $request->query->get('date_to_filter') : "";
+            $this->etat_filter = $request->query->has('etat_filter') ? $request->query->get('etat_filter') : "";
+            $iDisplayLength = intval($request->query->has('length') ? $request->query->get('length') : -1);
+            $iDisplayStart = intval($request->query->has('start') ? $request->query->get('start') : 0);
             //-----Source -------
             $iTotalRecords = count($offres);
             // filtering
@@ -102,7 +128,7 @@ class OffreController extends Controller
             $iFilteredRecords = count($offres);
             //------------------------------------
             //$id = 0; // identity of rows in the table
-            $url_image = $this->get('apm_core.packages_maker')->getPackages()->getUrl('/', 'resolve_img');
+            //$url_image = $this->get('apm_core.packages_maker')->getPackages()->getUrl('/', 'resolve_img');
             /** @var Offre $offre */
             foreach ($offres as $offre) {
                 //$id += 1;
@@ -112,12 +138,27 @@ class OffreController extends Controller
                     'code' => $offre->getCode(),
                     'designation' => $offre->getDesignation(),
                     'description' => $offre->getDescription(),
-                    'image' => $url_image . $offre->getImage(),
+                    //'image' => $url_image . $offre->getImage(),
                 ));
             }
             $json['totalRecords'] = $iTotalRecords;
             $json['filteredRecords'] = $iFilteredRecords; //nbre d'unité
-            return $this->json(json_encode($json), 200);
+            $data = array(
+                /* 'offres' => $offres,*/
+                'boutique' => $boutique,
+                'categorie' => $categorie,
+                'vendeur' => $vendeur,
+                'form' => $form->createView(),
+                'url_image' => $this->get('apm_core.packages_maker')->getPackages()->getUrl('/', 'img'),
+            );
+            /*$view = $this->view($json, 200)
+                ->setTemplate('APMVenteBundle:offre:index_ajax.html.twig')
+                ->setTemplateVar('offres')
+                ->setTemplateData($data);*/
+            /* ->setRoute('');*/
+            return $this->json($json, 200);
+            //return $this->handleView($view);
+
             // }
         } catch (AccessDeniedException $ads) {
             $session->getFlashBag()->add('danger', "<strong>Action interdite!</strong><br/>Pour jouir de ce service, veuillez consulter nos administrateurs.");
@@ -125,6 +166,55 @@ class OffreController extends Controller
         }
         //$session->set('previous_location', $request->getUri());
 
+    }
+
+    /**
+     * @param Boutique|null $boutique
+     * @param Transaction $transaction
+     */
+    private function listOfrresSecurity($boutique, $transaction)
+    {
+        //-----------------------------------security-------------------------------------------
+
+        $this->denyAccessUnlessGranted('ROLE_USERAVM', null, 'Unable to access this page!');
+        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
+            throw $this->createAccessDeniedException();
+        }
+        $gerant = null;
+        $proprietaire = null;
+        $auteur = null;
+        $beneficiaire = null;
+        $user = $this->getUser();
+        if ($boutique) {
+            $gerant = $boutique->getGerant();
+            $proprietaire = $boutique->getProprietaire();
+            if ($beneficiaire) $beneficiaire = $transaction->getBeneficiaire();
+        } else {
+            $auteur = $transaction->getAuteur();
+            $beneficiaire = $transaction->getBeneficiaire();
+        }
+        if ($user !== $gerant && $user !== $proprietaire && $user !== $auteur && $user !== $beneficiaire) {
+            throw $this->createAccessDeniedException();
+        }
+        //----------------------------------------------------------------------------------------
+    }
+
+    /**
+     * @param Transaction $transaction
+     * @return Collection
+     */
+    private function listOffres(Transaction $transaction)
+    {
+        $offres = new ArrayCollection();
+        $transaction_produits = $transaction->getTransactionProduits();
+        if (null !== $transaction_produits) {
+            /** @var Transaction_produit $transaction_produit */
+            foreach ($transaction_produits as $transaction_produit) {
+                $offre = $transaction_produit->getProduit();
+                $offres->add($offre);
+            }
+        }
+        return $offres;
     }
 
     /**
@@ -145,6 +235,17 @@ class OffreController extends Controller
             if ($user !== $gerant && $user !== $proprietaire) {
                 throw $this->createAccessDeniedException();
             }
+        }
+        //----------------------------------------------------------------------------------------
+    }
+
+    private
+    function adminSecurity()
+    {
+        //-----------------------------------security-------------------------------------------
+        $this->denyAccessUnlessGranted('ROLE_ADMIN', null, 'Unable to access this page!');
+        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY') || !$this->getUser() instanceof Admin) {
+            throw $this->createAccessDeniedException();
         }
         //----------------------------------------------------------------------------------------
     }
@@ -227,9 +328,10 @@ class OffreController extends Controller
     }
 
     /**
-     *
      * @param Request $request
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response | JsonResponse
+     * @return JsonResponse | Form | View
+     *
+     * @Post("/new/offre")
      */
     public function newAction(Request $request)
     {
@@ -238,47 +340,56 @@ class OffreController extends Controller
         $session = $request->getSession();
         /** @var Offre $offre */
         $offre = TradeFactory::getTradeProvider('offre');
-        $form = $this->createForm('APM\VenteBundle\Form\OffreType', $offre);
-        $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
-            try {
-                $this->createSecurity($offre->getBoutique(), $offre->getCategorie());
-                $em = $this->getDoctrine()->getManager();
-                $offre->setVendeur($this->getUser());
-                $em->persist($offre);
-                $em->flush();
-                if ($request->isXmlHttpRequest()) {
-                    $json["item"] = array(//permet au client de différencier les nouveaux éléments des élements juste modifiés
-                        "action" => 0,
-                        "id" => null, //it is null because the table will be reload automatically
-                    );
-                    $session->getFlashBag()->add('success', "<strong> Création de l'Offre. réf:" . $offre->getCode() . "</strong><br> Opération effectuée avec succès!");
-                    return $this->json(json_encode($json), 200);
-                    //--------------
-                }
-                $this->get('apm_core.crop_image')->liipImageResolver($offre->getImage());//resouds tout en créant l'image
-                if (null !== $offre->getImage()) {
-                    return $this->redirectToRoute('apm_vente_offre_show-image', array('id' => $offre->getId()));
-                } else {
-                    return $this->redirectToRoute('apm_vente_offre_show', array('id' => $offre->getId()));
-                }
-                //---
-            } catch (ConstraintViolationException $cve) {
-                $session->getFlashBag()->add('danger', "<strong>Echec de l'enregistrement. </strong><br>L'enregistrement a échoué dû à une contrainte de données!");
-                return $this->json(json_encode(["item" => null]));
-            } catch (RuntimeException $rte) {
-                $session->getFlashBag()->add('danger', "<strong>Echec de l'opération.</strong><br>L'enregistrement a échoué. bien vouloir réessayer plutard, svp!");
-                return $this->json(json_encode(["item" => null]));
-            } catch (AccessDeniedException $ads) {
-                $session->getFlashBag()->add('danger', "<strong>Action interdite.</strong><br>Vous n'êtes pas autorisez à effectuer cette opération!");
-                return $this->json(json_encode(["item" => null]));
-            }
+        $form = $this->createForm('APM\VenteBundle\Form\OffreType', $offre, [
+            'csrf_protection' => true
+        ]);
+        //$form->handleRequest($request);
+        $form->submit($request->request->all());
+        if (!$form->isValid()) {
+            return $form;
         }
-        return $this->render('APMVenteBundle:offre:new.html.twig', array(
+        try {
+            $this->createSecurity($offre->getBoutique(), $offre->getCategorie());
+            $em = $this->getDoctrine()->getManager();
+            $offre->setVendeur($this->getUser());
+            $em->persist($offre);
+            $em->flush();
+            $routeOption = [
+                'id' => $offre->getId(),
+                '_format' => $request->get('_format')
+            ];
+            // return $this->routeRedirectView('apm_', $routeOption, Response::HTTP_CREATED);
+            /*if ($request->isXmlHttpRequest()) {
+                $json["item"] = array(//permet au client de différencier les nouveaux éléments des élements juste modifiés
+                    "action" => 0,
+                    "id" => null, //it is null because the table will be reload automatically
+                );*/
+            $session->getFlashBag()->add('success', "<strong> Création de l'Offre. réf:" . $offre->getCode() . "</strong><br> Opération effectuée avec succès!");
+            return $this->json(null, Response::HTTP_CREATED);
+            //--------------
+            // }
+            /* $this->get('apm_core.crop_image')->liipImageResolver($offre->getImage());//resouds tout en créant l'image
+             if (null !== $offre->getImage()) {
+                 return $this->redirectToRoute('apm_vente_offre_show-image', array('id' => $offre->getId()));
+             } else {
+                 return $this->redirectToRoute('apm_vente_offre_show', array('id' => $offre->getId()));
+             }*/
+            //---
+        } catch (ConstraintViolationException $cve) {
+            $session->getFlashBag()->add('danger', "<strong>Echec de l'enregistrement. </strong><br>L'enregistrement a échoué dû à une contrainte de données!");
+            return $this->json(json_encode(["item" => null]));
+        } catch (RuntimeException $rte) {
+            $session->getFlashBag()->add('danger', "<strong>Echec de l'opération.</strong><br>L'enregistrement a échoué. bien vouloir réessayer plutard, svp!");
+            return $this->json(json_encode(["item" => null]));
+        } catch (AccessDeniedException $ads) {
+            $session->getFlashBag()->add('danger', "<strong>Action interdite.</strong><br>Vous n'êtes pas autorisez à effectuer cette opération!");
+            return $this->json(json_encode(["item" => null]));
+        }
+        /*return $this->render('APMVenteBundle:offre:new.html.twig', array(
             'form' => $form->createView(),
             'offre' => $offre,
             'url_image' => $this->get('apm_core.packages_maker')->getPackages()->getUrl('/', 'img'),
-        ));
+        ));*/
     }
 
     /**
@@ -320,9 +431,10 @@ class OffreController extends Controller
      * @param Request $request
      * @param Offre $offre
      * @return Response
+     *
+     * @get("/show-image/offre/{id}")
      */
-    public
-    function showImageAction(Request $request, Offre $offre)
+    public function showImageAction(Request $request, Offre $offre)
     {
         $this->listAndShowSecurity();
         $form = $this->createCrobForm($offre);
@@ -354,6 +466,8 @@ class OffreController extends Controller
      * @param Request $request
      * @param Offre $offre
      * @return JsonResponse
+     *
+     * @Get("/show/offre/{id}")
      */
     public
     function showAction(Request $request, Offre $offre)
@@ -389,11 +503,15 @@ class OffreController extends Controller
         return $this->json(json_encode($json), 200);
     }
 
+//------------------------ End INDEX ACTION --------------------------------------------
+
     /**
      * Displays a form to edit an existing Offre entity.
      * @param Request $request
      * @param Offre $offre
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response | JsonResponse
+     *
+     * @Put("/edit/offre/{id}")
      */
     public
     function editAction(Request $request, Offre $offre)
@@ -496,8 +614,6 @@ class OffreController extends Controller
         ));
     }
 
-//------------------------ End INDEX ACTION --------------------------------------------
-
     /**
      * @param Offre $offre
      */
@@ -546,6 +662,8 @@ class OffreController extends Controller
      * @param Request $request
      * @param Offre $offre
      * @return \Symfony\Component\HttpFoundation\RedirectResponse | JsonResponse
+     *
+     * @Delete("/delete/offre/{id}")
      */
     public
     function deleteAction(Request $request, Offre $offre = null)
@@ -590,8 +708,13 @@ class OffreController extends Controller
         }
     }
 
-    public
-    function ImageLoaderAction(Request $request)
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     *
+     * @Post("/image", name="image")
+     */
+    public function postAction(Request $request)
     {
         if ($request->isXmlHttpRequest() && $request->getMethod() === "POST") {
             $this->listAndShowSecurity();
@@ -659,17 +782,6 @@ class OffreController extends Controller
 
         }
         return new JsonResponse();
-    }
-
-    private
-    function adminSecurity()
-    {
-        //-----------------------------------security-------------------------------------------
-        $this->denyAccessUnlessGranted('ROLE_ADMIN', null, 'Unable to access this page!');
-        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY') || !$this->getUser() instanceof Admin) {
-            throw $this->createAccessDeniedException();
-        }
-        //----------------------------------------------------------------------------------------
     }
 
 }

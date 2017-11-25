@@ -1,11 +1,12 @@
 <?php
-
 namespace APM\VenteBundle\Entity;
 
 use APM\VenteBundle\Factory\TradeFactory;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use JMS\Serializer\Annotation\ExclusionPolicy;
+use JMS\Serializer\Annotation\Expose;
 
 /**
  * Remise
@@ -13,12 +14,13 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
  * @ORM\Table(name="remise")
  * @ORM\Entity(repositoryClass="APM\VenteBundle\Repository\RemiseRepository")
  * @UniqueEntity("code")
+ * @ExclusionPolicy("all")
  */
 class Remise extends TradeFactory
 {
     /**
      * @var string
-     *
+     * @Expose
      * @ORM\Column(name="code", type="string", length=255, nullable=true)
      */
     private $code;
@@ -87,7 +89,7 @@ class Remise extends TradeFactory
 
     /**
      * @var integer
-     *
+     * @Expose
      * @ORM\Column(name="id", type="integer", nullable=false)
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
@@ -96,6 +98,7 @@ class Remise extends TradeFactory
 
     /**
      * @var Offre
+     *
      * @ORM\ManyToOne(targetEntity="APM\VenteBundle\Entity\Offre", inversedBy="remises")
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="offre_id", referencedColumnName="id", nullable=false)

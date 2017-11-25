@@ -8,6 +8,10 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use JMS\Serializer\Annotation\ExclusionPolicy;
+use JMS\Serializer\Annotation\Expose;
+use JMS\Serializer\Annotation\Groups;
+use JMS\Serializer\Annotation\Type;
 
 /**
  * Categorie
@@ -15,11 +19,16 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
  * @ORM\Table(name="categorie")
  * @ORM\Entity(repositoryClass="APM\VenteBundle\Repository\CategorieRepository")
  * @UniqueEntity("code")
+ * @ExclusionPolicy("all")
+ *
  */
 class Categorie extends TradeFactory
 {
     /**
      * @var \DateTime
+     * @Type("DateTimeImmutable<'Y-m-d'>")
+     * @Expose
+     * @Groups({"details"})
      * @Assert\DateTime
      * @ORM\Column(name="dateCreation", type="datetime", nullable=false)
      */
@@ -27,13 +36,18 @@ class Categorie extends TradeFactory
 
     /**
      * @var string
-     *
+     * @Expose
+     * @Type("string")
+     * @Groups({"list", "details"})
      * @ORM\Column(name="code", type="string", length=255, nullable=false)
      */
     private $code;
 
     /**
      * @var string
+     * @Type("string")
+     * @Expose
+     * @Groups({"list", "details"})
      * @Assert\NotBlank
      * @Assert\Length(min=2, max=155)
      * @ORM\Column(name="designation", type="string", length=255, nullable=true)
@@ -41,6 +55,9 @@ class Categorie extends TradeFactory
     private $designation;
 
     /**
+     * @Expose
+     * @Type("string")
+     * @Groups({"list", "details"})
      * @var string
      * @Assert\Length(min=2, max=254)
      * @ORM\Column(name="description", type="string", length=255, nullable=true)
@@ -50,6 +67,9 @@ class Categorie extends TradeFactory
 
     /**
      * @var boolean
+     * @Type("bool")
+     * @Expose
+     * @Groups({"details"})
      * @Assert\Choice({0,1})
      * @ORM\Column(name="estLivrable", type="boolean", nullable=true)
      */
@@ -57,12 +77,18 @@ class Categorie extends TradeFactory
 
     /**
      * @var boolean
+     * @Type("bool")
+     * @Expose
+     * @Groups({"details"})
      * @Assert\Choice({0,1})
      * @ORM\Column(name="publiable", type="boolean", nullable=true)
      */
     private $publiable;
 
     /**
+     * @Expose
+     * @Type("int")
+     * @Groups({"details"})
      * @var integer
      * @ORM\Column(name="etat", type="integer", nullable=true)
      */
@@ -72,7 +98,9 @@ class Categorie extends TradeFactory
     /**
      * Id
      * @var integer
-     *
+     * @Type("int")
+     * @Expose
+     * @Groups({"test", "list", "details"})
      * @ORM\Column(name="id", type="integer", nullable=false)
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
@@ -82,6 +110,8 @@ class Categorie extends TradeFactory
     /**
      * @var Categorie
      *
+     *
+     * @Groups({"details"})
      * @ORM\ManyToOne(targetEntity="APM\VenteBundle\Entity\Categorie")
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="categorieCourante_id", referencedColumnName="id", nullable=true)
@@ -89,6 +119,17 @@ class Categorie extends TradeFactory
      */
     private $categorieCourante;
 
+    /**
+     * @var Boutique
+     *
+     *
+     * @Groups({"list", "details"})
+     * @ORM\ManyToOne(targetEntity="APM\VenteBundle\Entity\Boutique", inversedBy="categories")
+     * @ORM\JoinColumns({
+     *   @ORM\JoinColumn(name="boutique_id", referencedColumnName="id", nullable=false)
+     *     })
+     */
+    private $boutique;
 
     /**
      * @var Collection
@@ -96,15 +137,6 @@ class Categorie extends TradeFactory
      *
      */
     private $offres;
-
-    /**
-     * @var Boutique
-     * @ORM\ManyToOne(targetEntity="APM\VenteBundle\Entity\Boutique", inversedBy="categories")
-     * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="boutique_id", referencedColumnName="id", nullable=false)
-     *     })
-     */
-    private $boutique;
 
     /**
      * Categorie constructor.
@@ -115,6 +147,11 @@ class Categorie extends TradeFactory
         $this->offres = new ArrayCollection();
         $this->code = "CA" . $var;
         $this->dateCreation = new \DateTime('now');
+    }
+
+    public function __toString()
+    {
+        return $this->designation;
     }
 
     /**
@@ -362,11 +399,6 @@ class Categorie extends TradeFactory
         $this->boutique = $boutique;
 
         return $this;
-    }
-
-    public function __toString()
-    {
-        return $this->designation;
     }
 
     /**

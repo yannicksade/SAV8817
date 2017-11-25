@@ -16,10 +16,17 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use FOS\RestBundle\Controller\Annotations\RouteResource;
+use FOS\RestBundle\Controller\Annotations\Get;
+use FOS\RestBundle\Controller\Annotations\Post;
+use FOS\RestBundle\Controller\Annotations\Delete;
+use FOS\RestBundle\Controller\Annotations\Put;
+use FOS\RestBundle\Controller\Annotations\Patch;
+use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
 /**
  * Commissionnement controller.
- *
+ * @RouteResource("marketing", pluralize=false)
  */
 class CommissionnementController extends Controller
 {
@@ -40,8 +47,12 @@ class CommissionnementController extends Controller
      * @param Request $request
      * @param Boutique $boutique
      * @return \Symfony\Component\HttpFoundation\Response | JsonResponse
+     *
+     * @Get("/commissionnements", name="s")
+     * @Get("/commissionnements/boutique/{id}", name="s_boutique")
+     *
      */
-    public function indexAction(Request $request, Boutique $boutique = null)
+    public function getAction(Request $request, Boutique $boutique = null)
     {
 
         if (null !== $boutique) {
@@ -246,6 +257,9 @@ class CommissionnementController extends Controller
      * @param Request $request
      * @param Boutique $boutique
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response | JsonResponse
+     *
+     *
+     * @Post("/new/commissionnement/boutique/{id}")
      */
     public function newAction(Request $request, Boutique $boutique)
     {
@@ -303,6 +317,8 @@ class CommissionnementController extends Controller
      * @param Request $request
      * @param Commissionnement $commissionnement
      * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
+     *
+     * @Get("/show/commissionnement/{id}")
      */
     public function showAction(Request $request, Commissionnement $commissionnement)
     {
@@ -349,6 +365,8 @@ class CommissionnementController extends Controller
      * @param Request $request
      * @param Commissionnement $commissionnement
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response | JsonResponse
+     *
+     * @Patch("/edit/commissionnement/{id}")
      */
     public function editAction(Request $request, Commissionnement $commissionnement)
     {
@@ -420,6 +438,8 @@ class CommissionnementController extends Controller
      * @param Request $request
      * @param Commissionnement $commissionnement
      * @return \Symfony\Component\HttpFoundation\RedirectResponse | JsonResponse
+     *
+     * @Delete("/delete/commissionnement/{id}")
      */
     public function deleteAction(Request $request, Commissionnement $commissionnement)
     {
@@ -462,15 +482,5 @@ class CommissionnementController extends Controller
         //----------------------------------------------------------------------------------------
     }
 
-    public function deleteFromListAction(Commissionnement $commissionnement)
-    {
-        $this->deleteSecurity($commissionnement);
-        $em = $this->getDoctrine()->getManager();
-        $em->remove($commissionnement);
-        $em->flush();
-
-        return $this->redirectToRoute('apm_marketing_commissionnement_index');
-    }
-    //----------------------------------------------------------------------------------------
 }
 

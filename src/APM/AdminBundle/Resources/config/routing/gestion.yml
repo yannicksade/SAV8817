@@ -1,3 +1,0 @@
-apm_admin_gestion_index:
-    path:     /
-    defaults: { _controller: APMAdminBundle:Gestion:index }

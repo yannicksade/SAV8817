@@ -5,7 +5,7 @@ namespace APM\VenteBundle\Controller;
 use APM\TransportBundle\Entity\Livraison;
 use APM\UserBundle\Entity\Utilisateur_avm;
 use APM\VenteBundle\Entity\Boutique;
-use APM\VenteBundle\Entity\Offre;
+
 use APM\VenteBundle\Entity\Transaction;
 use APM\VenteBundle\Entity\Transaction_produit;
 use APM\VenteBundle\Factory\TradeFactory;
@@ -15,10 +15,17 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
+use FOS\RestBundle\Controller\Annotations\RouteResource;
+use FOS\RestBundle\Controller\Annotations\Get;
+use FOS\RestBundle\Controller\Annotations\Post;
+use FOS\RestBundle\Controller\Annotations\Patch;
+use FOS\RestBundle\Controller\Annotations\Delete;
+use FOS\RestBundle\Controller\Annotations\Put;
+use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
 /**
  * Transaction controller.
- *
+ * @RouteResource("transaction", pluralize=false)
  */
 class TransactionController extends Controller
 {
@@ -39,28 +46,32 @@ class TransactionController extends Controller
      * @param Boutique $boutique
      * @param Livraison $livraison
      * @return \Symfony\Component\HttpFoundation\Response | JsonResponse
+     *
+     * @Get("/", name="s")
+     * @Get("/boutique/{id}", name="s_boutique")
+     * @Get("/livraison/{livraison_id}", name="s_livraison")
      */
-    public function indexAction(Request $request, Boutique $boutique = null, Livraison $livraison = null)
+    public function getAction(Request $request, Boutique $boutique = null, Livraison $livraison = null)
     {
         $this->listAndShowSecurity($boutique);
         /** @var Utilisateur_avm $user */
         $user = $this->getUser();
         if ($request->isXmlHttpRequest() && $request->getMethod() === "POST") {
             $q = $request->get('q');
-            $this->beneficiaire_filter = $request->request->has('beneficiaire_filter') ? $request->request->get('beneficiaire_filter') : "";
-            $this->code_filter = $request->request->has('code_filter') ? $request->request->get('code_filter') : "";
-            $this->nature_filter = $request->request->has('nature_filter') ? $request->request->get('nature_filter') : "";
-            $this->etat_filter = $request->request->has('etat_filter') ? $request->request->get('etat_filter') : "";
-            $this->montant_filter = $request->request->has('montant_filter') ? $request->request->get('montant_filter') : "";
+            $this->beneficiaire_filter = $request->query->has('beneficiaire_filter') ? $request->query->get('beneficiaire_filter') : "";
+            $this->code_filter = $request->query->has('code_filter') ? $request->query->get('code_filter') : "";
+            $this->nature_filter = $request->query->has('nature_filter') ? $request->query->get('nature_filter') : "";
+            $this->etat_filter = $request->query->has('etat_filter') ? $request->query->get('etat_filter') : "";
+            $this->montant_filter = $request->query->has('montant_filter') ? $request->query->get('montant_filter') : "";
 
-            $this->shipped_filter = $request->request->has('shipped_filter') ? $request->request->get('shipped_filter') : "";
-            $this->boutiqueBeneficiaire_filter = $request->request->has('boutiqueBeneficiaire_filter') ? $request->request->get('boutiqueBeneficiaire_filter') : "";
-            $this->boutique_filter = $request->request->has('boutique_filter') ? $request->request->get('boutique_filter') : "";
-            $this->transactionProduit_filter = $request->request->has('transactionProduit_filter') ? $request->request->get('transactionProduit_filter') : "";
-            $this->produit_filter = $request->request->has('produit_filter') ? $request->request->get('produit_filter') : "";
+            $this->shipped_filter = $request->query->has('shipped_filter') ? $request->query->get('shipped_filter') : "";
+            $this->boutiqueBeneficiaire_filter = $request->query->has('boutiqueBeneficiaire_filter') ? $request->query->get('boutiqueBeneficiaire_filter') : "";
+            $this->boutique_filter = $request->query->has('boutique_filter') ? $request->query->get('boutique_filter') : "";
+            $this->transactionProduit_filter = $request->query->has('transactionProduit_filter') ? $request->query->get('transactionProduit_filter') : "";
+            $this->produit_filter = $request->query->has('produit_filter') ? $request->query->get('produit_filter') : "";
 
-            $iDisplayLength = $request->request->has('length') ? $request->request->get('length') : -1;
-            $iDisplayStart = $request->request->has('start') ? intval($request->request->get('start')) : 0;
+            $iDisplayLength = $request->query->has('length') ? $request->query->get('length') : -1;
+            $iDisplayStart = $request->query->has('start') ? intval($request->query->get('start')) : 0;
             $json = array();
             $json['items'] = array();
             if ($q === "sent" || $q === "all") {
@@ -147,7 +158,7 @@ class TransactionController extends Controller
         } else {
             if (null !== $transaction) {//s'il ne s'agit pas de la boutique, il peut s'agit de l'auteur ou du bénéficiaire qui veut avoir des informations
                 $auteur = $transaction->getAuteur();
-                if ($beneficiaire) $beneficiaire = $transaction->getBeneficiaire();
+                $beneficiaire = $transaction->getBeneficiaire();
             } else {
                 $vendeur = $user; //autoriser l'utilisateur AVM si l'objet ne porte pas sur ressource dédiée: boutique
             }
@@ -277,6 +288,9 @@ class TransactionController extends Controller
      * @param Request $request
      * @param Boutique $boutique
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response | JsonResponse
+     *
+     * @Post("/new/transaction")
+     * @Post("/new/transaction/boutique/{id}", name="_boutique")
      */
     public function newAction(Request $request, Boutique $boutique = null)
     {
@@ -350,6 +364,8 @@ class TransactionController extends Controller
      * @param Request $request
      * @param Transaction $transaction
      * @return \Symfony\Component\HttpFoundation\Response
+     *
+     * @Get("/show/transaction/{id}")
      */
     public function showAction(Request $request, Transaction $transaction)
     {
@@ -398,6 +414,8 @@ class TransactionController extends Controller
      * @param Request $request
      * @param Transaction $transaction
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     *
+     * @Put("/edit/transaction/{id}")
      */
     public function editAction(Request $request, Transaction $transaction)
     {
@@ -496,6 +514,8 @@ class TransactionController extends Controller
      * @param Request $request
      * @param Transaction $transaction
      * @return \Symfony\Component\HttpFoundation\RedirectResponse | JsonResponse
+     *
+     * @Delete("/delete/transaction/{id}")
      */
     public function deleteAction(Request $request, Transaction $transaction)
     {
@@ -517,65 +537,6 @@ class TransactionController extends Controller
         }
 
         return $this->redirectToRoute('apm_vente_transaction_index');
-    }
-
-    public function deleteFromListAction(Transaction $transaction)
-    {
-        $this->editAndDeleteSecurity($transaction);
-        $em = $this->getDoctrine()->getManager();
-        $em->remove($transaction);
-        $em->flush();
-
-        return $this->redirectToRoute('apm_vente_transaction_index');
-    }
-
-    //créer une transaction produit liée à la création d'une transaction
-
-    public function listeOffresAction(Request $request, Transaction $transaction)
-    {
-        if ($request->isXmlHttpRequest()) {
-            $transaction_produits = $transaction->getTransactionProduits();
-            $json = array();
-            $json['items'] = array();
-            if (null !== $transaction_produits) {
-                /** @var Transaction_produit $transaction_produit */
-                foreach ($transaction_produits as $transaction_produit) {
-                    $offre = $transaction_produit->getProduit();
-                    array_push($json['items'], array(
-                        'value' => $offre->getId(),
-                        'text' => $offre->getDesignation(),
-                    ));
-                }
-            }
-            return $this->json(json_encode($json), 200);
-        } else {
-            $offres = array();
-            $categorie = null;
-            $vendeur = null;
-            $boutique = null;
-            $transaction_produits = $transaction->getTransactionProduits();
-            if (null !== $transaction_produits) {
-                /** @var Transaction_produit $transaction_produit */
-                foreach ($transaction_produits as $transaction_produit) {
-                    $anOffer = $transaction_produit->getProduit();
-                    $count = array_push($offres, $anOffer);
-                    if (0 !== $count) {
-                        $anOffer = $offres[0];
-                        if ($anOffer) {
-                            $vendeur = $anOffer->getVendeur();
-                            $boutique = $anOffer->getBoutique();
-                        }
-                    }
-                }
-            }
-        }
-        return $this->render('APMVenteBundle:transaction_produit:index.html.twig', array(
-            'offres' => $offres,
-            'boutique' => $boutique,
-            'categorie' => $categorie,
-            'vendeur' => $vendeur,
-            'transaction' => $transaction,
-        ));
     }
 
 }

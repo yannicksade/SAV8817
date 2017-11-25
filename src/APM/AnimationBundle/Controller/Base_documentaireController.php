@@ -11,10 +11,17 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use FOS\RestBundle\Controller\Annotations\RouteResource;
+use FOS\RestBundle\Controller\Annotations\Get;
+use FOS\RestBundle\Controller\Annotations\Post;
+use FOS\RestBundle\Controller\Annotations\Delete;
+use FOS\RestBundle\Controller\Annotations\Put;
+use FOS\RestBundle\Controller\Annotations\Patch;
+use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
 /**
  * Base_documentaire controller.
- *
+ * @RouteResource("document")
  */
 class Base_documentaireController extends Controller
 {
@@ -30,8 +37,10 @@ class Base_documentaireController extends Controller
      *Liste les documents de l'utilisateur
      * @param Request $request
      * @return \Symfony\Component\HttpFoundation\Response | JsonResponse
+     *
+     * @Get("/documents")
      */
-    public function indexAction(Request $request)
+    public function getAction(Request $request)
     {
         /** @var Utilisateur_avm $user */
         $user = $this->getUser();
@@ -148,6 +157,7 @@ class Base_documentaireController extends Controller
 
     /*
      * Rename and Download a file
+     * @Get("/download/document/{id}")
      */
     public function downloadFileAction(Base_documentaire $document)
     {
@@ -174,6 +184,8 @@ class Base_documentaireController extends Controller
      * Creates a new Base_documentaire entity.
      * @param Request $request
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response| JsonResponse
+     *
+     * @Post("/new/document")
      */
     public function newAction(Request $request)
     {
@@ -218,6 +230,8 @@ class Base_documentaireController extends Controller
      * Finds and displays a Base_documentaire entity.
      * @param Base_documentaire $document
      * @return \Symfony\Component\HttpFoundation\Response | JsonResponse
+     *
+     * @Get("/show/document/{id}")
      */
     public function showAction(Base_documentaire $document)
     {
@@ -263,6 +277,8 @@ class Base_documentaireController extends Controller
      * @param Request $request
      * @param Base_documentaire $document
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     *
+     * @Put("/edit/document/{id}")
      */
     public function editAction(Request $request, Base_documentaire $document)
     {
@@ -339,6 +355,8 @@ class Base_documentaireController extends Controller
      * @param Request $request
      * @param Base_documentaire $document
      * @return \Symfony\Component\HttpFoundation\RedirectResponse | JsonResponse
+     *
+     * @Delete("/delete/document/{id}")
      */
     public function deleteAction(Request $request, Base_documentaire $document)
     {
@@ -362,13 +380,4 @@ class Base_documentaireController extends Controller
         return $this->redirectToRoute('apm_animation_base_documentaire_index');
     }
 
-    public function deleteFromListAction(Base_documentaire $document)
-    {
-        $this->editAndDeleteSecurity($document);
-        $em = $this->getDoctrine()->getManager();
-        $em->remove($document);
-        $em->flush();
-
-        return $this->redirectToRoute('apm_animation_base_documentaire_index');
-    }
 }

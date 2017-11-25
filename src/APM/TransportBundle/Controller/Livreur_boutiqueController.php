@@ -10,10 +10,18 @@ use Doctrine\Common\Collections\Collection;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use FOS\RestBundle\Controller\Annotations\RouteResource;
+use FOS\RestBundle\Controller\Annotations\Get;
+use FOS\RestBundle\Controller\Annotations\Post;
+use FOS\RestBundle\Controller\Annotations\Delete;
+use FOS\RestBundle\Controller\Annotations\Patch;
+use Nelmio\ApiDocBundle\Annotation\ApiDoc;
+
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 
 /**
  * Livreur_boutique controller.
- *
+ * @RouteResource("livreur", pluralize=false)
  */
 class Livreur_boutiqueController extends Controller
 {
@@ -27,8 +35,10 @@ class Livreur_boutiqueController extends Controller
      *
      * @param Boutique $boutique
      * @return \Symfony\Component\HttpFoundation\Response | JsonResponse
+     *
+     * @Get("/livreurs/boutique/{id}", name="s_boutique")
      */
-    public function indexAction(Boutique $boutique)
+    public function getAction(Boutique $boutique)
     {
         $this->listeAndShowSecurity();
         if ($request->isXmlHttpRequest()) {
@@ -148,10 +158,13 @@ class Livreur_boutiqueController extends Controller
     // les boutiques sont responsables de la création des livreur_boutiques
 
     /**
+     * @ParamConverter("transporteur", options={"mapping":{"transporteur_id":"id"}})
      * @param Request $request
      * @param Boutique $boutique
      * @param Profile_transporteur $transporteur
      * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     *
+     * @Post("/new/livreur/boutique/{id}/transporteur/{transporteur_id}")
      */
     public function newAction(Request $request, Boutique $boutique, Profile_transporteur $transporteur)
     {
@@ -209,6 +222,8 @@ class Livreur_boutiqueController extends Controller
      * @param Request $request
      * @param Livreur_boutique $livreur_boutique
      * @return \Symfony\Component\HttpFoundation\Response | JsonResponse
+     *
+     * @Get("/show/livreur/{id}")
      */
     public function showAction(Request $request, Livreur_boutique $livreur_boutique)
     {
@@ -252,9 +267,10 @@ class Livreur_boutiqueController extends Controller
      * @param Request $request
      * @param Livreur_boutique $livreur_boutique
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response|JsonResponse
+     *
+     * @Post("/edit/livreur/{id}")
      */
-    public
-    function editAction(Request $request, Livreur_boutique $livreur_boutique)
+    public function editAction(Request $request, Livreur_boutique $livreur_boutique)
     {
         $this->editAndDeleteSecurity($livreur_boutique);
         $deleteForm = $this->createDeleteForm($livreur_boutique);
@@ -329,9 +345,10 @@ class Livreur_boutiqueController extends Controller
      * @param Request $request
      * @param Livreur_boutique $livreur_boutique
      * @return \Symfony\Component\HttpFoundation\RedirectResponse | JsonResponse
+     *
+     * @Delete("/delete/livreur/{id}")
      */
-    public
-    function deleteAction(Request $request, Livreur_boutique $livreur_boutique)
+    public function deleteAction(Request $request, Livreur_boutique $livreur_boutique)
     {
         $this->editAndDeleteSecurity($livreur_boutique);
         $em = $this->getDoctrine()->getManager();
@@ -351,18 +368,5 @@ class Livreur_boutiqueController extends Controller
 
         return $this->redirectToRoute('apm_transport_livreur_boutique_index', ['id' => $livreur_boutique->getBoutiqueProprietaire()->getId()]);
     }
-
-    public
-    function deleteFromListAction(Livreur_boutique $livreur_boutique)
-    {
-
-        $this->editAndDeleteSecurity($livreur_boutique);
-        $em = $this->getDoctrine()->getManager();
-        $em->remove($livreur_boutique);
-        $em->flush();
-
-        return $this->redirectToRoute('apm_transport_livreur_boutique_index', ['id' => $livreur_boutique->getBoutiqueProprietaire()->getId()]);
-    }
-
 
 }

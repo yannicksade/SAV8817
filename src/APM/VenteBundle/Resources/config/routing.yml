@@ -1,31 +1,36 @@
 apm_vente_boutique:
-    resource: "@APMVenteBundle/Resources/config/routing/boutique.yml"
-    prefix:   /vente/boutique
-
-apm_vente_homepage:
-    path:     /vente
-    defaults: { _controller: APMVenteBundle:Default:index }
+    type: rest
+    resource: APM\VenteBundle\Controller\BoutiqueController
+    name_prefix: api_vente_
 
 apm_vente_categorie:
-    resource: "@APMVenteBundle/Resources/config/routing/categorie.yml"
-    prefix:   /vente/categorie
+    type: rest
+    resource: APM\VenteBundle\Controller\CategorieController
+    name_prefix: api_vente_
 
 apm_vente_offre:
-    resource: "@APMVenteBundle/Resources/config/routing/offre.yml"
-    prefix:   /vente/offre
+    type: rest
+    resource: APM\VenteBundle\Controller\OffreController
+    name_prefix: api_vente_
 
 apm_vente_rabais_offre:
-    resource: "@APMVenteBundle/Resources/config/routing/rabais_offre.yml"
-    prefix:   /vente/rabais_offre
+    type: rest
+    resource: APM\VenteBundle\Controller\Rabais_offreController
+    name_prefix: api_vente_
 
 apm_vente_remise:
-    resource: "@APMVenteBundle/Resources/config/routing/remise.yml"
-    prefix:   /vente/remise
+    type: rest
+    resource: APM\VenteBundle\Controller\RemiseController
+    name_prefix: api_vente_
 
 apm_vente_transaction_produit:
-    resource: "@APMVenteBundle/Resources/config/routing/transaction_produit.yml"
-    prefix:   /vente/transaction_produit
+    type: rest
+    resource: APM\VenteBundle\Controller\Transaction_produitController
+    name_prefix: api_vente_
 
 apm_vente_transaction:
-    resource: "@APMVenteBundle/Resources/config/routing/transaction.yml"
-    prefix:   /vente/transaction
+    type: rest
+    resource: APM\VenteBundle\Controller\TransactionController
+    name_prefix: api_vente_
+
+    #resource="@FOSUserBundle/Resources/config/routing/security.xml"

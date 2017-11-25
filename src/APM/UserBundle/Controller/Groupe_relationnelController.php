@@ -13,10 +13,18 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Session;
+use FOS\RestBundle\Controller\Annotations\RouteResource;
+use FOS\RestBundle\Controller\Annotations\Get;
+use FOS\RestBundle\Controller\Annotations\Post;
+use FOS\RestBundle\Controller\Annotations\Patch;
+use FOS\RestBundle\Controller\Annotations\Delete;
+use FOS\RestBundle\Controller\Annotations\Put;
+use Nelmio\ApiDocBundle\Annotation\ApiDoc;
+
 
 /**
  * Groupe_relationnel controller.
- *
+ * @RouteResource("groupeRelationnel", pluralize=false)
  */
 class Groupe_relationnelController extends Controller
 {
@@ -34,8 +42,10 @@ class Groupe_relationnelController extends Controller
      * Liste tous les groupes relationnels crées par l'utilisateur
      * @param Request $request
      * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
+     *
+     * @Get("/", name="s")
      */
-    public function indexAction(Request $request)
+    public function getAction(Request $request)
     {
         $this->listAndShowSecurity();
         /** @var Utilisateur_avm $user */
@@ -226,6 +236,8 @@ class Groupe_relationnelController extends Controller
      * Creates a new Groupe_relationnel entity.
      * @param Request $request
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response | JsonResponse
+     *
+     * @Post("/new/grouperelationnel")
      */
     public function newAction(Request $request)
     {
@@ -294,6 +306,13 @@ class Groupe_relationnelController extends Controller
         //----------------------------------------------------------------------------------------
     }
 
+    /**
+     * @param Request $request
+     * @param Groupe_relationnel $groupe_relationnel
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     *
+     * @get("/show-image/grouperelationnel/{id}")
+     */
     public function showImageAction(Request $request, Groupe_relationnel $groupe_relationnel)
     {
         $this->listAndShowSecurity();
@@ -326,9 +345,10 @@ class Groupe_relationnelController extends Controller
      * @param Request $request
      * @param Groupe_relationnel $groupe_relationnel
      * @return \Symfony\Component\HttpFoundation\Response
+     *
+     * @Get("/show/grouperelationnel/{id}")
      */
-    public
-    function showAction(Request $request, Groupe_relationnel $groupe_relationnel)
+    public function showAction(Request $request, Groupe_relationnel $groupe_relationnel)
     {
         $this->listAndShowSecurity();
         if ($request->isXmlHttpRequest()) {
@@ -375,9 +395,10 @@ class Groupe_relationnelController extends Controller
      * @param Request $request
      * @param Groupe_relationnel $groupe_relationnel
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     *
+     * @Put("/edit/grouperelationnel/{id}")
      */
-    public
-    function editAction(Request $request, Groupe_relationnel $groupe_relationnel)
+    public function editAction(Request $request, Groupe_relationnel $groupe_relationnel)
     {
         $this->editAndDeleteSecurity($groupe_relationnel);
         if ($request->isXmlHttpRequest() && $request->getMethod() === "POST") {
@@ -439,10 +460,9 @@ class Groupe_relationnelController extends Controller
 
     /**
      * @param Groupe_relationnel $groupe
-     * @internal param Commentaire $commentaire
+     *
      */
-    private
-    function editAndDeleteSecurity($groupe)
+    private function editAndDeleteSecurity($groupe)
     {
         //---------------------------------security-----------------------------------------------
         // Unable to access the controller unless you have a USERAVM role
@@ -464,9 +484,10 @@ class Groupe_relationnelController extends Controller
      * @param Request $request
      * @param Groupe_relationnel $groupe_relationnel
      * @return \Symfony\Component\HttpFoundation\RedirectResponse | JsonResponse
+     *
+     * @Delete("/delete/grouperelationnel/{id}")
      */
-    public
-    function deleteAction(Request $request, Groupe_relationnel $groupe_relationnel)
+    public function deleteAction(Request $request, Groupe_relationnel $groupe_relationnel)
     {
         $this->editAndDeleteSecurity($groupe_relationnel);
         $em = $this->getDoctrine()->getManager();
@@ -484,17 +505,6 @@ class Groupe_relationnelController extends Controller
             $em->remove($groupe_relationnel);
             $em->flush();
         }
-
-        return $this->redirectToRoute('apm_user_groupe-relationnel_index');
-    }
-
-    public
-    function deleteFromListAction(Groupe_relationnel $groupe_relationnel)
-    {
-        $this->editAndDeleteSecurity($groupe_relationnel);
-        $em = $this->getDoctrine()->getManager();
-        $em->remove($groupe_relationnel);
-        $em->flush();
 
         return $this->redirectToRoute('apm_user_groupe-relationnel_index');
     }

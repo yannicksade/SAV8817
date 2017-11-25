@@ -11,10 +11,18 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Session;
+use FOS\RestBundle\Controller\Annotations\RouteResource;
+use FOS\RestBundle\Controller\Annotations\Get;
+use FOS\RestBundle\Controller\Annotations\Post;
+use FOS\RestBundle\Controller\Annotations\Patch;
+use FOS\RestBundle\Controller\Annotations\Delete;
+use FOS\RestBundle\Controller\Annotations\Put;
+use Nelmio\ApiDocBundle\Annotation\ApiDoc;
+
 
 /**
  * Individu_to_groupe controller.
- *
+ * @RouteResource("individu-group", pluralize=false)
  */
 class Individu_to_groupeController extends Controller
 {
@@ -30,8 +38,10 @@ class Individu_to_groupeController extends Controller
      * @param Request $request
      * @param Groupe_relationnel $groupe_relationnel
      * @return \Symfony\Component\HttpFoundation\Response
+     *
+     * @Get("/group/{id}", name="s_groupe")
      */
-    public function indexAction(Request $request, Groupe_relationnel $groupe_relationnel)
+    public function getAction(Request $request, Groupe_relationnel $groupe_relationnel)
     {
         $this->listeAndShowSecurity($groupe_relationnel);
         $individu_to_groupes = $groupe_relationnel->getGroupeIndividus();
@@ -166,6 +176,8 @@ class Individu_to_groupeController extends Controller
      * @param Request $request
      * @param Groupe_relationnel $groupe_relationnel
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     *
+     * @Get("/new/relation/group/{id}", name="_group")
      */
     public function newAction(Request $request, Groupe_relationnel $groupe_relationnel)
     {
@@ -246,6 +258,8 @@ class Individu_to_groupeController extends Controller
      * @param Request $request
      * @param Individu_to_groupe $individu_to_groupe
      * @return \Symfony\Component\HttpFoundation\Response
+     *
+     * @Get("/show/relation/{id}")
      */
     public function showAction(Request $request, Individu_to_groupe $individu_to_groupe)
     {
@@ -288,6 +302,8 @@ class Individu_to_groupeController extends Controller
      * @param Request $request
      * @param Individu_to_groupe $individu_to_groupe
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     *
+     * @Put("/edit/relation/{id}")
      */
     public function editAction(Request $request, Individu_to_groupe $individu_to_groupe)
     {
@@ -355,6 +371,8 @@ class Individu_to_groupeController extends Controller
      * @param Request $request
      * @param Individu_to_groupe $individu_to_groupe
      * @return \Symfony\Component\HttpFoundation\RedirectResponse | JsonResponse
+     *
+     * @Delete("/delete/relation/{id}")
      */
     public function deleteAction(Request $request, Individu_to_groupe $individu_to_groupe)
     {
@@ -374,16 +392,6 @@ class Individu_to_groupeController extends Controller
             $em->flush();
         }
 
-        return $this->redirectToRoute('apm_user_individu-to-groupe_index');
-    }
-
-    public function deleteFromListAction(Individu_to_groupe $individu_to_groupe)
-    {
-        $this->editAndDeleteSecurity($individu_to_groupe);
-
-        $em = $this->getDoctrine()->getManager();
-        $em->remove($individu_to_groupe);
-        $em->flush();
         return $this->redirectToRoute('apm_user_individu-to-groupe_index');
     }
 }

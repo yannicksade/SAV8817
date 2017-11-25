@@ -11,10 +11,17 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Session;
+use FOS\RestBundle\Controller\Annotations\RouteResource;
+use FOS\RestBundle\Controller\Annotations\Get;
+use FOS\RestBundle\Controller\Annotations\Post;
+use FOS\RestBundle\Controller\Annotations\Delete;
+use FOS\RestBundle\Controller\Annotations\Put;
+use FOS\RestBundle\Controller\Annotations\Patch;
+use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
 /**
  * Specification_achat controller.
- *
+ * @RouteResource("specification", pluralize=false)
  */
 class Specification_achatController extends Controller
 {
@@ -35,8 +42,11 @@ class Specification_achatController extends Controller
      * Liste les spécifications sur une offre
      * @param Offre $offre
      * @return \Symfony\Component\HttpFoundation\Response| JsonResponse
+     *
+     * @Get("/specifications", name="s")
+     * @Get("/specifications/offre/{id}", name="s_offre")
      */
-    public function indexAction(Offre $offre = null)
+    public function getAction(Offre $offre = null)
     {
         $this->listAndShowSecurity($offre);
         if (null !== $offre) {
@@ -227,6 +237,8 @@ class Specification_achatController extends Controller
      * @param Request $request
      * @param Offre $offre
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response| JsonResponse
+     *
+     * @Post("/new/specification/offre/{id}")
      */
     public function newAction(Request $request, Offre $offre)
     {
@@ -275,6 +287,8 @@ class Specification_achatController extends Controller
      * @param Request $request
      * @param Specification_achat $specification
      * @return \Symfony\Component\HttpFoundation\Response| JsonResponse
+     *
+     * @Get("/show/specification/{id}")
      */
     public function showAction(Request $request, Specification_achat $specification)
     {
@@ -322,6 +336,8 @@ class Specification_achatController extends Controller
      * @param Request $request
      * @param Specification_achat $specification_achat
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     *
+     * @Put("/edit/specification/{id}")
      */
     public function editAction(Request $request, Specification_achat $specification_achat)
     {
@@ -395,6 +411,7 @@ class Specification_achatController extends Controller
      * @param Request $request
      * @param Specification_achat $specification_achat
      * @return \Symfony\Component\HttpFoundation\RedirectResponse | JsonResponse
+     * @Delete("/delete/specification/{id}")
      */
     public function deleteAction(Request $request, Specification_achat $specification_achat)
     {
@@ -429,17 +446,4 @@ class Specification_achatController extends Controller
 
     }
 
-    /**
-     * @param Specification_achat $specification_achat
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse
-     */
-    public function deleteFromListAction(Specification_achat $specification_achat)
-    {
-        $this->editAndDeleteSecurity($specification_achat);
-        $em = $this->getDoctrine()->getManager();
-        $em->remove($specification_achat);
-        $em->flush();
-
-        return $this->redirectToRoute('apm_achat_specification_achat_index');
-    }
 }

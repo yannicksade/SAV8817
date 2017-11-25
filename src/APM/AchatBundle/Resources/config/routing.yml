@@ -1,15 +1,14 @@
 apm_achat_groupe:
-    resource: "@APMAchatBundle/Resources/config/routing/groupe_offre.yml"
-    prefix:   /achat/groupe-offre
+    type: rest
+    resource: APM\AchatBundle\Controller\Groupe_offreController
+    name_prefix:   api_achat_
 
 apm_achat_service_apres_vente:
-    resource: "@APMAchatBundle/Resources/config/routing/service_apres_vente.yml"
-    prefix:   /achat/service_apres_vente
+    type: rest
+    resource: APM\AchatBundle\Controller\Service_apres_venteController
+    name_prefix:  api_achat_
 
 apm_achat_specification_achat:
-    resource: "@APMAchatBundle/Resources/config/routing/specification_achat.yml"
-    prefix:   /achat/specification
-
-apm_achat_homepage:
-    path:     /achat
-    defaults: { _controller: "APMAchatBundle:Default:index" }
+    type: rest
+    resource: APM\AchatBundle\Controller\Specification_achatController
+    name_prefix:  api_achat_

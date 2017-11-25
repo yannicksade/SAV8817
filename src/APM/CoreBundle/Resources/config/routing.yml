@@ -1,137 +1,115 @@
 
-#-------- ATTENTION: creer toute route dans le path correct pour garantir un accès dédiée et sécurisé ex: /easy-trade/user dédié aux utilisateurs ayant le role USERAVM---------
-
-apm_core_homepage:
-    path:     / #masque fos_user.registration_register et redirige la requete
-    defaults: { _controller: APMCoreBundle:Default:index }
-
-apm_core_relogin:
-    path:     /relogin
-    defaults: { _controller: APMCoreBundle:LockedScreen:relogin }
-    methods:  GET
-
-apm_core_locked-screen:
-    path:     /lock-dashboard
-    defaults: { _controller: APMCoreBundle:LockedScreen:index }
-    methods:  GET
+#-------- ATTENTION: creer toute route dans le path correct pour garantir un accès dédiée et sécurisé ex: /user dédié aux utilisateurs ayant le role USERAVM---------
 
 #--------------------- pages utilisateur ----------------------------------------------
-apm_core_user-registration:
-    resource: "@APMCoreBundle/Resources/config/user/registration.yml"
-    prefix:   /register/utilisateur-avm
-
-apm_core_user-profile:
-    resource: "@APMCoreBundle/Resources/config/user/profile.yml"
-    prefix:   /profile
-
 apm_core_shop:
     resource: "@APMCoreBundle/Resources/config/routing/shop.yml"
-    prefix:   /easy-trade/costumer/shop
+    prefix:   /costumer/shop
 
 apm_core_main:
     resource: "@APMCoreBundle/Resources/config/routing/main-site.yml"
-    prefix:   /easy-trade/costumer/main-site
+    prefix:   /costumer/main-site
 
 apm_core_user-dashboard:
     resource: "@APMCoreBundle/Resources/config/routing/user-dashboard.yml"
-    prefix:   /easy-trade/user/dashboard
+    prefix:   /user/dashboard
 
 
 #----------- ajouter d'autre accessibilité aux droits des utilisateurs AVM ici ---------
-#------- ex: /easy-trade/user/...
+#------- ex: /user/...
 
 
 #-------------------------- pages du staff ------------------------------------------------
 apm_core_staff_analyste:
     resource: "@APMCoreBundle/Resources/config/staff/analyste.yml"
-    prefix:   /easy-trade/staff/analyste
+    prefix:   /staff/analyste
 
 apm_core_staff_auditeur:
     resource: "@APMCoreBundle/Resources/config/staff/auditeur.yml"
-    prefix:   /easy-trade/staff/auditeur
+    prefix:   /staff/auditeur
 
 apm_core_staff_explorateur:
     resource: "@APMCoreBundle/Resources/config/staff/explorateur.yml"
-    prefix:   /easy-trade/staff/explorateur
+    prefix:   /staff/explorateur
 
 apm_core_staff_comptable:
     resource: "@APMCoreBundle/Resources/config/staff/comptable.yml"
-    prefix:   /easy-trade/staff/comptable
+    prefix:   /staff/comptable
 
 apm_core_staff_super-admin:
     resource: "@APMCoreBundle/Resources/config/staff/super-admin.yml"
-    prefix:   /easy-trade/staff/superAdmin
+    prefix:   /staff/superAdmin
 
 #--------------------------- pages du gerant ou du proprietaire de boutique ---------------
 apm_core_gerant-boutique:
     resource: "@APMCoreBundle/Resources/config/user/boutique.yml"
-    prefix:   /easy-trade/gerant-boutique
+    prefix:   /gerant-boutique
 
 apm_core_conseillerA2:
     resource: "@APMCoreBundle/Resources/config/user/conseillera2.yml"
-    prefix:   /easy-trade/conseiller
+    prefix:   /conseiller
 
 apm_core_transport:
     resource: "@APMCoreBundle/Resources/config/user/transport.yml"
-    prefix:   /easy-trade/transport
+    prefix:   /transport
 
 #---------------------------------------- gérer les Fonctionnalités du systeme------------------------------------------------
 apm_core_fonction_offre:
     resource: "@APMCoreBundle/Resources/config/fonctions/offre.yml"
-    prefix:   /easy-trade/user/offre
+    prefix:   /user/offre
 
 apm_core_fonction_boutique:
     resource: "@APMCoreBundle/Resources/config/fonctions/boutique.yml"
-    prefix:   /easy-trade/user/boutique
+    prefix:   /user/boutique
 
 #--------------------- public shop -------------------------------
 easy_t_shop_homepage:
-    path:     /easy-trade/costumer/shop
+    path:     /costumer/shop
     defaults: { _controller: APMCoreBundle:Shop/Home:index }
 
 easy_t_products:
     resource: "@APMCoreBundle/Resources/config/shop/products.yml"
-    prefix:   /easy-trade/costumer/shop/products
+    prefix:   /costumer/shop/products
 
 easy_t_shopping:
     resource: "@APMCoreBundle/Resources/config/shop/shopping.yml"
-    prefix:   /easy-trade/costumer/shop/shopping
+    prefix:   /costumer/shop/shopping
 
 easy_t_checkout:
     resource: "@APMCoreBundle/Resources/config/shop/checkout.yml"
-    prefix:   /easy-trade/costumer/shop/checkout
+    prefix:   /costumer/shop/checkout
 
 #--------------------------------- Public platform --------------------------------
 evm_homepage:
-    path:     /easy-trade/costumer/platform
+    path:     /costumer/platform
     defaults: { _controller: APMCoreBundle:Platform/Default:index }
 evm_homepage_empty:
-    path:     /easy-trade/costumer/platform/empty
+    path:     /costumer/platform/empty
     defaults: { _controller: APMCoreBundle:Platform/Default:empty }
 evm_boutique:
-    prefix:   /easy-trade/costumer/platform/Boutique
+    prefix:   /costumer/platform/Boutique
     resource: "@APMCoreBundle/Resources/config/platform/boutique.yml"
 evm_produit:
-    prefix:   /easy-trade/costumer/platform/Produit
+    prefix:   /costumer/platform/Produit
     resource: "@APMCoreBundle/Resources/config/platform/produit.yml"
 evm_transporteur:
-    prefix:   /easy-trade/costumer/platform/Transporteur
+    prefix:   /costumer/platform/Transporteur
     resource: "@APMCoreBundle/Resources/config/platform/transporteur.yml"
 evm_documentation:
-    prefix:   /easy-trade/costumer/platform/Documentation
+    prefix:   /costumer/platform/Documentation
     resource: "@APMCoreBundle/Resources/config/platform/documentation.yml"
 evm_commission:
-    prefix:   /easy-trade/costumer/platform/Commission
+    prefix:   /costumer/platform/Commission
     resource: "@APMCoreBundle/Resources/config/platform/commission.yml"
 evm_conseille:
-    prefix:   /easy-trade/costumer/platform/Conseille
+    prefix:   /costumer/platform/Conseille
     resource: "@APMCoreBundle/Resources/config/platform/conseille.yml"
 evm_region:
-    prefix:   /easy-trade/costumer/platform/Region
+    prefix:   /costumer/platform/Region
     resource: "@APMCoreBundle/Resources/config/platform/region.yml"
 evm_categorie:
-    prefix:   /easy-trade/costumer/platform/Categorie
+    prefix:   /costumer/platform/Categorie
     resource: "@APMCoreBundle/Resources/config/platform/categorie.yml"
 evm_login_util:
-    prefix:   /easy-trade/costumer/platform/Connexion
+    prefix:   /costumer/platform/Connexion
     resource: "@APMCoreBundle/Resources/config/platform/connexion.yml"

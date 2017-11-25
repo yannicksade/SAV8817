@@ -1,7 +1,4 @@
 apm_animation_base_documentaire:
-    resource: "@APMAnimationBundle/Resources/config/routing/base_documentaire.yml"
-    prefix:   /animation/base-documentaire
-
-apm_animation_homepage:
-    path:     /animation
-    defaults: { _controller: APMAnimationBundle:Default:index }
+    type: rest
+    resource:  APM\AnimationBundle\Controller\Base_documentaireController
+    name_prefix:   api_documentation_

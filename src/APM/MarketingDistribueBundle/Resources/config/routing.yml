@@ -1,19 +1,19 @@
-apm_marketing_distribue_commissionnement:
-    resource: "@APMMarketingDistribueBundle/Resources/config/routing/commissionnement.yml"
-    prefix:   /marketing/commissionnement
+apm_marketing_commissionnement:
+    type: rest
+    resource: APM\MarketingDistribueBundle\Controller\CommissionnementController
+    name_prefix: api_marketing_
 
-apm_marketing_distribue_conseiller:
-    resource: "@APMMarketingDistribueBundle/Resources/config/routing/conseiller.yml"
-    prefix:   /marketing/conseiller
+apm_marketing_conseiller:
+    type: rest
+    resource: APM\MarketingDistribueBundle\Controller\ConseillerController
+    name_prefix: api_marketing_
 
-apm_marketing_distribue_quota:
-    resource: "@APMMarketingDistribueBundle/Resources/config/routing/quota.yml"
-    prefix:   /marketing/quota
+apm_marketing_quota:
+    type: rest
+    resource: APM\MarketingDistribueBundle\Controller\QuotaController
+    name_prefix: api_marketing_
 
-apm_marketing_distribue_homepage:
-    path:     /marketing
-    defaults: { _controller: APMMarketingDistribueBundle:Default:index }
-
-apm_marketing_distribue_conseiller_boutique:
-    resource: "@APMMarketingDistribueBundle/Resources/config/routing/conseiller_boutique.yml"
-    prefix:   /marketing/conseiller-boutique
+apm_marketing_conseiller_boutique:
+    type: rest
+    resource: APM\MarketingDistribueBundle\Controller\Conseiller_boutiqueController
+    name_prefix:   api_marketing_

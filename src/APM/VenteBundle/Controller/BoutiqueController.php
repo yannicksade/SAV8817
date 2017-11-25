@@ -9,16 +9,25 @@ use APM\VenteBundle\Entity\Boutique;
 use APM\VenteBundle\Entity\Offre;
 use APM\VenteBundle\Factory\TradeFactory;
 use Doctrine\Common\Collections\Collection;
+use FOS\RestBundle\Controller\FOSRestController;
+use FOS\RestBundle\Routing\ClassResourceInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Session;
+use FOS\RestBundle\Controller\Annotations\RouteResource;
+use FOS\RestBundle\Controller\Annotations\Get;
+use FOS\RestBundle\Controller\Annotations\Post;
+use FOS\RestBundle\Controller\Annotations\Put;
+use FOS\RestBundle\Controller\Annotations\Patch;
+use FOS\RestBundle\Controller\Annotations\Delete;
+use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
 /**
  * Boutique controller.
- *
+ * @RouteResource("boutique", pluralize=false)
  */
-class BoutiqueController extends Controller
+class BoutiqueController extends FOSRestController implements ClassResourceInterface
 {
     private $designation_filter;
     private $code_filter;
@@ -33,8 +42,11 @@ class BoutiqueController extends Controller
      * @param Request $request
      * @param Utilisateur_avm|null $user
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
+     *
+     * @Get("/", name="s")
+     * @Get("/user/{id}", name="s_user")
      */
-    public function indexAction(Request $request, Utilisateur_avm $user = null)
+    public function getAction(Request $request, Utilisateur_avm $user = null)
     {
         $this->personalSecurity();
         /** @var Utilisateur_avm $user */
@@ -49,12 +61,12 @@ class BoutiqueController extends Controller
         $boutiquesGerant = $user->getBoutiquesGerant();
         if ($request->isXmlHttpRequest() && $request->getMethod() === "POST") {
             $p = $request->get('p');
-            $this->nationalite_filter = $request->request->has('nationalite_filter') ? $request->request->get('nationalite_filter') : "";
-            $this->code_filter = $request->request->has('code_filter') ? $request->request->get('code_filter') : "";
-            $this->designation_filter = $request->request->has('designation_filter') ? $request->request->get('designation_filter') : "";
-            $this->etat_filter = $request->request->has('etat_filter') ? $request->request->get('etat_filter') : "";
-            $iDisplayLength = $request->request->has('length') ? $request->request->get('length') : -1;
-            $iDisplayStart = $request->request->has('start') ? intval($request->request->get('start')) : 0;
+            $this->nationalite_filter = $request->query->has('nationalite_filter') ? $request->query->get('nationalite_filter') : "";
+            $this->code_filter = $request->query->has('code_filter') ? $request->query->get('code_filter') : "";
+            $this->designation_filter = $request->query->has('designation_filter') ? $request->query->get('designation_filter') : "";
+            $this->etat_filter = $request->query->has('etat_filter') ? $request->query->get('etat_filter') : "";
+            $iDisplayLength = $request->query->has('length') ? $request->query->get('length') : -1;
+            $iDisplayStart = $request->query->has('start') ? intval($request->query->get('start')) : 0;
 
             $json = array();
             $json['items'] = array();
@@ -197,6 +209,8 @@ class BoutiqueController extends Controller
      * Creates a new Boutique entity.
      * @param Request $request
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response | JsonResponse
+     *
+     * @Post("/new/boutique")
      */
     public function newAction(Request $request)
     {
@@ -311,6 +325,8 @@ class BoutiqueController extends Controller
      * @param Request $request
      * @param Boutique $boutique
      * @return \Symfony\Component\HttpFoundation\Response | JsonResponse
+     *
+     * @Get("/show/boutique/{id}")
      */
     public
     function showAction(Request $request, Boutique $boutique)
@@ -367,6 +383,8 @@ class BoutiqueController extends Controller
      * @param Request $request
      * @param Boutique $boutique
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     *
+     * @Put("/edit/boutique/{id}")
      */
     public
     function editAction(Request $request, Boutique $boutique)
@@ -493,6 +511,8 @@ class BoutiqueController extends Controller
      * @param Request $request
      * @param Boutique $boutique
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
+     *
+     * @Delete("/delete/boutique/{id}")
      */
     public
     function deleteAction(Request $request, Boutique $boutique)
@@ -512,17 +532,6 @@ class BoutiqueController extends Controller
             $em->remove($boutique);
             $em->flush();
         }
-        return $this->redirectToRoute('apm_vente_boutique_index');
-    }
-
-    public
-    function deleteFromListAction(Boutique $boutique)
-    {
-        $this->editAndDeleteSecurity($boutique);
-        $em = $this->getDoctrine()->getManager();
-        $em->remove($boutique);
-        $em->flush();
-
         return $this->redirectToRoute('apm_vente_boutique_index');
     }
 }

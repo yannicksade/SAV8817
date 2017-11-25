@@ -18,7 +18,18 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
+use FOS\RestBundle\Controller\Annotations\RouteResource;
+use FOS\RestBundle\Controller\Annotations\Get;
+use FOS\RestBundle\Controller\Annotations\Post;
+use FOS\RestBundle\Controller\Annotations\Delete;
+use FOS\RestBundle\Controller\Annotations\Put;
+use FOS\RestBundle\Controller\Annotations\Patch;
+use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
+/**
+ * Class Transporteur_zoneInterventionController
+ * @RouteResource("transporteur-zoneIntervention", pluralize=false)
+ */
 class Transporteur_zoneInterventionController extends Controller
 {
     private $transporteur_filter;
@@ -32,8 +43,11 @@ class Transporteur_zoneInterventionController extends Controller
      * @param Profile_transporteur $transporteur
      * @param Zone_intervention $zone_intervention
      * @return \Symfony\Component\HttpFoundation\Response | JsonResponse
+     *
+     * @Get("/transporteurs/zone/{zone_id}", name="s_zone")
+     * @Get("/zones/transporteur/{id}", name="s_transporteur")
      */
-    public function indexAction(Request $request, Profile_transporteur $transporteur = null, Zone_intervention $zone_intervention = null)
+    public function getAction(Request $request, Profile_transporteur $transporteur = null, Zone_intervention $zone_intervention = null)
     {
         $this->listeAndShowSecurity();
         if (null !== $transporteur) {
@@ -59,7 +73,7 @@ class Transporteur_zoneInterventionController extends Controller
                     'zoneIntervention' => $transporteur_zone->getZoneIntervention()->getId(),
                 ));
             }
-            return $this->json(json_encode($json),200);
+            return $this->json(json_encode($json), 200);
         }
         return $this->render('APMTransportBundle:transporteur_zone:index.html.twig', array(
                 'transporteurs_zones' => $transporteurs_zones,
@@ -132,8 +146,11 @@ class Transporteur_zoneInterventionController extends Controller
      * @param Profile_transporteur $transporteur
      * @param Zone_intervention|null $zone_intervention
      * @return \Symfony\Component\HttpFoundation\Response | JsonResponse
+     *
+     * @Post("/new/transporteur/{id}/zone/{zone_id}", name="_transporteur_zone")
+     *
      */
-    public function newAction(Request $request, Profile_transporteur $transporteur = null, Zone_intervention $zone_intervention = null)
+    public function newAction(Request $request, Profile_transporteur $transporteur, Zone_intervention $zone_intervention)
     {
         $this->createSecurity($transporteur);
         /** @var Transporteur_zoneintervention $transporteur_zoneIntervention */
@@ -142,7 +159,7 @@ class Transporteur_zoneInterventionController extends Controller
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             if (null !== $zone_intervention) $transporteur_zoneIntervention->setZoneIntervention($zone_intervention);
-           if(null !== $transporteur) $transporteur_zoneIntervention->setTransporteur($transporteur);
+            if (null !== $transporteur) $transporteur_zoneIntervention->setTransporteur($transporteur);
             $em = $this->getDoctrine()->getManager();
             $em->persist($transporteur_zoneIntervention);
             $em->flush();
@@ -187,6 +204,8 @@ class Transporteur_zoneInterventionController extends Controller
      * @param Request $request
      * @param Transporteur_zoneintervention $transporteur_zoneintervention
      * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
+     *
+     * @Get("/show/transporteur-zone/{id}")
      */
     public function showAction(Request $request, Transporteur_zoneintervention $transporteur_zoneintervention)
     {
@@ -243,6 +262,13 @@ class Transporteur_zoneInterventionController extends Controller
             ->getForm();
     }
 
+    /**
+     * @param Request $request
+     * @param Transporteur_zoneintervention $transporteur_zoneintervention
+     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     *
+     * @Post("/edit/transporteur-zone/{id}")
+     */
     public function editAction(Request $request, Transporteur_zoneintervention $transporteur_zoneintervention)
     {
         $this->editAndDeleteSecurity($transporteur_zoneintervention);
@@ -294,6 +320,8 @@ class Transporteur_zoneInterventionController extends Controller
      * @param Request $request
      * @param Transporteur_zoneintervention $transporteur_zoneintervention
      * @return \Symfony\Component\HttpFoundation\RedirectResponse | JsonResponse
+     *
+     * @Post("/delete/transporteur-zone/{id}")
      */
     public function deleteAction(Request $request, Transporteur_zoneintervention $transporteur_zoneintervention)
     {

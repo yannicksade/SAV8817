@@ -3,15 +3,71 @@ services:
     apm_core.packages_maker:
         class: APM\CoreBundle\Util\PackagesMaker
         calls:
-              - ['setValues', ['%images_url%',"%docs_url%", "%resolve_images_url%"]]
+              - ['setValues', [%images_url%,%docs_url%, %resolve_images_url%]]
 
     apm_core.vich_listener_remove:
-        class: APM\CoreBundle\EventListener\VichEventListener
-        arguments: ['@liip_imagine.cache.manager', '%basic_filter%']
+        class: APM\CoreBundle\Event\Listener\VichEventListener
+        arguments: ['@liip_imagine.cache.manager', %basic_filter%]
         tags:
-            - { name: kernel.event_listener, event: vich_uploader.pre_remove }
+             - { name: kernel.event_listener, event: vich_uploader.pre_remove }
 
     apm_core.crop_image:
         class: APM\CoreBundle\Util\CropMaker
         calls:
-              - ['setContainer', ['@service_container', '%basic_filter%']]
+              - ['setContainer', ['@service_container', %basic_filter%]]
+
+    apm_core_api.event.jwt_created_listener:
+        class: APM\CoreBundle\Event\Listener\JWTCreatedListener
+        arguments: ['@request_stack']
+        tags:
+             - { name: kernel.event_listener, event: lexik_jwt_authentication.on_jwt_created, method: onJWTCreated }
+
+#Events::JWT_DECODED  - Validating data in the JWT payload. perform your additional operation
+    apm_core_api.event.jwt_encoded_listener:
+        class: APM\CoreBundle\Event\Listener\JWTEncodedListener
+        tags:
+            - { name: kernel.event_listener, event: lexik_jwt_authentication.on_jwt_encoded, method: onJWTEncoded }
+
+#Events::JWT_DECODED  - Validating data in the JWT payload. perform your additional operation
+    apm_core_api.event.jwt_decoded_listener:
+        class: APM\CoreBundle\Event\Listener\JWTDecodedListener
+        arguments: ['@request_stack']
+        tags:
+            - { name: kernel.event_listener, event: lexik_jwt_authentication.on_jwt_decoded, method: onJWTDecoded }
+
+
+#Events::AUTHENTICATION_SUCCESS - Adding public data to the JWT response
+    apm_core_api.event.authentication_success_listener:
+        class: APM\CoreBundle\Event\Listener\AuthenticationSuccessListener
+        tags:
+            - { name: kernel.event_listener, event: lexik_jwt_authentication.on_authentication_success, method: onAuthenticationSuccessResponse }
+
+#Events::AUTHENTICATION_FAILURE - Customizing the failure response body
+    apm_core_api.event.authentication_failure_listener:
+        class: APM\CoreBundle\Event\Listener\AuthenticationFailureListener
+        tags:
+            - { name: kernel.event_listener, event: lexik_jwt_authentication.on_authentication_failure, method: onAuthenticationFailureResponse }
+
+#Events::JWT_INVALID - Customizing the invalid token response
+    apm_core_api.event.jwt_invalid_listener:
+        class:  APM\CoreBundle\Event\Listener\JWTInvalidListener
+        tags:
+            - { name: kernel.event_listener, event: lexik_jwt_authentication.on_jwt_invalid, method: onJWTInvalid }
+
+#Events::JWT_NOT_FOUND - Customizing the response on token not found
+    apm_core_api.event.jwt_not_found_listener:
+        class: APM\CoreBundle\Event\Listener\JWTNotFoundListener
+        tags:
+            - { name: kernel.event_listener, event: lexik_jwt_authentication.on_jwt_not_found, method: onJWTNotFound }
+
+#Events::JWT_EXPIRED - Customizing the response message on expired token
+    apm_core_api.event.jwt_expired_listener:
+        class: APM\CoreBundle\Event\Listener\JWTExpiredListener
+        tags:
+            - { name: kernel.event_listener, event: lexik_jwt_authentication.on_jwt_expired, method: onJWTExpired }
+
+#Events::JWT_AUTHENTICATED - Customizing your security token by adding your own data
+#    apm_core_api.event.jwt_authenticated_listener:
+#       class: APM\CoreBundle\Event\Listener\JWTAuthenticatedListener
+#       tags:
+#           - { name: kernel.event_listener, event: lexik_jwt_authentication.on_jwt_authenticated, method: onJWTAuthenticated }
