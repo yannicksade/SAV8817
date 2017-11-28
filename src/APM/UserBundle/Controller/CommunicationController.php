@@ -43,7 +43,7 @@ class CommunicationController extends Controller
      * @param Request $request
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
      *
-     * @Get("/", name="s")
+     * @Get("/cget/communications", name="s")
      */
     public function getAction(Request $request)
     {

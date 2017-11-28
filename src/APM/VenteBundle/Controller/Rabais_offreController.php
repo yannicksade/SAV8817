@@ -46,8 +46,8 @@ class Rabais_offreController extends Controller
      * @param Offre $offre
      * @return \Symfony\Component\HttpFoundation\Response
      *
-     * @Get("/utilisateur", name="s")
-     * @Get("/offre/{id}", name="s_offre")
+     * @Get("/cget/rabaisoffres/utilisateur", name="s")
+     * @Get("/cget/rabaisoffres/offre/{id}", name="s_offre")
      */
     public function getAction(Request $request, Offre $offre = null)
     {

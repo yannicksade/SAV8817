@@ -13,13 +13,21 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Session;
+use FOS\RestBundle\Controller\Annotations\Get;
+use FOS\RestBundle\Controller\Annotations\RouteResource;
+
+/**
+ * Class AjaxNotificationController
+ * @RouteResource("notification", pluralize=false)
+ */
 
 class AjaxNotificationController extends Controller
 {
     /**
      * @return Response
+     * @Get("/notifications", name="s")
      */
-    public function indexAction()
+    public function getAction()
     {
         if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY')) {
             throw $this->createAccessDeniedException();

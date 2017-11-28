@@ -41,7 +41,7 @@ class Zone_interventionController extends Controller
      * @param Request $request
      * @return Response | JsonResponse
      *
-     * @Get("/zoneinterventions")
+     * @Get("/cget/zoneinterventions")
      */
     public function getAction(Request $request)
     {

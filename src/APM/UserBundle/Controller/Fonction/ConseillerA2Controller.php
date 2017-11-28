@@ -6,14 +6,14 @@
  * Time: 07:10
  */
 
-namespace APM\CoreBundle\Controller\User;
+namespace APM\UserBundle\Controller\Fonction;
 
 
 use Symfony\Component\HttpFoundation\Response;
 
 class ConseillerA2Controller
 {
-    public function indexAction()
+    public function getAction()
     {
 
         return new Response("Pages des Conseiller (A2) agrées");

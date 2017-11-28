@@ -16,7 +16,7 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
 
 class MainSiteController extends Controller
 {
-    public function showAction(Request $request)
+    public function getAction(Request $request)
     {
 
         return new Response('Hello: Plateforme! Main site');

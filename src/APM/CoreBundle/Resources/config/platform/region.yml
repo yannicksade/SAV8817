@@ -1,3 +1,0 @@
-evm_region_all:
-    path:     /
-    defaults: { _controller: APMCoreBundle:Platform/Region:index }

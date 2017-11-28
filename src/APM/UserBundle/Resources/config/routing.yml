@@ -22,10 +22,26 @@ apm_user_individu-to-groupe:
 
 apm_user_profile:
     type:  rest
-    resource: APM\UserBundle\Controller\ProfileUtilisateurAVMController
+    resource: APM\UserBundle\Controller\ProfileController
     name_prefix: api_user_
 
 apm_user_change_password:
     type:  rest
     resource: APM\UserBundle\Controller\ChangePasswordController
     name_prefix: api_user_
+
+#-------------------- management ---------------
+apm_user_gerant-boutique:
+    type: rest
+    resource: APM\UserBundle\Controller\Fonction\GerantBoutiqueController
+    name_prefix:   api_user_
+
+apm_user_conseillerA2:
+    type: rest
+    resource: APM\UserBundle\Controller\Fonction\ConseillerA2Controller
+    name_prefix:   api_user_
+
+apm_user_transport:
+    type: rest
+    resource: APM\UserBundle\Controller\Fonction\TransportController
+    name_prefix:   api_user_

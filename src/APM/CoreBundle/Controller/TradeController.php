@@ -20,7 +20,13 @@ use Symfony\Component\HttpFoundation\{
     Request, Response
 };
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
+use FOS\RestBundle\Controller\Annotations\Put;
+use FOS\RestBundle\Controller\Annotations\RouteResource;
 
+/**
+ * Class TradeController
+ * @RouteResource("trade", pluralize=false)
+ */
 class TradeController extends Controller
 {
 
@@ -33,6 +39,8 @@ class TradeController extends Controller
      * @param Offre $offre
      * @param Boutique $boutique
      * @return \Symfony\Component\HttpFoundation\Response
+     *
+     * @Put("/inserer-offre/{id}/boutique/{boutique_id}", name="insererOffre_boutique", options={"method_prefix":false})
      */
     public function insererOffreDansBoutiqueAction(Offre $offre, Boutique $boutique)
     {
@@ -58,6 +66,8 @@ class TradeController extends Controller
      * @param Offre $offre
      * @param Boutique $boutique
      * @return \Symfony\Component\HttpFoundation\Response
+     *
+     * @Put("/retirer-offre/{id}/boutique/{boutique_id}", name="retirerOffre_boutique", options={"method_prefix":false})
      */
     public function desinsererOffreDansBoutiqueAction(Offre $offre, Boutique $boutique)
     {
@@ -73,11 +83,14 @@ class TradeController extends Controller
         ));
     }
 
+    //-------
     /**
      * @ParamConverter("categorie", options={"mapping": {"categorie_id":"id"}})
      * @param Offre $offre
      * @param Categorie $categorie
      * @return \Symfony\Component\HttpFoundation\Response
+     *
+     * @Put("/inserer-offre/{id}/categorie/{categorie_id}", name="insererOffre_categorie", options={"method_prefix":false})
      */
     public function insererOffreDansCategorieAction(Offre $offre, Categorie $categorie)
     {
@@ -97,6 +110,8 @@ class TradeController extends Controller
      * @param Offre $offre
      * @param Categorie $categorie
      * @return \Symfony\Component\HttpFoundation\Response
+     *
+     * @Put("/retirer-offre/{id}/categorie/{categorie_id}", name="retirerOffre_categorie", options={"method_prefix":false})
      */
     public function desinsererOffreDansCategorieAction(Offre $offre, Categorie $categorie)
     {
@@ -112,10 +127,12 @@ class TradeController extends Controller
     }
 
     /**
-     * @ParamConverter("categorieParent", options={"mapping": {"categorieParent_id":"id"}})
+     * @ParamConverter("categorieParent", options={"mapping": {"categorie_id":"id"}})
      * @param Categorie $categorie
      * @param Categorie $categorieParent
      * @return \Symfony\Component\HttpFoundation\Response
+     *
+     * @Put("/inserer-categorie/{id}/categorie/{categorie_id}", name="insererCategorie_categorie", options={"method_prefix":false})
      */
     public function insererCategorieParentAction(Categorie $categorie, Categorie $categorieParent)
     {
@@ -131,10 +148,12 @@ class TradeController extends Controller
     }
 
     /**
-     * @ParamConverter("categorieParent", options={"mapping": {"categorieParent_id":"id"}})
+     * @ParamConverter("categorieParent", options={"mapping": {"categorie_id":"id"}})
      * @param Categorie $categorie
      * @param Categorie $categorieParent
      * @return \Symfony\Component\HttpFoundation\Response
+     *
+     * @Put("/retirer-categorie/{id}/categorie/{categorie_id}", name="retirerCategorie_categorie", options={"method_prefix":false})
      */
     public function desinsererCategorieParentAction(Categorie $categorie, Categorie $categorieParent)
     {
@@ -154,6 +173,8 @@ class TradeController extends Controller
      * @param Boutique $boutique
      * @return \Symfony\Component\HttpFoundation\Response
      * @ParamConverter("boutique", options={"mapping": {"boutique_id":"id"}})
+     *
+     * @Put("/inserer-categorie/{id}/boutique/{boutique_id}", name="insererCategorie_boutique", options={"method_prefix":false})
      */
     public function insererCategorieDansBoutiqueAction(Categorie $categorie, Boutique $boutique)
     {
@@ -173,6 +194,8 @@ class TradeController extends Controller
      * @param Boutique $boutique
      * @return \Symfony\Component\HttpFoundation\Response
      * @ParamConverter("boutique", options={"mapping": {"boutique_id":"id"}})
+     *
+     * @Put("/retirer-categorie/{id}/boutique/{boutique_id}", name="retirerCategorie_boutique", options={"method_prefix":false})
      */
     public function desinsererCategorieDansBoutiqueAction(Categorie $categorie, Boutique $boutique)
     {
@@ -190,6 +213,8 @@ class TradeController extends Controller
     /*******************************************PUBLICATION/DEPUBLICATION*****************************************
      * @param Boutique $boutique
      * @return \Symfony\Component\HttpFoundation\Response
+     *
+     * @Put("/publier-boutique/{id}", name="publier", options={"method_prefix":false})
      */
     public function publierBoutiqueAction(Boutique $boutique)
     {
@@ -202,6 +227,12 @@ class TradeController extends Controller
         ));
     }
 
+    /**
+     * @param Boutique $boutique
+     * @return Response
+     *
+     * @Put("/de-publier/boutique/{id}", name="depublier", options={"method_prefix":false})
+     */
     public function depublierBoutiqueAction(Boutique $boutique)
     {
         $this->get('apm_vente.boutique')->depublier($boutique, null);
@@ -217,7 +248,10 @@ class TradeController extends Controller
      * @param Categorie $categorie
      * @param Boutique $boutique
      * @return \Symfony\Component\HttpFoundation\Response
+     *
      * @ParamConverter("boutique", options={"mapping": {"boutique_id"="id"}})
+     *
+     * @Put("/publier-categorie/{id}/boutique/{boutique_id}", name="publierCategorie_boutique", options={"method_prefix":false})
      */
     public function publierCategorieAction(Categorie $categorie, Boutique $boutique)
     {
@@ -235,6 +269,8 @@ class TradeController extends Controller
      * @param Boutique $boutique
      * @return \Symfony\Component\HttpFoundation\Response
      * @ParamConverter("boutique", options={"mapping": {"boutique_id"="id"}})
+     *
+     * @Put("/depublier-categorie/{id}/boutique/{boutique_id}", name="depublier_boutique",options={"method_prefix":false})
      */
     public function depublierCategorieAction(Categorie $categorie, Boutique $boutique)
     {
@@ -253,6 +289,8 @@ class TradeController extends Controller
      * @param Utilisateur_avm $utilisateur
      * @return Response
      * @ParamConverter("utilisateur", options={"mapping": {"user_id":"id"}})
+     *
+     * @Put("/restreindre-user/{id}/utilisateur/{user_id}", name="acceptAccess_user", options={"method_prefix": false})
      */
     public function restreindreOffreAUtilisateurAction(Request $request, Offre $offre, Utilisateur_avm $utilisateur)
     {
@@ -285,6 +323,8 @@ class TradeController extends Controller
      * @return Response
      * @internal param Utilisateur_avm $user
      * @ParamConverter("utilisateur", options={"mapping": {"user_id":"id"}})
+     *
+     * @Put("/exclure-offre/{id}/utilisateur/{user_id}", name="refuseAccess_user", options={"method_prefix": false})
      */
     public function exclureOffreAUtilisateurAction(Request $request, Offre $offre, Utilisateur_avm $utilisateur)
     {
@@ -324,6 +364,8 @@ class TradeController extends Controller
      * @ParamConverter("destinataire", options={"mapping": {"destinataire_id":"id"}})
      * @ParamConverter("ordre", options={"mapping": {"ordre_id":"id"}})
      * @ParamConverter("livraison", options={"mapping": {"livraison_id":"id"}})
+     *
+     * @Put("/transferer-offre/{id}/source/{source_id}/destinataire/{destinataire_id}/ordre/{ordre_id}/livraison/{livraison_id}", name="transfererOffre_source_destinataire_ordre_livraison", options={"method_prefix":false})
      */
     public function transfererOffreAction(Request $request, Offre $offre, Utilisateur_avm $source, Utilisateur_avm $destinataire, Specification_achat $ordre, Livraison $livraison)
     {
@@ -359,8 +401,10 @@ class TradeController extends Controller
      * @ParamConverter("destinataire", options={"mapping": {"destinataire_id":"id"}})
      * @ParamConverter("ordre", options={"mapping": {"ordre_id":"id"}})
      * @ParamConverter("livraison", options={"mapping": {"livraison_id":"id"}})
+     *
+     * @Put("/transferer-boutique/{id}/source/{source_id}/destinataire/{destinataire_id}/ordre/{ordre_id}/livraison/{livraison_id}", name="transfererBoutique_source_destinataire_ordre_livraison", options={"method_prefix":false})
      */
-    public function transfererBoutiqueAction(Request $request, Boutique $boutique, Utilisateur_avm $source, Utilisateur_avm $destinataire, Specification_achat $ordre, Livraison $livraison)
+    public function transferertBoutiqueAction(Request $request, Boutique $boutique, Utilisateur_avm $source, Utilisateur_avm $destinataire, Specification_achat $ordre, Livraison $livraison)
     {
         $form = $this->createForm('APM\VenteBundle\Form\Type\TransactionPromptType');
         $form->remove('quantite');
@@ -395,6 +439,8 @@ class TradeController extends Controller
      * @ParamConverter("destinataire", options={"mapping": {"destinataire_id":"id"}})
      * @ParamConverter("ordre", options={"mapping": {"ordre_id":"id"}})
      * @ParamConverter("livraison", options={"mapping": {"livraison_id":"id"}})
+     *
+     * @Put("/transferer-categorie/{id}/source/{source_id}/destinataire/{destinataire_id}/ordre/{ordre_id}/livraison/{livraison_id}", name="transfererCategorie_source_destinataire_ordre_livraison", options={"method_prefix":false})
      */
     public function transfererCategorieAction(Request $request, Categorie $categorie, Utilisateur_avm $source, Utilisateur_avm $destinataire, Specification_achat $ordre, Livraison $livraison)
     {

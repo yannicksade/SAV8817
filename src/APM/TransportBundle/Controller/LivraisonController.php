@@ -47,8 +47,8 @@ class LivraisonController extends Controller
      * @param Boutique $boutique
      * @return \Symfony\Component\HttpFoundation\Response| JsonResponse
      *
-     * @Get("/livraisons", name="s")
-     * @Get("/livraisons/boutique/{id}", name="s_boutique")
+     * @Get("/cget/livraisons", name="s")
+     * @Get("/cget/livraisons/boutique/{id}", name="s_boutique")
      */
     public function getAction(Request $request, Boutique $boutique = null)
     {

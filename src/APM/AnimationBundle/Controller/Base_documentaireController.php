@@ -38,7 +38,7 @@ class Base_documentaireController extends Controller
      * @param Request $request
      * @return \Symfony\Component\HttpFoundation\Response | JsonResponse
      *
-     * @Get("/documents")
+     * @Get("/cget/documents")
      */
     public function getAction(Request $request)
     {

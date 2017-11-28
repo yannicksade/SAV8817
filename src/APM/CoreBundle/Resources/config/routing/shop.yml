@@ -1,4 +1,0 @@
-apm_core_shop_show:
-    path:     /show/{id}
-    defaults: { _controller: "APMCoreBundle:Shop:show" }
-    methods:  GET

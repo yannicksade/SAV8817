@@ -1,9 +1,0 @@
-evm_transporteur_all:
-    path:     /
-    defaults: { _controller: APMCoreBundle:Platform/Transporteur:index }
-evm_transporteur_get_all:
-    path:     /all
-    defaults: { _controller: APMCoreBundle:Platform/Transporteur:getAll }
-evm_transporteur_detail:
-    path:     /profil
-    defaults: { _controller: APMCoreBundle:Platform/Transporteur:detail }

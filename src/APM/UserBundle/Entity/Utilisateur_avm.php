@@ -20,12 +20,18 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 use PUGX\MultiUserBundle\Validator\Constraints\UniqueEntity;
+use JMS\Serializer\Annotation\ExclusionPolicy;
+use JMS\Serializer\Annotation\Expose;
+use JMS\Serializer\Annotation\Groups;
+use JMS\Serializer\Annotation\Type;
+use JMS\Serializer\Annotation\Exclude;
 
 /**
  * @ORM\Entity
  * @ORM\Table(name="utilisateur_avm")
  * @UniqueEntity(fields = "username", targetClass = "APM\UserBundle\Entity\Utilisateur", message="fos_user.username.already_used")
  * @UniqueEntity(fields = "email", targetClass = "APM\UserBundle\Entity\Utilisateur", message="fos_user.email.already_used")
+ * @ExclusionPolicy("all")
  */
 class Utilisateur_avm extends Utilisateur
 {
@@ -37,11 +43,12 @@ class Utilisateur_avm extends Utilisateur
      */
     protected $id;
 
-
     /**
      * @var boolean
      * @Assert\Choice({0,1})
      * @ORM\Column(name="estAcheteur", type="boolean", nullable=true)
+     * @Expose
+     * @Groups({"user_details"})
      */
     private $isAcheteur;
 
@@ -49,6 +56,8 @@ class Utilisateur_avm extends Utilisateur
      * @var boolean
      * @Assert\Choice({0,1})
      * @ORM\Column(name="estConseillerA1", type="boolean", nullable=true)
+     * @Expose
+     * @Groups({"user_details"})
      */
     private $isConseillerA1;
 
@@ -56,6 +65,8 @@ class Utilisateur_avm extends Utilisateur
      * @var boolean
      * @Assert\Choice({0,1})
      * @ORM\Column(name="estGerantBoutique", type="boolean", nullable=true)
+     * @Expose
+     * @Groups({"user_details"})
      */
     private $isGerantBoutique;
 
@@ -64,6 +75,8 @@ class Utilisateur_avm extends Utilisateur
      * @var boolean
      * @Assert\Choice({0,1})
      * @ORM\Column(name="estTransporteur", type="boolean", nullable=true)
+     * @Expose
+     * @Groups({"user_details"})
      */
     private $isTransporteurLivreur;
 
@@ -71,6 +84,8 @@ class Utilisateur_avm extends Utilisateur
      * @var boolean
      * @Assert\Choice({0,1})
      * @ORM\Column(name="estVendeur", type="boolean", nullable=true)
+     * @Expose
+     * @Groups({"user_details"})
      */
     private $isVendeur;
 
@@ -78,6 +93,8 @@ class Utilisateur_avm extends Utilisateur
      * @var integer
      * @Assert\GreaterThanOrEqual(0)
      * @ORM\Column(name="pointsDeFidelite", type="integer", nullable=true)
+     * @Expose
+     * @Groups({"user_details"})
      */
     private $pointsDeFidelite;
 
@@ -184,11 +201,15 @@ class Utilisateur_avm extends Utilisateur
     /**
      * @var Profile_transporteur
      * @ORM\OneToOne(targetEntity="APM\TransportBundle\Entity\Profile_transporteur", mappedBy="utilisateur")
+     * @Expose
+     * @Groups({"user_details"})
      */
     private $transporteur;
 
     /**
      * @ORM\OneToOne(targetEntity="APM\MarketingDistribueBundle\Entity\Conseiller", mappedBy="utilisateur", cascade={"persist","remove"})
+     * @Expose
+     * @Groups({"user_details"})
      */
     private $profileConseiller;
 

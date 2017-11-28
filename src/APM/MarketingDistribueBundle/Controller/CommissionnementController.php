@@ -48,8 +48,8 @@ class CommissionnementController extends Controller
      * @param Boutique $boutique
      * @return \Symfony\Component\HttpFoundation\Response | JsonResponse
      *
-     * @Get("/commissionnements", name="s")
-     * @Get("/commissionnements/boutique/{id}", name="s_boutique")
+     * @Get("/cget/commissionnements", name="s")
+     * @Get("/cget/commissionnements/boutique/{id}", name="s_boutique")
      *
      */
     public function getAction(Request $request, Boutique $boutique = null)

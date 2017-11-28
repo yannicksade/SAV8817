@@ -7,6 +7,11 @@ use FOS\UserBundle\Model\User as BaseUser;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Validator\Constraints as Assert;
 use Vich\UploaderBundle\Mapping\Annotation as Vich;
+use JMS\Serializer\Annotation\ExclusionPolicy;
+use JMS\Serializer\Annotation\Expose;
+use JMS\Serializer\Annotation\Groups;
+use JMS\Serializer\Annotation\Type;
+use JMS\Serializer\Annotation\Exclude;
 
 /**
  * @ORM\Entity(repositoryClass="APM\UserBundle\Repository\UtilisateurRepository")
@@ -15,13 +20,27 @@ use Vich\UploaderBundle\Mapping\Annotation as Vich;
  * @ORM\InheritanceType("JOINED")
  * @ORM\DiscriminatorColumn(name="type", type="string")
  * @ORM\DiscriminatorMap({"admin" = "Admin", "utilisateur_avm" = "Utilisateur_avm"})
+ * @ExclusionPolicy("all")
  */
 abstract class Utilisateur extends BaseUser
 {
     /**
+     * @Expose
+     * @Groups({"list", "global_details"})
+     */
+    protected $username;
+    /**
+     * @Expose
+     * @Groups({"list", "global_details"})
+     */
+    protected $email;
+
+    /**
      * @var string
      * @Assert\Length(min=2)
      * @ORM\Column(name="profession", type="string", length=255, nullable=true)
+     * @Expose
+     * @Groups({"list", "global_details"})
      */
     protected $profession;
 
@@ -29,12 +48,16 @@ abstract class Utilisateur extends BaseUser
      * @var \DateTime
      * @Assert\DateTime
      * @ORM\Column(name="dateEnregistrement", type="datetime", nullable=true)
+     * @Expose
+     * @Groups({"global_details"})
      */
     protected $dateEnregistrement;
 
     /**
      * @var boolean
-     * @ORM\Column(name="isLoggedIn", type="boolean", nullable=false)
+     * @ORM\Column(name="isLoggedIn", type="boolean", nullable=true)
+     * @Expose
+     * @Groups({"global_details"})
      */
     protected $isLoggedIn;
 
@@ -42,10 +65,14 @@ abstract class Utilisateur extends BaseUser
      * @ORM\Id
      * @ORM\Column(type="integer")
      * @ORM\GeneratedValue(strategy="AUTO")
+     * @Expose
+     * @Groups({"list", "global_details"})
      */
     protected $id;
     /**
      * @var string
+     * @Expose
+     * @Groups({"global_details"})
      * @Assert\NotBlank
      * @Assert\Length(min=2, max=100)
      * @ORM\Column(name="nom", type="string", length=255, nullable=true)
@@ -55,32 +82,44 @@ abstract class Utilisateur extends BaseUser
      * @var string
      * @Assert\Length(min=2, max=100)
      * @ORM\Column(name="prenom", type="string", length=255, nullable=true)
+     * @Expose
+     * @Groups({"global_details"})
      */
     protected $prenom;
     /**
      * @var String
      * @ORM\Column(name="dateNaissance", type="string", nullable=true)
+     * @Expose
+     * @Groups({"global_details"})
      */
     protected $dateNaissance;
     /**
      * @Assert\Country()
      * @ORM\Column(name="pays", type="string", length=255, nullable=true)
+     * @Expose
+     * @Groups({"global_details"})
      */
     protected $pays;
     /**
      * @var string
      * @ORM\Column(name="genre", type="string", nullable=true)
+     * @Expose
+     * @Groups({"global_details"})
      */
     protected $genre;
     /**
      * @var integer
      * @Assert\Range(min=100,)
      * @ORM\Column(name="telephone", type="integer", nullable=true)
+     * @Expose
+     * @Groups({"global_details"})
      */
     protected $telephone;
 
     /**
      * @var string
+     * @Expose
+     * @Groups({"list", "global_details"})
      * @ORM\Column(name="code", type="string", length=255, nullable=true)
      */
     protected $code;
@@ -89,6 +128,8 @@ abstract class Utilisateur extends BaseUser
      * @var integer
      * @Assert\Choice({0,1,2,3})
      * @ORM\Column(name="etatCompte", type="integer", nullable=true)
+     * @Expose
+     * @Groups({"global_details"})
      */
     protected $etatDuCompte;
 
@@ -96,12 +137,16 @@ abstract class Utilisateur extends BaseUser
      * @var string
      * @Assert\Length(min=2, max=255)
      * @ORM\Column(name="adresse", type="string", nullable=true)
+     * @Expose
+     * @Groups({"global_details"})
      */
     protected $adresse;
 
     /**
      * @var string
      * @ORM\Column(name="image", type="string", nullable=true)
+     * @Expose
+     * @Groups({"list","global_details"})
      */
     protected $image;
 
@@ -116,6 +161,8 @@ abstract class Utilisateur extends BaseUser
     /**
      * @ORM\Column(name="updatedAt", type="datetime", nullable=true)
      * @var \DateTime
+     * @Expose
+     * @Groups({"global_details"})
      */
     protected $updatedAt;
 

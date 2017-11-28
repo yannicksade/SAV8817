@@ -43,7 +43,7 @@ class Groupe_offreController extends Controller
      * @param Request $request
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response | JsonResponse
      *
-     * @Get("/collectionoffre")
+     * @Get("/cget/collectionoffres", name="s")
      */
     public function getAction(Request $request)
     {

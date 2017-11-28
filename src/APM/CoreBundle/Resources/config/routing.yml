@@ -1,115 +1,22 @@
 
-#-------- ATTENTION: creer toute route dans le path correct pour garantir un accès dédiée et sécurisé ex: /user dédié aux utilisateurs ayant le role USERAVM---------
-
 #--------------------- pages utilisateur ----------------------------------------------
-apm_core_shop:
-    resource: "@APMCoreBundle/Resources/config/routing/shop.yml"
-    prefix:   /costumer/shop
+apm_core_user_dashboard:
+    type: rest
+    resource: APM\CoreBundle\Controller\UserDashboardController
+    name_prefix:   api_core_
 
-apm_core_main:
-    resource: "@APMCoreBundle/Resources/config/routing/main-site.yml"
-    prefix:   /costumer/main-site
+apm_core_user_platform:
+    type: rest
+    resource: APM\CoreBundle\Controller\MainSiteController
+    name_prefix:   api_core_
 
-apm_core_user-dashboard:
-    resource: "@APMCoreBundle/Resources/config/routing/user-dashboard.yml"
-    prefix:   /user/dashboard
-
-
-#----------- ajouter d'autre accessibilité aux droits des utilisateurs AVM ici ---------
-#------- ex: /user/...
-
-
-#-------------------------- pages du staff ------------------------------------------------
-apm_core_staff_analyste:
-    resource: "@APMCoreBundle/Resources/config/staff/analyste.yml"
-    prefix:   /staff/analyste
-
-apm_core_staff_auditeur:
-    resource: "@APMCoreBundle/Resources/config/staff/auditeur.yml"
-    prefix:   /staff/auditeur
-
-apm_core_staff_explorateur:
-    resource: "@APMCoreBundle/Resources/config/staff/explorateur.yml"
-    prefix:   /staff/explorateur
-
-apm_core_staff_comptable:
-    resource: "@APMCoreBundle/Resources/config/staff/comptable.yml"
-    prefix:   /staff/comptable
-
-apm_core_staff_super-admin:
-    resource: "@APMCoreBundle/Resources/config/staff/super-admin.yml"
-    prefix:   /staff/superAdmin
-
-#--------------------------- pages du gerant ou du proprietaire de boutique ---------------
-apm_core_gerant-boutique:
-    resource: "@APMCoreBundle/Resources/config/user/boutique.yml"
-    prefix:   /gerant-boutique
-
-apm_core_conseillerA2:
-    resource: "@APMCoreBundle/Resources/config/user/conseillera2.yml"
-    prefix:   /conseiller
-
-apm_core_transport:
-    resource: "@APMCoreBundle/Resources/config/user/transport.yml"
-    prefix:   /transport
+apm_core_user-dashboard_ajax-notification:
+    type: rest
+    resource: APM\CoreBundle\Controller\AjaxNotificationController
+    name_prefix:  api_core_
 
 #---------------------------------------- gérer les Fonctionnalités du systeme------------------------------------------------
 apm_core_fonction_offre:
-    resource: "@APMCoreBundle/Resources/config/fonctions/offre.yml"
-    prefix:   /user/offre
-
-apm_core_fonction_boutique:
-    resource: "@APMCoreBundle/Resources/config/fonctions/boutique.yml"
-    prefix:   /user/boutique
-
-#--------------------- public shop -------------------------------
-easy_t_shop_homepage:
-    path:     /costumer/shop
-    defaults: { _controller: APMCoreBundle:Shop/Home:index }
-
-easy_t_products:
-    resource: "@APMCoreBundle/Resources/config/shop/products.yml"
-    prefix:   /costumer/shop/products
-
-easy_t_shopping:
-    resource: "@APMCoreBundle/Resources/config/shop/shopping.yml"
-    prefix:   /costumer/shop/shopping
-
-easy_t_checkout:
-    resource: "@APMCoreBundle/Resources/config/shop/checkout.yml"
-    prefix:   /costumer/shop/checkout
-
-#--------------------------------- Public platform --------------------------------
-evm_homepage:
-    path:     /costumer/platform
-    defaults: { _controller: APMCoreBundle:Platform/Default:index }
-evm_homepage_empty:
-    path:     /costumer/platform/empty
-    defaults: { _controller: APMCoreBundle:Platform/Default:empty }
-evm_boutique:
-    prefix:   /costumer/platform/Boutique
-    resource: "@APMCoreBundle/Resources/config/platform/boutique.yml"
-evm_produit:
-    prefix:   /costumer/platform/Produit
-    resource: "@APMCoreBundle/Resources/config/platform/produit.yml"
-evm_transporteur:
-    prefix:   /costumer/platform/Transporteur
-    resource: "@APMCoreBundle/Resources/config/platform/transporteur.yml"
-evm_documentation:
-    prefix:   /costumer/platform/Documentation
-    resource: "@APMCoreBundle/Resources/config/platform/documentation.yml"
-evm_commission:
-    prefix:   /costumer/platform/Commission
-    resource: "@APMCoreBundle/Resources/config/platform/commission.yml"
-evm_conseille:
-    prefix:   /costumer/platform/Conseille
-    resource: "@APMCoreBundle/Resources/config/platform/conseille.yml"
-evm_region:
-    prefix:   /costumer/platform/Region
-    resource: "@APMCoreBundle/Resources/config/platform/region.yml"
-evm_categorie:
-    prefix:   /costumer/platform/Categorie
-    resource: "@APMCoreBundle/Resources/config/platform/categorie.yml"
-evm_login_util:
-    prefix:   /costumer/platform/Connexion
-    resource: "@APMCoreBundle/Resources/config/platform/connexion.yml"
+    type: rest
+    resource: APM\CoreBundle\Controller\TradeController
+    name_prefix:   api_core_

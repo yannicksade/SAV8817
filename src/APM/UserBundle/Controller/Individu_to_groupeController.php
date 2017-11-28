@@ -39,7 +39,7 @@ class Individu_to_groupeController extends Controller
      * @param Groupe_relationnel $groupe_relationnel
      * @return \Symfony\Component\HttpFoundation\Response
      *
-     * @Get("/group/{id}", name="s_groupe")
+     * @Get("/cget/individus/group/{id}", name="s_groupe")
      */
     public function getAction(Request $request, Groupe_relationnel $groupe_relationnel)
     {

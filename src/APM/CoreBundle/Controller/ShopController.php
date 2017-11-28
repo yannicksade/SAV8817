@@ -14,7 +14,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 class ShopController extends Controller
 {
 //traite ici la disposition des marchandises du client dans sa boutique.
-    public function showAction($id)
+    public function getAction($id)
     {
         $userData = array();
         $systemData = array();

@@ -44,7 +44,7 @@ class QuotaController extends Controller
      * @param Boutique $boutique
      * @return \Symfony\Component\HttpFoundation\Response
      *
-     * @Get("/commissions/boutique/{id}", name="s_boutique")
+     * @Get("/cget/commissions/boutique/{id}", name="s_boutique")
      */
     public function getAction(Request $request, Boutique $boutique)
     {

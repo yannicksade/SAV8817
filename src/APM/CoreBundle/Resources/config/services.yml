@@ -1,4 +1,14 @@
 services:
+    apm_user.registration_manager:
+        class: APM\UserBundle\Manager\RegistrationManager
+        calls:
+              - ["setContainer", ["@service_container"]]
+
+    apm_user.update_profile_manager:
+        class: APM\UserBundle\Manager\ProfileManager
+        calls:
+              - ["setContainer", ["@service_container"]]
+
 #---------- Upload files ---------
     apm_core.packages_maker:
         class: APM\CoreBundle\Util\PackagesMaker

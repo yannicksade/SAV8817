@@ -3,20 +3,20 @@
  * Created by PhpStorm.
  * User: Yannick
  * Date: 05/03/2017
- * Time: 06:00
+ * Time: 07:11
  */
 
-namespace APM\CoreBundle\Controller\Staff;
+namespace APM\UserBundle\Controller\Fonction;
 
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Response;
 
-class AnalysteController extends Controller
+class TransportController extends Controller
 {
-    public function indexAction()
+    public function getAction()
     {
 
-        return new Response("Pages des Analystes");
+        return new Response("Pages des Transporteurs");
     }
 }

@@ -45,7 +45,7 @@ class CommentaireController extends Controller
      * @param Offre $offre
      * @return \Symfony\Component\HttpFoundation\Response
      *
-     * @Get("/commentaires/offre/{id}", name="s_offre")
+     * @Get("/cget/commentaires/offre/{id}", name="s_offre")
      */
     public function getAction(Request $request, Offre $offre)
     {

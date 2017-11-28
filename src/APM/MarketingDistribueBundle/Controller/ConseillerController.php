@@ -40,7 +40,7 @@ class ConseillerController extends Controller
      * Liste tous les conseillers
      * @return \Symfony\Component\HttpFoundation\Response
      *
-     * @Get("/conseiller")
+     * @Get("/cget/conseiller")
      */
     public function getAction()
     {

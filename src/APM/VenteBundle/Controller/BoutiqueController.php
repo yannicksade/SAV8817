@@ -43,8 +43,8 @@ class BoutiqueController extends FOSRestController implements ClassResourceInter
      * @param Utilisateur_avm|null $user
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
      *
-     * @Get("/", name="s")
-     * @Get("/user/{id}", name="s_user")
+     * @Get("/cget/boutiques", name="s")
+     * @Get("/cget/boutiques/user/{id}", name="s_user")
      */
     public function getAction(Request $request, Utilisateur_avm $user = null)
     {

@@ -1,9 +1,0 @@
-evm_boutique_all:
-    path:     /
-    defaults: { _controller: APMCoreBundle:Platform/Boutique:index }
-evm_boutique_get_all:
-    path:     /all
-    defaults: { _controller: APMCoreBundle:Platform/Boutique:getAll }
-evm_boutique_find:
-    path:     /search
-    defaults: { _controller: APMCoreBundle:Platform/Boutique:find }

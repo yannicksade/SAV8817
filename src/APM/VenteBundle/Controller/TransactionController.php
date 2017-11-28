@@ -47,9 +47,9 @@ class TransactionController extends Controller
      * @param Livraison $livraison
      * @return \Symfony\Component\HttpFoundation\Response | JsonResponse
      *
-     * @Get("/", name="s")
-     * @Get("/boutique/{id}", name="s_boutique")
-     * @Get("/livraison/{livraison_id}", name="s_livraison")
+     * @Get("/cget/transactions", name="s")
+     * @Get("/cget/transactions/boutique/{id}", name="s_boutique")
+     * @Get("/cget/transactions/livraison/{livraison_id}", name="s_livraison")
      */
     public function getAction(Request $request, Boutique $boutique = null, Livraison $livraison = null)
     {

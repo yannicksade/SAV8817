@@ -1,4 +1,0 @@
-apm_core_notification_index:
-    path:     /
-    defaults: { _controller: "APMCoreBundle:Notification:index" }
-    methods:  GET

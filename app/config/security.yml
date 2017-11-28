@@ -7,16 +7,17 @@ security:
 
     role_hierarchy:
     #--------------------------------------------
+        ROLE_STAFF: ROLE_USER
     #---Rôle du staff spécialisés---------------
-        ROLE_AUDIT:   ROLE_USER #Controlleurs
-        ROLE_ANALYSE: ROLE_USER #Analystes
-        ROLE_EXP:     ROLE_USER #Exploitation
-        ROLE_COMP:    ROLE_USER #Comptable
+        ROLE_AUDIT:   ROLE_STAFF #Controlleurs
+        ROLE_ANALYSE: ROLE_STAFF #Analystes
+        ROLE_EXP:     ROLE_STAFF #Exploitation
+        ROLE_COMP:    ROLE_STAFF #Comptable
         ROLE_ADMIN:   [ROLE_AUDIT,ROLE_ANALYSE,ROLE_EXP,ROLE_COMP] #sous admin
 
     #--------------------------------------------
     #---Rôle du  super administrateur
-        ROLE_GESTIONNAIRE: ROLE_USER # manage staff registration
+        ROLE_GESTIONNAIRE: ROLE_STAFF # manage staff registration
         ROLE_SUPER_ADMIN: [ROLE_ADMIN, ROLE_GESTIONNAIRE]
     #--------------------------------------------
     #---Rôle des utilisateurs avm

@@ -44,8 +44,8 @@ class Transporteur_zoneInterventionController extends Controller
      * @param Zone_intervention $zone_intervention
      * @return \Symfony\Component\HttpFoundation\Response | JsonResponse
      *
-     * @Get("/transporteurs/zone/{zone_id}", name="s_zone")
-     * @Get("/zones/transporteur/{id}", name="s_transporteur")
+     * @Get("/cget/transporteurs/zone/{zone_id}", name="s_zone")
+     * @Get("/cget/zones/transporteur/{id}", name="s_transporteur")
      */
     public function getAction(Request $request, Profile_transporteur $transporteur = null, Zone_intervention $zone_intervention = null)
     {

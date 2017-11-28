@@ -36,7 +36,7 @@ class Profile_transporteurController extends Controller
      * @param Request $request
      * @return \Symfony\Component\HttpFoundation\Response | JsonResponse
      *
-     * @Get("/transporteurs", name="s")
+     * @Get("/cget/transporteurs", name="s")
      */
     public function getAction(Request $request)
     {

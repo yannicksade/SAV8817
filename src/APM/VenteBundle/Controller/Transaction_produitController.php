@@ -41,7 +41,7 @@ class Transaction_produitController extends Controller
      * @param Transaction $transaction
      * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
      *
-     * Get("/transaction-produits/transaction/{id}", name="s")
+     * Get("/cget/transaction-produits/transaction/{id}", name="s")
      */
     public function getAction(Request $request, Transaction $transaction)
     {

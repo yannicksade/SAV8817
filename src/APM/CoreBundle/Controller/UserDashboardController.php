@@ -11,7 +11,13 @@ namespace APM\CoreBundle\Controller;
 use APM\UserBundle\Entity\Utilisateur;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
-use FOS\UserBundle\EventListener\LastLoginListener;
+
+use FOS\RestBundle\Controller\Annotations\RouteResource;
+
+/**
+ * Class UserDashboardController
+ * @RouteResource("dashboard", pluralize=false)
+ */
 class UserDashboardController extends Controller
 {
 
@@ -19,7 +25,7 @@ class UserDashboardController extends Controller
      * @param Request $request
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
-    public function indexAction(Request $request)
+    public function getAction(Request $request)
     {
         $json = array();
         if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_REMEMBERED')) {

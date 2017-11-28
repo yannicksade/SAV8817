@@ -6,14 +6,14 @@
  * Time: 07:11
  */
 
-namespace APM\CoreBundle\Controller\User;
+namespace APM\UserBundle\Controller\Fonction;
 
 
 use Symfony\Component\HttpFoundation\Response;
 
 class GerantBoutiqueController
 {
-    public function indexAction()
+    public function getAction()
     {
 
         return new Response("Pages des Propriétaires ou gérants de boutiques");

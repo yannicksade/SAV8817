@@ -47,9 +47,9 @@ class RemiseController extends Controller
      * @param Offre $offre
      * @return \Symfony\Component\HttpFoundation\Response
      *
-     * @Get("/remises", name="s")
-     * @Get("/remises/boutique/{id}", name="s_boutique")
-     * @Get("/remises/{offre_id}", name="s_offre")
+     * @Get("/cget/remises", name="s")
+     * @Get("/cget/remises/boutique/{id}", name="s_boutique")
+     * @Get("/cget/remises/{offre_id}", name="s_offre")
      */
     public function getAction(Request $request, Boutique $boutique = null, Offre $offre = null)
     {

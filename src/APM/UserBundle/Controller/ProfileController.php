@@ -2,210 +2,120 @@
 /**
  * Created by PhpStorm.
  * User: pc
- * Date: 06/06/2017
- * Time: 10:10
+ * Date: 28/11/2017
+ * Time: 09:17
  */
 
 namespace APM\UserBundle\Controller;
 
 use APM\UserBundle\Entity\Admin;
-use APM\UserBundle\Entity\Utilisateur;
-use FOS\UserBundle\Event\FilterUserResponseEvent;
-use FOS\UserBundle\Event\FormEvent;
-use FOS\UserBundle\FOSUserEvents;
-use FOS\UserBundle\Model\UserInterface;
-use FOS\UserBundle\Model\UserManagerInterface;
-use PUGX\MultiUserBundle\Form\FormFactory;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Session\Session;
-use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use APM\UserBundle\Entity\Utilisateur_avm;
 use FOS\RestBundle\Controller\Annotations\Get;
 use FOS\RestBundle\Controller\Annotations\Post;
+use FOS\RestBundle\Controller\Annotations\Put;
+use FOS\RestBundle\Controller\Annotations\Patch;
+use APM\UserBundle\Entity\Utilisateur;
+use FOS\RestBundle\Controller\FOSRestController;
+use FOS\RestBundle\View\View;
+use FOS\UserBundle\Event\FilterUserResponseEvent;
+use FOS\UserBundle\Event\FormEvent;
+use FOS\UserBundle\Form\Factory\FactoryInterface;
+use FOS\UserBundle\FOSUserEvents;
+use JMS\Serializer\SerializationContext;
+use JMS\Serializer\SerializerBuilder;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
-/**
- * ProfileController
- */
-class ProfileController extends Controller
+class ProfileController extends FOSRestController
 {
     /**
      * Show the user.
-     * @param Request $request
      * @param Utilisateur $user
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return JsonResponse
+     * @Get("/show/profile/{id}")
      */
-    public function showAction(Request $request, Utilisateur $user = null)
+    public function showAction(Utilisateur $user)
     {
-        if(null === $user) $user = $this->getUser();
-            if (!is_object($user) || !$user instanceof UserInterface) {
-                throw new AccessDeniedException('This user does not have access to this section.');
-            }
-            if ($request->isXmlHttpRequest()) {
-                $json = array();
-                $json['item'] = array(
-                    'id' => $user->getId(),
-                    'code' => $user->getCode(),
-                    'nom' => $user->getNom(),
-                    'prenom' => $user->getPrenom(),
-                    'email' => $user->getEmail(),
-                    'username' => $user->getUsername(),
-                    'profession' => $user->getProfession(),
-                    'dateNaissance' => $user->getDateNaissance(),
-                    'pays' => $user->getPays(),
-                    'genre' => $user->getGenre(),
-                    'telephone' => $user->getTelephone(),
-                    'adresse' => $user->getAdresse(),
-                    'etatDuCompte' => $user->getEtatDuCompte(),
-                    'image' => $user->getImage(),
-                    'dateEnregistrement' => $user->getDateEnregistrement()->format('d-m-Y H:i'),
-                    'updatedAt' => $user->getUpdatedAt()->format('d-m-Y H:i'),
-                );
-                return $this->json(json_encode($json), 200);
-            }
-            return $this->render('@FOSUser/Profile/show.html.twig', array(
-                'user' => $user,
-                'url_image' => $this->get('apm_core.packages_maker')->getPackages()->getUrl('/', 'resolve_img'),
-                'type' => $user instanceof Admin,
-            ));
+        $serializerContext = SerializationContext::create()->enableMaxDepthChecks();
+        $serializer = SerializerBuilder::create()->build();
+        $data = $serializer->serialize($user, 'json', $serializerContext->setGroups(array("list")));
+        // 'url_image' => $this->get('apm_core.packages_maker')->getPackages()->getUrl('/', 'resolve_img')
+        return $this->json($data, 200);
     }
 
     /**
      * @param Request $request
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @param Utilisateur_avm $user
+     * @return View|JsonResponse
      *
-     * @Post("/edit")
+     * @Patch("/patch/profile/user/{id}")
      */
-    public function editAction(Request $request)
+    public function patchUserAction(Request $request, Utilisateur_avm $user)
     {
-        /** @var Utilisateur $user */
-        $user = $this->getUser();
-        if (!is_object($user) || !$user instanceof UserInterface) {
-            throw new AccessDeniedException('This user does not have access to this section.');
+        /** @var Utilisateur_avm $utilisateur */
+        $response = $this->get('apm_user.update_profile_manager')->updateUser(Utilisateur_avm::class, $request, false, $user);
+        if (is_object($response) && $response instanceof Utilisateur_avm) {
+            $utilisateur = $response;
+            return $this->routeRedirectView('api_user_show', ['id' => $utilisateur->getId()], Response::HTTP_NO_CONTENT);
         }
-        if ($request->isXmlHttpRequest() && $request->getMethod() === "POST") {
-            $json = array();
-            $json['item'] = array();
-            /** @var Session $session */
-            $session = $request->getSession();
-            $em = $this->getDoctrine()->getManager();
-            $property = $request->request->get('name');
-            $value = $request->request->get('value');
-            switch ($property) {
-                case 'etatDuCompte' :
-                    $user->setEtatDuCompte($value);
-                    break;
-                case 'username':
-                    $user->setUsername($value);
-                    break;
-                case 'email' :
-                    $user->setEmail($value);
-                    break;
-                case 'enabled' :
-                    $user->setEnabled($value);
-                    break;
-                case 'nom' :
-                    $user->setNom($value);
-                    break;
-                case 'prenom' :
-                    $user->setPrenom($value);
-                    break;
-                case 'profession' :
-                    $user->setProfession($value);
-                    break;
-                case 'dateNaissance' :
-                    $user->setDateNaissance($value);
-                    break;
-                case 'pays' :
-                    $user->setPays($value);
-                    break;
-                case 'genre' :
-                    $user->setGenre($value);
-                    break;
-                case 'telephone' :
-                    $user->setTelephone($value);
-                    break;
-                case 'adresse' :
-                    $user->setAdresse($value);
-                    break;
-                case 'image' :
-                    $user->setImageFile($value);
-                    break;
-                default:
-                    $session->getFlashBag()->add('info', "<strong> Aucune mis à jour effectuée</strong>");
-                    return $this->json(json_encode(["item" => null]), 205);
-            }
-            $em->flush();
-            $session->getFlashBag()->add('success', "Mis à jour profile. Propriété <strong>" . $property . "</strong> mis à jour<br> Opération effectuée avec succès!");
-            return $this->json(json_encode($json), 200);
-        }
-        /** @var FormFactory $formFactory */
-        $formFactory = $this->get('fos_user.profile.form.factory');
-        $form = $formFactory->createForm();
-        $form->setData($user);
-        $event = new FormEvent($form, $request);
-        /** @var $dispatcher EventDispatcherInterface */
-        $dispatcher = $this->get('event_dispatcher');
-        $dispatcher->dispatch(FOSUserEvents::PROFILE_EDIT_INITIALIZE, $event);
-        $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
-            /** @var $userManager UserManagerInterface */
-            $userManager = $this->get('fos_user.user_manager');
-            $userManager->updateUser($user);
-
-            $dispatcher->dispatch(FOSUserEvents::PROFILE_EDIT_SUCCESS, $event);
-            $this->get('apm_core.crop_image')->liipImageResolver($user->getImage());
-            //---
-            $dist = dirname(__DIR__, 4);
-            $file = $dist . '/web/' . $this->getParameter('images_url') . '/' . $user->getImage();
-            if (file_exists($file)) {
-                $url = $this->generateUrl('apm_user_profile_show-image', array('id' => $user->getId()));
-            } else {
-                $url = $this->generateUrl('fos_user_profile_show');
-            }
-            //---
-            $response = new RedirectResponse($url);
-            $dispatcher->dispatch(FOSUserEvents::PROFILE_EDIT_COMPLETED, new FilterUserResponseEvent($user, $request, $response));
-            return $response;
-        }
-
-        return $this->render('@FOSUser/Profile/edit.html.twig', array(
-            'form' => $form->createView(),
-        ));
+        return $this->json('invalid data', 400);
     }
 
-    public function showImageAction(Request $request)
+    /**
+     * @param Request $request
+     * @param Admin $user
+     * @return View|JsonResponse
+     *
+     * @Patch("/patch/profile/staff/{id}")
+     */
+    public function patchStaffAction(Request $request, Admin $user)
     {
-        $user = $this->getUser();
-        if (!is_object($user) || !$user instanceof UserInterface) {
-            throw new AccessDeniedException('This user does not have access to this section.');
+        /** @var Utilisateur_avm $utilisateur */
+        $response = $this->get('apm_user.update_profile_manager')->updateUser(Admin::class, $request, false, $user);
+        if (is_object($response) && $response instanceof Admin) {
+            $utilisateur = $response;
+            return $this->routeRedirectView('api_user_show', ['id' => $utilisateur->getId()], Response::HTTP_NO_CONTENT);
         }
-
-        $form = $this->createCrobForm($user);
-        $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
-            $this->get('apm_core.crop_image')->setCropParameters(intval($_POST['x']), intval($_POST['y']), intval($_POST['w']), intval($_POST['h']), $user->getImage(), $user);
-            $event = new FormEvent($form, $request);
-            if (null === $response = $event->getResponse()) {
-                $url = $this->generateUrl('fos_user_profile_show');
-                $response = new RedirectResponse($url);
-            }
-
-            return $response;
-        }
-
-        return $this->render('APMUserBundle:utilisateur_avm:image.html.twig', array(
-            'user' => $user,
-            'crop_form' => $form->createView(),
-        ));
+        return $this->json('Invalid data', 400);
     }
 
-    private function createCrobForm(Utilisateur $user)
+    private function security($user)
     {
-        return $this->createFormBuilder()
-            ->setAction($this->generateUrl('apm_user_profile_show-image', array('id' => $user->getId())))
-            ->setMethod('POST')
-            ->getForm();
+        //---------------------------------security-----------------------------------------------
+        // Access reserve au super admin
+        $this->denyAccessUnlessGranted('ROLE_STAFF', $user, 'Unable to access this page!');
+        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY') || !$user instanceof Admin) {
+            throw $this->createAccessDeniedException();
+        }
+        //-----------------------------------------------------------------------------------------
     }
+
+    /*public function showImageAction(Request $request)
+     {
+         $user = $this->getUser();
+         if (!is_object($user) || !$user instanceof UserInterface) {
+             throw new AccessDeniedException('This user does not have access to this section.');
+         }
+
+         $form = $this->createCrobForm($user);
+         $form->handleRequest($request);
+         if ($form->isSubmitted() && $form->isValid()) {
+             $this->get('apm_core.crop_image')->setCropParameters(intval($_POST['x']), intval($_POST['y']), intval($_POST['w']), intval($_POST['h']), $user->getImage(), $user);
+             $event = new FormEvent($form, $request);
+             if (null === $response = $event->getResponse()) {
+                 $url = $this->generateUrl('fos_user_profile_show');
+                 $response = new RedirectResponse($url);
+             }
+
+             return $response;
+         }
+
+         return $this->render('APMUserBundle:utilisateur_avm:image.html.twig', array(
+             'user' => $user,
+             'crop_form' => $form->createView(),
+         ));
+     }*/
+
 }

@@ -43,7 +43,7 @@ class Groupe_relationnelController extends Controller
      * @param Request $request
      * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
      *
-     * @Get("/", name="s")
+     * @Get("/cget/groupeRelationnels", name="s")
      */
     public function getAction(Request $request)
     {

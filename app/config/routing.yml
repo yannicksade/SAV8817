@@ -1,3 +1,10 @@
+
+#-------------------------------------------- api routes -----------------------------------------
+routing_rest:
+    resource: "routing_rest.yml"
+    prefix:   /apm
+
+#-------------------------------------------- third party routes ---------------------------------
 app:
     resource: "@AppBundle/Controller/"
     type:     annotation
@@ -7,7 +14,7 @@ _liip_imagine:
 
 NelmioApiDocBundle:
     resource: "@NelmioApiDocBundle/Resources/config/routing.yml"
-    prefix: "/doc"
+    prefix: "/api/doc"
 
 #fos_comment_api:
  #   type: rest
@@ -15,14 +22,7 @@ NelmioApiDocBundle:
    # prefix: /api
     #defaults: { _format: html }
 
-
-routing_rest:
-    resource: "routing_rest.yml"
-    prefix:   /apm
-
-#api_login_check:
-#    path: /login_check
-#----------
+#------------------------------- user account ----------------------------------------------------
 apm_security_login:
     type:  rest
     resource: APM\UserBundle\Controller\SecurityController
@@ -34,10 +34,32 @@ apm_user_resetting:
 
 apm_user_registration:
     type:  rest
-    resource: APM\UserBundle\Controller\RegistrationUtilisateurAVMController
+    resource: APM\UserBundle\Controller\RegistrationUserController
     prefix: /user
 
 apm_staff_registration:
     type:  rest
     resource: APM\UserBundle\Controller\RegistrationAdminController
     prefix: /staff
+
+
+#---------------------------- staff management ability ----------------------------------------
+apm_core_staff_analyste:
+    resource: "@APMAdminBundle/Resources/config/staff/analyste.yml"
+    prefix:   /staff/analyste
+
+apm_core_staff_auditeur:
+    resource: "@APMAdminBundle/Resources/config/staff/auditeur.yml"
+    prefix:   /staff/auditeur
+
+apm_core_staff_explorateur:
+    resource: "@APMAdminBundle/Resources/config/staff/explorateur.yml"
+    prefix:   /staff/explorateur
+
+apm_core_staff_comptable:
+    resource: "@APMAdminBundle/Resources/config/staff/comptable.yml"
+    prefix:   /staff/comptable
+
+apm_core_staff_super-admin:
+    resource: "@APMAdminBundle/Resources/config/staff/super-admin.yml"
+    prefix:   /staff/superAdmin

@@ -6,7 +6,7 @@
  * Time: 06:01
  */
 
-namespace APM\CoreBundle\Controller\Staff;
+namespace APM\AdminBundle\Controller\Staff;
 
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -14,7 +14,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class AuditeurController extends Controller
 {
-    public function indexAction()
+    public function getAction()
     {
 
         return new Response("Pages des Auditeurs");

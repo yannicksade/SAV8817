@@ -1,3 +1,0 @@
-evm_login_connect:
-    path:     /
-    defaults: { _controller: APMCoreBundle:Platform/Default:connect }

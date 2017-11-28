@@ -41,8 +41,8 @@ class Conseiller_boutiqueController extends Controller
      * @return \Symfony\Component\HttpFoundation\Response | JsonResponse Lister les boutique du conseiller
      *
      * Lister les boutique du conseiller
-     * @Get("/conseiller-boutiques", name="s")
-     * @Get("/conseillers-boutique/{id}", name="s_boutique")
+     * @Get("/cget/conseiller-boutiques", name="s")
+     * @Get("/cget/conseillers-boutique/{id}", name="s_boutique")
      */
     public function getAction(Request $request, Boutique $boutique = null)
     {

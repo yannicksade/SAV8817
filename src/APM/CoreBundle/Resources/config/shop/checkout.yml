@@ -1,3 +1,0 @@
-easy_t_checkout_home:
-    path:     /
-    defaults: { _controller: APMCoreBundle:Shop/Checkout:checkout}

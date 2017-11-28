@@ -67,13 +67,13 @@ class OffreController extends FOSRestController implements ClassResourceInterfac
      * @param Transaction|null $transaction
      * @return JsonResponse
      *
-     * @Get("/offres", name="s")
-     * @Get("/offres/boutique/{id}", name="s_boutique")
-     * @Get("/offres/boutique/{id}/categorie/{categorie_id}", name="s_categorie")
-     * @Get("/offres/user/{user_id}", name="s_ByAdmin")
-     * @Get("/offres/groupe/{groupe_id}", name="s_groupeOffre")
-     * @Get("/offres/transaction/{transaction_id}", name="s_transaction")
-     * @Get("/offres/boutique/{id}/transaction/{transaction_id}", name="s_transaction_boutique")
+     * @Get("/cget/offres", name="s")
+     * @Get("/cget/offres/boutique/{id}", name="s_boutique")
+     * @Get("/cget/offres/boutique/{id}/categorie/{categorie_id}", name="s_categorie")
+     * @Get("/cget/offres/user/{user_id}", name="s_ByAdmin")
+     * @Get("/cget/offres/groupe/{groupe_id}", name="s_groupeOffre")
+     * @Get("/cget/offres/transaction/{transaction_id}", name="s_transaction")
+     * @Get("/cget/offres/boutique/{id}/transaction/{transaction_id}", name="s_transaction_boutique")
      */
     public function getAction(Request $request, Boutique $boutique = null, Categorie $categorie = null, Utilisateur_avm $user = null, Groupe_offre $groupe_offre = null, Transaction $transaction = null)
     {

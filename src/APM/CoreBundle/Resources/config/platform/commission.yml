@@ -1,3 +1,0 @@
-evm_commission_all:
-    path:     /
-    defaults: { _controller: APMCoreBundle:Platform/Commission:index }

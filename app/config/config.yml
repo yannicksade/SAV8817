@@ -34,7 +34,7 @@ framework:
         resource: %kernel.root_dir%/config/routing.yml
         strict_requirements: ~
     form:            ~
-    csrf_protection: ~
+    #csrf_protection: ~
    #serializer:      { enable_annotations: true }
     templating:
         engines: [twig]
@@ -97,34 +97,28 @@ fos_user:
     user_class: APM\UserBundle\Entity\Utilisateur
     service:
         user_manager: pugx_user_manager
+        mailer: fos_user.mailer.twig_swift
+    use_username_form_type: true
     from_email:
-        address:           noreply@esay-trade.com
+        address:           webmaster@esay-trade.com
         sender_name:       webmaster
+    resetting:
+        email:
+            from_email:
+                address:    resetting-password@esay-trade.com
+                sender_name: Easy Trade Team
+            template:   '@FOSUser/Resetting/email.txt.twig'
 
 # PUGXMultiuserBundle
 pugx_multi_user:
     users:
-        utilisateur_avm:
-            entity:
-                class: APM\UserBundle\Entity\Utilisateur_avm
-#          factory:
-            registration:
-                form:
-                    type: APM\UserBundle\Form\Type\Utilisateur_avmType
-                    name: apm_utilisateur_avm_registration
-                    validation_groups:  [Registration, Default]
-            profile:
-                form:
-                    type: APM\UserBundle\Form\Type\ProfileUtilisateur_avmFormType
-                    name: apm_utilisateur_avm_profile
-                    validation_groups:  [Profile, Default]
         admin:
             entity:
                 class: APM\UserBundle\Entity\Admin
             #      factory:
             registration:
                  form:
-                     type: APM\UserBundle\Form\Type\RegistrationAdminFormType
+                     type: APM\UserBundle\Form\Type\AdminFormType
                      name: apm_admin_registration
                      validation_groups:  [Registration, Default]
             profile:
@@ -133,6 +127,20 @@ pugx_multi_user:
                      name: apm_admin_profile
                      validation_groups:  [Profile, Default]
 
+        utilisateur_avm:
+            entity:
+                class: APM\UserBundle\Entity\Utilisateur_avm
+
+            registration:
+                 form:
+                     type: APM\UserBundle\Form\Type\Utilisateur_avmFormType
+                     name: apm_utilisateur_avm_registration
+                     validation_groups:  [Registration, Default]
+            profile:
+                 form:
+                     type: APM\UserBundle\Form\Type\ProfileUtilisateur_avmFormType
+                     name: apm_utilisateur_avm_profile
+                     validation_groups:  [Profile, Default]
 
 web_profiler :
     intercept_redirects : false

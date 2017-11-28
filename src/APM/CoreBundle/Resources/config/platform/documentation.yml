@@ -1,3 +1,0 @@
-evm_documentation_all:
-    path:     /
-    defaults: { _controller: APMCoreBundle:Platform/Documentation:index }

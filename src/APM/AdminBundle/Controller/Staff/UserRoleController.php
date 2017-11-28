@@ -6,16 +6,26 @@
  * Time: 16:47
  */
 
-namespace APM\CoreBundle\Controller\Staff;
+namespace APM\AdminBundle\Controller\Staff;
 
 
 use APM\CoreBundle\Form\Type\UsersRolePromptType;
 use APM\UserBundle\Entity\Utilisateur;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
+use FOS\RestBundle\Controller\Annotations\RouteResource;
 
+/**
+ * Class UserRoleController
+ * @RouteResource("role", pluralize=false)
+ */
 class UserRoleController extends Controller
 {
+    /**
+     * @param Request $request
+     * @return \Symfony\Component\HttpFoundation\Response
+     * @Put("/grant/role")
+     */
     public function grantRoleAction(Request $request)
     {
         $form = $this->createForm(UsersRolePromptType::class);

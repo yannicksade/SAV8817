@@ -43,7 +43,7 @@ class CategorieController extends Controller
      * @param Boutique $boutique
      * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
      *
-     * @Get("/boutique/{id}", name="s")
+     * @Get("/cget/categories/boutique/{id}", name="s")
      */
     public function getAction(Request $request, Boutique $boutique)
     {

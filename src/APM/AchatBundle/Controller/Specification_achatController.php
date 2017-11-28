@@ -43,8 +43,8 @@ class Specification_achatController extends Controller
      * @param Offre $offre
      * @return \Symfony\Component\HttpFoundation\Response| JsonResponse
      *
-     * @Get("/specifications", name="s")
-     * @Get("/specifications/offre/{id}", name="s_offre")
+     * @Get("/cget/specifications", name="s")
+     * @Get("/cget/specifications/offre/{id}", name="s_offre")
      */
     public function getAction(Offre $offre = null)
     {

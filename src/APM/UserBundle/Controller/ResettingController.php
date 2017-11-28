@@ -39,7 +39,7 @@ class ResettingController extends FOSRestController
 {
     /**
      * Request reset user password: show form.
-     *
+     * @Post("/request")
      */
     public function requestAction()
     {
@@ -119,7 +119,7 @@ class ResettingController extends FOSRestController
      *
      * @return Response
      *
-     * @Post("/check/reset-password")
+     * @Post("/check")
      */
     public function checkEmailAction(Request $request)
     {

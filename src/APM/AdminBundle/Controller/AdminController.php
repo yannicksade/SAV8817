@@ -3,7 +3,7 @@
 namespace APM\AdminBundle\Controller;
 
 use APM\UserBundle\Entity\Admin;
-use APM\UserBundle\Form\Type\RegistrationAdminFormType;
+use APM\UserBundle\Form\Type\AdminFormType;
 use Doctrine\DBAL\Exception\ConstraintViolationException;
 use FOS\RestBundle\Controller\FOSRestController;
 use Symfony\Component\HttpFoundation\Request;
@@ -26,12 +26,12 @@ class AdminController extends FOSRestController
     /**
      * @param Request $request
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
-     * @Get("/staffs", name="s")
+     * @Get("/cget/staffs", name="s")
      */
     public function getAction(Request $request)
     {
         $admin = new Admin();
-        $form = $this->createForm(RegistrationAdminFormType::class, $admin);
+        $form = $this->createForm(AdminFormType::class, $admin);
         $em = $this->getEM();
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
@@ -102,7 +102,7 @@ class AdminController extends FOSRestController
     {
         //$request = $this->get('request');
         $em = $this->getEM();
-        $form = $this->createForm(RegistrationAdminFormType::class, $admin);
+        $form = $this->createForm(AdminFormType::class, $admin);
         $form->handleRequest($request);
         //$request->getMethod() == 'POST'
         if ($form->isSubmitted() && $form->isValid()) {

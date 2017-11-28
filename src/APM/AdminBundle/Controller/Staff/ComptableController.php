@@ -3,20 +3,20 @@
  * Created by PhpStorm.
  * User: Yannick
  * Date: 05/03/2017
- * Time: 07:11
+ * Time: 06:18
  */
 
-namespace APM\CoreBundle\Controller\User;
+namespace APM\AdminBundle\Controller\Staff;
 
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Response;
 
-class TransportController extends Controller
+class ComptableController extends Controller
 {
-    public function indexAction()
+    public function getAction()
     {
 
-        return new Response("Pages des Transporteurs");
+        return new Response("Pages des Comptables");
     }
 }

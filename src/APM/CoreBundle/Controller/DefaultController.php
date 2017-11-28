@@ -6,7 +6,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 class DefaultController extends Controller
 {
-    public function indexAction()
+    public function getAction()
     {
         return $this->redirectToRoute("apm_core_user-dashboard_index");
     }
