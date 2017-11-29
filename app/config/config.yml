@@ -11,6 +11,7 @@ parameters:
     docs_url: dashboard/assets/brochure/files
     resolve_images_url: http://localhost/SAV8817.git/web/app_dev.php/media/cache/resolve/basic_filter600x600/%images_url%
     basic_filter: basic_filter600x600
+    fos_user.resetting.token_ttl: 86400
 
     #nelmio api docs
     api_name: we-trade

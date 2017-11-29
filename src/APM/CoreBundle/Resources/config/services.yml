@@ -9,6 +9,11 @@ services:
         calls:
               - ["setContainer", ["@service_container"]]
 
+    apm_user.resetting_manager:
+        class: APM\UserBundle\Manager\ResettingManager
+        calls:
+              - ["setContainer", ["@service_container"]]
+
 #---------- Upload files ---------
     apm_core.packages_maker:
         class: APM\CoreBundle\Util\PackagesMaker

@@ -10,6 +10,7 @@ namespace APM\UserBundle\Manager;
 
 
 use APM\UserBundle\Entity\Utilisateur;
+use FOS\UserBundle\Event\FilterUserResponseEvent;
 use FOS\UserBundle\Event\FormEvent;
 use FOS\UserBundle\Event\GetResponseUserEvent;
 use FOS\UserBundle\Form\Factory\FactoryInterface;
@@ -67,6 +68,11 @@ class ProfileManager implements ContainerAwareInterface
         $dispatcher->dispatch(FOSUserEvents::PROFILE_EDIT_SUCCESS, $event);
 
         $userManager->updateUser($user);
+
+        if (null === $response = $event->getResponse()) {
+            return $user;
+        }
+        $dispatcher->dispatch(FOSUserEvents::PROFILE_EDIT_COMPLETED, new FilterUserResponseEvent($user, $request, $response));
 
         return $user;
     }

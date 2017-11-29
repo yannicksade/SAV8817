@@ -26,7 +26,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
@@ -87,7 +86,25 @@ class RegistrationManager implements ContainerAwareInterface
 
         $userManager->updateUser($user);
 
-        return $user;
+        $location = $this->container->get("fos_rest.router")->generate('api_user_show', ['id' => $user->getId()], UrlGeneratorInterface::ABSOLUTE_PATH);
+
+        $response = new JsonResponse(
+            [
+                'msg' => $this->container->get('translator')->trans('registration.flash.user_created', [], 'FOSUserBundle'),
+                'token' => $this->container->get('lexik_jwt_authentication.jwt_manager')->create($user)
+            ],
+            Response::HTTP_CREATED,
+            [
+                'location' => $location
+            ]
+        );
+
+        $dispatcher->dispatch(
+            FOSUserEvents::REGISTRATION_COMPLETED,
+            new FilterUserResponseEvent($user, $request, $response)
+        );
+
+        return $response;
     }
 
     private function discriminateAndGetManager($class)

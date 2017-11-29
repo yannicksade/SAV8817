@@ -11,20 +11,14 @@
 
 namespace APM\UserBundle\Controller;
 
+use APM\UserBundle\Entity\Admin;
+use APM\UserBundle\Entity\Utilisateur_avm;
 use FOS\RestBundle\Controller\FOSRestController;
-use FOS\UserBundle\Event\FilterUserResponseEvent;
-use FOS\UserBundle\Event\FormEvent;
-use FOS\UserBundle\Event\GetResponseNullableUserEvent;
-use FOS\UserBundle\Event\GetResponseUserEvent;
-use FOS\UserBundle\FOSUserEvents;
-use FOS\UserBundle\Model\UserInterface;
-use FOS\UserBundle\Util\TokenGeneratorInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use FOS\RestBundle\Controller\Annotations\Get;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use FOS\RestBundle\Controller\Annotations\Post;
 use FOS\RestBundle\Controller\Annotations\RouteResource;
 
@@ -33,167 +27,83 @@ use FOS\RestBundle\Controller\Annotations\RouteResource;
  *
  * @author Thibault Duplessis <thibault.duplessis@gmail.com>
  * @author Christophe Coevoet <stof@notk.org>
- * @RouteResource("resetting")
  */
 class ResettingController extends FOSRestController
 {
     /**
-     * Request reset user password: show form.
-     * @Post("/request")
+     * @Post("/user/request")
+     * @param Request $request
+     * @return FormInterface|JsonResponse|Response
      */
-    public function requestAction()
+    public function requestResetUserAction(Request $request)
     {
-        return $this->render('@FOSUser/Resetting/request.html.twig');
+        return $this->get('apm_user.resetting_manager')->request(Utilisateur_avm::class, $request);
     }
 
     /**
-     * Request reset user password: submit form and send email.
-     *
+     * Reset user password
+     * @Post("/user/confirm")
      * @param Request $request
-     *
-     * @return Response
-     *
-     * @Post("/send-email")
+     * @return FormInterface|JsonResponse|Response
      */
-    public function sendEmailAction(Request $request)
+    public function confirmResetUserAction(Request $request)
     {
-        $username = $request->request->get('username');
-
-        /** @var $user UserInterface */
-        $user = $this->get('fos_user.user_manager')->findUserByUsernameOrEmail($username);
-        /** @var $dispatcher EventDispatcherInterface */
-        $dispatcher = $this->get('event_dispatcher');
-
-        /* Dispatch init event */
-        $event = new GetResponseNullableUserEvent($user, $request);
-        $dispatcher->dispatch(FOSUserEvents::RESETTING_SEND_EMAIL_INITIALIZE, $event);
-
-        if (null !== $event->getResponse()) {
-            return $event->getResponse();
-        }
-
-        $ttl = $this->container->getParameter('fos_user.resetting.retry_ttl');
-
-        if (null !== $user && !$user->isPasswordRequestNonExpired($ttl)) {
-            $event = new GetResponseUserEvent($user, $request);
-            $dispatcher->dispatch(FOSUserEvents::RESETTING_RESET_REQUEST, $event);
-
-            if (null !== $event->getResponse()) {
-                return $event->getResponse();
-            }
-
-            if (null === $user->getConfirmationToken()) {
-                /** @var $tokenGenerator TokenGeneratorInterface */
-                $tokenGenerator = $this->get('fos_user.util.token_generator');
-                $user->setConfirmationToken($tokenGenerator->generateToken());
-            }
-
-            /* Dispatch confirm event */
-            $event = new GetResponseUserEvent($user, $request);
-            $dispatcher->dispatch(FOSUserEvents::RESETTING_SEND_EMAIL_CONFIRM, $event);
-
-            if (null !== $event->getResponse()) {
-                return $event->getResponse();
-            }
-
-            $this->get('fos_user.mailer')->sendResettingEmailMessage($user);
-            $user->setPasswordRequestedAt(new \DateTime());
-            $this->get('fos_user.user_manager')->updateUser($user);
-
-            /* Dispatch completed event */
-            $event = new GetResponseUserEvent($user, $request);
-            $dispatcher->dispatch(FOSUserEvents::RESETTING_SEND_EMAIL_COMPLETED, $event);
-
-            if (null !== $event->getResponse()) {
-                return $event->getResponse();
-            }
-        }
-
-        return new RedirectResponse($this->generateUrl('fos_user_resetting_check_email', array('username' => $username)));
+        return $this->get('apm_user.resetting_manager')->confirm(Utilisateur_avm::class, $request);
     }
 
     /**
-     * Tell the user to check his email provider.
+     * Change user password
      *
+     * @Post("/user/change/{id}")
      * @param Request $request
-     *
-     * @return Response
-     *
-     * @Post("/check")
+     * @param Utilisateur_avm $user
+     * @return FormInterface|JsonResponse
      */
-    public function checkEmailAction(Request $request)
+    public function changeResetUserAction(Request $request, Utilisateur_avm $user)
     {
-        $username = $request->query->get('username');
-
-        if (empty($username)) {
-            // the user does not come from the sendEmail action
-            return new RedirectResponse($this->generateUrl('fos_user_resetting_request'));
+        if ($user !== $this->getUser()) {
+            throw new AccessDeniedHttpException();
         }
+        return $this->get('apm_user.resetting_manager')->change(Utilisateur_avm::class, $request, $user);
+    }
 
-        return $this->render('@FOSUser/Resetting/check_email.html.twig', array(
-            'tokenLifetime' => ceil($this->container->getParameter('fos_user.resetting.retry_ttl') / 3600),
-        ));
+    //----------------------------------- staff ------------------------------------------------
+
+    /**
+     * @Post("/staff/request")
+     * @param Request $request
+     * @return FormInterface|JsonResponse|Response
+     */
+    public function requestResetStaffAction(Request $request)
+    {
+        return $this->get('apm_user.resetting_manager')->request(Admin::class, $request);
     }
 
     /**
-     * Reset user password.
-     *
+     * Reset user password
+     * @Post("/staff/confirm")
      * @param Request $request
-     * @param string $token
-     *
-     * @return Response
-     *
-     * @Post("/reset")
+     * @return FormInterface|JsonResponse|Response
      */
-    public function resetAction(Request $request, $token)
+    public function confirmResetStaffAction(Request $request)
     {
-        /** @var $formFactory \FOS\UserBundle\Form\Factory\FactoryInterface */
-        $formFactory = $this->get('fos_user.resetting.form.factory');
-        /** @var $userManager \FOS\UserBundle\Model\UserManagerInterface */
-        $userManager = $this->get('fos_user.user_manager');
-        /** @var $dispatcher \Symfony\Component\EventDispatcher\EventDispatcherInterface */
-        $dispatcher = $this->get('event_dispatcher');
-
-        $user = $userManager->findUserByConfirmationToken($token);
-
-        if (null === $user) {
-            throw new NotFoundHttpException(sprintf('The user with "confirmation token" does not exist for value "%s"', $token));
-        }
-
-        $event = new GetResponseUserEvent($user, $request);
-        $dispatcher->dispatch(FOSUserEvents::RESETTING_RESET_INITIALIZE, $event);
-
-        if (null !== $event->getResponse()) {
-            return $event->getResponse();
-        }
-
-        $form = $formFactory->createForm();
-        $form->setData($user);
-
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            $event = new FormEvent($form, $request);
-            $dispatcher->dispatch(FOSUserEvents::RESETTING_RESET_SUCCESS, $event);
-
-            $userManager->updateUser($user);
-
-            if (null === $response = $event->getResponse()) {
-                $url = $this->generateUrl('fos_user_profile_show');
-                $response = new RedirectResponse($url);
-            }
-
-            $dispatcher->dispatch(
-                FOSUserEvents::RESETTING_RESET_COMPLETED,
-                new FilterUserResponseEvent($user, $request, $response)
-            );
-
-            return $response;
-        }
-
-        return $this->render('@FOSUser/Resetting/reset.html.twig', array(
-            'token' => $token,
-            'form' => $form->createView(),
-        ));
+        return $this->get('apm_user.resetting_manager')->confirm(Admin::class, $request);
     }
+
+    /**
+     * Change user password
+     *
+     * @Post("/staff/change/{id}")
+     * @param Request $request
+     * @param Admin $user
+     * @return FormInterface|JsonResponse
+     */
+    public function changeResetStaffAction(Request $request, Admin $user)
+    {
+        if ($user !== $this->getUser()) {
+            throw new AccessDeniedHttpException();
+        }
+        return $this->get('apm_user.resetting_manager')->change(Admin::class, $request, $user);
+    }
+
 }

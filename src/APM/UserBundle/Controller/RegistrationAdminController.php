@@ -27,31 +27,7 @@ class RegistrationAdminController extends FOSRestController
     {
         $this->security($this->getUser());
         /** @var Admin $user */
-        $response = $this->get('apm_user.registration_manager')->register(Admin::class, $request);
-
-        if (is_object($response) && $response instanceof Admin) {
-            $user = $response;
-            $response = new JsonResponse(
-                [
-                    'msg' => $this->get('translator')->trans('registration.flash.user_created', [], 'FOSUserBundle'),
-                    'token' => $this->get('lexik_jwt_authentication.jwt_manager')->create($user)
-                ],
-                Response::HTTP_CREATED,
-                [
-                    'location' => $this->generateUrl(
-                        'api_user_show_profile',
-                        ['id' => $user->getId()],
-                        UrlGeneratorInterface::ABSOLUTE_PATH
-                    )
-                ]
-            );
-            $dispatcher = $this->get('event_dispatcher');
-            $dispatcher->dispatch(
-                FOSUserEvents::REGISTRATION_COMPLETED,
-                new FilterUserResponseEvent($user, $request, $response)
-            );
-        }
-        return $response;
+        return $this->get('apm_user.registration_manager')->register(Admin::class, $request);
     }
 
     private function security($user)
