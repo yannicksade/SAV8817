@@ -10,6 +10,7 @@ namespace APM\UserBundle\Manager;
 
 
 use FOS\RestBundle\Controller\FOSRestController;
+use FOS\UserBundle\Model\UserInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use FOS\RestBundle\Controller\Annotations\Post;
 use FOS\RestBundle\Controller\Annotations\RouteResource;
@@ -26,6 +27,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
@@ -51,7 +53,7 @@ class RegistrationManager implements ContainerAwareInterface
         $dispatcher = $this->container->get('event_dispatcher');
 
         $user = $userManager->createUser();
-        $user->setEnabled(true);
+        $user->setEnabled(false);
 
         $event = new GetResponseUserEvent($user, $request);
         $dispatcher->dispatch(FOSUserEvents::REGISTRATION_INITIALIZE, $event);
@@ -76,19 +78,47 @@ class RegistrationManager implements ContainerAwareInterface
 
             return $form;
         }
-
         $event = new FormEvent($form, $request);
-        $dispatcher->dispatch(FOSUserEvents::REGISTRATION_SUCCESS, $event);
 
         if ($event->getResponse()) {
             return $event->getResponse();
         }
+        $dispatcher->dispatch(FOSUserEvents::REGISTRATION_SUCCESS, $event);
+        $userManager->updateUser($user);
+
+        return $user;
+    }
+
+    private function discriminateAndGetManager($class)
+    {
+        $discriminator = $this->container->get('pugx_user.manager.user_discriminator');
+        $discriminator->setClass($class);
+        return $this->container->get('pugx_user_manager');
+    }
+
+    public function confirm($class, $request)
+    {
+        $token = $request->request->get('token', null);
+        /** @var $userManager UserManagerInterface */
+        $userManager = $this->discriminateAndGetManager($class);
+        $user = $userManager->findUserByConfirmationToken($token);
+        if (null === $user) {
+            return new JsonResponse('You must submit a token.', JsonResponse::HTTP_BAD_REQUEST);
+        }
+        /** @var $dispatcher EventDispatcherInterface */
+        $dispatcher = $this->container->get('event_dispatcher');
+
+        $user->setConfirmationToken(null);
+        $user->setEnabled(true);
+
+        $event = new GetResponseUserEvent($user, $request);
+        $dispatcher->dispatch(FOSUserEvents::REGISTRATION_CONFIRM, $event);
 
         $userManager->updateUser($user);
 
         $location = $this->container->get("fos_rest.router")->generate('api_user_show', ['id' => $user->getId()], UrlGeneratorInterface::ABSOLUTE_PATH);
 
-        $response = new JsonResponse(
+        $myResponse = new JsonResponse(
             [
                 'msg' => $this->container->get('translator')->trans('registration.flash.user_created', [], 'FOSUserBundle'),
                 'token' => $this->container->get('lexik_jwt_authentication.jwt_manager')->create($user)
@@ -99,18 +129,15 @@ class RegistrationManager implements ContainerAwareInterface
             ]
         );
 
+        if (null === $response = $event->getResponse()) {
+            return $myResponse;
+        }
+
         $dispatcher->dispatch(
             FOSUserEvents::REGISTRATION_COMPLETED,
             new FilterUserResponseEvent($user, $request, $response)
         );
 
-        return $response;
-    }
-
-    private function discriminateAndGetManager($class)
-    {
-        $discriminator = $this->container->get('pugx_user.manager.user_discriminator');
-        $discriminator->setClass($class);
-        return $this->container->get('pugx_user_manager');
+        return $myResponse;
     }
 }

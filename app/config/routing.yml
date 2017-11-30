@@ -16,6 +16,11 @@ NelmioApiDocBundle:
     resource: "@NelmioApiDocBundle/Resources/config/routing.yml"
     prefix: "/api/doc"
 
+fos_user_registration_check_email:
+    path:     /check-email-mask
+    #defaults: { _controller: "APMUserBundle:Registration:checkEmailAction" }
+    #methods:  GET
+
 #fos_comment_api:
  #   type: rest
   #  resource: "@FOSCommentBundle/Resources/config/routing.yml"
@@ -32,15 +37,16 @@ apm_user_resetting:
     resource: APM\UserBundle\Controller\ResettingController
     prefix: /reset-password
 
-apm_user_registration:
+apm_user_registration_user:
     type:  rest
     resource: APM\UserBundle\Controller\RegistrationUserController
     prefix: /user
 
-apm_staff_registration:
+apm_user_registration_staff:
     type:  rest
-    resource: APM\UserBundle\Controller\RegistrationAdminController
+    resource: APM\UserBundle\Controller\RegistrationStaffController
     prefix: /staff
+
 
 
 #---------------------------- staff management ability ----------------------------------------

@@ -14,6 +14,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use FOS\RestBundle\Controller\Annotations\Post;
 use FOS\RestBundle\Controller\Annotations\Get;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
@@ -22,10 +23,11 @@ use FOS\RestBundle\Controller\Annotations\RouteResource;
 /**
  * Class RegistrationUtilisateurAVMController
  * @package APM\UserBundle\Controller
- * @RouteResource("user")
+ * @RouteResource("staff")
  */
-class RegistrationUserController extends FOSRestController
+class RegistrationStaffController extends FOSRestController
 {
+
     /**
      * @Post("/register")
      * @param Request $request
@@ -33,10 +35,10 @@ class RegistrationUserController extends FOSRestController
      */
     public function registerAction(Request $request)
     {
-        /** @var Utilisateur_avm $user */
-        $response = $this->get('apm_user.registration_manager')->register(Utilisateur_avm::class, $request);
-
-        if (is_object($response) && $response instanceof Utilisateur_avm) {
+        $this->security($this->getUser());
+        /** @var Admin $user */
+        $response = $this->get('apm_user.registration_manager')->register(Admin::class, $request);
+        if (is_object($response) && $response instanceof Admin) {
             $user = $response;
             return new JsonResponse(
                 array(
@@ -61,6 +63,17 @@ class RegistrationUserController extends FOSRestController
         }
     }
 
+    private function security($user)
+    {
+        //---------------------------------security-----------------------------------------------
+        // Access reserve au super admin
+        $this->denyAccessUnlessGranted('ROLE_SUPER_ADMIN', null, 'Unable to access this page!');
+        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY') || !$user instanceof Admin) {
+            throw $this->createAccessDeniedException();
+        }
+        //-----------------------------------------------------------------------------------------
+    }
+
     /**
      * @param Request $request
      * @return JsonResponse
@@ -69,8 +82,7 @@ class RegistrationUserController extends FOSRestController
     public function registrationConfirmationAction(Request $request)
     {
 
-        return $this->get('apm_user.registration_manager')->confirm(Utilisateur_avm::class, $request);
+        return $this->get('apm_user.registration_manager')->confirm(Admin::class, $request);
     }
-
 
 }

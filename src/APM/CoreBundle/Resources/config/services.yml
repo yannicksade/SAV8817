@@ -14,6 +14,11 @@ services:
         calls:
               - ["setContainer", ["@service_container"]]
 
+    apm_user.rest_mailer:
+        class: APM\CoreBundle\Util\RestMailer
+        public: true
+        parent: fos_user.mailer.twig_swift
+
 #---------- Upload files ---------
     apm_core.packages_maker:
         class: APM\CoreBundle\Util\PackagesMaker

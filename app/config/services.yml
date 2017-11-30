@@ -4,9 +4,9 @@
 parameters:
 #    parameter_name: value
 
-services:
-    app.form.registration:
-        class: APMUserBundle\Form\RegistrationType
-        tags:
-            - { name: form.type, alias: lgp_user_registration }
+#services:
+ #   app.form.registration:
+  #      class: APMUserBundle\Form\RegistrationType
+   #     tags:
+     #       - { name: form.type, alias: lgp_user_registration }
 

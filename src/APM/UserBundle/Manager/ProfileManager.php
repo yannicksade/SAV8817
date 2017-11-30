@@ -18,8 +18,6 @@ use FOS\UserBundle\FOSUserEvents;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\HttpFoundation\Response;
-use FOS\RestBundle\View\ViewHandler;
 
 class ProfileManager implements ContainerAwareInterface
 {

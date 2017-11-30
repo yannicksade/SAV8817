@@ -89,7 +89,8 @@ swiftmailer:
     transport: %mailer_transport%
     username:  %mailer_user%
     password:  %mailer_password%
-    host:      %mailer_host%
+    #host:      %mailer_host%
+    spool:     { type: memory }
 
 # Fos user
 fos_user:
@@ -98,11 +99,18 @@ fos_user:
     user_class: APM\UserBundle\Entity\Utilisateur
     service:
         user_manager: pugx_user_manager
-        mailer: fos_user.mailer.twig_swift
-    use_username_form_type: true
+        mailer: apm_user.rest_mailer
+    #use_username_form_type: true
     from_email:
         address:           webmaster@esay-trade.com
         sender_name:       webmaster
+    registration:
+        confirmation:
+            enabled: true
+            from_email:
+                address:     yannicksade@gmail.com
+                sender_name: Easy Trade Team
+            template:   '@FOSUser/Registration/email.txt.twig'
     resetting:
         email:
             from_email:

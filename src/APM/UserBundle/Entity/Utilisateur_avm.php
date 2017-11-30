@@ -249,7 +249,6 @@ class Utilisateur_avm extends Utilisateur
 
         $this->dateEnregistrement = new \DateTime("now");
         $this->roles = array('ROLE_USERAVM');
-        $this->enabled = true;
         $this->code = "X" . CodeGenerator::getGenerator(6);
 
         $this->offres = new ArrayCollection();

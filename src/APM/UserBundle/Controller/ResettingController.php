@@ -51,21 +51,6 @@ class ResettingController extends FOSRestController
         return $this->get('apm_user.resetting_manager')->confirm(Utilisateur_avm::class, $request);
     }
 
-    /**
-     * Change user password
-     *
-     * @Post("/user/change/{id}")
-     * @param Request $request
-     * @param Utilisateur_avm $user
-     * @return FormInterface|JsonResponse
-     */
-    public function changeResetUserAction(Request $request, Utilisateur_avm $user)
-    {
-        if ($user !== $this->getUser()) {
-            throw new AccessDeniedHttpException();
-        }
-        return $this->get('apm_user.resetting_manager')->change(Utilisateur_avm::class, $request, $user);
-    }
 
     //----------------------------------- staff ------------------------------------------------
 
@@ -88,22 +73,6 @@ class ResettingController extends FOSRestController
     public function confirmResetStaffAction(Request $request)
     {
         return $this->get('apm_user.resetting_manager')->confirm(Admin::class, $request);
-    }
-
-    /**
-     * Change user password
-     *
-     * @Post("/staff/change/{id}")
-     * @param Request $request
-     * @param Admin $user
-     * @return FormInterface|JsonResponse
-     */
-    public function changeResetStaffAction(Request $request, Admin $user)
-    {
-        if ($user !== $this->getUser()) {
-            throw new AccessDeniedHttpException();
-        }
-        return $this->get('apm_user.resetting_manager')->change(Admin::class, $request, $user);
     }
 
 }

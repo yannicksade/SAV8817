@@ -8,8 +8,6 @@
 
 namespace APM\UserBundle\Manager;
 
-
-use APM\UserBundle\Entity\Utilisateur;
 use FOS\UserBundle\Event\FilterUserResponseEvent;
 use FOS\UserBundle\Event\FormEvent;
 use FOS\UserBundle\Event\GetResponseNullableUserEvent;
@@ -23,6 +21,8 @@ use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
+
+use FOS\UserBundle\Mailer\TwigSwiftMailer;
 
 class ResettingManager implements ContainerAwareInterface
 {
@@ -90,7 +90,7 @@ class ResettingManager implements ContainerAwareInterface
             return $event->getResponse();
         }
 
-        $this->container->get('fos_user.mailer')->sendResettingEmailMessage($user);
+        $this->container->get('apm_user.rest_mailer')->sendResettingEmailMessage($user);
         $user->setPasswordRequestedAt(new \DateTime());
         $em->updateUser($user);
 
@@ -153,7 +153,9 @@ class ResettingManager implements ContainerAwareInterface
             return $event->getResponse();
         }
 
-        $form = $formFactory->createForm();
+        $form = $formFactory->createForm(array(
+            "allow_extra_fields" => true
+        ));
         $form->setData($user);
         $form->submit($request->request->all());
 

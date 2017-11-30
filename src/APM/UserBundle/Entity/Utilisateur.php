@@ -87,10 +87,10 @@ abstract class Utilisateur extends BaseUser
      */
     protected $prenom;
     /**
-     * @var String
-     * @ORM\Column(name="dateNaissance", type="string", nullable=true)
+     * @var \DateTime
      * @Expose
      * @Groups({"global_details"})
+     * @ORM\Column(name="dateNaissance", type="datetime", nullable=true)
      */
     protected $dateNaissance;
     /**
@@ -235,7 +235,7 @@ abstract class Utilisateur extends BaseUser
     /**
      * Get dateNaissance
      *
-     * @return string
+     * @return \DateTime
      */
     public function getDateNaissance()
     {
@@ -245,7 +245,7 @@ abstract class Utilisateur extends BaseUser
     /**
      * Set dateNaissance
      *
-     * @param string $dateNaissance
+     * @param \DateTime $dateNaissance
      *
      * @return Utilisateur
      */

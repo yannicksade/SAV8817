@@ -25,11 +25,6 @@ apm_user_profile:
     resource: APM\UserBundle\Controller\ProfileController
     name_prefix: api_user_
 
-apm_user_change_password:
-    type:  rest
-    resource: APM\UserBundle\Controller\ChangePasswordController
-    name_prefix: api_user_
-
 #-------------------- management ---------------
 apm_user_gerant-boutique:
     type: rest

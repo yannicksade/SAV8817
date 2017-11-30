@@ -7,16 +7,13 @@ namespace APM\UserBundle\Entity;
 use APM\CoreBundle\Trade\CodeGenerator;
 use Symfony\Component\Validator\Constraints as Assert;
 use Doctrine\ORM\Mapping as ORM;
-use JMS\Serializer\Annotation\ExclusionPolicy;
-use JMS\Serializer\Annotation\Expose;
-use JMS\Serializer\Annotation\Groups;
-use JMS\Serializer\Annotation\Type;
-use JMS\Serializer\Annotation\Exclude;
+use PUGX\MultiUserBundle\Validator\Constraints\UniqueEntity;
 
 /**
  * @ORM\Entity(repositoryClass="APM\UserBundle\Repository\AdminRepository")
  * @ORM\Table(name="Admin")
- * @ExclusionPolicy("all")
+ * @UniqueEntity(fields = "username", targetClass = "APM\UserBundle\Entity\Utilisateur", message="fos_user.username.already_used")
+ * @UniqueEntity(fields = "email", targetClass = "APM\UserBundle\Entity\Utilisateur", message="fos_user.email.already_used")
  */
 class Admin extends Utilisateur
 {
@@ -28,12 +25,13 @@ class Admin extends Utilisateur
     protected $id;
 
     public function __construct() {
+
         parent::__construct();
+
         $this->dateEnregistrement = new \DateTime();
-        $this->lastLogin = new \DateTime;
-        $this->enabled = false;
+        $this->lastLogin = new \DateTime();
+        $this->roles = array("ROLE_STAFF");
         $this->code = "XX" . CodeGenerator::getGenerator(4);
-        $this->roles = array('ROLE_STAFF');
     }
 
     public function __toString()

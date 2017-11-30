@@ -41,16 +41,17 @@ security:
             pattern: ^/ping$
             anonymous: true
 
-
-        api_user_register:
+        api_register_user:
             pattern: ^/user/register
             anonymous: true
 
-
-        api_staff_register:
-            pattern: ^/staff/register
+        api_confirm_user:
+            pattern: ^/user/confirmation-password
             anonymous: true
 
+        api_confirm_staff:
+            pattern: ^/staff/confirmation-password
+            anonymous: true
 
         api_docs:
             pattern: ^/doc
@@ -99,15 +100,14 @@ security:
         - { path: ^/doc, role: IS_AUTHENTICATED_ANONYMOUSLY }
 
         - { path: ^/login, role: IS_AUTHENTICATED_ANONYMOUSLY } # This is for All users logged in or anonymous
-        - { path: ^/user/register, role: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/user/register, role: IS_AUTHENTICATED_ANONYMOUSLY } #
+        - { path: ^/check-email-mask , role: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/user/confirmation-password , role: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/staff/confirmation-password , role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/reset-password, role: IS_AUTHENTICATED_ANONYMOUSLY }
-        - { path: ^/apm/core/anonymous, role: IS_AUTHENTICATED_ANONYMOUSLY}
 
-        - { path: ^/change-password, role: IS_AUTHENTICATED_FULLY } # This is strictly for users who have successfully logged in and not via remembered me cookie
-        - { path: ^/, role: IS_AUTHENTICATED_FULLY }
+        - { path: ^/apm/user/change-password, role: IS_AUTHENTICATED_FULLY }
 
-
-        - { path: ^/staff/register, role: ROLE_GESTIONNAIRE}
     #     pages accessibles aux utilisateurs avm authentifiés
         - { path: ^/apm/core/user, role: ROLE_USERAVM }
     #     pages accessibles aux Gérants Boutiques et aux propriétaires

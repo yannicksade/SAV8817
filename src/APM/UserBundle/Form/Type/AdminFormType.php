@@ -13,32 +13,32 @@ class AdminFormType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder
-            /* ->add('type', ChoiceType::class, [
-                 'required' => false,
-                 'choices' => [
-                     'Utilisateur AVM' => 'utilisateur_avm',
-                     'Staff' => 'admin',
-                 ]
-             ])*/
-            ->add('enabled', CheckboxType::class, ['required' => false])
-            ->add('roles', ChoiceType::class, array(
-                    'choices' => [
-                        'UtilisateurAVM' => 'ROLE_USERAVM',
-                        'TiersUtilisateur' => 'ROLE_USER',
-                        'Analyste' => 'ROLE_ANALYSE',
-                        'Explorateur' => 'ROLE_EXP',
-                        'Auditeur' => 'ROLE_AUDIT',
-                        'Comptable' => 'ROLE_COMP',
-                        'Gestionnaire' => 'ROLE_ADMIN',
-                        'Boutique' => 'ROLE_BOUTIQUE',
-                        'Transporteur' => 'ROLE_TRANSPORTEUR',
-                        'Conseiller' => 'ROLE_CONSEILLER',
-                    ],
-                    'required' => true,
-                    'multiple' => true,
-                )
-            );
+        /* $builder
+            * ->add('type', ChoiceType::class, [
+                  'required' => false,
+                  'choices' => [
+                      'Utilisateur AVM' => 'utilisateur_avm',
+                      'Staff' => 'admin',
+                  ]
+              ])
+              ->add('enabled', CheckboxType::class, ['required' => false])
+             *->add('roles', ChoiceType::class, array(
+                      'choices' => [
+                          'UtilisateurAVM' => 'ROLE_USERAVM',
+                          'TiersUtilisateur' => 'ROLE_USER',
+                          'Analyste' => 'ROLE_ANALYSE',
+                          'Explorateur' => 'ROLE_EXP',
+                          'Auditeur' => 'ROLE_AUDIT',
+                          'Comptable' => 'ROLE_COMP',
+                          'Gestionnaire' => 'ROLE_ADMIN',
+                          'Boutique' => 'ROLE_BOUTIQUE',
+                          'Transporteur' => 'ROLE_TRANSPORTEUR',
+                          'Conseiller' => 'ROLE_CONSEILLER',
+                      ],
+                      'required' => true,
+                      'multiple' => true,
+                  )
+              )*/;
     }
 
 

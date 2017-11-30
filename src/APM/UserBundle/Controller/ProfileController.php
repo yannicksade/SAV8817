@@ -27,6 +27,8 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 class ProfileController extends FOSRestController
 {
@@ -48,19 +50,31 @@ class ProfileController extends FOSRestController
     /**
      * @param Request $request
      * @param Utilisateur_avm $user
-     * @return View|JsonResponse
+     * @return View|JsonResponse|Response
      *
      * @Patch("/patch/profile/user/{id}")
      */
     public function patchUserAction(Request $request, Utilisateur_avm $user)
     {
+        $this->securityUser($user);
         /** @var Utilisateur_avm $utilisateur */
         $response = $this->get('apm_user.update_profile_manager')->updateUser(Utilisateur_avm::class, $request, false, $user);
         if (is_object($response) && $response instanceof Utilisateur_avm) {
             $utilisateur = $response;
             return $this->routeRedirectView('api_user_show', ['id' => $utilisateur->getId()], Response::HTTP_NO_CONTENT);
         }
-        return $this->json('invalid data', 400);
+
+        return $response;
+    }
+
+    private function securityUser($user)
+    {
+        //---------------------------------security-----------------------------------------------
+        $this->denyAccessUnlessGranted('ROLE_USERAVM', $user, 'This user does not have access to this section.');
+        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY')) {
+            throw $this->createAccessDeniedException();
+        }
+        //-----------------------------------------------------------------------------------------
     }
 
     /**
@@ -72,24 +86,57 @@ class ProfileController extends FOSRestController
      */
     public function patchStaffAction(Request $request, Admin $user)
     {
-        /** @var Utilisateur_avm $utilisateur */
+        $this->securityStaff($user);
         $response = $this->get('apm_user.update_profile_manager')->updateUser(Admin::class, $request, false, $user);
         if (is_object($response) && $response instanceof Admin) {
             $utilisateur = $response;
             return $this->routeRedirectView('api_user_show', ['id' => $utilisateur->getId()], Response::HTTP_NO_CONTENT);
         }
-        return $this->json('Invalid data', 400);
+        return $response;
     }
 
-    private function security($user)
+    private function securityStaff($user)
     {
         //---------------------------------security-----------------------------------------------
-        // Access reserve au super admin
-        $this->denyAccessUnlessGranted('ROLE_STAFF', $user, 'Unable to access this page!');
-        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY') || !$user instanceof Admin) {
+        $this->denyAccessUnlessGranted('ROLE_STAFF', $user, 'This user does not have access to this page.');
+        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY')) {
             throw $this->createAccessDeniedException();
         }
         //-----------------------------------------------------------------------------------------
+    }
+
+    /**
+     * Change user password
+     *
+     * @Post("/change-password/user/{id}")
+     * @param Request $request
+     * @param Utilisateur_avm $user
+     * @return FormInterface|JsonResponse
+     */
+    public function changepasswordUserAction(Request $request, Utilisateur_avm $user)
+    {
+        $this->securityUser($user);
+        if ($user !== $this->getUser()) {
+            throw new AccessDeniedHttpException("This user does not have access to this section");
+        }
+        return $this->get('apm_user.resetting_manager')->change(Utilisateur_avm::class, $request, $user);
+    }
+
+    /**
+     * Change user password
+     *
+     * @Post("/change-password/staff/{id}")
+     * @param Request $request
+     * @param Admin $user
+     * @return FormInterface|JsonResponse
+     */
+    public function changepasswordStaffAction(Request $request, Admin $user)
+    {
+        $this->securityStaff($user);
+        if ($user !== $this->getUser()) {
+            throw new AccessDeniedHttpException("This user does not have access to this section");
+        }
+        return $this->get('apm_user.resetting_manager')->change(Admin::class, $request, $user);
     }
 
     /*public function showImageAction(Request $request)
