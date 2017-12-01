@@ -20,6 +20,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use FOS\RestBundle\Controller\Annotations\Post;
+use FOS\RestBundle\Controller\Annotations\Get;
 use FOS\RestBundle\Controller\Annotations\RouteResource;
 
 /**
@@ -74,5 +75,26 @@ class ResettingController extends FOSRestController
     {
         return $this->get('apm_user.resetting_manager')->confirm(Admin::class, $request);
     }
+
+    /**
+     * @Get("/get/form-user")
+     * @param Request $request
+     * @return JsonResponse|Response
+     */
+    public function getResetFormUserAction(Request $request)
+    {
+        return $this->get('apm_user.resetting_manager')->confirm(Utilisateur_avm::class, $request);
+    }
+
+    /**
+     * @Get("/get/form-staff")
+     * @param Request $request
+     * @return JsonResponse|Response
+     */
+    public function getResetFormStaffAction(Request $request)
+    {
+        return $this->get('apm_user.resetting_manager')->confirm(Admin::class, $request);
+    }
+
 
 }

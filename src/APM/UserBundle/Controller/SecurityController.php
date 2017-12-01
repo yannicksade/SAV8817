@@ -62,8 +62,8 @@ class SecurityController extends FOSRestController
         $offre->setCode("YSADE023");
         $offre->setDateCreation(new \DateTime("now"));
 
-        //$view = $this->view([$offre], 200);
         $data = $serializer->serialize($offres, 'json', $serializerContext->setGroups(array("offre_details")));
+        //$view = $this->view([$offre], 200)
         //->setTemplate('FOSUserBundle:security:login.html.twig');
         // ->setTemplateVar('offres')
         //->setTemplateData($data);
@@ -127,28 +127,4 @@ class SecurityController extends FOSRestController
         throw new \DomainException('You should never see this');
     }
 
-    /**
-     * @Lock("/lock")
-     */
-    public function lockAction(Request $request)
-    {
-        $session = $request->getSession();
-        /** @var Utilisateur $user */
-        $user = $this->getUser();
-        $session->set('email', $user->getEmail());
-        $session->set('username', $user->getUsername());
-        $session->set('image', $user->getImage());
-
-        //$jwtManager = $this->container->get('lexik_jwt_authentication.jwt_manager');
-
-        throw new LockedException();
-    }
-
-    public function reloginAction(Request $request)
-    {
-        $session = $request->getSession();
-        $session->invalidate();
-        //supprimer le token
-        return $this->routeRedirectView('fos_user_security_login');
-    }
 }

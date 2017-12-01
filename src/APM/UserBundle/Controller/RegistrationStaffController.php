@@ -31,36 +31,13 @@ class RegistrationStaffController extends FOSRestController
     /**
      * @Post("/register")
      * @param Request $request
-     * @return JsonResponse
+     * @return JsonResponse|Response
      */
     public function registerAction(Request $request)
     {
         $this->security($this->getUser());
-        /** @var Admin $user */
-        $response = $this->get('apm_user.registration_manager')->register(Admin::class, $request);
-        if (is_object($response) && $response instanceof Admin) {
-            $user = $response;
-            return new JsonResponse(
-                array(
-                    "msg" => "A token has been sent to" . $user->getEmail() . "please check your email to activate your account!"
-                ),
-                Response::HTTP_CONTINUE
-            );
-        } elseif ($response instanceof FormInterface) {
-            return new JsonResponse(
-                array(
-                    "msg" => "data invalid"
-                ),
-                Response::HTTP_BAD_REQUEST
-            );
-        } else {
-            return new JsonResponse(
-                array(
-                    "msg" => "unknow error"
-                ),
-                Response::HTTP_BAD_REQUEST
-            );
-        }
+        return $this->get('apm_user.registration_manager')->register(Admin::class, $request);
+
     }
 
     private function security($user)
@@ -76,8 +53,8 @@ class RegistrationStaffController extends FOSRestController
 
     /**
      * @param Request $request
-     * @return JsonResponse
-     * @Post("/confirmation-password")
+     * @return JsonResponse|Response
+     * @Get("/confirmation-password")
      */
     public function registrationConfirmationAction(Request $request)
     {

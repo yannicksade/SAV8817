@@ -87,7 +87,7 @@ services:
             - { name: kernel.event_listener, event: lexik_jwt_authentication.on_jwt_expired, method: onJWTExpired }
 
 #Events::JWT_AUTHENTICATED - Customizing your security token by adding your own data
-#    apm_core_api.event.jwt_authenticated_listener:
-#       class: APM\CoreBundle\Event\Listener\JWTAuthenticatedListener
-#       tags:
-#           - { name: kernel.event_listener, event: lexik_jwt_authentication.on_jwt_authenticated, method: onJWTAuthenticated }
+    apm_core_api.event.jwt_authenticated_listener:
+        class: APM\CoreBundle\Event\Listener\JWTAuthenticatedListener
+        tags:
+           - { name: kernel.event_listener, event: lexik_jwt_authentication.on_jwt_authenticated, method: onJWTAuthenticated }

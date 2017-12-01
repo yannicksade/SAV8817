@@ -8,6 +8,7 @@
 
 namespace APM\UserBundle\Manager;
 
+use APM\UserBundle\Entity\Admin;
 use FOS\UserBundle\Event\FilterUserResponseEvent;
 use FOS\UserBundle\Event\FormEvent;
 use FOS\UserBundle\Event\GetResponseNullableUserEvent;
@@ -22,7 +23,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
-use FOS\UserBundle\Mailer\TwigSwiftMailer;
+use FOS\RestBundle\View\View;
 
 class ResettingManager implements ContainerAwareInterface
 {
@@ -121,21 +122,21 @@ class ResettingManager implements ContainerAwareInterface
 
     public function confirm($class, $request)
     {
-        $token = $request->request->get('token', null);
+        if (!$request->query->has('token')) {
+            return new JsonResponse('You must submit a token.', JsonResponse::HTTP_BAD_REQUEST);
+        }
+        $token = $request->query->get('token');
 
         if (null === $token) {
             return new JsonResponse('You must submit a token.', JsonResponse::HTTP_BAD_REQUEST);
         }
 
-        /** @var $userManager UserManagerInterface */
-        $userManager = $this->discriminateAndGetManager($class);
-
+        //-----------
         /** @var $formFactory FactoryInterface */
         $formFactory = $this->container->get('fos_user.resetting.form.factory');
 
-        /** @var $dispatcher EventDispatcherInterface */
-        $dispatcher = $this->container->get('event_dispatcher');
-
+        /** @var $userManager UserManagerInterface */
+        $userManager = $this->discriminateAndGetManager($class);
         $user = $userManager->findUserByConfirmationToken($token);
 
         if (null === $user) {
@@ -146,41 +147,53 @@ class ResettingManager implements ContainerAwareInterface
             );
         }
 
+        $form = $formFactory->createForm();
+        $form->setData($user);
+
+        /** @var $dispatcher EventDispatcherInterface */
+        $dispatcher = $this->container->get('event_dispatcher');
+        $view = (new view(null, 200))->setFormat("html");
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $data = array(
+                "username" => $user->getUsername(),
+                'message' => $this->container->get('translator')->trans('resetting.flash.success', [], 'FOSUserBundle'),
+                'target' => "http://localhost:4200/"
+            );
+            $view->setTemplate("@FOSUser/Registration/confirmed.html.twig")->setTemplateData($data);
+            $myResponse = $this->container->get("fos_rest.view_handler")->handle($view);
+
+            $event = new FormEvent($form, $request);
+            $dispatcher->dispatch(FOSUserEvents::RESETTING_RESET_SUCCESS, $event);
+            $userManager->updateUser($user);
+
+            if (null === $response = $event->getResponse()) {
+                return $myResponse;
+            }
+
+            $dispatcher->dispatch(FOSUserEvents::RESETTING_RESET_COMPLETED, new FilterUserResponseEvent($user, $request, $response));
+
+            return $myResponse;
+        }
         $event = new GetResponseUserEvent($user, $request);
         $dispatcher->dispatch(FOSUserEvents::RESETTING_RESET_INITIALIZE, $event);
-
         if (null !== $event->getResponse()) {
             return $event->getResponse();
         }
-
-        $form = $formFactory->createForm(array(
-            "allow_extra_fields" => true
-        ));
-        $form->setData($user);
-        $form->submit($request->request->all());
-
-        if (!$form->isValid()) {
-            return $form;
-        }
-
-        $event = new FormEvent($form, $request);
-        $dispatcher->dispatch(FOSUserEvents::RESETTING_RESET_SUCCESS, $event);
-
-        $userManager->updateUser($user);
-
-        if (null === $response = $event->getResponse()) {
-            return new JsonResponse(
-                $this->container->get('translator')->trans('resetting.flash.success', [], 'FOSUserBundle'),
-                JsonResponse::HTTP_OK
-            );
-        }
-
-        $dispatcher->dispatch(FOSUserEvents::RESETTING_RESET_COMPLETED, new FilterUserResponseEvent($user, $request, $response));
-
-        return new JsonResponse(
-            $this->container->get('translator')->trans('resetting.flash.success', [], 'FOSUserBundle'),
-            JsonResponse::HTTP_OK
+        $path = $user instanceof Admin ? "confirm_reset_staff" : "confirm_reset_user";
+        $data = array(
+            "username" => $user->getUsername(),
+            "form" => $form->createView(),
+            "token" => $token,
+            "route" => $path
         );
+
+
+        $view->setTemplate("@FOSUser/Resetting/reset.html.twig")
+            ->setTemplateData($data);
+
+        return $this->container->get("fos_rest.view_handler")->handle($view);
+
     }
 
     public function change($class, $request, $user)

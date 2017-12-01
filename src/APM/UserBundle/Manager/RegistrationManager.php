@@ -15,6 +15,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use FOS\RestBundle\Controller\Annotations\Post;
 use FOS\RestBundle\Controller\Annotations\RouteResource;
 use FOS\RestBundle\Routing\ClassResourceInterface;
+use FOS\RestBundle\View\View;
 use FOS\UserBundle\Event\FilterUserResponseEvent;
 use FOS\UserBundle\Event\FormEvent;
 use FOS\UserBundle\Event\GetResponseUserEvent;
@@ -25,9 +26,9 @@ use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
@@ -76,7 +77,7 @@ class RegistrationManager implements ContainerAwareInterface
                 return $response;
             }
 
-            return $form;
+            return new JsonResponse("invalid data");
         }
         $event = new FormEvent($form, $request);
 
@@ -86,7 +87,14 @@ class RegistrationManager implements ContainerAwareInterface
         $dispatcher->dispatch(FOSUserEvents::REGISTRATION_SUCCESS, $event);
         $userManager->updateUser($user);
 
-        return $user;
+        return new JsonResponse(
+            $this->container->get('translator')->trans(
+                'registration.check_email',
+                ['%email%' => $user->getEmail()],
+                'FOSUserBundle'
+            ),
+            JsonResponse::HTTP_OK
+        );
     }
 
     private function discriminateAndGetManager($class)
@@ -96,14 +104,19 @@ class RegistrationManager implements ContainerAwareInterface
         return $this->container->get('pugx_user_manager');
     }
 
-    public function confirm($class, $request)
+    public function confirm($class, Request $request)
     {
-        $token = $request->request->get('token', null);
+        if (!$request->query->has('token')) {
+            return new JsonResponse('You must submit a token.', JsonResponse::HTTP_BAD_REQUEST);
+        }
+        $token = $request->query->get('token');
         /** @var $userManager UserManagerInterface */
         $userManager = $this->discriminateAndGetManager($class);
         $user = $userManager->findUserByConfirmationToken($token);
         if (null === $user) {
-            return new JsonResponse('You must submit a token.', JsonResponse::HTTP_BAD_REQUEST);
+            return new JsonResponse(
+                sprintf('The user with "confirmation token" does not exist for value "%s"', $token),
+                JsonResponse::HTTP_BAD_REQUEST);
         }
         /** @var $dispatcher EventDispatcherInterface */
         $dispatcher = $this->container->get('event_dispatcher');
@@ -116,18 +129,18 @@ class RegistrationManager implements ContainerAwareInterface
 
         $userManager->updateUser($user);
 
-        $location = $this->container->get("fos_rest.router")->generate('api_user_show', ['id' => $user->getId()], UrlGeneratorInterface::ABSOLUTE_PATH);
-
-        $myResponse = new JsonResponse(
-            [
-                'msg' => $this->container->get('translator')->trans('registration.flash.user_created', [], 'FOSUserBundle'),
-                'token' => $this->container->get('lexik_jwt_authentication.jwt_manager')->create($user)
-            ],
-            Response::HTTP_CREATED,
-            [
-                'location' => $location
-            ]
+        //$location = $this->container->get("fos_rest.router")->generate('api_user_show', ['id' => $user->getId()], UrlGeneratorInterface::RELATIVE_PATH);
+        $data = array(
+            "username" => $user->getUsername(),
+            'message' => $this->container->get('translator')->trans('registration.flash.user_created', [], 'FOSUserBundle'),
+            'target' => "http://localhost:4200/"
         );
+
+        $view = new view(null, 200);
+        $view->setTemplate("@FOSUser/Registration/confirmed.html.twig")
+            ->setTemplateData($data)
+            ->setFormat("html");
+        $myResponse = $this->container->get("fos_rest.view_handler")->handle($view);
 
         if (null === $response = $event->getResponse()) {
             return $myResponse;

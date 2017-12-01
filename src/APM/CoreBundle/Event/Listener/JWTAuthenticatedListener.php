@@ -8,6 +8,7 @@
 
 namespace APM\CoreBundle\Event\Listener;
 
+use APM\UserBundle\Entity\Utilisateur;
 use Lexik\Bundle\JWTAuthenticationBundle\Event\JWTAuthenticatedEvent;
 
 class JWTAuthenticatedListener
@@ -21,9 +22,13 @@ class JWTAuthenticatedListener
     public function onJWTAuthenticated(JWTAuthenticatedEvent $event)
     {
         $token = $event->getToken();
-        $payload = $event->getPayload();
+        //$payload = $event->getPayload();
+        if ($token && $token->isAuthenticated()) {
+            /** @var Utilisateur $user */
+            //$user = $token->getUser();
+            //$user->setLastLogin(new \DateTime());
+        }
+        //$token->setAttribute('UUID', $payload['UUID']);
 
-        $token->setAttribute('UUID', $payload['UUID']);
-        $token->isAuthenticated();
     }
 }

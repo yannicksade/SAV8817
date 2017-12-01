@@ -1,7 +1,5 @@
 {% trans_default_domain 'FOSUserBundle' %}
-<p>{{ 'registration.confirmed'|trans({'%username%': user.username}) }}</p>
-{% if targetUrl %}
-    <p><a href="{{ targetUrl }}">{{ 'registration.back'|trans }}</a></p>
-{% endif %}
+<h1> Validation du compte </h1>
+<div>{{ message }} : <strong>{{ username }}</strong></div>
 
-    {{ render(url('apm_core_main_show')) }}
+<a href="{{ target }}"> Accéder au site </a>

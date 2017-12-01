@@ -29,42 +29,19 @@ class RegistrationUserController extends FOSRestController
     /**
      * @Post("/register")
      * @param Request $request
-     * @return JsonResponse
+     * @return JsonResponse | Response
      */
     public function registerAction(Request $request)
     {
-        /** @var Utilisateur_avm $user */
-        $response = $this->get('apm_user.registration_manager')->register(Utilisateur_avm::class, $request);
+        return $this->get('apm_user.registration_manager')->register(Utilisateur_avm::class, $request);
 
-        if (is_object($response) && $response instanceof Utilisateur_avm) {
-            $user = $response;
-            return new JsonResponse(
-                array(
-                    "msg" => "A token has been sent to" . $user->getEmail() . "please check your email to activate your account!"
-                ),
-                Response::HTTP_CONTINUE
-            );
-        } elseif ($response instanceof FormInterface) {
-            return new JsonResponse(
-                array(
-                    "msg" => "data invalid"
-                ),
-                Response::HTTP_BAD_REQUEST
-            );
-        } else {
-            return new JsonResponse(
-                array(
-                    "msg" => "unknow error"
-                ),
-                Response::HTTP_BAD_REQUEST
-            );
-        }
     }
+
 
     /**
      * @param Request $request
-     * @return JsonResponse
-     * @Post("/confirmation-password")
+     * @return JsonResponse|Response
+     * @Get("/confirmation-password")
      */
     public function registrationConfirmationAction(Request $request)
     {

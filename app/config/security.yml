@@ -101,7 +101,8 @@ security:
 
         - { path: ^/login, role: IS_AUTHENTICATED_ANONYMOUSLY } # This is for All users logged in or anonymous
         - { path: ^/user/register, role: IS_AUTHENTICATED_ANONYMOUSLY } #
-        - { path: ^/check-email-mask , role: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/check-email-mask , role: IS_AUTHENTICATED_ANONYMOUSLY } #
+        - { path: ^/user/check/email , role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/user/confirmation-password , role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/staff/confirmation-password , role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/reset-password, role: IS_AUTHENTICATED_ANONYMOUSLY }

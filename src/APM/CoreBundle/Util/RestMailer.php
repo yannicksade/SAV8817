@@ -111,7 +111,7 @@ class RestMailer implements MailerInterface
      */
     public function sendResettingEmailMessage(UserInterface $user)
     {
-        $route = $user instanceof Admin ? 'confirm_reset_staff' : 'confirm_reset_user';
+        $route = $user instanceof Admin ? 'get_reset_form_staff' : 'get_reset_form_user';
         $template = $this->parameters['template']['resetting'];
         $url = $this->router->generate(
             $route,
