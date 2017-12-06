@@ -33,7 +33,6 @@ class JWTDecodedListener
     {
         $request = $this->requestStack->getCurrentRequest();
         $payload = $event->getPayload();
-        $now = new \DateTime();
         if (!isset($payload['ip']) || $payload['ip'] != $request->getClientIp()) {
             $event->markAsInvalid();
         }

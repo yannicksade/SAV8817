@@ -109,8 +109,6 @@ security:
 
         - { path: ^/apm/user/change-password, role: IS_AUTHENTICATED_FULLY }
 
-    #     pages accessibles aux utilisateurs avm authentifiés
-        - { path: ^/apm/core/user, role: ROLE_USERAVM }
     #     pages accessibles aux Gérants Boutiques et aux propriétaires
         - { path: ^/apm/core/gerant-boutique, role: ROLE_BOUTIQUE }
     #     pages accessibles aux Transporteurs
@@ -131,6 +129,9 @@ security:
                   #  pages accessibles aux administrateurs
         - { path: ^/apm/core/gestionnaire, role: ROLE_ADMIN} #gestion du business
           #   pages accessibles au super admin
+
+ #     pages accessibles aux utilisateurs avm authentifiés
+        - { path: ^/apm, role: ROLE_USERAVM }
 
         - { path: ^/, role: ROLE_SUPER_ADMIN} # Everything that has not been included in any careful path belong to the super user
 
