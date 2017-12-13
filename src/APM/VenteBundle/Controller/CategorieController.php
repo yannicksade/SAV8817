@@ -49,39 +49,30 @@ class CategorieController extends Controller
     {
         $this->listAndShowSecurity($boutique);
         $categories = $boutique->getCategories();
-        if($request->isXmlHttpRequest()){
-            $this->code_filter = $request->query->has('code_filter') ? $request->query->get('code_filter') : "";
-            $this->designation_filter = $request->query->has('designation_filter') ? $request->query->get('designation_filter') : "";
-            $this->description_filter = $request->query->has('description_filter') ? $request->query->get('description_filter') : "";
-            $this->livrable_filter = $request->query->has('livrable_filter') ? $request->query->get('livrable_filter') : "";
-            $this->publiable_filter = $request->query->has('publiable_filter') ? $request->query->get('publiable_filter') : "";
-            $this->etat_filter = $request->query->has('etat_filter') ? $request->query->get('etat_filter') : "";
-            $this->categorieCourante_filter = $request->query->has('categorieCourante_filter') ? $request->query->get('categorieCourante_filter') : "";
-            $this->dateFrom_filter = $request->query->has('date_from_filter') ? $request->query->get('date_from_filter') : "";
-            $this->dateTo_filter = $request->query->has('date_to_filter') ? $request->query->get('date_to_filter') : "";
+        $this->code_filter = $request->query->has('code_filter') ? $request->query->get('code_filter') : "";
+        $this->designation_filter = $request->query->has('designation_filter') ? $request->query->get('designation_filter') : "";
+        $this->description_filter = $request->query->has('description_filter') ? $request->query->get('description_filter') : "";
+        $this->livrable_filter = $request->query->has('livrable_filter') ? $request->query->get('livrable_filter') : "";
+        $this->publiable_filter = $request->query->has('publiable_filter') ? $request->query->get('publiable_filter') : "";
+        $this->etat_filter = $request->query->has('etat_filter') ? $request->query->get('etat_filter') : "";
+        $this->categorieCourante_filter = $request->query->has('categorieCourante_filter') ? $request->query->get('categorieCourante_filter') : "";
+        $this->dateFrom_filter = $request->query->has('date_from_filter') ? $request->query->get('date_from_filter') : "";
+        $this->dateTo_filter = $request->query->has('date_to_filter') ? $request->query->get('date_to_filter') : "";
+        $iDisplayLength = $request->query->has('length') ? $request->query->get('length') : -1;
+        $iDisplayStart = $request->query->has('start') ? intval($request->query->get('start')) : 0;
+        $json = array();
+        $selectedGroup = array("owner_list");
+        $iTotalRecords = count($categories);
+        if ($iDisplayLength < 0) $iDisplayLength = $iTotalRecords;
+        $categories = $this->handleResults($categories, $iTotalRecords, $iDisplayStart, $iDisplayLength);
+        $iFilteredRecords = count($categories);
+        $data = $this->get('apm_core.data_serialized')->getFormalData($categories, $selectedGroup);
+        $json['totalRecords'] = $iTotalRecords;
+        $json['filteredRecords'] = $iFilteredRecords;
+        $json['items'] = $data;
 
-            $iDisplayLength = $request->query->has('length') ? $request->query->get('length') : -1;
-            $iDisplayStart = $request->query->has('start') ? intval($request->query->get('start')) : 0;
-            $json = array();
-            $iTotalRecords = count($categories);
-            if ($iDisplayLength < 0) $iDisplayLength = $iTotalRecords;
-            $categories = $this->handleResults($categories, $iTotalRecords, $iDisplayStart, $iDisplayLength);
-                /** @var Categorie $category */
-                foreach ($categories as $category) {
-                    array_push($json, array(
-                        'id' => $category->getId(),
-                        'code' => $category->getCode(),
-                        'designation' => $category->getDesignation(),
-                        'description' => $category->getDescription(),
-                    ));
-                }
-                return $this->json($json, 200);
-        }
-        
-            return $this->render('APMVenteBundle:categorie:index.html.twig', array(
-            'categories' => $categories,
-            'boutique' => $boutique
-        ));
+        return new JsonResponse($json, 200);
+
     }
 
     /**
@@ -195,7 +186,7 @@ class CategorieController extends Controller
             $dt2 = $e2->getDateCreation()->getTimestamp();
             return $dt1 <= $dt2 ? 1 : -1;
         });
-        if($iDisplayLength < 0) $iDisplayLength = $iTotalRecords;
+        if ($iDisplayLength < 0) $iDisplayLength = $iTotalRecords;
         //paging; slice and preserve keys' order
         $categories = array_slice($categories, $iDisplayStart, $iDisplayLength, true);
 
@@ -290,50 +281,16 @@ class CategorieController extends Controller
 
     /**
      * Finds and displays a Categorie entity.
-     * @param Request $request
      * @param Categorie $categorie
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return JsonResponse
      *
      * @Get("/show/categorie/{id}")
      */
-    public function showAction(Request $request, Categorie $categorie)
+    public function showAction(Categorie $categorie)
     {
         $this->listAndShowSecurity();
-        if ($request->isXmlHttpRequest()) {
-            $json = array();
-            $json['item'] = array(
-                'id' => $categorie->getId(),
-                'code' => $categorie->getCode(),
-                'designation' => $categorie->getDesignation(),
-                'description' => $categorie->getDescription(),
-                'etat' => $categorie->getEtat(),
-                'dateCreation' => $categorie->getDateCreation()->format('d-m-Y H:i'),
-                'categorieCourante' => $categorie->getCategorieCourante()->getId(),
-                'publiable' => $categorie->getPubliable(),
-                'livrable' => $categorie->getLivrable(),
-            );
-            return $this->json(json_encode($json), 200);
-        }
-        $deleteForm = $this->createDeleteForm($categorie);
-        return $this->render('APMVenteBundle:categorie:show.html.twig', array(
-            'categorie' => $categorie,
-            'delete_form' => $deleteForm->createView(),
-        ));
-    }
-
-    /**
-     * Creates a form to delete a Categorie entity.
-     *
-     * @param Categorie $categorie The Categorie entity
-     *
-     * @return \Symfony\Component\Form\Form The form
-     */
-    private function createDeleteForm(Categorie $categorie)
-    {
-        return $this->createFormBuilder()
-            ->setAction($this->generateUrl('apm_vente_categorie_delete', array('id' => $categorie->getId())))
-            ->setMethod('DELETE')
-            ->getForm();
+        $data = $this->get('apm_core.data_serialized')->getFormalData($categorie, ["owner_categorie_details", "owner_list"]);
+        return new JsonResponse($data, 200);
     }
 
     /**
@@ -429,6 +386,21 @@ class CategorieController extends Controller
     }
 
     /**
+     * Creates a form to delete a Categorie entity.
+     *
+     * @param Categorie $categorie The Categorie entity
+     *
+     * @return \Symfony\Component\Form\Form The form
+     */
+    private function createDeleteForm(Categorie $categorie)
+    {
+        return $this->createFormBuilder()
+            ->setAction($this->generateUrl('apm_vente_categorie_delete', array('id' => $categorie->getId())))
+            ->setMethod('DELETE')
+            ->getForm();
+    }
+
+    /**
      * Deletes a Categorie entity.
      * @param Request $request
      * @param Categorie $categorie
@@ -453,7 +425,7 @@ class CategorieController extends Controller
             $em->flush();
         }
 
-        return $this->redirectToRoute('apm_vente_categorie_index', ['id' =>$categorie->getBoutique()->getId()]);
+        return $this->redirectToRoute('apm_vente_categorie_index', ['id' => $categorie->getBoutique()->getId()]);
     }
 
 }

@@ -13,18 +13,25 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Symfony\Component\Validator\Constraints as Assert;
 use Doctrine\ORM\Mapping as ORM;
-
+use JMS\Serializer\Annotation\ExclusionPolicy;
+use JMS\Serializer\Annotation\Expose;
+use JMS\Serializer\Annotation\Groups;
+use JMS\Serializer\Annotation\Type;
+use JMS\Serializer\Annotation\Exclude;
 /**
  * Conseiller
  *
  * @ORM\Table(name="conseiller_boutique")
  * @ORM\Entity(repositoryClass="APM\MarketingDistribueBundle\Repository\Conseiller_boutiqueRepository")
+ * @ExclusionPolicy("all")
  */
 class Conseiller_boutique extends TradeFactory
 {
     /**
      * Id
      * @var integer
+     * @Expose
+     * @Groups({"others_list", "owner_list", "others_conseillerB_details", "owner_conseillerB_details"})
      * @ORM\Column(name="id", type="integer", nullable=false)
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
@@ -34,6 +41,8 @@ class Conseiller_boutique extends TradeFactory
 
     /**
      * @var integer
+     * @Expose
+     * @Groups({"others_conseillerB_details", "owner_conseillerB_details"})
      * @Assert\Range(min=0)
      * @ORM\Column(name="gainValeur", type="integer", nullable=true)
      */
@@ -41,12 +50,16 @@ class Conseiller_boutique extends TradeFactory
 
     /**
      * @var \DateTime
+     * @Expose
+     * @Groups({"owner_conseillerB_details"})
      * @ORM\Column(name="date", type="datetime")
      */
     private $date;
 
     /**
      * @var Conseiller
+     * @Expose
+     * @Groups({"others_list", "owner_list", "others_conseillerB_details", "owner_conseillerB_details"})
      * @ORM\ManyToOne(targetEntity="APM\MarketingDistribueBundle\Entity\Conseiller", inversedBy="conseillerBoutiques")
      * @ORM\JoinColumns({
      *     @ORM\JoinColumn(name="conseiller_id", referencedColumnName="id", nullable=false)
@@ -56,6 +69,8 @@ class Conseiller_boutique extends TradeFactory
 
     /**
      * @var Boutique
+     * @Expose
+     * @Groups({"others_list", "owner_list", "others_conseillerB_details", "owner_conseillerB_details"})
      * @ORM\ManyToOne(targetEntity="APM\VenteBundle\Entity\Boutique", inversedBy="boutiqueConseillers")
      * @ORM\JoinColumns({
      *     @ORM\JoinColumn(name="boutique_id", referencedColumnName="id", nullable=false)

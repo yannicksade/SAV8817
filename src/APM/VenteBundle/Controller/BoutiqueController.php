@@ -59,59 +59,38 @@ class BoutiqueController extends FOSRestController implements ClassResourceInter
         /** @var Boutique $boutique */
         $boutiques = $user->getBoutiquesProprietaire();
         $boutiquesGerant = $user->getBoutiquesGerant();
-        if ($request->isXmlHttpRequest() && $request->getMethod() === "POST") {
-            $p = $request->get('p');
-            $this->nationalite_filter = $request->query->has('nationalite_filter') ? $request->query->get('nationalite_filter') : "";
-            $this->code_filter = $request->query->has('code_filter') ? $request->query->get('code_filter') : "";
-            $this->designation_filter = $request->query->has('designation_filter') ? $request->query->get('designation_filter') : "";
-            $this->etat_filter = $request->query->has('etat_filter') ? $request->query->get('etat_filter') : "";
-            $iDisplayLength = $request->query->has('length') ? $request->query->get('length') : -1;
-            $iDisplayStart = $request->query->has('start') ? intval($request->query->get('start')) : 0;
-
-            $json = array();
-            $json['items'] = array();
-            if (($p === "owner" || $p === "both") && null !== $boutiques) {
-                $iTotalRecords = count($boutiques);
-                if ($iDisplayLength < 0) $iDisplayLength = $iTotalRecords;
-                $boutiques = $this->handleResults($boutiques, $iTotalRecords, $iDisplayStart, $iDisplayLength);
-                $iFilteredRecords = count($boutiques);
-                //filtre
-                foreach ($boutiques as $boutique) {
-                    array_push($json['items'], array(
-                        'id' => $boutique->getId(),
-                        'code' => $boutique->getCode(),
-                        'designation' => $boutique->getDesignation(),
-                        'description' => $boutique->getDescription(),
-                        'image' => $boutique->getImage()
-                    ));
-                }
-                $json['totalRecordsOwner'] = $iTotalRecords;
-                $json['filteredRecordsOwner'] = $iFilteredRecords;
-            }
-            if (($p === "shopkeeper" || $p === "both") && null !== $boutiquesGerant) {
-                $iTotalRecords = count($boutiquesGerant);
-                if ($iDisplayLength < 0) $iDisplayLength = $iTotalRecords;
-                $boutiquesGerant = $this->handleResults($boutiquesGerant, $iTotalRecords, $iDisplayStart, $iDisplayLength);
-                $iFilteredRecords = count($boutiques);
-                foreach ($boutiquesGerant as $boutique) {
-                    array_push($json['items'], array(
-                        'id' => $boutique->getId(),
-                        'code' => $boutique->getCode(),
-                        'designation' => $boutique->getDesignation(),
-                        'description' => $boutique->getDescription(),
-                        'image' => $boutique->getImage()
-                    ));
-                }
-                $json['totalRecordsShopkeeper'] = $iTotalRecords;
-                $json['filteredRecordsShopkeeper'] = $iFilteredRecords;
-            }
-            return $this->json(json_encode($json), 200);
+        $p = $request->get('p');
+        $this->nationalite_filter = $request->query->has('nationalite_filter') ? $request->query->get('nationalite_filter') : "";
+        $this->code_filter = $request->query->has('code_filter') ? $request->query->get('code_filter') : "";
+        $this->designation_filter = $request->query->has('designation_filter') ? $request->query->get('designation_filter') : "";
+        $this->etat_filter = $request->query->has('etat_filter') ? $request->query->get('etat_filter') : "";
+        $iDisplayLength = $request->query->has('length') ? $request->query->get('length') : -1;
+        $iDisplayStart = $request->query->has('start') ? intval($request->query->get('start')) : 0;
+        $selectedGroup = array("owner_list");
+        $json = array();
+        $json['items'] = array();
+        if (($p === "owner" || $p === "both") && null !== $boutiques) {
+            $iTotalRecords = count($boutiques);
+            if ($iDisplayLength < 0) $iDisplayLength = $iTotalRecords;
+            $boutiques = $this->handleResults($boutiques, $iTotalRecords, $iDisplayStart, $iDisplayLength);
+            $iFilteredRecords = count($boutiques);
+            $data = $this->get('apm_core.data_serialized')->getFormalData($boutiques, $selectedGroup);
+            $json['items'] = $data;
+            $json['totalRecordsOwner'] = $iTotalRecords;
+            $json['filteredRecordsOwner'] = $iFilteredRecords;
         }
-        return $this->render('APMVenteBundle:boutique:index.html.twig', array(
-            'boutiquesProprietaire' => $boutiques,
-            'boutiquesGerant' => $boutiquesGerant,
-            'url_image' => $this->get('apm_core.packages_maker')->getPackages()->getUrl('/', 'resolve_img'),
-        ));
+        if (($p === "shopkeeper" || $p === "both") && null !== $boutiquesGerant) {
+            $iTotalRecords = count($boutiquesGerant);
+            if ($iDisplayLength < 0) $iDisplayLength = $iTotalRecords;
+            $boutiquesGerant = $this->handleResults($boutiquesGerant, $iTotalRecords, $iDisplayStart, $iDisplayLength);
+            $iFilteredRecords = count($boutiques);
+            $data = $this->get('apm_core.data_serialized')->getFormalData($boutiquesGerant, $selectedGroup);
+            $json['totalRecordsShopkeeper'] = $iTotalRecords;
+            $json['filteredRecordsShopkeeper'] = $iFilteredRecords;
+            $json['items'] = $data;
+        }
+
+        return new JsonResponse($json, 200);
     }
 
     private
@@ -322,61 +301,18 @@ class BoutiqueController extends FOSRestController implements ClassResourceInter
 
     /**
      * Finds and displays a Boutique entity.
-     * @param Request $request
      * @param Boutique $boutique
      * @return \Symfony\Component\HttpFoundation\Response | JsonResponse
      *
      * @Get("/show/boutique/{id}")
      */
     public
-    function showAction(Request $request, Boutique $boutique)
+    function showAction(Boutique $boutique)
     {
         $this->listAndShowSecurity();
-        if ($request->isXmlHttpRequest()) {
-            $json = array();
-            $json['item'] = array(
-                'id' => $boutique->getId(),
-                'code' => $boutique->getCode(),
-                'designation' => $boutique->getDesignation(),
-                'nationalite' => $boutique->getNationalite(),
-                'description' => $boutique->getDescription(),
-                'publiable' => $boutique->getPubliable(),
-                'raisonSociale' => $boutique->getRaisonSociale(),
-                'statutSocial' => $boutique->getStatutSocial(),
-                'gerant' => $boutique->getGerant()->getUsername(),
-                'proprietaire' => $boutique->getProprietaire(),
-                'etat' => $boutique->getEtat(),
-            );
-            return $this->json(json_encode($json), 200);
-        }
-
-        $deleteForm = $this->createDeleteForm($boutique);
-        return $this->render('APMVenteBundle:boutique:show.html.twig', array(
-            'boutique' => $boutique,
-            'delete_form' => $deleteForm->createView(),
-            'url_image' => $this->get('apm_core.packages_maker')->getPackages()->getUrl('/', 'resolve_img'),
-        ));
+        $data = $this->get('apm_core.data_serialized')->getFormalData($boutique, ["owner_boutique_details", "owner_list"]);
+        return new JsonResponse($data, 200);
     }
-
-    /**
-     * Creates a form to delete a Boutique entity.
-     *
-     * @param Boutique $boutique The Boutique entity
-     *
-     * @return \Symfony\Component\Form\Form The form
-     */
-    private
-    function createDeleteForm(Boutique $boutique)
-    {
-        return $this->createFormBuilder()
-            ->setAction($this->generateUrl('apm_vente_boutique_delete', array('id' => $boutique->getId())))
-            ->setMethod('DELETE')
-            ->getForm();
-    }
-
-    /*changer le personnel ayant le droit sur les produits de la
-     * changer les droits sur les offres
-    */
 
     /**
      * Displays a form to edit an existing Boutique entity.
@@ -468,6 +404,10 @@ class BoutiqueController extends FOSRestController implements ClassResourceInter
         ));
     }
 
+    /*changer le personnel ayant le droit sur les produits de la
+     * changer les droits sur les offres
+    */
+
     /**
      * @param Boutique $boutique
      */
@@ -504,6 +444,22 @@ class BoutiqueController extends FOSRestController implements ClassResourceInter
                 }
             }
         }
+    }
+
+    /**
+     * Creates a form to delete a Boutique entity.
+     *
+     * @param Boutique $boutique The Boutique entity
+     *
+     * @return \Symfony\Component\Form\Form The form
+     */
+    private
+    function createDeleteForm(Boutique $boutique)
+    {
+        return $this->createFormBuilder()
+            ->setAction($this->generateUrl('apm_vente_boutique_delete', array('id' => $boutique->getId())))
+            ->setMethod('DELETE')
+            ->getForm();
     }
 
     /**

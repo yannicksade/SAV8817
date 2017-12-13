@@ -54,7 +54,6 @@ class Rabais_offreController extends Controller
         $this->listAndShowSecurity($offre);
         /** @var Utilisateur_avm $user */
         $user = $this->getUser();
-        if ($request->isXmlHttpRequest() && $request->getMethod() === "POST") {
             $q = $request->get('q');
             $this->beneficiaire_filter = $request->query->has('beneficiaire_filter') ? $request->query->get('beneficiaire_filter') : "";
             $this->code_filter = $request->query->has('code_filter') ? $request->query->get('code_filter') : "";
@@ -71,21 +70,18 @@ class Rabais_offreController extends Controller
             $iDisplayStart = $request->query->has('start') ? intval($request->query->get('start')) : 0;
             $json = array();
             $rabais_offres = null;
+        $json['items'] = array();
             if ($q === "fromProduct" || $q === "all") {
                 if (null !== $offre) $rabais_offres = $offre->getRabais();
                 if (null !== $rabais_offres) {
                     $iTotalRecords = count($rabais_offres);
                     if ($iDisplayLength < 0) $iDisplayLength = $iTotalRecords;
                     $rabais_offres = $this->handleResults($rabais_offres, $iTotalRecords, $iDisplayStart, $iDisplayLength);
-                    //filtre
-                    /** @var Rabais_offre $rabai */
-                    foreach ($rabais_offres as $rabai) {
-                        array_push($json, array(
-                            'id' => $rabai->getId(),
-                            'code' => $rabai->getCode(),
-                            'description' => $rabai->getDescription()
-                        ));
-                    }
+                    $iFilteredRecords = count($rabais_offres);
+                    $data = $this->get('apm_core.data_serialized')->getFormalData($rabais_offres, array("owner_list"));
+                    $json['totalRecordsFromProduct'] = $iTotalRecords;
+                    $json['filteredRecordsFromProduct'] = $iFilteredRecords;
+                    $json['items'] = $data;
                 }
             }
 
@@ -95,14 +91,11 @@ class Rabais_offreController extends Controller
                     $iTotalRecords = count($rabais_recus);
                     if ($iDisplayLength < 0) $iDisplayLength = $iTotalRecords;
                     $rabais_recus = $this->handleResults($rabais_recus, $iTotalRecords, $iDisplayStart, $iDisplayLength);
-                    //filtre
-                    foreach ($rabais_recus as $rabai) {
-                        array_push($json, array(
-                            'id' => $rabai->getId(),
-                            'code' => $rabai->getCode(),
-                            'description' => $rabai->getDescription()
-                        ));
-                    }
+                    $iFilteredRecords = count($rabais_offres);
+                    $data = $this->get('apm_core.data_serialized')->getFormalData($rabais_recus, array("owner_list"));
+                    $json['totalRecordsSent'] = $iTotalRecords;
+                    $json['filteredRecordsSent'] = $iFilteredRecords;
+                    $json['items'] = $data;
                 }
             }
 
@@ -112,26 +105,14 @@ class Rabais_offreController extends Controller
                     $iTotalRecords = count($rabais_accordes);
                     if ($iDisplayLength < 0) $iDisplayLength = $iTotalRecords;
                     $rabais_accordes = $this->handleResults($rabais_accordes, $iTotalRecords, $iDisplayStart, $iDisplayLength);
-                    foreach ($rabais_accordes as $rabai) {
-                        array_push($json, array(
-                            'id' => $rabai->getId(),
-                            'code' => $rabai->getCode(),
-                            'description' => $rabai->getDescription()
-                        ));
-                    }
+                    $iFilteredRecords = count($rabais_accordes);
+                    $data = $this->get('apm_core.data_serialized')->getFormalData($rabais_accordes, array("others_list"));
+                    $json['totalRecordsReceived'] = $iTotalRecords;
+                    $json['filteredRecordsReceived'] = $iFilteredRecords;
+                    $json['items'] = $data;
                 }
             }
-            return $this->json($json, 200);
-        }
-        $rabais_accordes = $user->getRabaisAccordes();
-        $rabais_recus = $user->getRabaisRecus();
-        if (null !== $offre) $rabais_offres = $offre->getRabais();
-        return $this->render('APMVenteBundle:rabais_offre:index.html.twig', array(
-            'rabais_offres' => $rabais_offres,
-            'rabais_recus' => $rabais_recus,
-            'rabais_accordes' => $rabais_accordes,
-            'offre' => $offre,
-        ));
+        return new JsonResponse($json, 200);
     }
 
     /**
@@ -360,51 +341,15 @@ class Rabais_offreController extends Controller
     /**
      * Finds and displays a Rabais_offre entity.
      * @param Rabais_offre $rabais_offre
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return JsonResponse
      *
      * @Get("/show/rabaioffre/{id}")
      */
     public function showAction(Rabais_offre $rabais_offre)
     {
         $this->listAndShowSecurity($rabais_offre->getOffre(), $rabais_offre);
-        if ($request->isXmlHttpRequest()) {
-            $json = array();
-            $json['item'] = array(
-                'id' => $rabais_offre->getId(),
-                'code' => $rabais_offre->getCode(),
-                'description' => $rabais_offre->getDescription(),
-                'dateLimite' => $rabais_offre->getDateLimite()->format('d-m-Y H:i'),
-                'nombreDeFois' => $rabais_offre->getNombreDefois(),
-                'prixUpdate' => $rabais_offre->getPrixUpdate(),
-                'beneficiaire' => $rabais_offre->getBeneficiaireRabais()->getId(),
-                'vendeur' => $rabais_offre->getVendeur()->getId(),
-                'quantiteMin' => $rabais_offre->getQuantiteMin(),
-                'groupe' => $rabais_offre->getGroupe()->getId(),
-                'offre' => $rabais_offre->getOffre()->getId(),
-                'date' => $rabais_offre->getDate()->format('d-m-Y H:i'),
-            );
-            return $this->json(json_encode($json), 200);
-        }
-        $deleteForm = $this->createDeleteForm($rabais_offre);
-        return $this->render('APMVenteBundle:rabais_offre:show.html.twig', array(
-            'rabais_offre' => $rabais_offre,
-            'delete_form' => $deleteForm->createView(),
-        ));
-    }
-
-    /**
-     * Creates a form to delete a Rabais_offre entity.
-     *
-     * @param Rabais_offre $rabais_offre The Rabais_offre entity
-     *
-     * @return \Symfony\Component\Form\Form The form
-     */
-    private function createDeleteForm(Rabais_offre $rabais_offre)
-    {
-        return $this->createFormBuilder()
-            ->setAction($this->generateUrl('apm_vente_rabais_offre_delete', array('id' => $rabais_offre->getId())))
-            ->setMethod('DELETE')
-            ->getForm();
+        $data = $this->get('apm_core.data_serialized')->getFormalData($rabais_offre, ["owner_rabais_details", "owner_list"]);
+        return new JsonResponse($data, 200);
     }
 
     /**
@@ -509,6 +454,21 @@ class Rabais_offreController extends Controller
         }
         //----------------------------------------------------------------------------------------
 
+    }
+
+    /**
+     * Creates a form to delete a Rabais_offre entity.
+     *
+     * @param Rabais_offre $rabais_offre The Rabais_offre entity
+     *
+     * @return \Symfony\Component\Form\Form The form
+     */
+    private function createDeleteForm(Rabais_offre $rabais_offre)
+    {
+        return $this->createFormBuilder()
+            ->setAction($this->generateUrl('apm_vente_rabais_offre_delete', array('id' => $rabais_offre->getId())))
+            ->setMethod('DELETE')
+            ->getForm();
     }
 
     /**

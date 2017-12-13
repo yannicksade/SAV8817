@@ -9,6 +9,11 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use JMS\Serializer\Annotation\ExclusionPolicy;
+use JMS\Serializer\Annotation\Expose;
+use JMS\Serializer\Annotation\Groups;
+use JMS\Serializer\Annotation\Type;
+use JMS\Serializer\Annotation\Exclude;
 /**
  * Profile_transporteur
  *
@@ -16,19 +21,22 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
  * @ORM\Entity(repositoryClass="APM\TransportBundle\Repository\TransporteurRepository")
  * @UniqueEntity("code", message="Ce code est déjà pris.")
  * @UniqueEntity("matricule", message="Ce matricule existe déja.")
- *
+ * @ExclusionPolicy("all")
  */
 class Profile_transporteur extends TradeFactory
 {
     /**
      * @var string
-     *
+     * @Expose
+     * @Groups({"owner_list", "owner_transporteur_details", "others_transporteur_details"})
      * @ORM\Column(name="code", type="string", length=255, nullable=false)
      */
     private $code;
 
     /**
      * @var \DateTime
+     * @Expose
+     * @Groups({"owner_transporteur_details"})
      * @Assert\DateTime
      * @ORM\Column(name="dateEnregistrement", type="datetime", nullable=false)
      */
@@ -36,6 +44,8 @@ class Profile_transporteur extends TradeFactory
 
     /**
      * @var string
+     * @Expose
+     * @Groups({"owner_transporteur_details", "others_transporteur_details"})
      * @Assert\NotBlank
      * @Assert\Length(min=2, max=205)
      * @ORM\Column(name="matricule", type="string", length=255, nullable=false)
@@ -44,6 +54,8 @@ class Profile_transporteur extends TradeFactory
 
     /**
      * @var string
+     * @Expose
+     * @Groups({"others_transporteur_details", "owner_transporteur_details"})
      * @ORM\Column(name="description", type="string", length=255, nullable=false)
      */
     private $description;
@@ -51,7 +63,8 @@ class Profile_transporteur extends TradeFactory
     /**
      * Id
      * @var integer
-     *
+     * @Expose
+     * @Groups({"owner_list", "others_list", "others_transporteur_details", "owner_transporteur_details"})
      * @ORM\Column(name="id", type="integer", nullable=false)
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
@@ -60,7 +73,8 @@ class Profile_transporteur extends TradeFactory
 
     /**
      * @var Utilisateur_avm
-     *
+     * @Expose
+     * @Groups({"owner_transporteur_details"})
      * @ORM\OneToOne(targetEntity="APM\UserBundle\Entity\Utilisateur_avm", inversedBy="transporteur")
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="utilisateur_id", referencedColumnName="id", nullable=false)
@@ -68,6 +82,13 @@ class Profile_transporteur extends TradeFactory
      */
     private $utilisateur;
 
+    /**
+     * @var Livreur_boutique
+     * @Expose
+     * @Groups({"others_transporteur_details", "owner_transporteur_details"})
+     * @ORM\OneToOne(targetEntity="APM\TransportBundle\Entity\Livreur_boutique", mappedBy="transporteur")
+     */
+    private $livreurBoutique;
 
     /**
      * @var Collection
@@ -87,13 +108,6 @@ class Profile_transporteur extends TradeFactory
      * @ORM\OneToMany(targetEntity="APM\TransportBundle\Entity\Transporteur_zoneintervention", mappedBy="transporteur")
      */
     private $transporteur_zones;
-
-    /**
-     * @var Livreur_boutique
-     *
-     * @ORM\OneToOne(targetEntity="APM\TransportBundle\Entity\Livreur_boutique", mappedBy="transporteur")
-     */
-    private $livreurBoutique;
 
 
     /**

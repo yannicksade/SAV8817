@@ -8,39 +8,49 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
-
+use JMS\Serializer\Annotation\ExclusionPolicy;
+use JMS\Serializer\Annotation\Expose;
+use JMS\Serializer\Annotation\Groups;
+use JMS\Serializer\Annotation\Type;
+use JMS\Serializer\Annotation\Exclude;
 /**
  * Zone_intervention
  *
  * @ORM\Table(name="Zone_intervention")
  * @ORM\Entity(repositoryClass="APM\TransportBundle\Repository\Zone_interventionRepository")
  * @UniqueEntity("code")
+ * @ExclusionPolicy("all")
  */
 class Zone_intervention extends TradeFactory
 {
     /**
      * @var string
-     *
+     * @Expose
+     * @Groups({"owner_list", "owner_zone_details", "others_zone_details"})
      * @ORM\Column(name="code", type="string", length=255, nullable=true)
      */
     private $code;
 
     /**
      * @var string
-     *
+     * @Expose
+     * @Groups({"owner_zone_details", "others_zone_details"})
      * @ORM\Column(name="zonetime", type="string", length=255, nullable=true)
      */
     private $zoneTime;
 
     /**
      * @var string
-     *
+     * @Expose
+     * @Groups({"owner_zone_details", "others_zone_details"})
      * @ORM\Column(name="ville", type="string", length=255, nullable=true)
      */
     private $ville;
 
     /**
      * @var string
+     * @Expose
+     * @Groups({"owner_zone_details", "others_zone_details"})
      * @Assert\Locale
      * @ORM\Column(name="language", type="string", length=255, nullable=true)
      */
@@ -48,6 +58,8 @@ class Zone_intervention extends TradeFactory
 
     /**
      * @var string
+     * @Expose
+     * @Groups({"owner_list", "others_list", "owner_zone_details", "others_zone_details"})
      * @Assert\Length(min=2, max=254)
      * @ORM\Column(name="description", type="string", length=255, nullable=true)
      */
@@ -55,6 +67,8 @@ class Zone_intervention extends TradeFactory
 
     /**
      * @var string
+     * @Expose
+     * @Groups({"owner_list", "others_list", "owner_zone_details", "others_zone_details"})
      * @Assert\Length(min=2, max=100)
      * @ORM\Column(name="designation", type="string", length=255, nullable=true)
      */
@@ -62,6 +76,8 @@ class Zone_intervention extends TradeFactory
 
     /**
      * @var string
+     * @Expose
+     * @Groups({"owner_zone_details", "others_zone_details"})
      * @Assert\Length(min=2, max=254)
      * @ORM\Column(name="adresse", type="string", length=255, nullable=true)
      */
@@ -69,6 +85,8 @@ class Zone_intervention extends TradeFactory
 
     /**
      * @var string
+     * @Expose
+     * @Groups({"owner_zone_details", "others_zone_details"})
      * @Assert\Country
      * @ORM\Column(name="pays", type="string", length=255, nullable=true)
      */
@@ -76,24 +94,28 @@ class Zone_intervention extends TradeFactory
 
     /**
      * @var integer
-     *
+     * @Expose
+     * @Groups({"owner_list", "others_list", "owner_zone_details", "others_zone_details"})
      * @ORM\Column(name="id", type="integer", nullable=false)
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id;
+
     /**
      * @var \DateTime
+     * @Expose
+     * @Groups({"owner_zone_details"})
      * @Assert\DateTime
      * @ORM\Column(name="dateEnregistrement", type="datetime", nullable=false)
      */
     private $dateEnregistrement;
 
 
-
     /**
      * @var Profile_transporteur
-     *
+     * @Expose
+     * @Groups({"owner_zone_details", "others_zone_details"})
      * @ORM\ManyToOne(targetEntity="APM\TransportBundle\Entity\Profile_transporteur", inversedBy="zones")
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="transporteurProprietaire_id", referencedColumnName="id", nullable=false)

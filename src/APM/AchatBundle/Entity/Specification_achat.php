@@ -8,24 +8,33 @@ use APM\VenteBundle\Entity\Offre;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
-
+use JMS\Serializer\Annotation\ExclusionPolicy;
+use JMS\Serializer\Annotation\Expose;
+use JMS\Serializer\Annotation\Groups;
+use JMS\Serializer\Annotation\Type;
+use JMS\Serializer\Annotation\Exclude;
 /**
  * Specification_achat
  *
  * @ORM\Table(name="Specification_achat")
  * @ORM\Entity(repositoryClass="APM\AchatBundle\Repository\Specification_achatRepository")
  * @UniqueEntity("code")
+ * @ExclusionPolicy("all")
  */
 class Specification_achat extends TradeFactory
 {
     /**
      *
      * @var string
+     * @Expose
+     * @Groups({"owner_list", "others_spA_details", "owner_spA_details"})
      * @ORM\Column(name="code", type="string", length=255, nullable=false )
      */
     private $code;
     /**
      * @var boolean
+     * @Expose
+     * @Groups({"others_spA_details", "owner_spA_details"})
      * @Assert\Choice({0,1})
      * @ORM\Column(name="avecDemandeRabais", type="boolean", nullable=false)
      */
@@ -33,6 +42,8 @@ class Specification_achat extends TradeFactory
 
     /**
      * @var boolean
+     * @Expose
+     * @Groups({"others_spA_details", "owner_spA_details"})
      * @Assert\Choice({0,1})
      * @ORM\Column(name="avecLivraison", type="boolean", nullable=false)
      */
@@ -40,6 +51,8 @@ class Specification_achat extends TradeFactory
 
     /**
      * @var string
+     * @Expose
+     * @Groups({"others_spA_details", "owner_spA_details"})
      * @Assert\Length(min=2, max=254)
      * @ORM\Column(name="avis", type="string", length=255, nullable=true)
      */
@@ -47,6 +60,8 @@ class Specification_achat extends TradeFactory
 
     /**
      * @var \DateTime
+     * @Expose
+     * @Groups({"others_spA_details", "owner_spA_details"})
      * @Assert\DateTime()
      * @ORM\Column(name="dateLivraisonSouhaite", type="datetime", nullable=true)
      */
@@ -54,6 +69,8 @@ class Specification_achat extends TradeFactory
 
     /**
      * @var \DateTime
+     * @Expose
+     * @Groups({"others_spA_details", "owner_spA_details"})
      * @Assert\DateTime()
      * @ORM\Column(name="$dateCreation", type="datetime", nullable=true)
      */
@@ -61,6 +78,8 @@ class Specification_achat extends TradeFactory
 
     /**
      * @var boolean
+     * @Expose
+     * @Groups({"others_spA_details", "owner_spA_details"})
      * @Assert\Choice({0,1})
      * @ORM\Column(name="echantillon", type="boolean", nullable=false)
      */
@@ -69,6 +88,8 @@ class Specification_achat extends TradeFactory
     /**
      * Id
      * @var integer
+     * @Expose
+     * @Groups({"owner_list", "others_list", "others_spA_details", "owner_spA_details"})
      * @ORM\Column(name="id", type="integer", nullable=false)
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
@@ -76,8 +97,9 @@ class Specification_achat extends TradeFactory
     private $id;
 
     /**
-     *
      * @var Offre
+     * @Expose
+     * @Groups({"others_spA_details", "owner_spA_details"})
      * @ORM\ManyToOne(targetEntity="APM\VenteBundle\Entity\Offre", inversedBy="specifications")
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="offre_id", referencedColumnName="id", nullable=false)
@@ -89,13 +111,14 @@ class Specification_achat extends TradeFactory
     /**
      *
      * @var Utilisateur_avm
+     * @Expose
+     * @Groups({"others_spA_details", "owner_spA_details"})
      * @ORM\ManyToOne(targetEntity="APM\UserBundle\Entity\Utilisateur_avm", inversedBy="specifications")
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="utilisateur_id", referencedColumnName="id", nullable=false)
      * })
      */
     private $utilisateur;
-
 
     /**
      * Constructor
@@ -349,6 +372,16 @@ class Specification_achat extends TradeFactory
     }
 
     /**
+     * Get dateCreation
+     *
+     * @return \DateTime
+     */
+    public function getDateCreation()
+    {
+        return $this->dateCreation;
+    }
+
+    /**
      * Set dateCreation
      *
      * @param \DateTime $dateCreation
@@ -360,15 +393,5 @@ class Specification_achat extends TradeFactory
         $this->dateCreation = $dateCreation;
 
         return $this;
-    }
-
-    /**
-     * Get dateCreation
-     *
-     * @return \DateTime
-     */
-    public function getDateCreation()
-    {
-        return $this->dateCreation;
     }
 }

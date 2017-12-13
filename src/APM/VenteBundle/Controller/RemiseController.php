@@ -45,7 +45,7 @@ class RemiseController extends Controller
      * @param Request $request
      * @param Boutique|null $boutique
      * @param Offre $offre
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return JsonResponse
      *
      * @Get("/cget/remises", name="s")
      * @Get("/cget/remises/boutique/{id}", name="s_boutique")
@@ -77,42 +77,32 @@ class RemiseController extends Controller
                 }
             }
         }
-        if ($request->isXmlHttpRequest()) {
-            $this->dateExpiration_filter = $request->query->has('dateExpiration_filter') ? $request->query->get('dateExpiration_filter') : "";
-            $this->code_filter = $request->query->has('code_filter') ? $request->query->get('code_filter') : "";
-            $this->offre_filter = $request->query->has('offre_filter') ? $request->query->get('offre_filter') : "";
-            $this->etat_filter = $request->query->has('etat_filter') ? $request->query->get('etat_filter') : "";
-            $this->valeurMin_filter = $request->query->has('valeurMin_filter') ? $request->query->get('valeurMin_filter') : "";
-            $this->valeurMax_filter = $request->query->has('valeurMax_filter') ? $request->query->get('valeurMax_filter') : "";
-            $this->nombreUtilisation_filter = $request->query->has('nombreUtilisation_filter') ? $request->query->get('nombreUtilisation_filter') : "";
-            $this->quantiteMin_filter = $request->query->has('quantiteMin_filter') ? $request->query->get('quantiteMin_filter') : "";
-            $this->permanence_filter = $request->query->has('permanence_filter') ? $request->query->get('permanence_filter') : "";
-            $this->restreint_filter = $request->query->has('restreint_filter') ? $request->query->get('restreint_filter') : "";
-            $iDisplayLength = $request->query->has('length') ? $request->query->get('length') : -1;
-            $iDisplayStart = $request->query->has('start') ? intval($request->query->get('start')) : 0;
-            $json = array();
-            $json['items'] = array();
-            $iTotalRecords = count($remisesEffectues);
-            if ($iDisplayLength < 0) $iDisplayLength = $iTotalRecords;
-            $remises = $this->handleResults($remises, $iTotalRecords, $iDisplayStart, $iDisplayLength);
-            //filtre
-            /** @var Remise $remise */
-            foreach ($remises as $remise) {
-                array_push($json['items'], array(
-                    'id' => $remise->getId(),
-                    'code' => $remise->getCode(),
-                    'description' => $remise->getDescription(),
-                ));
-            }
-            return $this->json(json_encode($json), 200);
-        }
-        $session->set('previous_location', $request->getUri());
-        return $this->render('APMVenteBundle:remise:index.html.twig', [
-                "offre_remises" => $remises,
-                "offre" => $offre,
-                "boutique" => $boutique,
-            ]
-        );
+
+        $this->dateExpiration_filter = $request->query->has('dateExpiration_filter') ? $request->query->get('dateExpiration_filter') : "";
+        $this->code_filter = $request->query->has('code_filter') ? $request->query->get('code_filter') : "";
+        $this->offre_filter = $request->query->has('offre_filter') ? $request->query->get('offre_filter') : "";
+        $this->etat_filter = $request->query->has('etat_filter') ? $request->query->get('etat_filter') : "";
+        $this->valeurMin_filter = $request->query->has('valeurMin_filter') ? $request->query->get('valeurMin_filter') : "";
+        $this->valeurMax_filter = $request->query->has('valeurMax_filter') ? $request->query->get('valeurMax_filter') : "";
+        $this->nombreUtilisation_filter = $request->query->has('nombreUtilisation_filter') ? $request->query->get('nombreUtilisation_filter') : "";
+        $this->quantiteMin_filter = $request->query->has('quantiteMin_filter') ? $request->query->get('quantiteMin_filter') : "";
+        $this->permanence_filter = $request->query->has('permanence_filter') ? $request->query->get('permanence_filter') : "";
+        $this->restreint_filter = $request->query->has('restreint_filter') ? $request->query->get('restreint_filter') : "";
+        $iDisplayLength = $request->query->has('length') ? $request->query->get('length') : -1;
+        $iDisplayStart = $request->query->has('start') ? intval($request->query->get('start')) : 0;
+        $json = array();
+        $json['items'] = array();
+        $iTotalRecords = count($remises);
+        if ($iDisplayLength < 0) $iDisplayLength = $iTotalRecords;
+        $remises = $this->handleResults($remises, $iTotalRecords, $iDisplayStart, $iDisplayLength);
+        //filtre
+        $iFilteredRecords = count($remises);
+        $data = $this->get('apm_core.data_serialized')->getFormalData($remises, array("owner_list"));
+        $json['totalRecords'] = $iTotalRecords;
+        $json['filteredRecords'] = $iFilteredRecords;
+        $json['items'] = $data;
+
+        return new JsonResponse($json, 200);
     }
 
     /**
@@ -246,7 +236,7 @@ class RemiseController extends Controller
                 $em->persist($remise);
                 $em->flush();
                 if ($request->isXmlHttpRequest()) {
-                    $json= array();
+                    $json = array();
                     $json["item"] = array(//prevenir le client
                         "action" => 0,
                     );
@@ -295,50 +285,15 @@ class RemiseController extends Controller
     /**
      * Finds and displays a Remise entity.
      * @param Remise $remise
-     * @return \Symfony\Component\HttpFoundation\Response | JsonResponse
+     * @return JsonResponse
      *
      * @Get("/show/remise/{id}")
      */
     public function showAction(Remise $remise)
     {
         $this->listAndShowSecurity($remise->getOffre());
-        if ($request->isXmlHttpRequest()) {
-            $json = array();
-            $json['item'] = array(
-                'id' => $remise->getId(),
-                'code' => $remise->getCode(),
-                'description' => $remise->getDescription(),
-                'offre' => $remise->getOffre()->getId(),
-                'date' => $remise->getDate()->format('d-m-Y H:i'),
-                'dateExpiration' => $remise->getDateExpiration()->format('d-m-Y H:i'),
-                'etat' => $remise->getEtat(),
-                'quantiteMin' => $remise->getQuantiteMin(),
-                'valeur' => $remise->getValeur(),
-                'nombreUtilisation' => $remise->getNombreUtilisation(),
-                'restreint' => $remise->getRestreint(),
-            );
-            return $this->json(json_encode($json), 200);
-        }
-        $deleteForm = $this->createDeleteForm($remise);
-        return $this->render('APMVenteBundle:remise:show.html.twig', array(
-            'remise' => $remise,
-            'delete_form' => $deleteForm->createView(),
-        ));
-    }
-
-    /**
-     * Creates a form to delete a Remise entity.
-     *
-     * @param Remise $remise The Remise entity
-     *
-     * @return \Symfony\Component\Form\Form The form
-     */
-    private function createDeleteForm(Remise $remise)
-    {
-        return $this->createFormBuilder()
-            ->setAction($this->generateUrl('apm_vente_remise_delete', array('id' => $remise->getId())))
-            ->setMethod('DELETE')
-            ->getForm();
+        $data = $this->get('apm_core.data_serialized')->getFormalData($remise, ["owner_remise_details", "owner_list"]);
+        return new JsonResponse($data, 200);
     }
 
     /**
@@ -430,6 +385,21 @@ class RemiseController extends Controller
         }
         //----------------------------------------------------------------------------------------
 
+    }
+
+    /**
+     * Creates a form to delete a Remise entity.
+     *
+     * @param Remise $remise The Remise entity
+     *
+     * @return \Symfony\Component\Form\Form The form
+     */
+    private function createDeleteForm(Remise $remise)
+    {
+        return $this->createFormBuilder()
+            ->setAction($this->generateUrl('apm_vente_remise_delete', array('id' => $remise->getId())))
+            ->setMethod('DELETE')
+            ->getForm();
     }
 
     /**

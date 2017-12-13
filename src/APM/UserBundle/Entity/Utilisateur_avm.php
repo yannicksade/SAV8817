@@ -48,7 +48,7 @@ class Utilisateur_avm extends Utilisateur
      * @Assert\Choice({0,1})
      * @ORM\Column(name="estAcheteur", type="boolean", nullable=true)
      * @Expose
-     * @Groups({"user_details"})
+     * @Groups({"owner_user_details"})
      */
     private $isAcheteur;
 
@@ -57,7 +57,7 @@ class Utilisateur_avm extends Utilisateur
      * @Assert\Choice({0,1})
      * @ORM\Column(name="estConseillerA1", type="boolean", nullable=true)
      * @Expose
-     * @Groups({"user_details"})
+     * @Groups({"owner_user_details"})
      */
     private $isConseillerA1;
 
@@ -66,7 +66,7 @@ class Utilisateur_avm extends Utilisateur
      * @Assert\Choice({0,1})
      * @ORM\Column(name="estGerantBoutique", type="boolean", nullable=true)
      * @Expose
-     * @Groups({"user_details"})
+     * @Groups({"owner_user_details"})
      */
     private $isGerantBoutique;
 
@@ -76,7 +76,7 @@ class Utilisateur_avm extends Utilisateur
      * @Assert\Choice({0,1})
      * @ORM\Column(name="estTransporteur", type="boolean", nullable=true)
      * @Expose
-     * @Groups({"user_details"})
+     * @Groups({"owner_user_details"})
      */
     private $isTransporteurLivreur;
 
@@ -85,7 +85,7 @@ class Utilisateur_avm extends Utilisateur
      * @Assert\Choice({0,1})
      * @ORM\Column(name="estVendeur", type="boolean", nullable=true)
      * @Expose
-     * @Groups({"user_details"})
+     * @Groups({"owner_user_details"})
      */
     private $isVendeur;
 
@@ -94,7 +94,7 @@ class Utilisateur_avm extends Utilisateur
      * @Assert\GreaterThanOrEqual(0)
      * @ORM\Column(name="pointsDeFidelite", type="integer", nullable=true)
      * @Expose
-     * @Groups({"user_details"})
+     * @Groups({"owner_user_details"})
      */
     private $pointsDeFidelite;
 
@@ -107,7 +107,6 @@ class Utilisateur_avm extends Utilisateur
 
     /**
      * @var Collection
-     *
      * @ORM\ManyToMany(targetEntity="APM\VenteBundle\Entity\Offre")
      * @ORM\JoinTable(name="utilisateur_offre",
      *   joinColumns={
@@ -200,16 +199,16 @@ class Utilisateur_avm extends Utilisateur
 
     /**
      * @var Profile_transporteur
-     * @ORM\OneToOne(targetEntity="APM\TransportBundle\Entity\Profile_transporteur", mappedBy="utilisateur")
      * @Expose
-     * @Groups({"user_details"})
+     * @Groups({"owner_user_details"})
+     * @ORM\OneToOne(targetEntity="APM\TransportBundle\Entity\Profile_transporteur", mappedBy="utilisateur")
      */
     private $transporteur;
 
     /**
      * @ORM\OneToOne(targetEntity="APM\MarketingDistribueBundle\Entity\Conseiller", mappedBy="utilisateur", cascade={"persist","remove"})
      * @Expose
-     * @Groups({"user_details"})
+     * @Groups({"owner_user_details"})
      */
     private $profileConseiller;
 

@@ -27,7 +27,7 @@ class Reseau_conseillersController extends Controller
     /** Liste les binômes du réseau du conseiller (2 par 2) pour dessiner l'arbre
      * @param Request $request
      * @param Conseiller|null $conseiller
-     * @return \Symfony\Component\HttpFoundation\Response|JsonResponse
+     * @return JsonResponse
      *
      * @Get("/network")
      * @Put("/new-network/conseiller{id}", name="_conseiller")
@@ -39,23 +39,10 @@ class Reseau_conseillersController extends Controller
         if (null === $conseiller) {
             $user = $this->getUser();
             $conseiller = $user->getProfileConseiller();
-            if (null === $conseiller) return $this->json(null, 404);
+            if (null === $conseiller) return $this->json("not found", 404);
         }
-        if ($request->isXmlHttpRequest()) {
-            $json = array();
-            $json['item'] = array(
-                'id' => $conseiller->getId(),
-                'code' => $conseiller->getCode(),
-                'leftChild' => $conseiller->getConseillerGauche()->getId(),
-                'rightChild' => $conseiller->getConseillerDroite()->getId(),
-                'nbrInstance' => $conseiller->getNombreInstanceReseau(),
-                );
-            return $this->json(json_encode($json), 200);
-        }
-
-        return $this->render('APMMarketingReseauBundle:reseau_conseillers:index.html.twig', array(
-            'conseiller' => $conseiller,
-        ));
+        $data = $this->get('apm_core.data_serialized')->getFormalData($conseiller, array("net", "owner_list"));
+        return new JsonResponse($data, 200);
     }
 
     /**

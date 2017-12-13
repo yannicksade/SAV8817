@@ -7,18 +7,24 @@ use APM\VenteBundle\Entity\Offre;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
+use JMS\Serializer\Annotation\ExclusionPolicy;
+use JMS\Serializer\Annotation\Expose;
+use JMS\Serializer\Annotation\Groups;
 
 /**
  * Commentaire
  *
  * @ORM\Table(name="commentaire")
  * @ORM\Entity(repositoryClass="APM\UserBundle\Repository\CommentaireRepository")
+ * @ExclusionPolicy("all")
  */
 class Commentaire extends TradeFactory
 {
 
     /**
      * @var string
+     * @Expose
+     * @Groups({"others_list", "owner_list", "owner_commentaire_details", "others_commentaire_details"})
      * @Assert\Length(min=1, max=2450)
      * @ORM\Column(name="contenu", type="text", length=2500, nullable=true)
      */
@@ -26,12 +32,16 @@ class Commentaire extends TradeFactory
 
     /**
      * @var boolean
+     * @Expose
+     * @Groups({"owner_commentaire_details"})
      * @ORM\Column(name="publiable", type="boolean", nullable=false)
      */
     private $publiable;
 
     /**
      * @var \DateTime
+     * @Expose
+     * @Groups({"owner_commentaire_details", "others_commentaire_details"})
      * @Assert\DateTime
      * @ORM\Column(name="date", type="datetime", nullable=true)
      */
@@ -39,6 +49,8 @@ class Commentaire extends TradeFactory
 
     /**
      * @var integer
+     * @Expose
+     * @Groups({"owner_commentaire_details", "others_commentaire_details"})
      * @Assert\Range(min=0, max=10)
      * @ORM\Column(name="evaluation", type="smallint", nullable=true)
      */
@@ -47,7 +59,8 @@ class Commentaire extends TradeFactory
     /**
      * Id
      * @var integer
-     *
+     * @Expose
+     * @Groups({"others_list", "owner_list", "others_commentaire_details", "owner_commentaire_details"})
      * @ORM\Column(name="id", type="integer", nullable=false)
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
@@ -56,7 +69,8 @@ class Commentaire extends TradeFactory
 
     /**
      * @var Utilisateur_avm
-     *
+     * @Expose
+     * @Groups({"owner_commentaire_details", "others_commentaire_details"})
      * @ORM\ManyToOne(targetEntity="APM\UserBundle\Entity\Utilisateur_avm" , inversedBy="commentaires")
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="utilisateur_id", referencedColumnName="id", nullable=false)
@@ -66,7 +80,8 @@ class Commentaire extends TradeFactory
 
     /**
      * @var Offre
-     *
+     * @Expose
+     * @Groups({"owner_commentaire_details", "others_commentaire_details"})
      * @ORM\ManyToOne(targetEntity="APM\VenteBundle\Entity\Offre", inversedBy="commentaires")
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="offre_id", referencedColumnName="id", nullable=false)

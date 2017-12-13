@@ -10,26 +10,34 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
-
+use JMS\Serializer\Annotation\ExclusionPolicy;
+use JMS\Serializer\Annotation\Expose;
+use JMS\Serializer\Annotation\Groups;
+use JMS\Serializer\Annotation\Type;
+use JMS\Serializer\Annotation\Exclude;
 /**
  * Groupe_offre
  *
  * @ORM\Table(name="Groupe_offre")
  * @ORM\Entity(repositoryClass="APM\AchatBundle\Repository\Groupe_offreRepository")
  * @UniqueEntity("code")
+ * @ExclusionPolicy("all")
  */
 class Groupe_offre extends TradeFactory
 {
 
     /**
      * @var string
-     *
+     * @Expose
+     * @Groups({"owner_list", "others_groupeO_details", "owner_groupeO_details"})
      * @ORM\Column(name="code", type="string", length=255, nullable=false)
      */
     private $code;
 
     /**
      * @var \DateTime
+     * @Expose
+     * @Groups({"owner_groupeO_details"})
      * @Assert\DateTime
      * @ORM\Column(name="dateDeVigueur", type="datetime", nullable=true)
      */
@@ -37,6 +45,8 @@ class Groupe_offre extends TradeFactory
 
     /**
      * @var \DateTime
+     * @Expose
+     * @Groups({"owner_groupeO_details"})
      * @Assert\DateTime
      * @ORM\Column(name="dateCreation", type="datetime", nullable=true)
      */
@@ -45,6 +55,8 @@ class Groupe_offre extends TradeFactory
 
     /**
      * @var integer
+     * @Expose
+     * @Groups({"owner_groupeO_details"})
      * @ORM\Column(name="propriete", type="integer", nullable=true)
      * @Assert\Range(min=0, max=4)
      */
@@ -52,6 +64,8 @@ class Groupe_offre extends TradeFactory
 
     /**
      * @var string
+     * @Expose
+     * @Groups({"owner_list", "others_list", "others_groupeO_details", "owner_groupeO_details"})
      * @ORM\Column(name="description", type="string", length=255, nullable=true)
      * @Assert\Length(min=2, max=254, minMessage="Ce champs doit contenir au moins {{limit}} caracteres.",
      * maxMessage="Ce champs doit contenir au plus {{limit}} caracteres.")
@@ -60,6 +74,8 @@ class Groupe_offre extends TradeFactory
 
     /**
      * @var boolean
+     * @Expose
+     * @Groups({"owner_groupeO_details"})
      * @Assert\Choice({0,1})
      * @ORM\Column(name="estRecurrent", type="boolean", nullable=false)
      */
@@ -67,6 +83,8 @@ class Groupe_offre extends TradeFactory
 
     /**
      * @var string
+     * @Expose
+     * @Groups({"owner_list", "others_list", "others_groupeO_details", "owner_groupeO_details"})
      * @Assert\NotNull()
      * @Assert\Length(min=2, max=50)
      * @ORM\Column(name="designation", type="string", length=255, nullable=false)
@@ -75,7 +93,8 @@ class Groupe_offre extends TradeFactory
 
     /**
      * @var integer
-     *
+     * @Expose
+     * @Groups({"owner_list", "others_list", "others_groupeO_details", "owner_groupeO_details"})
      * @ORM\Column(name="id", type="integer", nullable=false)
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
@@ -84,7 +103,8 @@ class Groupe_offre extends TradeFactory
 
     /**
      * @var Utilisateur_avm
-     *
+     * @Expose
+     * @Groups({"others_groupeO_details", "owner_groupeO_details"})
      * @ORM\ManyToOne(targetEntity="APM\UserBundle\Entity\Utilisateur_avm", inversedBy="groupesOffres")
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="createur_id", referencedColumnName="id", nullable=false)
@@ -337,6 +357,16 @@ class Groupe_offre extends TradeFactory
     }
 
     /**
+     * Get dateCreation
+     *
+     * @return \DateTime
+     */
+    public function getDateCreation()
+    {
+        return $this->dateCreation;
+    }
+
+    /**
      * Set dateCreation
      *
      * @param \DateTime $dateCreation
@@ -348,15 +378,5 @@ class Groupe_offre extends TradeFactory
         $this->dateCreation = $dateCreation;
 
         return $this;
-    }
-
-    /**
-     * Get dateCreation
-     *
-     * @return \DateTime
-     */
-    public function getDateCreation()
-    {
-        return $this->dateCreation;
     }
 }

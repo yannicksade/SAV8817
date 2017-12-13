@@ -56,81 +56,59 @@ class TransactionController extends Controller
         $this->listAndShowSecurity($boutique);
         /** @var Utilisateur_avm $user */
         $user = $this->getUser();
-        if ($request->isXmlHttpRequest() && $request->getMethod() === "POST") {
-            $q = $request->get('q');
-            $this->beneficiaire_filter = $request->query->has('beneficiaire_filter') ? $request->query->get('beneficiaire_filter') : "";
-            $this->code_filter = $request->query->has('code_filter') ? $request->query->get('code_filter') : "";
-            $this->nature_filter = $request->query->has('nature_filter') ? $request->query->get('nature_filter') : "";
-            $this->etat_filter = $request->query->has('etat_filter') ? $request->query->get('etat_filter') : "";
-            $this->montant_filter = $request->query->has('montant_filter') ? $request->query->get('montant_filter') : "";
+        $q = $request->get('q');
+        $this->beneficiaire_filter = $request->query->has('beneficiaire_filter') ? $request->query->get('beneficiaire_filter') : "";
+        $this->code_filter = $request->query->has('code_filter') ? $request->query->get('code_filter') : "";
+        $this->nature_filter = $request->query->has('nature_filter') ? $request->query->get('nature_filter') : "";
+        $this->etat_filter = $request->query->has('etat_filter') ? $request->query->get('etat_filter') : "";
+        $this->montant_filter = $request->query->has('montant_filter') ? $request->query->get('montant_filter') : "";
 
-            $this->shipped_filter = $request->query->has('shipped_filter') ? $request->query->get('shipped_filter') : "";
-            $this->boutiqueBeneficiaire_filter = $request->query->has('boutiqueBeneficiaire_filter') ? $request->query->get('boutiqueBeneficiaire_filter') : "";
-            $this->boutique_filter = $request->query->has('boutique_filter') ? $request->query->get('boutique_filter') : "";
-            $this->transactionProduit_filter = $request->query->has('transactionProduit_filter') ? $request->query->get('transactionProduit_filter') : "";
-            $this->produit_filter = $request->query->has('produit_filter') ? $request->query->get('produit_filter') : "";
+        $this->shipped_filter = $request->query->has('shipped_filter') ? $request->query->get('shipped_filter') : "";
+        $this->boutiqueBeneficiaire_filter = $request->query->has('boutiqueBeneficiaire_filter') ? $request->query->get('boutiqueBeneficiaire_filter') : "";
+        $this->boutique_filter = $request->query->has('boutique_filter') ? $request->query->get('boutique_filter') : "";
+        $this->transactionProduit_filter = $request->query->has('transactionProduit_filter') ? $request->query->get('transactionProduit_filter') : "";
+        $this->produit_filter = $request->query->has('produit_filter') ? $request->query->get('produit_filter') : "";
 
-            $iDisplayLength = $request->query->has('length') ? $request->query->get('length') : -1;
-            $iDisplayStart = $request->query->has('start') ? intval($request->query->get('start')) : 0;
-            $json = array();
-            $json['items'] = array();
-            if ($q === "sent" || $q === "all") {
-                $transactionsEffectues =  (null !== $boutique)? $boutique->getTransactions() : $user->getTransactionsEffectues();
-                $iTotalRecords = count($transactionsEffectues);
-                if ($iDisplayLength < 0) $iDisplayLength = $iTotalRecords;
-                $transactionsEffectues = $this->handleResults($transactionsEffectues, $iTotalRecords, $iDisplayStart, $iDisplayLength);
-                /** @var Transaction $transaction */
-                foreach ($transactionsEffectues as $transaction) {
-                    array_push($json, array(
-                        'id' => $transaction->getId(),
-                        'code' => $transaction->getCode(),
-                        'nature' => $transaction->getNature(),
-                    ));
-                }
-            }
-            if ($q === "received" || $q === "all") {
-                $transactionsRecues = (null !== $boutique)?$boutique->getTransactionsRecues(): $user->getTransactionsRecues();
-                $iTotalRecords = count($transactionsRecues);
-                if ($iDisplayLength < 0) $iDisplayLength = $iTotalRecords;
-                $transactionsRecues = $this->handleResults($transactionsRecues, $iTotalRecords, $iDisplayStart, $iDisplayLength);
-                foreach ($transactionsRecues as $transaction) {
-                    array_push($json, array(
-                        'id' => $transaction->getId(),
-                        'code' => $transaction->getCode(),
-                        'nature' => $transaction->getNature(),
-                    ));
-                }
-            }
-            if ($q === "done" || $q === "all") {
-                $transactions = $livraison->getOperations();
-                $iTotalRecords = count($transactions);
-                if ($iDisplayLength < 0) $iDisplayLength = $iTotalRecords;
-                $transactions = $this->handleResults($transactions, $iTotalRecords, $iDisplayStart, $iDisplayLength);
-                foreach ($transactions as $transaction) {
-                    array_push($json, array(
-                        'value' => $transaction->getId(),
-                        'text' => $transaction->getNature(),
-                    ));
-                }
-            }
-
-            return $this->json(json_encode($json), 200);
+        $iDisplayLength = $request->query->has('length') ? $request->query->get('length') : -1;
+        $iDisplayStart = $request->query->has('start') ? intval($request->query->get('start')) : 0;
+        $json = array();
+        $json['items'] = array();
+        if ($q === "sent" || $q === "all") {
+            $transactionsEffectues = (null !== $boutique) ? $boutique->getTransactions() : $user->getTransactionsEffectues();
+            $iTotalRecords = count($transactionsEffectues);
+            if ($iDisplayLength < 0) $iDisplayLength = $iTotalRecords;
+            $transactionsEffectues = $this->handleResults($transactionsEffectues, $iTotalRecords, $iDisplayStart, $iDisplayLength);
+            $iFilteredRecords = count($transactionsEffectues);
+            $data = $this->get('apm_core.data_serialized')->getFormalData($transactionsEffectues, array("owner_list"));
+            $json['totalRecordsSent'] = $iTotalRecords;
+            $json['filteredRecordsSent'] = $iFilteredRecords;
+            $json['items'] = $data;
         }
-        if (null !== $boutique) {
-            $transactionsEffectues = $boutique->getTransactions();
-            $transactionsRecues = $boutique->getTransactionsRecues();
-        } elseif(null !== $livraison){
-            $transactionsEffectues = $livraison->getOperations();
-            $transactionsRecues = null;
-        }else {
-            $transactionsEffectues = $user->getTransactionsEffectues();
-            $transactionsRecues = $user->getTransactionsRecues();
+        if ($q === "received" || $q === "all") {
+            $transactionsRecues = (null !== $boutique) ? $boutique->getTransactionsRecues() : $user->getTransactionsRecues();
+            $iTotalRecords = count($transactionsRecues);
+            if ($iDisplayLength < 0) $iDisplayLength = $iTotalRecords;
+            $transactionsRecues = $this->handleResults($transactionsRecues, $iTotalRecords, $iDisplayStart, $iDisplayLength);
+            $iFilteredRecords = count($transactionsRecues);
+            $data = $this->get('apm_core.data_serialized')->getFormalData($transactionsRecues, array("owner_list"));
+            $json['totalRecordsReceived'] = $iTotalRecords;
+            $json['filteredRecordsReceived'] = $iFilteredRecords;
+            $json['items'] = $data;
         }
-        return $this->render('APMVenteBundle:transaction:index.html.twig', array(
-            'transactionsEffectues' => $transactionsEffectues,
-            'transactionsRecues' => $transactionsRecues,
-            'boutique' => $boutique,
-        ));
+        if ($q === "done" || $q === "all") {
+            $transactions = $livraison->getOperations();
+            $iTotalRecords = count($transactions);
+            if ($iDisplayLength < 0) $iDisplayLength = $iTotalRecords;
+            $transactions = $this->handleResults($transactions, $iTotalRecords, $iDisplayStart, $iDisplayLength);
+            $iFilteredRecords = count($transactions);
+            $data = $this->get('apm_core.data_serialized')->getFormalData($transactions, array("owner_list"));
+            $json['totalRecordsDone'] = $iTotalRecords;
+            $json['filteredRecordsDone'] = $iFilteredRecords;
+            $json['items'] = $data;
+        }
+
+        return new JsonResponse($json, 200);
+
     }
 
     /**
@@ -370,44 +348,9 @@ class TransactionController extends Controller
     public function showAction(Request $request, Transaction $transaction)
     {
         $this->listAndShowSecurity($transaction->getBoutique(), $transaction);
-        if ($request->isXmlHttpRequest()) {
-            $json = array();
-            $json['item'] = array(
-                'id' => $transaction->getId(),
-                'code' => $transaction->getCode(),
-                'nature' => $transaction->getNature(),
-                'description' => $transaction->getDescription(),
-                'etat' => $transaction->getStatut(),
-                'montant' => $transaction->getMontant(),
-                'beneficiaire' => $transaction->getBeneficiaire()->getId(),
-                'auteur' => $transaction->getAuteur()->getId(),
-                'destinataireNonAvm' => $transaction->getDestinataireNonAvm(),
-                'date' => $transaction->getDate()->format('d-m-Y H:i')
-            );
-            return $this->json(json_encode($json), 200);
-        }
-        $deleteForm = $this->createDeleteForm($transaction);
-        return $this->render('APMVenteBundle:transaction:show.html.twig', array(
-            'transaction' => $transaction,
-            'delete_form' => $deleteForm->createView(),
-        ));
+        $data = $this->get('apm_core.data_serialized')->getFormalData($transaction, ["owner_transaction_details", "owner_list"]);
+        return new JsonResponse($data, 200);
     }
-
-    /**
-     * Creates a form to delete a Transaction entity.
-     *
-     * @param Transaction $transaction The Transaction entity
-     *
-     * @return \Symfony\Component\Form\Form The form
-     */
-    private function createDeleteForm(Transaction $transaction)
-    {
-        return $this->createFormBuilder()
-            ->setAction($this->generateUrl('apm_vente_transaction_delete', array('id' => $transaction->getId())))
-            ->setMethod('DELETE')
-            ->getForm();
-    }
-
 
     /**
      * Displays a form to edit an existing Transaction entity.
@@ -507,6 +450,21 @@ class TransactionController extends Controller
         }
 
         //----------------------------------------------------------------------------------------
+    }
+
+    /**
+     * Creates a form to delete a Transaction entity.
+     *
+     * @param Transaction $transaction The Transaction entity
+     *
+     * @return \Symfony\Component\Form\Form The form
+     */
+    private function createDeleteForm(Transaction $transaction)
+    {
+        return $this->createFormBuilder()
+            ->setAction($this->generateUrl('apm_vente_transaction_delete', array('id' => $transaction->getId())))
+            ->setMethod('DELETE')
+            ->getForm();
     }
 
     /**

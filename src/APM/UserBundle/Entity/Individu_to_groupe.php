@@ -6,6 +6,10 @@ use APM\UserBundle\Factory\TradeFactory;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use JMS\Serializer\Annotation\Expose;
+use JMS\Serializer\Annotation\Exclude;
+use JMS\Serializer\Annotation\Groups;
+use JMS\Serializer\Annotation\ExclusionPolicy;
 
 /**
  * Individu_to_groupe
@@ -18,6 +22,8 @@ class Individu_to_groupe extends TradeFactory
 {
     /**
      * @var \DateTime
+     * @Expose
+     * @Groups({"owner_individuToG_details", "others_individuToG_details"})
      * @Assert\DateTime
      * @ORM\Column(name="dateCreation", type="datetime", nullable=false)
      */
@@ -25,6 +31,8 @@ class Individu_to_groupe extends TradeFactory
 
     /**
      * @var integer
+     * @Expose
+     * @Groups({"owner_individuToG_details"})
      * @Assert\Choice({0,1,2})
      * @ORM\Column(name="propriete", type="integer", length=255, nullable=true)
      */
@@ -32,7 +40,8 @@ class Individu_to_groupe extends TradeFactory
 
     /**
      * @var integer
-     *
+     * @Expose
+     * @Groups({"owner_list", "others_list", "owner_individuToG_details", "others_individuToG_details"})
      * @ORM\Column(name="id", type="integer", nullable=false)
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
@@ -41,7 +50,8 @@ class Individu_to_groupe extends TradeFactory
 
     /**
      * @var Groupe_relationnel
-     *
+     * @Expose
+     * @Groups({"owner_list", "others_list", "owner_individuToG_details", "others_individuToG_details"})
      * @ORM\ManyToOne(targetEntity="APM\UserBundle\Entity\Groupe_relationnel", inversedBy="groupeIndividus")
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="groupeRelationnel_id", referencedColumnName="id", nullable=false)
@@ -52,7 +62,7 @@ class Individu_to_groupe extends TradeFactory
 
     /**
      * @var Utilisateur_avm
-     *
+     * @Groups({"owner_list", "others_list", "owner_individuToG_details", "others_individuToG_details"})
      * @ORM\ManyToOne(targetEntity="APM\UserBundle\Entity\Utilisateur_avm", inversedBy="individuGroupes")
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="individu_id", referencedColumnName="id", nullable=false)

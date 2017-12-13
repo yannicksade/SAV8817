@@ -8,25 +8,31 @@ use APM\VenteBundle\Factory\TradeFactory;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
-
+use JMS\Serializer\Annotation\ExclusionPolicy;
+use JMS\Serializer\Annotation\Expose;
+use JMS\Serializer\Annotation\Groups;
 /**
  * Rabais_offre
  *
  * @ORM\Table(name="rabais_offre")
  * @ORM\Entity(repositoryClass="APM\VenteBundle\Repository\Rabais_offreRepository")
  * @UniqueEntity("code")
+ * @ExclusionPolicy("all")
  */
 class Rabais_offre extends TradeFactory
 {
     /**
      * @var string
-     *
+     * @Expose
+     * @Groups({"owner_list", "owner_rabais_details", "others_rabais_details"})
      * @ORM\Column(name="code", type="string", length=255 , nullable=false)
      */
     private $code;
 
     /**
      * @var \DateTime|null
+     * @Expose
+     * @Groups({"owner_rabais_details", "others_rabais_details"})
      * @Assert\DateTime
      * @ORM\Column(name="dateLimite", type="datetime", nullable=true)
      */
@@ -34,6 +40,8 @@ class Rabais_offre extends TradeFactory
 
     /**
      * @var integer
+     * @Expose
+     * @Groups({"owner_rabais_details","others_rabais_details"})
      * @Assert\Range(min=1,max=10) avec <null> le nombre d'occurrence est indefini
      * @ORM\Column(name="nombreDefois", type="smallint", nullable=true)
      */
@@ -41,20 +49,24 @@ class Rabais_offre extends TradeFactory
 
     /**
      * @var string
-     *
+     * @Expose
+     * @Groups({"owner_rabais_details","others_rabais_details"})
      * @ORM\Column(name="prixUpdate", type="decimal",nullable=true)
      */
     private $prixUpdate;
 
     /**
      * @var string
-     *
+     * @Expose
+     * @Groups({"owner_list", "others_list", "owner_rabais_details", "others_rabais_details"})
      * @ORM\Column(name="$description", type="string",nullable=true)
      */
     private $description;
 
     /**
      * @var integer
+     * @Expose
+     * @Groups({"owner_rabais_details", "others_rabais_details"})
      * @Assert\GreaterThan(0)
      * @ORM\Column(name="quantiteMin", type="integer", nullable=true)
      */
@@ -62,7 +74,8 @@ class Rabais_offre extends TradeFactory
 
     /**
      * @var integer
-     *
+     * @Expose
+     * @Groups({"owner_rabais_details", "others_rabais_details", "owner_list", "others_list"})
      * @ORM\Column(name="id", type="integer", nullable=false)
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
@@ -71,7 +84,8 @@ class Rabais_offre extends TradeFactory
 
     /**
      * @var Utilisateur_avm
-     *
+     * @Expose
+     * @Groups({"owner_rabais_details","others_rabais_details"})
      * @ORM\ManyToOne(targetEntity="APM\UserBundle\Entity\Utilisateur_avm", inversedBy="rabaisAccordes")
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="vendeur_id", referencedColumnName="id", nullable=false)
@@ -81,7 +95,8 @@ class Rabais_offre extends TradeFactory
 
     /**
      * @var Utilisateur_avm
-     *
+     * @Expose
+     * @Groups({"owner_rabais_details", "others_rabais_details"})
      * @ORM\ManyToOne(targetEntity="APM\UserBundle\Entity\Utilisateur_avm", inversedBy="rabaisRecus")
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="beneficiaire_id", referencedColumnName="id", nullable=false)
@@ -91,6 +106,8 @@ class Rabais_offre extends TradeFactory
 
     /**
      * @var Offre
+     * @Expose
+     * @Groups({"owner_rabais_details","others_rabais_details"})
      * @ORM\ManyToOne(targetEntity="APM\VenteBundle\Entity\Offre", inversedBy="rabais")
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="offre_id", referencedColumnName="id", nullable = false)
@@ -101,6 +118,8 @@ class Rabais_offre extends TradeFactory
 
     /**
      * @var Groupe_relationnel
+     * @Expose
+     * @Groups({"owner_rabais_details", "others_rabais_details"})
      * @ORM\ManyToOne(targetEntity="APM\UserBundle\Entity\Groupe_relationnel", inversedBy="rabais")
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="groupe_id", referencedColumnName="id")
@@ -110,6 +129,8 @@ class Rabais_offre extends TradeFactory
 
     /**
      * @var \DateTime
+     * @Expose
+     * @Groups({"owner_rabais_details", "others_rabais_details"})
      * @Assert\DateTime
      * @ORM\Column(name="dateCreation", type="datetime", nullable=false)
      */

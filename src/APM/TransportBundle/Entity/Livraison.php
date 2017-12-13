@@ -11,7 +11,11 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
-
+use JMS\Serializer\Annotation\ExclusionPolicy;
+use JMS\Serializer\Annotation\Expose;
+use JMS\Serializer\Annotation\Groups;
+use JMS\Serializer\Annotation\Type;
+use JMS\Serializer\Annotation\Exclude;
 
 /**
  * Livraison
@@ -19,17 +23,22 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
  * @ORM\Table(name="livraison")
  * @ORM\Entity(repositoryClass="APM\TransportBundle\Repository\LivraisonRepository")
  * @UniqueEntity("code")
+ * @ExclusionPolicy("all")
  */
 class Livraison extends TradeFactory
 {
     /**
      * @var string
+     * @Expose
+     * @Groups({"owner_list", "owner_livraison_details", "others_livraison_details"})
      * @ORM\Column(name="code", type="string", length=255, nullable=false )
      */
     private $code;
 
     /**
      * @var \DateTime
+     * @Expose
+     * @Groups({"owner_livraison_details", "others_livraison_details"})
      * @Assert\DateTime
      * @ORM\Column(name="dateEnregistrement", type="datetime", nullable=false)
      */
@@ -37,6 +46,8 @@ class Livraison extends TradeFactory
 
     /**
      * @var \DateTime
+     * @Expose
+     * @Groups({"owner_livraison_details", "others_livraison_details"})
      * @Assert\DateTime
      * @ORM\Column(name="dateHeureLivraison", type="datetime", nullable=true)
      */
@@ -44,6 +55,8 @@ class Livraison extends TradeFactory
 
     /**
      * @var string
+     * @Expose
+     * @Groups({"owner_list", "others_list", "owner_livraison_details", "others_livraison_details"})
      * @Assert\Length(min=2, max=254)
      * @ORM\Column(name="description", type="string", length=255, nullable=true)
      */
@@ -51,25 +64,32 @@ class Livraison extends TradeFactory
 
     /**
      * @var integer
+     * @Expose
+     * @Groups({"owner_livraison_details", "others_livraison_details"})
      * @ORM\Column(name="etatLivraison", type="integer",nullable=true)
      */
     private $etatLivraison;
 
     /**
      * @var string
+     * @Expose
+     * @Groups({"owner_livraison_details"})
      * @ORM\Column(name="priorite", type="string", length=255, nullable=true)
      */
     private $priorite;
 
     /**
      * @var boolean
+     * @Expose
+     * @Groups({"owner_livraison_details"})
      * @ORM\Column(name="valide", type="boolean", nullable=true)
      */
     private $valide;
 
     /**
      * @var integer
-     *
+     * @Expose
+     * @Groups({"others_list", "owner_list", "owner_livraison_details", "others_livraison_details"})
      * @ORM\Column(name="id", type="integer", nullable=false)
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
@@ -78,7 +98,8 @@ class Livraison extends TradeFactory
 
     /**
      * @var Profile_transporteur
-     *
+     * @Expose
+     * @Groups({"owner_livraison_details", "others_livraison_details"})
      * @ORM\ManyToOne(targetEntity="APM\TransportBundle\Entity\Profile_transporteur", inversedBy="livraisons")
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="livreur_boutique_id", referencedColumnName="id")
@@ -88,7 +109,8 @@ class Livraison extends TradeFactory
 
     /**
      * @var Utilisateur_avm
-     *
+     * @Expose
+     * @Groups({"owner_livraison_details"})
      * @ORM\ManyToOne(targetEntity="APM\UserBundle\Entity\Utilisateur_avm", inversedBy="livraisons")
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="utilisateur_id", referencedColumnName="id", nullable=false)
@@ -98,7 +120,8 @@ class Livraison extends TradeFactory
 
     /**
      * @var Boutique
-     *
+     * @Expose
+     * @Groups({"owner_livraison_details", "others_livraison_details"})
      * @ORM\ManyToOne(targetEntity="APM\VenteBundle\Entity\Boutique", inversedBy="livraisons")
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="boutique_id", referencedColumnName="id")

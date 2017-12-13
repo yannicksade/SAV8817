@@ -5,27 +5,32 @@ namespace APM\VenteBundle\Entity;
 use APM\VenteBundle\Factory\TradeFactory;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
-
+use JMS\Serializer\Annotation\ExclusionPolicy;
+use JMS\Serializer\Annotation\Expose;
+use JMS\Serializer\Annotation\Groups;
 
 /**
  * Transaction_produit
  *
  * @ORM\Table(name="Transaction_produit")
  * @ORM\Entity(repositoryClass="APM\VenteBundle\Repository\Transaction_produitRepository")
- *
+ * @ExclusionPolicy("all")
  */
 class Transaction_produit extends TradeFactory
 {
 
     /**
      * @var integer
-     *
+     * @Expose
+     * @Groups({"owner_transactionP_details", "others_transactionP_details"})
      * @ORM\Column(name="quantite", type="integer", nullable=true)
      */
     private $quantite;
 
     /**
      * @var \DateTime
+     * @Expose
+     * @Groups({"owner_transactionP_details", "others_transactionP_details"})
      * @Assert\DateTime
      * @ORM\Column(name="date", type="datetime", nullable=false)
      */
@@ -33,13 +38,16 @@ class Transaction_produit extends TradeFactory
 
     /**
      * @var string
+     * @Expose
+     * @Groups({"owner_transactionP_details", "others_transactionP_details"})
      * @ORM\Column(name="reference", type="string", length=255, nullable=true)
      */
     private $reference;
     /**
      * Id
      * @var integer
-     *
+     * @Expose
+     * @Groups({"owner_list", "others_list", "owner_transactionP_details", "others_transactionP_details"})
      * @ORM\Column(name="id", type="integer", nullable=false)
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
@@ -48,6 +56,8 @@ class Transaction_produit extends TradeFactory
 
     /**
      * @var Offre
+     * @Expose
+     * @Groups({"owner_list", "others_list", "owner_transactionP_details", "others_transactionP_details"})
      * @ORM\ManyToOne(targetEntity="APM\VenteBundle\Entity\Offre", inversedBy="produitTransactions")
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="produit_id", referencedColumnName="id", nullable=false)
@@ -57,6 +67,8 @@ class Transaction_produit extends TradeFactory
 
     /**
      * @var Transaction
+     * @Expose
+     * @Groups({"owner_transactionP_details", "others_transactionP_details"})
      * @ORM\ManyToOne(targetEntity="APM\VenteBundle\Entity\Transaction" , inversedBy="transactionProduits")
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="transaction_id", referencedColumnName="id", nullable=false)
@@ -181,6 +193,16 @@ class Transaction_produit extends TradeFactory
     }
 
     /**
+     * Get dateInsertion
+     *
+     * @return \DateTime
+     */
+    public function getDateInsertion()
+    {
+        return $this->dateInsertion;
+    }
+
+    /**
      * Set dateInsertion
      *
      * @param \DateTime $dateInsertion
@@ -192,15 +214,5 @@ class Transaction_produit extends TradeFactory
         $this->dateInsertion = $dateInsertion;
 
         return $this;
-    }
-
-    /**
-     * Get dateInsertion
-     *
-     * @return \DateTime
-     */
-    public function getDateInsertion()
-    {
-        return $this->dateInsertion;
     }
 }

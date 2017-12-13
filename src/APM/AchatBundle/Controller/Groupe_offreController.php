@@ -52,41 +52,30 @@ class Groupe_offreController extends Controller
         /** @var Utilisateur_avm $user */
         $user = $this->getUser();
         $groupe_offres = $user->getGroupesOffres();//liste
-        if ($request->isXmlHttpRequest() && $request->getMethod() === "POST") {
-            $this->propriete_filter = $request->request->has('propriete_filter') ? $request->request->get('propriete_filter') : "";
-            $this->code_filter = $request->request->has('code_filter') ? $request->request->get('code_filter') : "";
-            $this->designation_filter = $request->request->has('designation_filter') ? $request->request->get('designation_filter') : "";
-            $this->dateFrom_filter = $request->request->has('dateFrom_filter') ? $request->request->get('dateFrom_filter') : "";
-            $this->dateTo_filter = $request->request->has('dateTo_filter') ? $request->request->get('dateTo_filter') : "";
-            $this->dateVigueurFrom_filter = $request->request->has('dateVigueurFrom_filter') ? $request->request->get('dateVigueurFrom_filter') : "";
-            $this->dateVigueurTo_filter = $request->request->has('dateVigueurTo_filter') ? $request->request->get('dateVigueurTo_filter') : "";
-            $this->description_filter = $request->request->has('description_filter') ? $request->request->get('description_filter') : "";
-            $this->createur_filter = $request->request->has('createur_filter') ? $request->request->get('createur_filter') : "";
-            $this->recurrent_filter = $request->request->has('recurrent_filter') ? $request->request->get('recurrent_filter') : "";
+        $this->propriete_filter = $request->query->has('propriete_filter') ? $request->query->get('propriete_filter') : "";
+        $this->code_filter = $request->query->has('code_filter') ? $request->query->get('code_filter') : "";
+        $this->designation_filter = $request->query->has('designation_filter') ? $request->query->get('designation_filter') : "";
+        $this->dateFrom_filter = $request->query->has('dateFrom_filter') ? $request->query->get('dateFrom_filter') : "";
+        $this->dateTo_filter = $request->query->has('dateTo_filter') ? $request->query->get('dateTo_filter') : "";
+        $this->dateVigueurFrom_filter = $request->query->has('dateVigueurFrom_filter') ? $request->query->get('dateVigueurFrom_filter') : "";
+        $this->dateVigueurTo_filter = $request->query->has('dateVigueurTo_filter') ? $request->query->get('dateVigueurTo_filter') : "";
+        $this->description_filter = $request->query->has('description_filter') ? $request->query->get('description_filter') : "";
+        $this->createur_filter = $request->query->has('createur_filter') ? $request->query->get('createur_filter') : "";
+        $this->recurrent_filter = $request->query->has('recurrent_filter') ? $request->query->get('recurrent_filter') : "";
 
-            $iDisplayLength = $request->request->has('length') ? $request->request->get('length') : -1;
-            $iDisplayStart = $request->request->has('start') ? intval($request->request->get('start')) : 0;
-            $json = array();
-            $json['items'] = array();
-            $iTotalRecords = count($groupe_offres);
-            if ($iDisplayLength < 0) $iDisplayLength = $iTotalRecords;
-            $groupe_offres = $this->handleResults($groupe_offres, $iTotalRecords, $iDisplayStart, $iDisplayLength);
-            /** @var Groupe_offre $groupe_offre */
-            foreach ($groupe_offres as $groupe_offre) {
-                array_push($json['items'], array(
-                    'id' => $groupe_offre->getId(),
-                    'code' => $groupe_offre->getCode(),
-                    'designation' => $groupe_offre->getDesignation(),
-                    'description' => $groupe_offre->getDescription()
-                ));
-            }
-            return $this->json(json_encode($json), 200);
-        }
-        return $this->render('APMAchatBundle:groupe_offre:index.html.twig', array(
-            'groupe_offres' => $groupe_offres,
-            'form' => $form->createView(),
-            'url_image' => $this->get('apm_core.packages_maker')->getPackages()->getUrl('/', 'resolve_img'),
-        ));
+        $iDisplayLength = $request->query->has('length') ? $request->query->get('length') : -1;
+        $iDisplayStart = $request->query->has('start') ? intval($request->query->get('start')) : 0;
+        $json = array();
+        $iTotalRecords = count($groupe_offres);
+        if ($iDisplayLength < 0) $iDisplayLength = $iTotalRecords;
+        $groupe_offres = $this->handleResults($groupe_offres, $iTotalRecords, $iDisplayStart, $iDisplayLength);
+        $iFilteredRecords = count($groupe_offres);
+        $data = $this->get('apm_core.data_serialized')->getFormalData($groupe_offres, array("owner_list"));
+        $json['totalRecords'] = $iTotalRecords;
+        $json['filteredRecords'] = $iFilteredRecords;
+        $json['items'] = $data;
+
+        return new JsonResponse($json, 200);
     }
 
     private function listAndShowSecurity(Groupe_offre $groupe_offre = null)
@@ -287,8 +276,8 @@ class Groupe_offreController extends Controller
             if ($request->isXmlHttpRequest()) {
                 $json = array();
                 $json['item'] = array();
-                $property = $request->request->get('name');
-                $value = $request->request->get('value');
+                $property = $request->query->get('name');
+                $value = $request->query->get('value');
                 switch ($property) {
                     case 'dateDeVigueur':
                         $groupe_offre->setDateDeVigueur($value);
@@ -358,35 +347,15 @@ class Groupe_offreController extends Controller
     }
 
     /**
-     * @param Request $request
      * @param Groupe_offre $groupe_offre
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
+     * @return JsonResponse
      * @Get("/show/collectionoffre/{id}")
      */
-    public function showAction(Request $request, Groupe_offre $groupe_offre)
+    public function showAction(Groupe_offre $groupe_offre)
     {
         $this->listAndShowSecurity();
-        if ($request->isXmlHttpRequest()) {
-            $json = array();
-            $json['item'] = array(
-                'id' => $groupe_offre->getId(),
-                'code' => $groupe_offre->getCode(),
-                'designation' => $groupe_offre->getDesignation(),
-                'description' => $groupe_offre->getDescription(),
-                'dateDeVigueur' => $groupe_offre->getDateDeVigueur()->format('d-m-Y H:i'),
-                'date' => $groupe_offre->getDateCreation()->format('d-m-Y H:i'),
-                'recurrent' => $groupe_offre->getRecurrent(),
-                'createur' => $groupe_offre->getCreateur()->getId(),
-                'propriete' => $groupe_offre->getPropriete(),
-            );
-            return $this->json(json_encode($json), 200);
-        }
-        $deleteForm = $this->createDeleteForm($groupe_offre);
-        return $this->render('APMVenteBundle:groupe_offre:show.html.twig', array(
-            'boutique' => $groupe_offre,
-            'form' => $deleteForm->createView(),
-            'url_image' => $this->get('apm_core.packages_maker')->getPackages()->getUrl('/', 'resolve_img'),
-        ));
+        $data = $this->get('apm_core.data_serialized')->getFormalData($groupe_offre, ["owner_groupeO_details", "owner_list"]);
+        return new JsonResponse($data, 200);
     }
 
     /**

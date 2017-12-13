@@ -45,7 +45,7 @@ class LivraisonController extends Controller
      * les livraisons se font uniquement sur les opérations effectuées...
      * @param Request $request
      * @param Boutique $boutique
-     * @return \Symfony\Component\HttpFoundation\Response| JsonResponse
+     * @return JsonResponse
      *
      * @Get("/cget/livraisons", name="s")
      * @Get("/cget/livraisons/boutique/{id}", name="s_boutique")
@@ -60,38 +60,29 @@ class LivraisonController extends Controller
             $user = $this->getUser();
             $livraisons = $user->getLivraisons();
         }
-        if ($request->isXmlHttpRequest()) {
-            $json = array();
-            $json['items'] = array();
-            $this->datePrevueFrom_filter = $request->request->has('datePrevueFrom_filter') ? $request->request->get('datePrevueFrom_filter') : "";
-            $this->datePrevueTo_filter = $request->request->has('datePrevueTo_filter') ? $request->request->get('datePrevueTo_filter') : "";
-            $this->dateEnregistrementFrom_filter = $request->request->has('dateEnregistrementFrom_filter') ? $request->request->get('dateEnregistrementFrom_filter') : "";
-            $this->dateEnregistrementTo_filter = $request->request->has('dateEnregistrementTo_filter') ? $request->request->get('dateEnregistrementTo_filter') : "";
-            $this->code_filter = $request->request->has('code_filter') ? $request->request->get('code_filter') : "";
-            $this->livreur_boutique = $request->request->has('livreur_boutique') ? $request->request->get('livreur_boutique') : "";
-            $this->description_filter = $request->request->has('description_filter') ? $request->request->get('description_filter') : "";
-            $this->etat_filter = $request->request->has('etat_filter') ? $request->request->get('etat_filter') : "";
-            $this->priorite_filter = $request->request->has('priorite_filter') ? $request->request->get('priorite_filter') : "";
-            $this->valide_filter = $request->request->has('valide_filter') ? $request->request->get('valide_filter') : "";
-            $iDisplayLength = $request->request->has('length') ? $request->request->get('length') : -1;
-            $iDisplayStart = $request->request->has('start') ? intval($request->request->get('start')) : 0;
-            $iTotalRecords = count($livraisons);
-            if ($iDisplayLength < 0) $iDisplayLength = $iTotalRecords;
-            $livraisons = $this->handleResults($livraisons, $iTotalRecords, $iDisplayStart, $iDisplayLength);
-            /** @var Livraison $livraison */
-            foreach ($livraisons as $livraison) {
-                array_push($json['items'], array(
-                    'id' => $livraison->getId(),
-                    'code' => $livraison->getCode(),
-                    'description' => $livraison->getDescription(),
-                ));
-            }
-            return $this->json(json_encode($json), 200);
-        }
-        return $this->render('APMTransportBundle:livraison:index.html.twig', array(
-            'livraisons' => $livraisons,
-            'boutique' => $boutique,
-        ));
+        $json = array();
+        $this->datePrevueFrom_filter = $request->query->has('datePrevueFrom_filter') ? $request->query->get('datePrevueFrom_filter') : "";
+        $this->datePrevueTo_filter = $request->query->has('datePrevueTo_filter') ? $request->query->get('datePrevueTo_filter') : "";
+        $this->dateEnregistrementFrom_filter = $request->query->has('dateEnregistrementFrom_filter') ? $request->query->get('dateEnregistrementFrom_filter') : "";
+        $this->dateEnregistrementTo_filter = $request->query->has('dateEnregistrementTo_filter') ? $request->query->get('dateEnregistrementTo_filter') : "";
+        $this->code_filter = $request->query->has('code_filter') ? $request->query->get('code_filter') : "";
+        $this->livreur_boutique = $request->query->has('livreur_boutique') ? $request->query->get('livreur_boutique') : "";
+        $this->description_filter = $request->query->has('description_filter') ? $request->query->get('description_filter') : "";
+        $this->etat_filter = $request->query->has('etat_filter') ? $request->query->get('etat_filter') : "";
+        $this->priorite_filter = $request->query->has('priorite_filter') ? $request->query->get('priorite_filter') : "";
+        $this->valide_filter = $request->query->has('valide_filter') ? $request->query->get('valide_filter') : "";
+        $iDisplayLength = $request->query->has('length') ? $request->query->get('length') : -1;
+        $iDisplayStart = $request->query->has('start') ? intval($request->query->get('start')) : 0;
+        $iTotalRecords = count($livraisons);
+        if ($iDisplayLength < 0) $iDisplayLength = $iTotalRecords;
+        $livraisons = $this->handleResults($livraisons, $iTotalRecords, $iDisplayStart, $iDisplayLength);
+        $iFilteredRecords = count($livraisons);
+        $data = $this->get('apm_core.data_serialized')->getFormalData($livraisons, array("owner_list"));
+        $json['totalRecords'] = $iTotalRecords;
+        $json['filteredRecords'] = $iFilteredRecords;
+        $json['items'] = $data;
+
+        return new JsonResponse($json, 200);
     }
 
     /**
@@ -232,20 +223,20 @@ class LivraisonController extends Controller
      */
     public function newAction(Request $request, Boutique $boutique = null, Transaction $transaction = null)
     {
-        $tr=[];
-        if(null !== $transaction) $tr = new ArrayCollection([$transaction]);
+        $tr = [];
+        if (null !== $transaction) $tr = new ArrayCollection([$transaction]);
         $this->createSecurity($boutique, $tr);
         /** @var Livraison $livraison */
         $livraison = TradeFactory::getTradeProvider("livraison");
         $form = $this->createForm('APM\TransportBundle\Form\LivraisonType', $livraison);
-        if(null !== $transaction)$form->remove('operations');
+        if (null !== $transaction) $form->remove('operations');
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             $livraison->setUtilisateur($this->getUser());
             $livraison->setBoutique($boutique);
-            if(null !== $transaction){
+            if (null !== $transaction) {
                 $transactions = $tr;
-            }else{
+            } else {
                 $transactions = $livraison->getOperations();
             }
             $this->createSecurity($boutique, $transactions);
@@ -257,12 +248,12 @@ class LivraisonController extends Controller
             $em = $this->getDoctrine()->getManager();
             $em->persist($livraison);
             $em->flush();
-            if($request->isXmlHttpRequest()){
+            if ($request->isXmlHttpRequest()) {
                 $json = array();
-                $json['item'] =array();
+                $json['item'] = array();
                 return $this->json(json_encode($json), 200);
             }
-            
+
             return $this->redirectToRoute('apm_transport_livraison_show', array('id' => $livraison->getId()));
         }
 
@@ -271,7 +262,7 @@ class LivraisonController extends Controller
             'form' => $form->createView(),
         ));
     }
-    
+
     /**
      * @param Boutique $boutique
      * Verifie si la boutique appartient à son proprietaire ou le gerant
@@ -306,78 +297,21 @@ class LivraisonController extends Controller
     /**
      * @ParamConverter("transaction", options={"mapping":{"transaction_id":"id"}})
      * voir un livraison
-     * @param Request $request
      * @param Livraison $livraison
      * @param Transaction $transaction
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
+     * @return JsonResponse
      *
      * @Get("/show/livraison{id}")
      */
-    public function showAction(Request $request, Livraison $livraison, Transaction $transaction = null)
+    public function showAction(Livraison $livraison, Transaction $transaction = null)
     {
         if ($transaction) {
             $this->listeAndShowSecurity(null, $transaction->getBeneficiaire());
         } else {
             $this->listeAndShowSecurity($livraison->getBoutique());
         }
-        if ($request->isXmlHttpRequest()) {
-            $json = array();
-            $json['item'] = array(
-                'id' => $livraison->getId(),
-                'date' => $livraison->getDateEtHeureLivraison()->format('d-m-Y H:i'),
-                'code' => $livraison->getCode(),
-                'description' => $livraison->getDescription(),
-                'dateEnregistrement' => $livraison->getDateEnregistrement()->format('d-m-Y H:i'),
-                'etat' => $livraison->getEtatLivraison(),
-                'priorite' => $livraison->getPriorite(),
-                'valide' => $livraison->isValide(),
-                'livreur' => $livraison->getLivreur()->getId()
-            );
-            return $this->json(json_encode($json), 200);
-        }
-        $deleteForm = $this->createDeleteForm($livraison);
-        return $this->render('APMTransportBundle:livraison:show.html.twig', array(
-            'livraison' => $livraison,
-            'delete_form' => $deleteForm->createView(),
-        ));
-    }
-
-    /**
-     * Creates a form to delete a Livraison entity.
-     *
-     * @param Livraison $livraison The Livraison entity
-     *
-     * @return \Symfony\Component\Form\Form The form
-     */
-    private function createDeleteForm(Livraison $livraison)
-    {
-        $this->editAndDeleteSecurity($livraison);
-        return $this->createFormBuilder()
-            ->setAction($this->generateUrl('apm_transport_livraison_delete', array('id' => $livraison->getId())))
-            ->setMethod('DELETE')
-            ->getForm();
-    }
-
-    /**
-     * @param Livraison $livraison
-     */
-    private function editAndDeleteSecurity($livraison)
-    {//----- security : au cas ou il s'agirait d'une boutique vérifier le droit de l'utilisateur --------------------
-        $this->denyAccessUnlessGranted('ROLE_USERAVM', null, 'Unable to access this page!');
-        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY')) {
-            throw $this->createAccessDeniedException();
-        }
-        $user = $this->getUser();
-        $boutique = $livraison->getBoutique();
-        if (null !== $boutique) {
-            $gerant = $boutique->getGerant();
-            $proprietaire = $boutique->getProprietaire();
-            if ($user !== $gerant && $user !== $proprietaire && $user !== $livraison->getUtilisateur()) {
-                throw $this->createAccessDeniedException();
-            }
-        }
-        //--------------------------------------------------------------------------------------------------------------
-
+        $data = $this->get('apm_core.data_serialized')->getFormalData($livraison, ["owner_livraison_details", "owner_list"]);
+        return new JsonResponse($data, 200);
     }
 
     /**
@@ -395,8 +329,9 @@ class LivraisonController extends Controller
         $editForm->handleRequest($request);
         /** @var Session $session */
         $session = $request->getSession();
-        if ($editForm->isSubmitted() && $editForm->isValid() 
-            || $request->isXmlHttpRequest() && $request->isMethod('POST')) {
+        if ($editForm->isSubmitted() && $editForm->isValid()
+            || $request->isXmlHttpRequest() && $request->isMethod('POST')
+        ) {
             $em = $this->getDoctrine()->getManager();
             $transactions = $livraison->getOperations();
             /** @var Transaction $transaction */
@@ -408,8 +343,8 @@ class LivraisonController extends Controller
                 if ($request->isXmlHttpRequest()) {
                     $json = array();
                     $json['item'] = array();
-                    $property = $request->request->get('name');
-                    $value = $request->request->get('value');
+                    $property = $request->query->get('name');
+                    $value = $request->query->get('value');
                     switch ($property) {
                         case 'dateLivraison':
                             $livraison->setDateEtHeureLivraison($value);
@@ -433,7 +368,7 @@ class LivraisonController extends Controller
                             break;
                         case 'transaction':
                             /** @var Transaction $transaction */
-                            $transaction= $em->getRepository('APMVenteBundle:Transaction')->find($value);
+                            $transaction = $em->getRepository('APMVenteBundle:Transaction')->find($value);
                             $transaction->setLivraison($livraison);
                             $livraison->addOperation($transaction);
                             break;
@@ -461,6 +396,44 @@ class LivraisonController extends Controller
             'edit_form' => $editForm->createView(),
             'delete_form' => $deleteForm->createView(),
         ));
+    }
+
+    /**
+     * @param Livraison $livraison
+     */
+    private function editAndDeleteSecurity($livraison)
+    {//----- security : au cas ou il s'agirait d'une boutique vérifier le droit de l'utilisateur --------------------
+        $this->denyAccessUnlessGranted('ROLE_USERAVM', null, 'Unable to access this page!');
+        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY')) {
+            throw $this->createAccessDeniedException();
+        }
+        $user = $this->getUser();
+        $boutique = $livraison->getBoutique();
+        if (null !== $boutique) {
+            $gerant = $boutique->getGerant();
+            $proprietaire = $boutique->getProprietaire();
+            if ($user !== $gerant && $user !== $proprietaire && $user !== $livraison->getUtilisateur()) {
+                throw $this->createAccessDeniedException();
+            }
+        }
+        //--------------------------------------------------------------------------------------------------------------
+
+    }
+
+    /**
+     * Creates a form to delete a Livraison entity.
+     *
+     * @param Livraison $livraison The Livraison entity
+     *
+     * @return \Symfony\Component\Form\Form The form
+     */
+    private function createDeleteForm(Livraison $livraison)
+    {
+        $this->editAndDeleteSecurity($livraison);
+        return $this->createFormBuilder()
+            ->setAction($this->generateUrl('apm_transport_livraison_delete', array('id' => $livraison->getId())))
+            ->setMethod('DELETE')
+            ->getForm();
     }
 
     /**

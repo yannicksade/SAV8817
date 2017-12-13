@@ -81,6 +81,7 @@ class OffreController extends FOSRestController implements ClassResourceInterfac
             /** @var Session $session */
             $session = $request->getSession();
             $vendeur = null;
+            $selectedGroup = array("others_list");
             if (null !== $transaction) {
                 //security
                 $this->listOfrresSecurity($boutique, $transaction);
@@ -98,19 +99,15 @@ class OffreController extends FOSRestController implements ClassResourceInterfac
                 if (null === $user) {
                     $this->listAndShowSecurity();
                     $user = $this->getUser();
+                    $selectedGroup = array("owner_list");
                 } else {
                     $this->adminSecurity();
                 }
                 /** @var Collection $offres */
                 $offres = $user->getOffres();
             }
-            $form = $this->createForm('APM\VenteBundle\Form\OffreType');
-            $form->handleRequest($request);
-            /** @var Session $session */
-            $session = $request->getSession();
-            //if ($request->isXmlHttpRequest() && $request->getMethod() === "POST") {
+
             $json = array();
-            $json['items'] = array();
             //filter parameters
             $this->code_filter = $request->query->has('code_filter') ? $request->query->get('code_filter') : "";
             $this->designation_filter = $request->query->has('desc_filter') ? $request->query->get('desc_filter') : "";
@@ -129,40 +126,16 @@ class OffreController extends FOSRestController implements ClassResourceInterfac
             //------------------------------------
             //$id = 0; // identity of rows in the table
             //$url_image = $this->get('apm_core.packages_maker')->getPackages()->getUrl('/', 'resolve_img');
-            /** @var Offre $offre */
-            foreach ($offres as $offre) {
-                //$id += 1;
-                //$session->set('offre_'.$id, $offre->getId()); //convert id before sending them to client
-                array_push($json['items'], array(
-                    'id' => $offre->getId(),
-                    'code' => $offre->getCode(),
-                    'designation' => $offre->getDesignation(),
-                    'description' => $offre->getDescription(),
-                    //'image' => $url_image . $offre->getImage(),
-                ));
-            }
+            //$id += 1;
+            //$session->set('offre_'.$id, $offre->getId()); //convert id before sending them to client
+            $data = $this->get('apm_core.data_serialized')->getFormalData($offres, $selectedGroup);
             $json['totalRecords'] = $iTotalRecords;
             $json['filteredRecords'] = $iFilteredRecords; //nbre d'unité
-            $data = array(
-                /* 'offres' => $offres,*/
-                'boutique' => $boutique,
-                'categorie' => $categorie,
-                'vendeur' => $vendeur,
-                'form' => $form->createView(),
-                'url_image' => $this->get('apm_core.packages_maker')->getPackages()->getUrl('/', 'img'),
-            );
-            /*$view = $this->view($json, 200)
-                ->setTemplate('APMVenteBundle:offre:index_ajax.html.twig')
-                ->setTemplateVar('offres')
-                ->setTemplateData($data);*/
-            /* ->setRoute('');*/
-            return $this->json($json, 200);
-            //return $this->handleView($view);
-
-            // }
+            $json['items'] = $data;
+            return new JsonResponse($json, 200);
         } catch (AccessDeniedException $ads) {
             $session->getFlashBag()->add('danger', "<strong>Action interdite!</strong><br/>Pour jouir de ce service, veuillez consulter nos administrateurs.");
-            return $this->json($json);
+            return new JsonResponse("Access denied", 403);
         }
         //$session->set('previous_location', $request->getUri());
 
@@ -470,37 +443,11 @@ class OffreController extends FOSRestController implements ClassResourceInterfac
      * @Get("/show/offre/{id}")
      */
     public
-    function showAction(Request $request, Offre $offre)
+    function showAction(Offre $offre)
     {
         $this->listAndShowSecurity();
-        $json = array();
-        $json['item'] = array(
-            'id' => $offre->getId(),
-            'designation' => $offre->getDesignation(),
-            'code' => $offre->getCode(),
-            'image' => $this->get('apm_core.packages_maker')->getPackages()->getUrl('/', 'resolve_img') . $offre->getImage(),
-            'categorie' => $offre->getCategorie()->getId(),
-            'boutiqueID' => !$offre->getBoutique() ? -1 : $offre->getBoutique()->getId(),
-            'dureeGarantie' => $offre->getDureeGarantie(),
-            'remiseProduit' => $offre->getRemiseProduit(),
-            'modeVente' => $offre->getModeVente(),
-            'modelDeSerie' => $offre->getModelDeSerie(),
-            'prixUnitaire' => $offre->getPrixUnitaire(),
-            'quantite' => $offre->getQuantite(),
-            'unite' => $offre->getUnite(),
-            'rate' => $offre->getEvaluation(),
-            'typeOffre' => $offre->getTypeOffre(),
-            'description' => $offre->getDescription(),
-            'publiable' => $offre->getPubliable(),
-            'apparenceNeuf' => $offre->getApparenceNeuf(),
-            'etat' => $offre->getEtat(),
-            'retourne' => $offre->getRetourne(),
-            'updatedAt' => $offre->getUpdatedAt()->format("d/m/Y - H:i"),
-            'dateCreation' => $offre->getDateCreation() ? $offre->getDateCreation()->format("d/m/Y - H:i") : '',
-            'dateExpiration' => $offre->getDateExpiration() ? $offre->getDateExpiration()->format("d/m/Y - H:i") : '',
-            'vendeur' => $offre->getVendeur()->getId(),
-        );
-        return $this->json(json_encode($json), 200);
+        $data = $this->get('apm_core.data_serialized')->getFormalData($offre, ["owner_offre_details", "owner_list"]);
+        return new JsonResponse($data, 200);
     }
 
 //------------------------ End INDEX ACTION --------------------------------------------

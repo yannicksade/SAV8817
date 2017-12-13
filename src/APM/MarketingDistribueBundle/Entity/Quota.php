@@ -9,6 +9,11 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
+use JMS\Serializer\Annotation\ExclusionPolicy;
+use JMS\Serializer\Annotation\Expose;
+use JMS\Serializer\Annotation\Groups;
+use JMS\Serializer\Annotation\Type;
+use JMS\Serializer\Annotation\Exclude;
 
 /**
  * Quota
@@ -16,24 +21,30 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @ORM\Table(name="quota")
  * @ORM\Entity(repositoryClass="APM\MarketingDistribueBundle\Repository\QuotaRepository")
  * @UniqueEntity("code")
+ * @ExclusionPolicy("all")
  */
 class Quota extends TradeFactory
 {
     /**
      * @var string
-     *
+     * @Expose
+     * @Groups({"owner_list", "others_quota_details", "owner_quota_details"})
      * @ORM\Column(name="code", type="string", length=255, nullable=false)
      */
     private $code;
 
     /**
      * @var \DateTime
+     * @Expose
+     * @Groups({"others_quota_details", "owner_quota_details"})
      * @ORM\column(type="datetime")
      */
     private $date;
 
     /**
      * @var string
+     * @Expose
+     * @Groups({"others_list", "owner_list", "others_quota_details", "owner_quota_details"})
      * @Assert\Length(min=2, max=254)
      * @ORM\Column(name="description", type="string", length=255, nullable=true)
      */
@@ -41,6 +52,8 @@ class Quota extends TradeFactory
 
     /**
      * @var string
+     * @Expose
+     * @Groups({"others_quota_details", "owner_quota_details"})
      * @Assert\NotBlank
      * @Assert\Length(min=2, max=55)
      * @ORM\Column(name="libelleQuota", type="string", length=255, nullable=true)
@@ -49,22 +62,17 @@ class Quota extends TradeFactory
 
     /**
      * @var string
-     *
+     * @Expose
+     * @Groups({"others_quota_details", "owner_quota_details"})
      * @ORM\Column(name="valeurQuota", type="string", length=255, nullable=true)
      */
     private $valeurQuota;
 
     /**
-     * @Assert\Image()
-     * @var string
-     * @ORM\Column(name="image", type="string", nullable=true)
-     */
-    private $image;
-
-    /**
      * Id
      * @var integer
-     *
+     * @Expose
+     * @Groups({"others_list", "owner_list", "others_quota_details", "owner_quota_details"})
      * @ORM\Column(name="id", type="integer", nullable=false)
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
@@ -73,6 +81,8 @@ class Quota extends TradeFactory
 
     /**
      * @var Boutique
+     * @Expose
+     * @Groups({"others_quota_details", "owner_quota_details"})
      * @ORM\ManyToOne(targetEntity="APM\VenteBundle\Entity\Boutique", inversedBy="commissionnements")
      * @ORM\JoinColumns({
      *     @ORM\JoinColumn(name="boutiqueProprietaire_id", referencedColumnName="id", nullable=false)
@@ -284,27 +294,4 @@ class Quota extends TradeFactory
         return $this->code;
     }
 
-    /**
-     * Get image
-     *
-     * @return string
-     */
-    public function getImage()
-    {
-        return $this->image;
-    }
-
-    /**
-     * Set image
-     *
-     * @param string $image
-     *
-     * @return Quota
-     */
-    public function setImage($image)
-    {
-        $this->image = $image;
-
-        return $this;
-    }
 }

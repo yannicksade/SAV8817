@@ -50,62 +50,50 @@ class CommunicationController extends Controller
         $this->listAndShowSecurity();
         /** @var Utilisateur_avm $user */
         $user = $this->getUser();
-        if ($request->isXmlHttpRequest() && $request->getMethod() === "POST") {
-            $q = $request->get('q');
-            $this->dateDeVigueurFrom_filter = $request->request->has('dateDeVigueurFrom_filter') ? $request->request->get('dateDeVigueurFrom_filter') : "";
-            $this->dateDeVigueurTo_filter = $request->request->has('dateDeVigueurTo_filter') ? $request->request->get('dateDeVigueurTo_filter') : "";
-            $this->code_filter = $request->request->has('code_filter') ? $request->request->get('code_filter') : "";
-            $this->contenu_filter = $request->request->has('contenu_filter') ? $request->request->get('contenu_filter') : "";
-            $this->etat_filter = $request->request->has('etat_filter') ? $request->request->get('etat_filter') : "";
-            $this->reference_filter = $request->request->has('reference_filter') ? $request->request->get('reference_filter') : "";
-            $this->dateFinFrom_filter = $request->request->has('dateFinFrom_filter') ? $request->request->get('dateFinFrom_filter') : "";
-            $this->dateFinTo_filter = $request->request->has('dateFinTo_filter') ? $request->request->get('dateFinTo_filter') : "";
-            $this->date_filter = $request->request->has('date_filter') ? $request->request->get('date_filter') : "";
-            $this->type_filter = $request->request->has('type_filter') ? $request->request->get('type_filter') : "";
-            $this->valide_filter = $request->request->has('valide_filter') ? $request->request->get('valide_filter') : "";
-            $this->emetteur_filter = $request->request->has('emetteur_filter') ? $request->request->get('emetteur_filter') : "";
-            $this->recepteur_filter = $request->request->has('recepteur_filter') ? $request->request->get('recepteur_filter') : "";
-            $iDisplayLength = $request->request->has('length') ? $request->request->get('length') : -1;
-            $iDisplayStart = $request->request->has('start') ? intval($request->request->get('start')) : 0;
+        $q = $request->get('q');
+        $this->dateDeVigueurFrom_filter = $request->query->has('dateDeVigueurFrom_filter') ? $request->query->get('dateDeVigueurFrom_filter') : "";
+        $this->dateDeVigueurTo_filter = $request->query->has('dateDeVigueurTo_filter') ? $request->query->get('dateDeVigueurTo_filter') : "";
+        $this->code_filter = $request->query->has('code_filter') ? $request->query->get('code_filter') : "";
+        $this->contenu_filter = $request->query->has('contenu_filter') ? $request->query->get('contenu_filter') : "";
+        $this->etat_filter = $request->query->has('etat_filter') ? $request->query->get('etat_filter') : "";
+        $this->reference_filter = $request->query->has('reference_filter') ? $request->query->get('reference_filter') : "";
+        $this->dateFinFrom_filter = $request->query->has('dateFinFrom_filter') ? $request->query->get('dateFinFrom_filter') : "";
+        $this->dateFinTo_filter = $request->query->has('dateFinTo_filter') ? $request->query->get('dateFinTo_filter') : "";
+        $this->date_filter = $request->query->has('date_filter') ? $request->query->get('date_filter') : "";
+        $this->type_filter = $request->query->has('type_filter') ? $request->query->get('type_filter') : "";
+        $this->valide_filter = $request->query->has('valide_filter') ? $request->query->get('valide_filter') : "";
+        $this->emetteur_filter = $request->query->has('emetteur_filter') ? $request->query->get('emetteur_filter') : "";
+        $this->recepteur_filter = $request->query->has('recepteur_filter') ? $request->query->get('recepteur_filter') : "";
+        $iDisplayLength = $request->query->has('length') ? $request->query->get('length') : -1;
+        $iDisplayStart = $request->query->has('start') ? intval($request->query->get('start')) : 0;
 
-            $json = array();
-            if ($q === "sent" || $q === "all") {
-                $communicationsSent = $user->getEmetteurCommunications();
-                $iTotalRecords = count($communicationsSent);
-                if ($iDisplayLength < 0) $iDisplayLength = $iTotalRecords;
-                $communicationsSent = $this->handleResults($communicationsSent, $iTotalRecords, $iDisplayStart, $iDisplayLength);
-                //filtre
-                /** @var Communication $communication */
-                foreach ($communicationsSent as $communication) {
-                    array_push($json, array(
-                        'id' => $communication->getId(),
-                        'objet' => $communication->getObjet(),
-                    ));
-                }
-            }
-            if ($q === "received" || $q === "all") {
-                $communicationsReceived = $user->getRecepteurCommunications();
-                $iTotalRecords = count($communicationsReceived);
-                if ($iDisplayLength < 0) $iDisplayLength = $iTotalRecords;
-                $communicationsReceived = $this->handleResults($communicationsReceived, $iTotalRecords, $iDisplayStart, $iDisplayLength);
-                foreach ($communicationsReceived as $communication) {
-                    array_push($json, array(
-                        'id' => $communication->getId(),
-                        'code' => $communication->getCode(),
-                        'object' => $communication->getObjet(),
-                    ));
-                }
-            }
-            return $this->json(json_encode($json), 200);
+        $json = array();
+        $json['items'] = array();
+        if ($q === "sent" || $q === "all") {
+            $communicationsSent = $user->getEmetteurCommunications();
+            $iTotalRecords = count($communicationsSent);
+            if ($iDisplayLength < 0) $iDisplayLength = $iTotalRecords;
+            $communicationsSent = $this->handleResults($communicationsSent, $iTotalRecords, $iDisplayStart, $iDisplayLength);
+            $iFilteredRecords = count($communicationsSent);
+            $data = $this->get('apm_core.data_serialized')->getFormalData($communicationsSent, array("owner_list"));
+            $json['totalRecordsSent'] = $iTotalRecords;
+            $json['filteredRecordsSent'] = $iFilteredRecords;
+            $json['items'] = $data;
         }
 
-        $communicationsSent = $user->getEmetteurCommunications();
-        $communicationsReceived = $user->getRecepteurCommunications();
+        if ($q === "received" || $q === "all") {
+            $communicationsReceived = $user->getRecepteurCommunications();
+            $iTotalRecords = count($communicationsReceived);
+            if ($iDisplayLength < 0) $iDisplayLength = $iTotalRecords;
+            $communicationsReceived = $this->handleResults($communicationsReceived, $iTotalRecords, $iDisplayStart, $iDisplayLength);
+            $iFilteredRecords = count($communicationsReceived);
+            $data = $this->get('apm_core.data_serialized')->getFormalData($communicationsReceived, array("owner_list"));
+            $json['totalRecordsReceived'] = $iTotalRecords;
+            $json['filteredRecordsReceived'] = $iFilteredRecords;
+            $json['items'] = $data;
+        }
 
-        return $this->render('APMUserBundle:communication:index.html.twig', array(
-            'communicationsSent' => $communicationsSent,
-            'communicationsReceived' => $communicationsReceived,
-        ));
+        return new JsonResponse($json, 200);
     }
 
     private function listAndShowSecurity()
@@ -289,52 +277,15 @@ class CommunicationController extends Controller
     /**
      * Finds and displays a Communication entity.
      * @param Communication $communication
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return JsonResponse
      *
      * @Get("/show/communication/{id}")
      */
     public function showAction(Communication $communication)
     {
         $this->listAndShowSecurity();
-        if ($request->isXmlHttpRequest()) {
-            $json = array();
-            $json['item'] = array(
-                'id' => $communication->getId(),
-                'code' => $communication->getCode(),
-                'objet' => $communication->getObjet(),
-                'dateDeVigueur' => $communication->getDateDeVigueur()->format('d-m-Y H:i'),
-                'dateFin' => $communication->getDateFin()->format('d-m-Y H:i'),
-                'contenu' => $communication->getContenu(),
-                'date' => $communication->getDate()->format('d-m-Y H:i'),
-                'reference' => $communication->getReference(),
-                'etat' => $communication->getEtat(),
-                'emetteur' => $communication->getEmetteur()->getId(),
-                'recepteur' => $communication->getRecepteur()->getId(),
-                'type' => $communication->getType(),
-                'valide' => $communication->getValide(),
-            );
-            return $this->json(json_encode($json), 200);
-        }
-        $deleteForm = $this->createDeleteForm($communication);
-        return $this->render('APMUserBundle:communication:show.html.twig', array(
-            'communication' => $communication,
-            'delete_form' => $deleteForm->createView(),
-        ));
-    }
-
-    /**
-     * Creates a form to delete a Communication entity.
-     *
-     * @param Communication $communication The Communication entity
-     *
-     * @return \Symfony\Component\Form\Form The form
-     */
-    private function createDeleteForm(Communication $communication)
-    {
-        return $this->createFormBuilder()
-            ->setAction($this->generateUrl('apm_user_communication_delete', array('id' => $communication->getId())))
-            ->setMethod('DELETE')
-            ->getForm();
+        $data = $this->get('apm_core.data_serialized')->getFormalData($communication, ["owner_communication_details", "owner_list"]);
+        return new JsonResponse($data, 200);
     }
 
     /**
@@ -354,8 +305,8 @@ class CommunicationController extends Controller
             /** @var Session $session */
             $session = $request->getSession();
             $em = $this->getDoctrine()->getManager();
-            $property = $request->request->get('name');
-            $value = $request->request->get('value');
+            $property = $request->query->get('name');
+            $value = $request->query->get('value');
             switch ($property) {
                 case 'dateDeVigueur':
                     $communication->setDatedevigueur($value);
@@ -417,6 +368,21 @@ class CommunicationController extends Controller
         }
         //----------------------------------------------------------------------------------------
 
+    }
+
+    /**
+     * Creates a form to delete a Communication entity.
+     *
+     * @param Communication $communication The Communication entity
+     *
+     * @return \Symfony\Component\Form\Form The form
+     */
+    private function createDeleteForm(Communication $communication)
+    {
+        return $this->createFormBuilder()
+            ->setAction($this->generateUrl('apm_user_communication_delete', array('id' => $communication->getId())))
+            ->setMethod('DELETE')
+            ->getForm();
     }
 
     /**

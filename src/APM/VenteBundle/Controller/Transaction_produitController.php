@@ -19,6 +19,7 @@ use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use FOS\RestBundle\Controller\Annotations\Put;
 use FOS\RestBundle\Controller\Annotations\Patch;
 use FOS\RestBundle\Controller\Annotations\Delete;
+
 /**
  * Transaction_produit controller.
  * @RouteResource("transaction_produit", pluralize=false)
@@ -39,7 +40,7 @@ class Transaction_produitController extends Controller
      * @ParamConverter("offre", options={"mapping": {"offre_id":"id"}})
      * @param Request $request
      * @param Transaction $transaction
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
+     * @return JsonResponse
      *
      * Get("/cget/transaction-produits/transaction/{id}", name="s")
      */
@@ -47,36 +48,26 @@ class Transaction_produitController extends Controller
     {
         $this->listAndShowSecurity($transaction, null);
         $transaction_produits = $transaction->getTransactionProduits();
-        if ($request->isXmlHttpRequest()) {
-            $this->reference_filter = $request->request->has('reference_filter') ? $request->request->get('reference_filter') : "";
-            $this->designation_filter = $request->request->has('designation_filter') ? $request->request->get('designation_filter') : "";
-            $this->quantiteFrom_filter = $request->request->has('quantiteFrom_filter') ? $request->request->get('quantiteFrom_filter') : "";
-            $this->quantiteTo_filter = $request->request->has('quantiteTo_filter') ? $request->request->get('quantiteTo_filter') : "";
-            $this->codeTransaction_filter = $request->request->has('codeTransaction_filter') ? $request->request->get('codeTransaction_filter') : "";
-            $this->dateInsertionFrom_filter = $request->request->has('dateInsertionFrom_filter') ? $request->request->get('dateInsertionFrom_filter') : "";
-            $this->dateInsertionTo_filter = $request->request->has('dateInsertionTo_filter') ? $request->request->get('dateInsertionTo_filter') : "";
-            $iDisplayLength = $request->request->has('length') ? $request->request->get('length') : -1;
-            $iDisplayStart = $request->request->has('start') ? intval($request->request->get('start')) : 0;
-            $json = array();
-            $json['items'] = array();
-            $iTotalRecords = count($transaction_produits);
-            if ($iDisplayLength < 0) $iDisplayLength = $iTotalRecords;
-            $transaction_produits = $this->handleResults($transaction_produits, $iTotalRecords, $iDisplayStart, $iDisplayLength);
-            /** @var Transaction_produit $transaction_produit */
-            foreach ($transaction_produits as $transaction_produit) {
-                array_push($json['items'], array(
-                    'id' => $transaction_produit->getId(),
-                    'offre' => $transaction_produit->getProduit()->getId(),
-                    'reference' => $transaction_produit->getReference(),
-                ));
-            }
-            return $this->json(json_encode($json), 200);
-        }
 
-        return $this->render('APMVenteBundle:transaction_produit:index.html.twig', array(
-            'transactions' => $transaction_produits,
-            'transaction' => $transaction
-        ));
+        $this->reference_filter = $request->query->has('reference_filter') ? $request->query->get('reference_filter') : "";
+        $this->designation_filter = $request->query->has('designation_filter') ? $request->query->get('designation_filter') : "";
+        $this->quantiteFrom_filter = $request->query->has('quantiteFrom_filter') ? $request->query->get('quantiteFrom_filter') : "";
+        $this->quantiteTo_filter = $request->query->has('quantiteTo_filter') ? $request->query->get('quantiteTo_filter') : "";
+        $this->codeTransaction_filter = $request->query->has('codeTransaction_filter') ? $request->query->get('codeTransaction_filter') : "";
+        $this->dateInsertionFrom_filter = $request->query->has('dateInsertionFrom_filter') ? $request->query->get('dateInsertionFrom_filter') : "";
+        $this->dateInsertionTo_filter = $request->query->has('dateInsertionTo_filter') ? $request->query->get('dateInsertionTo_filter') : "";
+        $iDisplayLength = $request->query->has('length') ? $request->query->get('length') : -1;
+        $iDisplayStart = $request->query->has('start') ? intval($request->query->get('start')) : 0;
+        $json = array();
+        $iTotalRecords = count($transaction_produits);
+        if ($iDisplayLength < 0) $iDisplayLength = $iTotalRecords;
+        $transaction_produits = $this->handleResults($transaction_produits, $iTotalRecords, $iDisplayStart, $iDisplayLength);
+        $iFilteredRecords = count($transaction_produits);
+        $data = $this->get('apm_core.data_serialized')->getFormalData($transaction_produits, array("owner_list"));
+        $json['totalRecords'] = $iTotalRecords;
+        $json['filteredRecords'] = $iFilteredRecords;
+        $json['items'] = $data;
+        return new JsonResponse($json, 200);
     }
 
     /**
@@ -290,47 +281,16 @@ class Transaction_produitController extends Controller
 
     /**
      * Finds and displays a Transaction_produit entity.
-     * @param Request $request
      * @param Transaction_produit $transaction_produit
      * @return \Symfony\Component\HttpFoundation\Response
      *
      * @Get("/show/transaction-produit/{id}")
      */
-    public function showAction(Request $request, Transaction_produit $transaction_produit)
+    public function showAction(Transaction_produit $transaction_produit)
     {
         $this->listAndShowSecurity($transaction_produit->getTransaction(), $transaction_produit->getProduit());
-        if ($request->isXmlHttpRequest()) {
-            $json = array();
-            $json['item'] = array(
-                'id' => $transaction_produit->getId(),
-                'offre' => $transaction_produit->getProduit()->getId(),
-                'code' => $transaction_produit->getTransaction()->getCode(),
-                'reference' => $transaction_produit->getReference(),
-                'quantite' => $transaction_produit->getQuantite(),
-
-            );
-            return $this->json(json_encode($json), 200);
-        }
-        $deleteForm = $this->createDeleteForm($transaction_produit);
-        return $this->render('APMVenteBundle:transaction_produit:show.html.twig', array(
-            'transaction_produit' => $transaction_produit,
-            'delete_form' => $deleteForm->createView(),
-        ));
-    }
-
-    /**
-     * Creates a form to delete a Transaction_produit entity.
-     *
-     * @param Transaction_produit $transaction_produit The Transaction_produit entity
-     *
-     * @return \Symfony\Component\Form\Form The form
-     */
-    private function createDeleteForm(Transaction_produit $transaction_produit)
-    {
-        return $this->createFormBuilder()
-            ->setAction($this->generateUrl('apm_vente_transaction_produit_delete', array('id' => $transaction_produit->getId())))
-            ->setMethod('DELETE')
-            ->getForm();
+        $data = $this->get('apm_core.data_serialized')->getFormalData($transaction_produit, ["owner_transactionP_details", "owner_list"]);
+        return new JsonResponse($data, 200);
     }
 
     /**
@@ -350,8 +310,8 @@ class Transaction_produitController extends Controller
             /** @var Session $session */
             $session = $request->getSession();
             $em = $this->getDoctrine()->getManager();
-            $property = $request->request->get('name');
-            $value = $request->request->get('value');
+            $property = $request->query->get('name');
+            $value = $request->query->get('value');
             switch ($property) {
                 case 'reference':
                     $transaction_produit->setReference($value);
@@ -398,6 +358,21 @@ class Transaction_produitController extends Controller
             throw $this->createAccessDeniedException();
         }
         //----------------------------------------------------------------------------------------
+    }
+
+    /**
+     * Creates a form to delete a Transaction_produit entity.
+     *
+     * @param Transaction_produit $transaction_produit The Transaction_produit entity
+     *
+     * @return \Symfony\Component\Form\Form The form
+     */
+    private function createDeleteForm(Transaction_produit $transaction_produit)
+    {
+        return $this->createFormBuilder()
+            ->setAction($this->generateUrl('apm_vente_transaction_produit_delete', array('id' => $transaction_produit->getId())))
+            ->setMethod('DELETE')
+            ->getForm();
     }
 
     /**

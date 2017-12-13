@@ -8,19 +8,24 @@ use APM\VenteBundle\Entity\Boutique;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
-
+use JMS\Serializer\Annotation\ExclusionPolicy;
+use JMS\Serializer\Annotation\Expose;
+use JMS\Serializer\Annotation\Groups;
+use JMS\Serializer\Annotation\Type;
+use JMS\Serializer\Annotation\Exclude;
 
 /**
  * Livreur_boutique
  * @ORM\Table(name="livreur_boutique")
  * @ORM\Entity(repositoryClass="APM\TransportBundle\Repository\Livreur_boutiqueRepository")
+ * @ExclusionPolicy("all")
  */
 class Livreur_boutique extends TradeFactory
 {
-
-
     /**
      * @ORM\Id
+     * @Expose
+     * @Groups({"owner_list","others_list","owner_livreur_details", "others_livreur_details"})
      * @ORM\GeneratedValue(strategy="AUTO")
      * @ORM\Column(name="id", type="integer", nullable=false)
      */
@@ -28,6 +33,8 @@ class Livreur_boutique extends TradeFactory
 
     /**
      * @var \DateTime
+     * @Expose
+     * @Groups({"owner_livreur_details"})
      * @Assert\DateTime
      * @ORM\Column(name="dateEnregistrement", type="datetime", nullable=false)
      */
@@ -35,6 +42,8 @@ class Livreur_boutique extends TradeFactory
 
     /**
      * @var string
+     * @Expose
+     * @Groups({"owner_livreur_details", "others_livreur_details"})
      * @Assert\Length(min=2, max=254)
      * @ORM\Column(name="reference", type="string", length=255, nullable=false)
      */
@@ -42,7 +51,8 @@ class Livreur_boutique extends TradeFactory
 
     /**
      * @var Profile_transporteur
-     *
+     * @Expose
+     * @Groups({"owner_livreur_details"})
      * @ORM\OneToOne(targetEntity="APM\TransportBundle\Entity\Profile_transporteur", inversedBy="livreurBoutique", cascade={"persist","remove"})
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="transporteur_id", referencedColumnName="id", nullable=true)
@@ -52,7 +62,8 @@ class Livreur_boutique extends TradeFactory
 
     /**
      * @var Boutique
-     *
+     * @Expose
+     * @Groups({"owner_livreur_details", "others_livreur_details"})
      * @ORM\ManyToOne(targetEntity="APM\VenteBundle\Entity\Boutique", inversedBy="livreurBoutiques")
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="boutique_id", referencedColumnName="id", nullable=false)
@@ -173,6 +184,16 @@ class Livreur_boutique extends TradeFactory
     }
 
     /**
+     * Get transporteur
+     *
+     * @return \APM\TransportBundle\Entity\Profile_transporteur
+     */
+    public function getTransporteur()
+    {
+        return $this->transporteur;
+    }
+
+    /**
      * Set transporteur
      *
      * @param \APM\TransportBundle\Entity\Profile_transporteur $transporteur
@@ -187,13 +208,13 @@ class Livreur_boutique extends TradeFactory
     }
 
     /**
-     * Get transporteur
+     * Get dateEnregistrement
      *
-     * @return \APM\TransportBundle\Entity\Profile_transporteur
+     * @return \DateTime
      */
-    public function getTransporteur()
+    public function getDateEnregistrement()
     {
-        return $this->transporteur;
+        return $this->dateEnregistrement;
     }
 
     /**
@@ -208,15 +229,5 @@ class Livreur_boutique extends TradeFactory
         $this->dateEnregistrement = $dateEnregistrement;
 
         return $this;
-    }
-
-    /**
-     * Get dateEnregistrement
-     *
-     * @return \DateTime
-     */
-    public function getDateEnregistrement()
-    {
-        return $this->dateEnregistrement;
     }
 }

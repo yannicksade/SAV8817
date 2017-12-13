@@ -8,19 +8,25 @@ use Symfony\Component\Validator\Constraints as Assert;
 use APM\UserBundle\Entity\Utilisateur_avm;
 use APM\VenteBundle\Entity\Offre;
 use Doctrine\ORM\Mapping as ORM;
-
+use JMS\Serializer\Annotation\ExclusionPolicy;
+use JMS\Serializer\Annotation\Expose;
+use JMS\Serializer\Annotation\Groups;
+use JMS\Serializer\Annotation\Type;
+use JMS\Serializer\Annotation\Exclude;
 /**
  * Service_apres_vente
  *
  * @ORM\Table(name="Service_apres_vente")
  * @ORM\Entity(repositoryClass="APM\AchatBundle\Repository\Service_apres_venteRepository")
  * @UniqueEntity("code")
+ * @ExclusionPolicy("all")
  */
 class Service_apres_vente extends TradeFactory
 {
     /**
      * @var string
-     *
+     * @Expose
+     * @Groups({"owner_list", "others_sav_details", "owner_sav_details"})
      * @ORM\Column(name="codeSAV", type="string", length=255, nullable=false)
      *
      */
@@ -28,6 +34,8 @@ class Service_apres_vente extends TradeFactory
 
     /**
      * @var \DateTime
+     * @Expose
+     * @Groups({"others_sav_details", "owner_sav_details"})
      * @Assert\DateTime
      * @ORM\Column(name="dateDue", type="datetime", nullable=true)
      */
@@ -35,6 +43,8 @@ class Service_apres_vente extends TradeFactory
 
     /**
      * @var string
+     * @Expose
+     * @Groups({"owner_list", "others_list", "others_sav_details", "owner_sav_details"})
      * @Assert\Length(min=2, max=254)
      * @ORM\Column(name="descriptionPanne", type="string", length=255, nullable=true)
      */
@@ -42,6 +52,8 @@ class Service_apres_vente extends TradeFactory
 
     /**
      * @var integer
+     * @Expose
+     * @Groups({"others_sav_details", "owner_sav_details"})
      * @Assert\Choice({0,1,2,3})
      * @ORM\Column(name="etat", type="integer", nullable=true)
      */
@@ -49,6 +61,8 @@ class Service_apres_vente extends TradeFactory
 
     /**
      * @var string
+     * @Expose
+     * @Groups({"others_sav_details", "owner_sav_details"})
      * @Assert\Length(min=2)
      * @ORM\Column(name="commentaire", type="string", length=255, nullable=true)
      */
@@ -57,7 +71,8 @@ class Service_apres_vente extends TradeFactory
 
     /**
      * @var integer
-     *
+     * @Expose
+     * @Groups({"owner_list", "others_list", "others_sav_details", "owner_sav_details"})
      * @ORM\Column(name="id", type="integer", nullable=false)
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
@@ -65,7 +80,9 @@ class Service_apres_vente extends TradeFactory
     private $id;
 
     /**
-     *
+     * @var Utilisateur_avm
+     * @Expose
+     * @Groups({"others_sav_details", "owner_sav_details"})
      * @ORM\ManyToOne(targetEntity="APM\UserBundle\Entity\Utilisateur_avm", inversedBy="servicesApresVentes")
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="client_id", referencedColumnName="id", nullable=false)
@@ -75,7 +92,8 @@ class Service_apres_vente extends TradeFactory
 
     /**
      * @var Offre
-     *
+     * @Expose
+     * @Groups({"others_sav_details", "owner_sav_details"})
      * @ORM\ManyToOne(targetEntity="APM\VenteBundle\Entity\Offre", inversedBy="service_apres_ventes")
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="offre_id", referencedColumnName="id", nullable=false)

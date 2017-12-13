@@ -12,6 +12,9 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use JMS\Serializer\Annotation\ExclusionPolicy;
+use JMS\Serializer\Annotation\Expose;
+use JMS\Serializer\Annotation\Groups;
 
 /**
  * Communication
@@ -19,11 +22,14 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
  * @ORM\Table(name="communication")
  * @ORM\Entity(repositoryClass="APM\UserBundle\Repository\CommunicationRepository")
  * @UniqueEntity("code")
+ * @ExclusionPolicy("all")
  */
 class Communication extends TradeFactory
 {
     /**
      * @ORM\Id
+     * @Expose
+     * @Groups({"others_list", "owner_list", "owner_communication_details", "others_communication_details"})
      * @ORM\GeneratedValue(strategy="AUTO")
      * @ORM\Column(type="integer")
      */
@@ -31,12 +37,16 @@ class Communication extends TradeFactory
 
     /**
      * @var string
+     * @Expose
+     * @Groups({"owner_communication_details", "others_communication_details"})
      * @ORM\Column(name="code", type="string", nullable=false)
      */
     private $code;
 
     /**
      * @var \DateTime
+     * @Expose
+     * @Groups({"owner_communication_details", "others_communication_details"})
      * @Assert\DateTime
      * @ORM\Column(name="dateDeVigueur", type="datetime", nullable=true)
      */
@@ -44,6 +54,8 @@ class Communication extends TradeFactory
 
     /**
      * @var string
+     * @Expose
+     * @Groups({"owner_communication_details", "others_communication_details"})
      * @Assert\Length(min=0)
      * @ORM\Column(name="contenu", type="text", nullable=true)
      */
@@ -51,6 +63,8 @@ class Communication extends TradeFactory
 
     /**
      * @var \DateTime
+     * @Expose
+     * @Groups({"owner_communication_details", "others_communication_details"})
      * @Assert\DateTime
      * @ORM\Column(name="dateEmission", type="datetime", nullable=false)
      */
@@ -59,6 +73,8 @@ class Communication extends TradeFactory
 
     /**
      * @var string
+     * @Expose
+     * @Groups({"owner_communication_details", "others_communication_details"})
      * @Assert\Length(min=2, max=254)
      * @ORM\Column(name="reference", type="string", length=255, nullable=true)
      */
@@ -73,6 +89,8 @@ class Communication extends TradeFactory
 
     /**
      * @var \DateTime
+     * @Expose
+     * @Groups({"owner_communication_details", "others_communication_details"})
      * @Assert\DateTime
      * @ORM\Column(name="dateFin", type="datetime", nullable=true)
      */
@@ -80,24 +98,32 @@ class Communication extends TradeFactory
 
     /**
      * @var integer
+     * @Expose
+     * @Groups({"owner_communication_details", "others_communication_details"})
      * @ORM\Column(name="etat", type="integer", nullable=true)
      */
     private $etat;
 
     /**
      * @var integer
+     * @Expose
+     * @Groups({"owner_communication_details", "others_communication_details"})
      * @ORM\Column(name="type", type="integer", nullable=true)
      */
     private $type;
 
     /**
      * @var boolean
+     * @Expose
+     * @Groups({"owner_communication_details", "others_communication_details"})
      * @ORM\Column(name="valide", type="boolean", nullable=true)
      */
     private $valide;
 
     /**
      * @var Utilisateur_avm
+     * @Expose
+     * @Groups({"owner_communication_details", "others_communication_details", "others_list"})
      * @ORM\ManyToOne(targetEntity="APM\UserBundle\Entity\Utilisateur_avm", inversedBy="emetteurCommunications")
      * @ORM\JoinColumns({
      *     @ORM\JoinColumn(name="emetteur_id", referencedColumnName="id", nullable=false)
@@ -107,6 +133,8 @@ class Communication extends TradeFactory
 
     /**
      * @var Utilisateur_avm
+     * @Expose
+     * @Groups({"owner_communication_details", "others_communication_details", "owner_list"})
      * @ORM\ManyToOne(targetEntity="APM\UserBundle\Entity\Utilisateur_avm", inversedBy="recepteurCommunications")
      * @ORM\JoinColumns({
      *     @ORM\JoinColumn(name="recepteur_id", referencedColumnName="id", nullable=false)
@@ -115,19 +143,20 @@ class Communication extends TradeFactory
     private $recepteur;
 
     /**
-     * @var
-     * @ORM\ManyToMany(targetEntity="APM\AnimationBundle\Entity\Base_documentaire")
-     */
-    private $documents;
-
-
-    /**
      * @var string
+     * @Expose
+     * @Groups({"owner_communication_details", "others_communication_details", "owner_list", "others_list"})
      * @Assert\NotBlank
      * @Assert\Length(min=2, max=254)
      * @ORM\Column(name="objet", type="string", length=255, nullable=true)
      */
     private $objet;
+
+    /**
+     * @var Collection
+     * @ORM\ManyToMany(targetEntity="APM\AnimationBundle\Entity\Base_documentaire")
+     */
+    private $documents;
 
 
     /**

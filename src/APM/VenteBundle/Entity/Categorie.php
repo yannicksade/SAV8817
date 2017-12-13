@@ -26,9 +26,9 @@ class Categorie extends TradeFactory
 {
     /**
      * @var \DateTime
-     * @Type("DateTimeImmutable<'Y-m-d'>")
+     * @Type("DateTime<'Y-m-d'>")
      * @Expose
-     * @Groups({"details"})
+     * @Groups({"owner_categorie_details"})
      * @Assert\DateTime
      * @ORM\Column(name="dateCreation", type="datetime", nullable=false)
      */
@@ -38,7 +38,7 @@ class Categorie extends TradeFactory
      * @var string
      * @Expose
      * @Type("string")
-     * @Groups({"list", "details"})
+     * @Groups({"owner_categorie_details", "others_categorie_details", "owner_list"})
      * @ORM\Column(name="code", type="string", length=255, nullable=false)
      */
     private $code;
@@ -47,7 +47,7 @@ class Categorie extends TradeFactory
      * @var string
      * @Type("string")
      * @Expose
-     * @Groups({"list", "details"})
+     * @Groups({"owner_categorie_details", "others_categorie_details", "owner_list", "others_list"})
      * @Assert\NotBlank
      * @Assert\Length(min=2, max=155)
      * @ORM\Column(name="designation", type="string", length=255, nullable=true)
@@ -57,7 +57,7 @@ class Categorie extends TradeFactory
     /**
      * @Expose
      * @Type("string")
-     * @Groups({"list", "details"})
+     * @Groups({"owner_categorie_details", "others_categorie_details", "owner_list", "others_list"})
      * @var string
      * @Assert\Length(min=2, max=254)
      * @ORM\Column(name="description", type="string", length=255, nullable=true)
@@ -69,7 +69,7 @@ class Categorie extends TradeFactory
      * @var boolean
      * @Type("bool")
      * @Expose
-     * @Groups({"details"})
+     * @Groups({"owner_categorie_details", "others_categorie_details"})
      * @Assert\Choice({0,1})
      * @ORM\Column(name="estLivrable", type="boolean", nullable=true)
      */
@@ -79,7 +79,7 @@ class Categorie extends TradeFactory
      * @var boolean
      * @Type("bool")
      * @Expose
-     * @Groups({"details"})
+     * @Groups({"owner_categorie_details"})
      * @Assert\Choice({0,1})
      * @ORM\Column(name="publiable", type="boolean", nullable=true)
      */
@@ -88,7 +88,7 @@ class Categorie extends TradeFactory
     /**
      * @Expose
      * @Type("int")
-     * @Groups({"details"})
+     * @Groups({"owner_categorie_details", "others_categorie_details"})
      * @var integer
      * @ORM\Column(name="etat", type="integer", nullable=true)
      */
@@ -100,7 +100,7 @@ class Categorie extends TradeFactory
      * @var integer
      * @Type("int")
      * @Expose
-     * @Groups({"test", "list", "details"})
+     * @Groups({"test", "owner_categorie_details", "others_categorie_details", "owner_list", "others_list"})
      * @ORM\Column(name="id", type="integer", nullable=false)
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
@@ -110,8 +110,7 @@ class Categorie extends TradeFactory
     /**
      * @var Categorie
      *
-     *
-     * @Groups({"details"})
+     * @Groups({"owner_categorie_details", "others_list"})
      * @ORM\ManyToOne(targetEntity="APM\VenteBundle\Entity\Categorie")
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="categorieCourante_id", referencedColumnName="id", nullable=true)
@@ -123,7 +122,7 @@ class Categorie extends TradeFactory
      * @var Boutique
      *
      *
-     * @Groups({"list", "details"})
+     * @Groups({"owner_categorie_details", "others_categorie_details"})
      * @ORM\ManyToOne(targetEntity="APM\VenteBundle\Entity\Boutique", inversedBy="categories")
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="boutique_id", referencedColumnName="id", nullable=false)

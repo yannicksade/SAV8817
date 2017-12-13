@@ -77,7 +77,7 @@ class RegistrationManager implements ContainerAwareInterface
                 return $response;
             }
 
-            return new JsonResponse("invalid data");
+            return new JsonResponse("invalid data", 400);
         }
         $event = new FormEvent($form, $request);
 

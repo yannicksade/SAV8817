@@ -41,7 +41,7 @@ class Groupe_relationnelController extends Controller
     /**
      * Liste tous les groupes relationnels crées par l'utilisateur
      * @param Request $request
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
+     * @return JsonResponse
      *
      * @Get("/cget/groupeRelationnels", name="s")
      */
@@ -50,85 +50,54 @@ class Groupe_relationnelController extends Controller
         $this->listAndShowSecurity();
         /** @var Utilisateur_avm $user */
         $user = $this->getUser();
-        if ($request->isXmlHttpRequest() && $request->getMethod() === "POST") {
-            $q = $request->get('q');
-            $this->dateCreationFrom_filter = $request->request->has('dateCreationFrom_filter') ? $request->request->get('dateCreationFrom_filter') : "";
-            $this->dateCreationTo_filter = $request->request->has('dateCreationTo_filter') ? $request->request->get('dateCreationTo_filter') : "";
-            $this->code_filter = $request->request->has('code_filter') ? $request->request->get('code_filter') : "";
-            $this->description_filter = $request->request->has('description_filter') ? $request->request->get('description_filter') : "";
-            $this->designation_filter = $request->request->has('designation_filter') ? $request->request->get('designation_filter') : "";
-            $this->conversationalGroup_filter = $request->request->has('conversationalGroup_filter') ? $request->request->get('conversationalGroup_filter') : "";
-            $this->type_filter = $request->request->has('type_filter') ? $request->request->get('type_filter') : "";
-            $this->proprietaire_filter = $request->request->has('proprietaire_filter') ? $request->request->get('proprietaire_filter') : "";
-            $iDisplayLength = $request->request->has('length') ? $request->request->get('length') : -1;
-            $iDisplayStart = $request->request->has('start') ? intval($request->request->get('start')) : 0;
-            $json = array();
-            $json['items'] = array();
-            if ($q === "owner" || $q === "all") {
-                $groupes = $user->getGroupesProprietaire();
-                $iTotalRecords = count($groupes);
+        $q = $request->get('q');
+        $this->dateCreationFrom_filter = $request->request->has('dateCreationFrom_filter') ? $request->request->get('dateCreationFrom_filter') : "";
+        $this->dateCreationTo_filter = $request->request->has('dateCreationTo_filter') ? $request->request->get('dateCreationTo_filter') : "";
+        $this->code_filter = $request->request->has('code_filter') ? $request->request->get('code_filter') : "";
+        $this->description_filter = $request->request->has('description_filter') ? $request->request->get('description_filter') : "";
+        $this->designation_filter = $request->request->has('designation_filter') ? $request->request->get('designation_filter') : "";
+        $this->conversationalGroup_filter = $request->request->has('conversationalGroup_filter') ? $request->request->get('conversationalGroup_filter') : "";
+        $this->type_filter = $request->request->has('type_filter') ? $request->request->get('type_filter') : "";
+        $this->proprietaire_filter = $request->request->has('proprietaire_filter') ? $request->request->get('proprietaire_filter') : "";
+        $iDisplayLength = $request->request->has('length') ? $request->request->get('length') : -1;
+        $iDisplayStart = $request->request->has('start') ? intval($request->request->get('start')) : 0;
+        $json = array();
+        $json['items'] = array();
+        if ($q === "owner" || $q === "all") {
+            $groupes = $user->getGroupesProprietaire();
+            $iTotalRecords = count($groupes);
+            if ($iDisplayLength < 0) $iDisplayLength = $iTotalRecords;
+            $groupes = $this->handleResults($groupes, $iTotalRecords, $iDisplayStart, $iDisplayLength);
+            $iFilteredRecords = count($groupes);
+            $data = $this->get('apm_core.data_serialized')->getFormalData($groupes, array("owner_list"));
+            $json['totalRecordsOwner'] = $iTotalRecords;
+            $json['filteredRecordsOwner'] = $iFilteredRecords;
+            $json['items'] = $data;
+        }
+        if ($q === "guest" || $q === "all") {
+            //----- Ajout des groupes de conversation : groupes auxquels appartient l'utilisateur ---------------------
+            $individu_groupes = $user->getIndividuGroupes();
+            $groupesConversationnel = new ArrayCollection();;
+            if (null !== $individu_groupes) {
+                foreach ($individu_groupes as $individu_groupe) {
+                    /** @var Groupe_relationnel $groupe_relationnel */
+                    $groupe_relationnel = $individu_groupe->getGroupeRelationnel();
+                    if ($groupe_relationnel->isConversationalGroup() && $user !== $groupe_relationnel->getProprietaire()) {
+                        $groupesConversationnel->add($groupe_relationnel);
+                    };
+                }
+                $iTotalRecords = count($groupesConversationnel);
                 if ($iDisplayLength < 0) $iDisplayLength = $iTotalRecords;
-                $groupes = $this->handleResults($groupes, $iTotalRecords, $iDisplayStart, $iDisplayLength);
-                //filtre
-                /** @var Groupe_relationnel $groupe */
-                foreach ($groupes as $groupe) {
-                    array_push($json['items'], array(
-                        'id' => $groupe->getId(),
-                        'designation' => $groupe->getDesignation(),
-                        'code' => $groupe->getCode(),
-                        'image' => $groupe->getImage(),
-                        'description' => $groupe->getDescription(),
-                    ));
-                }
+                $groupes = $this->handleResults($groupesConversationnel, $iTotalRecords, $iDisplayStart, $iDisplayLength);
+                $iFilteredRecords = count($groupes);
+                $data = $this->get('apm_core.data_serialized')->getFormalData($groupes, array("owner_list"));
+                $json['totalRecordsGuest'] = $iTotalRecords;
+                $json['filteredRecordsGuest'] = $iFilteredRecords;
+                $json['items'] = $data;
             }
-            if ($q === "guest" || $q === "all") {
-                //----- Ajout des groupes de conversation : groupes auxquels appartient l'utilisateur ---------------------
-                $individu_groupes = $user->getIndividuGroupes();
-                $groupesConversationnel = new ArrayCollection();;
-                if (null !== $individu_groupes) {
-                    foreach ($individu_groupes as $individu_groupe) {
-                        /** @var Groupe_relationnel $groupe_relationnel */
-                        $groupe_relationnel = $individu_groupe->getGroupeRelationnel();
-                        if ($groupe_relationnel->isConversationalGroup() && $user !== $groupe_relationnel->getProprietaire()) {
-                            $groupesConversationnel->add($groupe_relationnel);
-                        };
-                    }
-                    $iTotalRecords = count($groupesConversationnel);
-                    if ($iDisplayLength < 0) $iDisplayLength = $iTotalRecords;
-                    $groupes = $this->handleResults($groupesConversationnel, $iTotalRecords, $iDisplayStart, $iDisplayLength);
-                    foreach ($groupes as $groupe) {
-                        array_push($json['items'], array(
-                            'id' => $groupe->getId(),
-                            'designation' => $groupe->getDesignation(),
-                            'code' => $groupe->getCode(),
-                            'image' => $groupe->getImage(),
-                            'description' => $groupe->getDescription(),
-                        ));
-                    }
-                }
-                //---------------------------------------------------------------------------------------------------------
-            }
-            return $this->json(json_encode($json), 200);
+            //---------------------------------------------------------------------------------------------------------
         }
-        //----- Ajout des groupes de conversation : groupes auxquels appartient l'utilisateur ---------------------
-        $individu_groupes = $user->getIndividuGroupes();
-        $groupesConversationnel = array();
-        if (null !== $individu_groupes) {
-            /** @var Individu_to_groupe $individu_groupe */
-            foreach ($individu_groupes as $individu_groupe) {
-                $groupe_relationnel = $individu_groupe->getGroupeRelationnel();
-                if ($groupe_relationnel->isConversationalGroup() && $user !== $groupe_relationnel->getProprietaire()) {
-                    array_push($groupesConversationnel, $groupe_relationnel);
-                };
-            }
-        }
-        //---------------------------------------------------------------------------------------------------------
-        $groupes = $user->getGroupesProprietaire();
-        return $this->render('APMUserBundle:groupe_relationnel:index.html.twig', array(
-            'groupe_relationnels' => $groupes,
-            'groupe_conversationnels' => $groupesConversationnel,
-            'url_image' => $this->get('apm_core.packages_maker')->getPackages()->getUrl('/', 'resolve_img'),
-        ));
+        return new JsonResponse($json, 200);
     }
 
     private function listAndShowSecurity()
@@ -342,52 +311,16 @@ class Groupe_relationnelController extends Controller
 
     /**
      * Finds and displays a Groupe_relationnel entity.
-     * @param Request $request
      * @param Groupe_relationnel $groupe_relationnel
      * @return \Symfony\Component\HttpFoundation\Response
      *
      * @Get("/show/grouperelationnel/{id}")
      */
-    public function showAction(Request $request, Groupe_relationnel $groupe_relationnel)
+    public function showAction(Groupe_relationnel $groupe_relationnel)
     {
         $this->listAndShowSecurity();
-        if ($request->isXmlHttpRequest()) {
-            $json = array();
-            $json['item'] = array(
-                'id' => $groupe_relationnel->getId(),
-                'code' => $groupe_relationnel->getCode(),
-                'description' => $groupe_relationnel->getDescription(),
-                'designation' => $groupe_relationnel->getDesignation(),
-                'conversationalGroup' => $groupe_relationnel->getConversationalGroup(),
-                'type' => $groupe_relationnel->getType(),
-                'proprietaire' => $groupe_relationnel->getProprietaire()->getUsername(),
-                'dateCreation' => $groupe_relationnel->getDateCreation()->format('d-m-Y H:i'),
-                'updatedAt' => $groupe_relationnel->getUpdatedAt()->format('d-m-Y H:i'),
-            );
-            return $this->json(json_encode($json), 200);
-        }
-        $deleteForm = $this->createDeleteForm($groupe_relationnel);
-        return $this->render('APMUserBundle:groupe_relationnel:show.html.twig', array(
-            'groupe_relationnel' => $groupe_relationnel,
-            'delete_form' => $deleteForm->createView(),
-            'url_image' => $this->get('apm_core.packages_maker')->getPackages()->getUrl('/', 'resolve_img'),
-        ));
-    }
-
-    /**
-     * Creates a form to delete a Groupe_relationnel entity.
-     *
-     * @param Groupe_relationnel $groupe_relationnel The Groupe_relationnel entity
-     *
-     * @return \Symfony\Component\Form\Form The form
-     */
-    private
-    function createDeleteForm(Groupe_relationnel $groupe_relationnel)
-    {
-        return $this->createFormBuilder()
-            ->setAction($this->generateUrl('apm_user_groupe-relationnel_delete', array('id' => $groupe_relationnel->getId())))
-            ->setMethod('DELETE')
-            ->getForm();
+        $data = $this->get('apm_core.data_serialized')->getFormalData($groupe_relationnel, ["owner_groupeR_details", "owner_list"]);
+        return new JsonResponse($data, 200);
     }
 
     /**
@@ -477,6 +410,22 @@ class Groupe_relationnelController extends Controller
         }
         //----------------------------------------------------------------------------------------
 
+    }
+
+    /**
+     * Creates a form to delete a Groupe_relationnel entity.
+     *
+     * @param Groupe_relationnel $groupe_relationnel The Groupe_relationnel entity
+     *
+     * @return \Symfony\Component\Form\Form The form
+     */
+    private
+    function createDeleteForm(Groupe_relationnel $groupe_relationnel)
+    {
+        return $this->createFormBuilder()
+            ->setAction($this->generateUrl('apm_user_groupe-relationnel_delete', array('id' => $groupe_relationnel->getId())))
+            ->setMethod('DELETE')
+            ->getForm();
     }
 
     /**

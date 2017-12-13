@@ -36,7 +36,7 @@ class Offre extends TradeFactory
     /**
      * @Expose
      * @Type("string")
-     * @Groups({"list","offre_details"})
+     * @Groups({"owner_list","owner_offre_details"})
      * @var string
      * @ORM\Column(name="code", type="string", length=255, nullable=false)
      */
@@ -44,7 +44,7 @@ class Offre extends TradeFactory
 
     /**
      * @Expose
-     * @Groups({"offre_details"})
+     * @Groups({"owner_offre_details", "others_offre_details"})
      * @var string
      * @Type("string")
      * @Assert\Url
@@ -54,8 +54,8 @@ class Offre extends TradeFactory
 
     /**
      * @Expose
-     * @Type("DateTime<'Y-m-d'>")
-     * @Groups({"offre_details"})
+     * @Type("DateTime<'d-m-Y H:i'>")
+     * @Groups({"owner_offre_details"})
      * @var \DateTime
      * @Assert\DateTime
      * @ORM\Column(name="dateCreation", type="datetime", nullable=false)
@@ -64,8 +64,8 @@ class Offre extends TradeFactory
 
     /**
      * @Expose
-     * @Type("DateTime<'Y-m-d'>")
-     * @Groups({"offre_details"})
+     * @Type("DateTime<'d-m-Y H:i'>")
+     * @Groups({"owner_offre_details", "others_offre_details"})
      * @var \DateTime
      * @Assert\DateTime
      * @ORM\Column(name="dateExpiration", type="datetime", nullable=true)
@@ -74,7 +74,7 @@ class Offre extends TradeFactory
 
     /**
      * @Expose
-     * @Groups({"list", "offre_details"})
+     * @Groups({"owner_list", "others_list", "owner_offre_details", "others_offre_details"})
      * @var string
      * @Type("string")
      * @Assert\Length(min=2, max=254)
@@ -86,7 +86,7 @@ class Offre extends TradeFactory
      * @var string
      * @Type("string")
      * @Expose
-     * @Groups({"list", "offre_details"})
+     * @Groups({"owner_list", "others_list", "owner_offre_details", "others_offre_details"})
      * @Assert\NotNull
      * @Assert\Length(min=2)
      * @ORM\Column(name="designation", type="string", length=255, nullable=false)
@@ -95,7 +95,7 @@ class Offre extends TradeFactory
 
     /**
      * @Expose
-     * @Groups({"offre_details"})
+     * @Groups({"owner_offre_details", "others_offre_details"})
      * @var integer
      * @Type("integer")
      * @ORM\Column(name="dureeGarantie", type="integer", nullable=true)
@@ -104,7 +104,7 @@ class Offre extends TradeFactory
 
     /**
      * @Expose
-     * @Groups({"offre_details"})
+     * @Groups({"owner_offre_details"})
      * @var boolean
      * @Type("bool")
      * @ORM\Column(name="estRetourne", type="boolean", nullable=true)
@@ -113,7 +113,7 @@ class Offre extends TradeFactory
 
     /**
      * @Expose
-     * @Groups({"offre_details"})
+     * @Groups({"owner_offre_details", "others_offre_details"})
      * @Type("string")
      * @var string
      * @Assert\length(min=2, max=254)
@@ -123,7 +123,7 @@ class Offre extends TradeFactory
 
     /**
      * @Expose
-     * @Groups({"list", "offre_details"})
+     * @Groups({"owner_offre_details", "others_offre_details"})
      * @var integer
      * @Type("integer")
      * @ORM\Column(name="etat", type="integer", nullable=false)
@@ -132,7 +132,7 @@ class Offre extends TradeFactory
 
     /**
      * @Expose
-     * @Groups({"offre_details"})
+     * @Groups({"owner_offre_details", "others_offre_details"})
      * @Type("int")
      * @var integer
      * @ORM\Column(name="apparenceNeuf", type="integer", nullable=true)
@@ -141,7 +141,7 @@ class Offre extends TradeFactory
 
     /**
      * @Expose
-     * @Groups({"offre_details"})
+     * @Groups({"owner_list", "others_list", "owner_offre_details", "others_offre_details"})
      * @var string
      * @Type("string")
      * @ORM\Column(name="image", type="string", nullable=true)
@@ -158,8 +158,8 @@ class Offre extends TradeFactory
 
     /**
      * @Expose
-     * @Type("DateTime<'Y-m-d'>")
-     * @Groups({"offre_details"})
+     * @Type("DateTime<'d-m-Y H:i'>")
+     * @Groups({"owner_offre_details"})
      * @ORM\Column(name="updatedAt", type="datetime", nullable= false)
      * @var \DateTime
      */
@@ -167,7 +167,7 @@ class Offre extends TradeFactory
 
     /**
      * @Expose
-     * @Groups({"offre_details"})
+     * @Groups({"owner_offre_details","others_offre_details"})
      * @var integer
      * @Type("int")
      * @ORM\Column(name="modeVente", type="integer", nullable=false)
@@ -176,7 +176,7 @@ class Offre extends TradeFactory
 
     /**
      * @Expose
-     * @Groups({"offre_details"})
+     * @Groups({"owner_offre_details", "others_offre_details"})
      * @var string
      * @Type("string")
      * @Assert\length(min=2, max=254)
@@ -186,7 +186,7 @@ class Offre extends TradeFactory
 
     /**
      * @Expose
-     * @Groups({"offre_details"})
+     * @Groups({"owner_offre_details", "others_offre_details"})
      * @var string
      * @Type("string")
      * @ORM\Column(name="prixUnitaire", type="decimal", nullable=true)
@@ -195,7 +195,7 @@ class Offre extends TradeFactory
 
     /**
      * @Expose
-     * @Groups({"offre_details"})
+     * @Groups({"owner_offre_details"})
      * @var integer
      * @Type("int")
      * @Assert\GreaterThan(0)
@@ -205,7 +205,7 @@ class Offre extends TradeFactory
 
     /**
      * @Expose
-     * @Groups({"offre_details"})
+     * @Groups({"owner_offre_details"})
      * @var integer
      * @Type("int")
      * @Assert\Range(min=0)
@@ -215,7 +215,7 @@ class Offre extends TradeFactory
 
     /**
      * @Expose
-     * @Groups({"offre_details"})
+     * @Groups({"owner_offre_details", "others_offre_details"})
      * @var integer
      * @Type("int")
      * @Assert\Range(min=0, max=10)
@@ -225,7 +225,7 @@ class Offre extends TradeFactory
 
     /**
      * @Expose
-     * @Groups({"offre_details"})
+     * @Groups({"owner_offre_details", "others_offre_details"})
      * @var string
      * @Type("string")
      * @ORM\Column(name="remiseProduit", type="decimal", nullable=true)
@@ -234,7 +234,7 @@ class Offre extends TradeFactory
 
     /**
      * @Expose
-     * @Groups({"offre_details"})
+     * @Groups({"owner_offre_details", "others_offre_details"})
      * @var integer
      * @Type("int")
      * @ORM\Column(name="typeOffre", type="integer", nullable=false)
@@ -243,7 +243,7 @@ class Offre extends TradeFactory
 
     /**
      * @Expose
-     * @Groups({"offre_details"})
+     * @Groups({"owner_offre_details"})
      * @var boolean
      * @ORM\Column(name="valide", type="boolean", nullable=true)
      */
@@ -251,7 +251,7 @@ class Offre extends TradeFactory
 
     /**
      * @Expose
-     * @Groups({"offre_details"})
+     * @Groups({"owner_offre_details"})
      * @var boolean
      * @Type("bool")
      * @ORM\Column(name="publiable", type="boolean", nullable=true)
@@ -263,7 +263,7 @@ class Offre extends TradeFactory
      * @Type("integer")
      * @ORM\Id
      * @Expose
-     * @Groups({"test", "list", "offre_details"})
+     * @Groups({"test", "owner_list", "others_list", "owner_offre_details", "others_offre_details"})
      * @ORM\Column(name="id", type="integer", nullable=false)
      * @ORM\GeneratedValue(strategy="AUTO")
      */
@@ -273,7 +273,7 @@ class Offre extends TradeFactory
      * @var Categorie
      * @Type("APM\VenteBundle\Entity\Categorie")
      * @Expose
-     * @Groups({"test", "offre_details"})
+     * @Groups({"test", "owner_offre_details", "others_offre_details"})
      * @ORM\ManyToOne(targetEntity="APM\VenteBundle\Entity\Categorie", inversedBy="offres")
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="categorie_id", referencedColumnName="id")
@@ -285,7 +285,7 @@ class Offre extends TradeFactory
      * @var Boutique
      * @Type("APM\VenteBundle\Entity\Boutique")
      * @Expose
-     * @Groups({"test", "offre_details"})
+     * @Groups({"test", "owner_offre_details", "others_offre_details"})
      * @ORM\ManyToOne(targetEntity="APM\VenteBundle\Entity\Boutique", inversedBy="offres")
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="boutique_id", referencedColumnName="id")
@@ -297,7 +297,7 @@ class Offre extends TradeFactory
      * @var Utilisateur_avm
      * @Type("APM\UserBundle\Entity\Utilisateur_avm")
      * @Expose
-     * @Groups({"test","offre_details"})
+     * @Groups({"test", "owner_offre_details", "others_offre_details"})
      * @ORM\ManyToOne(targetEntity="APM\UserBundle\Entity\Utilisateur_avm", inversedBy="offres")
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="vendeur_id", referencedColumnName="id", nullable=true)
@@ -309,7 +309,7 @@ class Offre extends TradeFactory
      * @var Base_documentaire
      * @Type("APM\AnimationBundle\Entity\Base_documentaire")
      * @Expose
-     * @Groups({"test","offre_details"})
+     * @Groups({"test", "owner_offre_details", "others_offre_details"})
      * @ORM\ManyToOne(targetEntity="APM\AnimationBundle\Entity\Base_documentaire", inversedBy="produits")
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="document_id", referencedColumnName="id", nullable=true)
@@ -320,7 +320,6 @@ class Offre extends TradeFactory
     /**
      * @var Collection
      * @ORM\OneToMany(targetEntity="APM\AchatBundle\Entity\Service_apres_vente", mappedBy="offre")
-     *
      */
     private $service_apres_ventes;
     /**

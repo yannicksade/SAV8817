@@ -43,7 +43,7 @@ class CommentaireController extends Controller
      *
      * @param Request $request
      * @param Offre $offre
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return JsonResponse
      *
      * @Get("/cget/commentaires/offre/{id}", name="s_offre")
      */
@@ -72,33 +72,26 @@ class CommentaireController extends Controller
             }
         }
 
-        if ($request->isXmlHttpRequest() && $request->getMethod() === "POST") {
-            $this->contenu_filter = $request->request->has('contenu_filter') ? $request->request->get('contenu_filter') : "";
-            $this->dateLimiteFrom_filter = $request->request->has('dateLimiteFrom_filter') ? $request->request->get('dateLimiteFrom_filter') : "";
-            $this->dateLimiteTo_filter = $request->request->has('dateLimiteTo_filter') ? $request->request->get('dateLimiteTo_filter') : "";
-            $this->publiable_filter = $request->request->has('publiable_filter') ? $request->request->get('publiable_filter') : "";
-            $this->utilisateur_filter = $request->request->has('utilisateur_filter') ? $request->request->get('utilisateur_filter') : "";
-            $iDisplayLength = $request->request->has('length') ? $request->request->get('length') : -1;
-            $iDisplayStart = $request->request->has('start') ? intval($request->request->get('start')) : 0;
-            $json = array();
+        $this->contenu_filter = $request->query->has('contenu_filter') ? $request->query->get('contenu_filter') : "";
+        $this->dateLimiteFrom_filter = $request->query->has('dateLimiteFrom_filter') ? $request->query->get('dateLimiteFrom_filter') : "";
+        $this->dateLimiteTo_filter = $request->query->has('dateLimiteTo_filter') ? $request->query->get('dateLimiteTo_filter') : "";
+        $this->publiable_filter = $request->query->has('publiable_filter') ? $request->query->get('publiable_filter') : "";
+        $this->utilisateur_filter = $request->query->has('utilisateur_filter') ? $request->query->get('utilisateur_filter') : "";
+        $iDisplayLength = $request->query->has('length') ? $request->query->get('length') : -1;
+        $iDisplayStart = $request->query->has('start') ? intval($request->query->get('start')) : 0;
+        $json = array();
 
-            $iTotalRecords = count($commentaires);
-            if ($iDisplayLength < 0) $iDisplayLength = $iTotalRecords;
-            $commentaires = $this->handleResults($commentaires, $iTotalRecords, $iDisplayStart, $iDisplayLength);
-            //filtre
-            /** @var Commentaire offre $commentaire */
-            foreach ($commentaires as $commentaire) {
-                array_push($json, array(
-                    'id' => $commentaire->getId(),
-                    'enonceContenu' => substr($commentaire->getContenu(), 10),
-                ));
-            }
-            return $this->json($json, 200);
-        }
-        return $this->render('APMUserBundle:commentaire:index.html.twig', array(
-            'commentaires' => $commentaires,
-            'offre' => $offre,
-        ));
+        $iTotalRecords = count($commentaires);
+        if ($iDisplayLength < 0) $iDisplayLength = $iTotalRecords;
+        $commentaires = $this->handleResults($commentaires, $iTotalRecords, $iDisplayStart, $iDisplayLength);
+        //filtre
+        $iFilteredRecords = count($commentaires);
+        $data = $this->get('apm_core.data_serialized')->getFormalData($commentaires, array("owner_list"));
+        $json['totalRecords'] = $iTotalRecords;
+        $json['filteredRecords'] = $iFilteredRecords;
+        $json['items'] = $data;
+
+        return new JsonResponse($json, 200);
     }
 
     /**
@@ -262,38 +255,8 @@ class CommentaireController extends Controller
     public function showAction(Request $request, Commentaire $commentaire)
     {
         $this->listAndShowSecurity();
-        if ($request->isXmlHttpRequest()) {
-            $json = array();
-            $json['item'] = array(
-                'id' => $commentaire->getId(),
-                'date' => $commentaire->getDate()->format('d-m-Y H:i'),
-                'contenu' => $commentaire->getContenu(),
-                'publiable' => $commentaire->getPubliable(),
-                'evaluation' => $commentaire->getEvaluation(),
-                'utilisateur' => $commentaire->getUtilisateur()->getId(),
-            );
-            return $this->json(json_encode($json), 200);
-        }
-        $deleteForm = $this->createDeleteForm($commentaire);
-        return $this->render('APMUserBundle:commentaire:show.html.twig', array(
-            'commentaire' => $commentaire,
-            'delete_form' => $deleteForm->createView(),
-        ));
-    }
-
-    /**
-     * Creates a form to delete a Commentaire entity.
-     *
-     * @param Commentaire $commentaire The Commentaire entity
-     *
-     * @return \Symfony\Component\Form\Form The form
-     */
-    private function createDeleteForm(Commentaire $commentaire)
-    {
-        return $this->createFormBuilder()
-            ->setAction($this->generateUrl('apm_user_commentaire_delete', array('id' => $commentaire->getId())))
-            ->setMethod('DELETE')
-            ->getForm();
+        $data = $this->get('apm_core.data_serialized')->getFormalData($commentaire, ["owner_commentaire_details", "owner_list"]);
+        return new JsonResponse($data, 200);
     }
 
     /**
@@ -313,8 +276,8 @@ class CommentaireController extends Controller
             /** @var Session $session */
             $session = $request->getSession();
             $em = $this->getDoctrine()->getManager();
-            $property = $request->request->get('name');
-            $value = $request->request->get('value');
+            $property = $request->query->get('name');
+            $value = $request->query->get('value');
             switch ($property) {
                 case 'publiable':
                     $commentaire->setPubliable($value);
@@ -366,6 +329,21 @@ class CommentaireController extends Controller
         }
         //----------------------------------------------------------------------------------------
 
+    }
+
+    /**
+     * Creates a form to delete a Commentaire entity.
+     *
+     * @param Commentaire $commentaire The Commentaire entity
+     *
+     * @return \Symfony\Component\Form\Form The form
+     */
+    private function createDeleteForm(Commentaire $commentaire)
+    {
+        return $this->createFormBuilder()
+            ->setAction($this->generateUrl('apm_user_commentaire_delete', array('id' => $commentaire->getId())))
+            ->setMethod('DELETE')
+            ->getForm();
     }
 
     // pour soumettre un commentaire il faut que l'offre soit publique

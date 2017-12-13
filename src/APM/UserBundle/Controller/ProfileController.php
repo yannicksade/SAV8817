@@ -40,11 +40,8 @@ class ProfileController extends FOSRestController
      */
     public function showAction(Utilisateur $user)
     {
-        $serializerContext = SerializationContext::create()->enableMaxDepthChecks();
-        $serializer = SerializerBuilder::create()->build();
-        $data = $serializer->serialize($user, 'json', $serializerContext->setGroups(array("list")));
-        // 'url_image' => $this->get('apm_core.packages_maker')->getPackages()->getUrl('/', 'resolve_img')
-        return $this->json($data, 200);
+        $data = $this->get('apm_core.data_serialized')->getFormalData($user, ["owner_user_details", "owner_list"]);
+        return new JsonResponse($data, 200);
     }
 
     /**

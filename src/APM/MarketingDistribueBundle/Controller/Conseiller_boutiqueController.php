@@ -55,56 +55,27 @@ class Conseiller_boutiqueController extends Controller
             $boutiques_conseillers = $boutique->getBoutiqueConseillers();
         }
 
-        if ($request->isXmlHttpRequest()) {
-            $json = array();
-            $json['items'] = array();
-            $this->gainValeur_filter = $request->request->has('gainValeur_filter') ? $request->request->get('gainValeur_filter') : "";
-            $this->code_filter = $request->request->has('code_filter') ? $request->request->get('code_filter') : "";
-            $this->dateFrom_filter = $request->request->has('dateFrom_filter') ? $request->request->get('dateFrom_filter') : "";
-            $this->dateTo_filter = $request->request->has('dateTo_filter') ? $request->request->get('dateTo_filter') : "";
-            $this->conseiller_filter = $request->request->has('conseiller_filter') ? $request->request->get('conseiller_filter') : "";
-            $this->boutique_filter = $request->request->has('boutique_filter') ? $request->request->get('boutique_filter') : "";
-            $iDisplayLength = $request->request->has('length') ? $request->request->get('length') : -1;
-            $iDisplayStart = $request->request->has('start') ? intval($request->request->get('start')) : 0;
-            $iTotalRecords = count($boutiques_conseillers);
-            if ($iDisplayLength < 0) $iDisplayLength = $iTotalRecords;
-            $boutiques_conseillers = $this->handleResults($boutiques_conseillers, $iTotalRecords, $iDisplayStart, $iDisplayLength);
+        $json = array();
+        $this->gainValeur_filter = $request->query->has('gainValeur_filter') ? $request->query->get('gainValeur_filter') : "";
+        $this->code_filter = $request->query->has('code_filter') ? $request->query->get('code_filter') : "";
+        $this->dateFrom_filter = $request->query->has('dateFrom_filter') ? $request->query->get('dateFrom_filter') : "";
+        $this->dateTo_filter = $request->query->has('dateTo_filter') ? $request->query->get('dateTo_filter') : "";
+        $this->conseiller_filter = $request->query->has('conseiller_filter') ? $request->query->get('conseiller_filter') : "";
+        $this->boutique_filter = $request->query->has('boutique_filter') ? $request->query->get('boutique_filter') : "";
+        $iDisplayLength = $request->query->has('length') ? $request->query->get('length') : -1;
+        $iDisplayStart = $request->query->has('start') ? intval($request->query->get('start')) : 0;
+        $iTotalRecords = count($boutiques_conseillers);
+        if ($iDisplayLength < 0) $iDisplayLength = $iTotalRecords;
+        $boutiques_conseillers = $this->handleResults($boutiques_conseillers, $iTotalRecords, $iDisplayStart, $iDisplayLength);
+        $iFilteredRecords = count($boutiques_conseillers);
+        $data = $this->get('apm_core.data_serialized')->getFormalData($boutiques_conseillers, array("owner_list"));
+        $json['totalRecords'] = $iTotalRecords;
+        $json['filteredRecords'] = $iFilteredRecords;
+        $json['items'] = $data;
+        return new JsonResponse($json, 200);
 
-            /** @var Conseiller_boutique $boutique_conseiller */
-            foreach ($boutiques_conseillers as $boutique_conseiller) {
-                array_push($json['items'], array(
-                    'id' => $boutique_conseiller->getId(),
-                    'conseillerBoutique' => $boutique_conseiller->getId(),
-                    'conseiller' => $boutique_conseiller->getConseiller()->getId(),
-                    'boutique' => $boutique_conseiller->getBoutique()->getId(),
-                ));
-            }
-            return $this->json(json_encode($json), 200);
-        }
-
-        if (null === $boutique) {
-            /** @var Conseiller_boutique $conseiller_boutique */
-            foreach ($boutiques_conseillers as $conseiller_boutique) {
-                $boutiques [] = $conseiller_boutique->getBoutique();
-            }
-            $template = 'APMVenteBundle:boutique:index.html.twig';
-            $data = array(
-                'boutiquesProprietaire' => $boutiques,
-                'boutiquesGerant' => null,
-            );
-        } else {
-            /** @var Conseiller_boutique $boutique_conseiller */
-            foreach ($boutiques_conseillers as $boutique_conseiller) {
-                $conseillers [] = $boutique_conseiller->getConseiller();
-            }
-            $template = 'APMMarketingDistribueBundle:conseiller:index_old.html.twig';
-            $data = array(
-                'conseillers' => $conseillers,
-                'boutique' => $boutique,
-            );
-        }
-        return $this->render($template, $data);
     }
+
 
     /**
      * @param Conseiller_boutique $conseiller_boutique
@@ -261,45 +232,16 @@ class Conseiller_boutiqueController extends Controller
 
     /**
      * Finds and displays a conseiller_boutique entity.
-     * @param Request $request
      * @param Conseiller_boutique $conseiller_boutique
-     * @return \Symfony\Component\HttpFoundation\Response | JsonResponse
+     * @return JsonResponse
      *
      * @Get("/show/conseiller-boutique/{id}")
      */
-    public function showAction(Request $request, Conseiller_boutique $conseiller_boutique)
+    public function showAction(Conseiller_boutique $conseiller_boutique)
     {
         $this->listAndShowSecurity($conseiller_boutique);
-        if ($request->isXmlHttpRequest()) {
-            $json['item'] = array(
-                'id' => $conseiller_boutique->getId(),
-                'date' => $conseiller_boutique->getDate()->format('d-m-Y H:i'),
-                'gainValeur' => $conseiller_boutique->getGainValeur(),
-                'conseiller' => $conseiller_boutique->getConseiller()->getId(),
-                'boutique' => $conseiller_boutique->getBoutique()->getId(),
-            );
-            return $this->json(json_encode($json), 200);
-        }
-        $deleteForm = $this->createDeleteForm($conseiller_boutique);
-        return $this->render('APMMarketingDistribueBundle:conseiller_boutique:show.html.twig', array(
-            'conseiller_boutique' => $conseiller_boutique,
-            'delete_form' => $deleteForm->createView(),
-        ));
-    }
-
-    /**
-     * Creates a form to delete a conseiller_boutique entity.
-     *
-     * @param Conseiller_boutique $conseiller_boutique The conseiller_boutique entity
-     *
-     * @return \Symfony\Component\Form\Form The form
-     */
-    private function createDeleteForm(Conseiller_boutique $conseiller_boutique)
-    {
-        return $this->createFormBuilder()
-            ->setAction($this->generateUrl('apm_marketing_conseiller_boutique_delete', array('id' => $conseiller_boutique->getId())))
-            ->setMethod('DELETE')
-            ->getForm();
+        $data = $this->get('apm_core.data_serialized')->getFormalData($conseiller_boutique, ["owner_conseillerB_details", "owner_list"]);
+        return new JsonResponse($data, 200);
     }
 
     /**
@@ -324,8 +266,8 @@ class Conseiller_boutiqueController extends Controller
                 if ($request->isXmlHttpRequest()) {
                     $json = array();
                     $json['item'] = array();
-                    $property = $request->request->get('name');
-                    $value = $request->request->get('value');
+                    $property = $request->query->get('name');
+                    $value = $request->query->get('value');
                     switch ($property) {
                         case 'gainValeur':
                             $conseiller_boutique->setGainValeur($value);
@@ -389,6 +331,21 @@ class Conseiller_boutiqueController extends Controller
         }
         //----------------------------------------------------------------------------------------
 
+    }
+
+    /**
+     * Creates a form to delete a conseiller_boutique entity.
+     *
+     * @param Conseiller_boutique $conseiller_boutique The conseiller_boutique entity
+     *
+     * @return \Symfony\Component\Form\Form The form
+     */
+    private function createDeleteForm(Conseiller_boutique $conseiller_boutique)
+    {
+        return $this->createFormBuilder()
+            ->setAction($this->generateUrl('apm_marketing_conseiller_boutique_delete', array('id' => $conseiller_boutique->getId())))
+            ->setMethod('DELETE')
+            ->getForm();
     }
 
     /**

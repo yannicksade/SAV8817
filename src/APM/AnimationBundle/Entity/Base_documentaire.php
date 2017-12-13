@@ -11,7 +11,11 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Validator\Constraints as Assert;
 use Vich\UploaderBundle\Mapping\Annotation as Vich;
-
+use JMS\Serializer\Annotation\ExclusionPolicy;
+use JMS\Serializer\Annotation\Expose;
+use JMS\Serializer\Annotation\Groups;
+use JMS\Serializer\Annotation\Type;
+use JMS\Serializer\Annotation\Exclude;
 /**
  * Base_documentaire
  *
@@ -19,18 +23,23 @@ use Vich\UploaderBundle\Mapping\Annotation as Vich;
  * @ORM\Entity(repositoryClass="APM\AnimationBundle\Repository\Base_documentaireRepository")
  * @Vich\Uploadable
  * @UniqueEntity("code")
+ * @ExclusionPolicy("all")
  */
 class Base_documentaire extends TradeFactory
 {
 
     /**
      * @var string
+     * @Expose
+     * @Groups({"owner_list", "others_document_details", "owner_document_details"})
      * @ORM\Column(name="code", type="string", length=255, nullable=true)
      */
     private $code;
 
     /**
      * @var string
+     * @Expose
+     * @Groups({"others_list", "owner_list", "others_document_details", "owner_document_details"})
      * @Assert\Length(min=2, max=254)
      * @ORM\Column(name="description", type="string", length=255, nullable=true)
      */
@@ -38,6 +47,8 @@ class Base_documentaire extends TradeFactory
 
     /**
      * @var string
+     * @Expose
+     * @Groups({"others_list", "owner_list", "others_document_details", "owner_document_details"})
      * @Assert\NotNull
      * @Assert\Length(min=2, max=55)
      * @ORM\Column(name="objet", type="string", length=255, nullable=true)
@@ -46,11 +57,14 @@ class Base_documentaire extends TradeFactory
 
     /**
      * @var string
+     * @Expose
+     * @Groups({"others_document_details", "owner_document_details"})
      * @ORM\Column(name="brochure", type="string")
      */
     private $brochure;
 
     /**
+     * @Exclude
      * @Assert\File( maxSize = "1024k",
      *     mimeTypes = {"application/pdf", "application/x-pdf"},
      *     mimeTypesMessage = "Please upload a valid PDF"
@@ -61,26 +75,36 @@ class Base_documentaire extends TradeFactory
     private $productFile;
 
     /**
-     * @ORM\Column(name="updatedAt", type="datetime")
      * @var \DateTime
+     * @Expose
+     * @Groups({"others_document_details", "owner_document_details"})
+     * @ORM\Column(name="updatedAt", type="datetime")
+     * 
      */
     private $updatedAt;
+
     /**
      * @var integer
-     *
+     * @Expose
+     * @Groups({"others_list", "owner_list", "others_document_details", "owner_document_details"})
      * @ORM\Column(name="id", type="integer", nullable=false)
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id;
+
     /**
      * @var \DateTime
+     * @Expose
+     * @Groups({"others_document_details", "owner_document_details"})
      * @Assert\DateTime
      * @ORM\Column(name="date", type="datetime", nullable=true)
      */
     private $date;
+
     /**
      * @var Utilisateur_avm
+     * 
      * @ORM\ManyToOne(targetEntity="APM\UserBundle\Entity\Utilisateur_avm", inversedBy="documents")
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="proprietaire_id", referencedColumnName="id", nullable=false)

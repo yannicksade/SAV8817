@@ -10,8 +10,11 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
-
-
+use JMS\Serializer\Annotation\ExclusionPolicy;
+use JMS\Serializer\Annotation\Expose;
+use JMS\Serializer\Annotation\Groups;
+use JMS\Serializer\Annotation\Type;
+use JMS\Serializer\Annotation\Exclude;
 /**
  * Conseiller
  *
@@ -19,17 +22,22 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
  * @ORM\Entity(repositoryClass="APM\MarketingDistribueBundle\Repository\ConseillerRepository")
  * @UniqueEntity("code", message="Ce code est déjà pris.")
  * @UniqueEntity("matricule", message="ce matricule existe déjà.")
+ * @ExclusionPolicy("all")
  */
 class Conseiller extends TradeFactory
 {
     /**
      * @var string
-     *
+     * @Expose
+     * @Groups({"owner_list", "owner_conseiller_details", "others_conseiller_details"})
      * @ORM\Column(name="code", type="string", length=255, nullable=false)
      */
     private $code;
+
     /**
      * @var \DateTime
+     * @Expose
+     * @Groups({"owner_conseiller_details", "others_conseiller_details"})
      * @Assert\DateTime
      * @ORM\Column(name="dateEnregistrement", type="datetime", nullable=true)
      */
@@ -37,12 +45,17 @@ class Conseiller extends TradeFactory
 
     /**
      * @var \DateTime
+     * @Expose
+     * @Groups({"owner_conseiller_details", "others_conseiller_details"})
      * @Assert\DateTime
      * @ORM\Column(name="dateCreationReseau", type="datetime", nullable=true)
      */
     private $dateCreationReseau;
+
     /**
      * @var string
+     * @Expose
+     * @Groups({"owner_list", "others_list", "owner_conseiller_details", "others_conseiller_details"})
      * @Assert\Length(min=2, max=254)
      * @ORM\Column(name="description", type="string", length=255, nullable=true)
      */
@@ -50,6 +63,8 @@ class Conseiller extends TradeFactory
 
     /**
      * @var boolean
+     * @Expose
+     * @Groups({"owner_conseiller_details"})
      * @Assert\Choice({0,1})
      * @ORM\Column(name="estConseillerA2", type="boolean", nullable=true)
      */
@@ -57,12 +72,16 @@ class Conseiller extends TradeFactory
 
     /**
      * @var integer
+     * @Expose
+     * @Groups({"net", "owner_conseiller_details"})
      * @ORM\Column(name="nombreInstance", type="integer", nullable=true)
      */
     private $nombreInstanceReseau;
 
     /**
      * @var string
+     * @Expose
+     * @Groups({"owner_list", "others_conseiller_details", "owner_conseiller_details", "others_conseiller_details"})
      * @Assert\Length(min=2, max=100)
      * @ORM\Column(name="matricule", type="string", length=255, nullable=true)
      */
@@ -70,6 +89,8 @@ class Conseiller extends TradeFactory
 
     /**
      * @var integer
+     * @Expose
+     * @Groups({"owner_conseiller_details"})
      * @Assert\Range(min=0)
      * @ORM\Column(name="valeurquota", type="integer", nullable=true)
      */
@@ -77,7 +98,8 @@ class Conseiller extends TradeFactory
 
     /**
      * @var integer
-     *
+     * @Expose
+     * @Groups({"net", "owner_list", "others_list", "owner_conseiller_details", "others_conseiller_details"})
      * @ORM\Column(name="id", type="integer", nullable=false)
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
@@ -86,21 +108,18 @@ class Conseiller extends TradeFactory
 
     /**
      * @var Utilisateur_avm
-     *
+     * @Expose
+     * @Groups({"owner_conseiller_details"})
      * @ORM\OneToOne(targetEntity="APM\UserBundle\Entity\Utilisateur_avm", inversedBy="profileConseiller")
      * @ORM\JoinColumn(name="utilisateur_id", referencedColumnName="id" , nullable=true)
      */
     private $utilisateur;
 
-    /**
-     * @var Collection
-     * @ORM\OneToMany(targetEntity="APM\MarketingDistribueBundle\Entity\Conseiller_boutique", mappedBy="conseiller", cascade={"persist","remove"})
-     */
-    private $conseillerBoutiques;
 
     /**
      * @var Conseiller
-     *
+     * @Expose
+     * @Groups({"net", "owner_conseiller_details"})
      * @ORM\ManyToOne(targetEntity="APM\MarketingDistribueBundle\Entity\Conseiller")
      */
     private $masterConseiller;
@@ -108,19 +127,25 @@ class Conseiller extends TradeFactory
 
     /**
      * @var Conseiller
-     *
+     * @Expose
+     * @Groups({"net", "owner_conseiller_details"})
      * @ORM\ManyToOne(targetEntity="APM\MarketingDistribueBundle\Entity\Conseiller")
      */
     private $conseillerDroite;
 
     /**
      * @var Conseiller
-     *
+     * @Expose
+     * @Groups({"net", "owner_conseiller_details"})
      * @ORM\ManyToOne(targetEntity="APM\MarketingDistribueBundle\Entity\Conseiller")
      */
     private $conseillerGauche;
 
-
+    /**
+     * @var Collection
+     * @ORM\OneToMany(targetEntity="APM\MarketingDistribueBundle\Entity\Conseiller_boutique", mappedBy="conseiller", cascade={"persist","remove"})
+     */
+    private $conseillerBoutiques;
     /**
      * Constructor
      * @param string $var

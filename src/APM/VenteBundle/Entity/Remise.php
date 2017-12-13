@@ -7,6 +7,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use JMS\Serializer\Annotation\ExclusionPolicy;
 use JMS\Serializer\Annotation\Expose;
+use JMS\Serializer\Annotation\Groups;
 
 /**
  * Remise
@@ -21,26 +22,31 @@ class Remise extends TradeFactory
     /**
      * @var string
      * @Expose
+     * @Groups({"owner_list", "owner_remise_details", "others_remise_details"})
      * @ORM\Column(name="code", type="string", length=255, nullable=true)
      */
     private $code;
 
     /**
      * @var integer
-     *
+     * @Expose
+     * @Groups({"owner_remise_details", "others_remise_details"})
      * @ORM\Column(name="etat", type="integer", nullable=false)
      */
     private $etat;
 
     /**
      * @var string
-     *
+     * @Expose
+     * @Groups({"owner_list", "others_list", "owner_remise_details", "others_remise_details"})
      * @ORM\Column(name="description", type="string", nullable=true)
      */
     private $description;
 
     /**
      * @var \DateTime
+     * @Expose
+     * @Groups({"owner_remise_details", "others_remise_details"})
      * @Assert\DateTime
      * @ORM\Column(name="dateCreation", type="datetime", nullable=false)
      */
@@ -48,6 +54,8 @@ class Remise extends TradeFactory
 
     /**
      * @var \DateTime|null
+     * @Expose
+     * @Groups({"owner_remise_details", "others_remise_details"})
      * @Assert\DateTime
      * @ORM\Column(name="dateExpiration", type="datetime", nullable=true)
      */
@@ -55,6 +63,8 @@ class Remise extends TradeFactory
 
     /**
      * @var boolean
+     * @Expose
+     * @Groups({"owner_remise_details"})
      * @Assert\Choice({0,1})
      * @ORM\Column(name="Restricted", type="boolean", nullable=true)
      */
@@ -62,12 +72,17 @@ class Remise extends TradeFactory
 
     /**
      * @var integer
+     * @Expose
+     * @Groups({"owner_remise_details", "others_remise_details"})
      * @Assert\Range(min=0, max=30)
      * @ORM\Column(name="nombreUtilisation", type="smallint", nullable=true)
      */
     private $nombreUtilisation;
+
     /**
      * @var boolean
+     * @Expose
+     * @Groups({"owner_remise_details", "others_remise_details"})
      * @Assert\Choice({0,1})
      * @ORM\Column(name="permanence", type="boolean", nullable=true)
      */
@@ -75,6 +90,8 @@ class Remise extends TradeFactory
 
     /**
      * @var integer
+     * @Expose
+     * @Groups({"owner_remise_details", "others_remise_details"})
      * @Assert\GreaterThan(0)
      * @ORM\Column(name="quantiteMin", type="integer", nullable=true)
      */
@@ -82,7 +99,7 @@ class Remise extends TradeFactory
 
     /**
      * @var string
-     *
+     * @Groups({"owner_remise_details", "others_remise_details"})
      * @ORM\Column(name="valeur", type="decimal", nullable=true)
      */
     private $valeur;
@@ -90,6 +107,7 @@ class Remise extends TradeFactory
     /**
      * @var integer
      * @Expose
+     * @Groups({"owner_list", "others_list", "owner_remise_details", "others_remise_details"})
      * @ORM\Column(name="id", type="integer", nullable=false)
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
@@ -98,7 +116,8 @@ class Remise extends TradeFactory
 
     /**
      * @var Offre
-     *
+     * @Expose
+     * @Groups({"owner_remise_details", "others_remise_details"})
      * @ORM\ManyToOne(targetEntity="APM\VenteBundle\Entity\Offre", inversedBy="remises")
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="offre_id", referencedColumnName="id", nullable=false)

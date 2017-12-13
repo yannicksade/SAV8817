@@ -5,8 +5,12 @@ namespace APM\MarketingDistribueBundle\Entity;
 use APM\MarketingDistribueBundle\Factory\TradeFactory;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Doctrine\ORM\Mapping as ORM;
-
 use Symfony\Component\Validator\Constraints as Assert;
+use JMS\Serializer\Annotation\ExclusionPolicy;
+use JMS\Serializer\Annotation\Expose;
+use JMS\Serializer\Annotation\Groups;
+use JMS\Serializer\Annotation\Type;
+use JMS\Serializer\Annotation\Exclude;
 
 /**
  * Commissionnement
@@ -14,11 +18,13 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @ORM\Table(name="commissionnement")
  * @ORM\Entity(repositoryClass="APM\MarketingDistribueBundle\Repository\CommissionnementRepository")
  * @UniqueEntity("code")
+ * @ExclusionPolicy("all")
  */
 class Commissionnement extends TradeFactory
 {
     /**
-     *
+     * @Expose
+     * @Groups({"owner_list", "owner_commissionnement_details", "others_commissionnement_details"})
      * @var string
      * @ORM\Column(name="code", type="string", length=255, nullable=false )
      */
@@ -27,6 +33,8 @@ class Commissionnement extends TradeFactory
     /**
      *
      * @var integer
+     * @Expose
+     * @Groups({"owner_commissionnement_details"})
      * @Assert\Range(min=0)
      * @ORM\Column(name="creditDepense", type="integer", nullable=true)
      */
@@ -34,6 +42,8 @@ class Commissionnement extends TradeFactory
 
     /**
      * @var \DateTime
+     * @Expose
+     * @Groups({"owner_commissionnement_details"})
      * @Assert\DateTime
      * @ORM\Column(name="dateCreation", type="datetime", nullable=true)
      */
@@ -41,6 +51,8 @@ class Commissionnement extends TradeFactory
 
     /**
      * @var string
+     * @Expose
+     * @Groups({"owner_list", "others_list", "owner_commissionnement_details", "others_commissionnement_details"})
      * @Assert\Length(min=2, max=155)
      * @ORM\Column(name="libelle", type="string", length=255, nullable=true)
      */
@@ -49,6 +61,8 @@ class Commissionnement extends TradeFactory
 
     /**
      * @var string
+     * @Expose
+     * @Groups({"owner_list", "others_list", "owner_commissionnement_details", "others_commissionnement_details"})
      * @Assert\Length(min=2, max=254)
      * @ORM\Column(name="description", type="string", length=255, nullable=true)
      */
@@ -56,7 +70,8 @@ class Commissionnement extends TradeFactory
 
     /**
      * @var integer
-     *
+     * @Expose
+     * @Groups({"owner_commissionnement_details", "others_commissionnement_details"})
      * @Assert\GreaterThan(0)
      * @ORM\Column(name="quantite", type="integer", nullable=true)
      */
@@ -65,7 +80,8 @@ class Commissionnement extends TradeFactory
     /**
      * Id
      * @var integer
-     *
+     * @Expose
+     * @Groups({"owner_list", "others_list", "owner_commissionnement_details", "others_commissionnement_details"})
      * @ORM\Column(name="id", type="integer", nullable=false)
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
@@ -74,7 +90,8 @@ class Commissionnement extends TradeFactory
 
     /**
      * @var Conseiller_boutique
-     *
+     * @Expose
+     * @Groups({"owner_commissionnement_details", "others_commissionnement_details"})
      * @ORM\ManyToOne(targetEntity="APM\MarketingDistribueBundle\Entity\Conseiller_boutique", inversedBy="commissionnements")
      * @ORM\JoinColumns({
      *     @ORM\JoinColumn(name="conseillerBoutique_id", referencedColumnName="id", nullable=false)
@@ -84,6 +101,8 @@ class Commissionnement extends TradeFactory
 
     /**
      * @var Quota
+     * @Expose
+     * @Groups({"owner_commissionnement_details", "others_commissionnement_details"})
      * @ORM\ManyToOne(targetEntity="APM\MarketingDistribueBundle\Entity\Quota", inversedBy="commissionnements")
      * @ORM\JoinColumns({
      *     @ORM\JoinColumn(name="commission_id", referencedColumnName="id", nullable=false)

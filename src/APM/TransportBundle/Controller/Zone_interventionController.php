@@ -50,78 +50,50 @@ class Zone_interventionController extends Controller
         /** @var Utilisateur_avm $user */
         $user = $this->getUser();
         $transporteur = $user->getTransporteur();
-        if ($request->isXmlHttpRequest()) {
-            $q = $request->query->get('q');
-            $this->designation_filter = $request->request->has('designation_filter') ? $request->request->get('designation_filter') : "";
-            $this->code_filter = $request->request->has('code_filter') ? $request->request->get('code_filter') : "";
-            $this->description_filter = $request->request->has('description_filter') ? $request->request->get('description_filter') : "";
-            $this->adresse_filter = $request->request->has('adresse_filter') ? $request->request->get('adresse_filter') : "";
-            $this->pays_filter = $request->request->has('pays_filter') ? $request->request->get('pays_filter') : "";
-            $this->transporteur_filter = $request->request->has('transporteur_filter') ? $request->request->get('transporteur_filter') : "";
-            $iDisplayLength = $request->request->has('length') ? $request->request->get('length') : -1;
-            $iDisplayStart = $request->request->has('start') ? intval($request->request->get('start')) : 0;
-            $json = array();
-            $json['items'] = array();
-            if ($q === "guest" || $q === "all") {
-                $transporteur_zones = (null !== $transporteur) ? $transporteur->getTransporteurZones() : null;
-                if ($transporteur_zones !== null) {
-                    $zones = array();
-                    /** @var Transporteur_zoneintervention $t_z */
-                    foreach ($transporteur_zones as $t_z) {
-                        array_push($zones, $t_z->getZoneIntervention());
-                    }
-                    $zones = new ArrayCollection($zones);
-                    $iTotalRecords = count($zones);
-                    if ($iDisplayLength < 0) $iDisplayLength = $iTotalRecords;
-                    $zones = $this->handleResults($zones, $iTotalRecords, $iDisplayStart, $iDisplayLength);
-                    /** @var Zone_intervention $zone */
-                    foreach ($zones as $zone) {
-                        array_push($json['items'], array(
-                            'id' => $zone->getId(),
-                            'code' => $zone->getCode(),
-                            'designation' => $zone->getDesignation(),
-                            'description' => $zone->getDescription(),
-                        ));
-                    }
-                }
-            }
-            if ($q === "owner" || $q === "all") {
-                $zones = (null !== $transporteur) ? $transporteur->getZones() : null;
-                if (null !== $zones) {
-                    $iTotalRecords = count($zones);
-                    if ($iDisplayLength < 0) $iDisplayLength = $iTotalRecords;
-                    $zones = $this->handleResults($zones, $iTotalRecords, $iDisplayStart, $iDisplayLength);
-                    /** @var Zone_intervention $zone */
-                    foreach ($zones as $zone) {
-                        array_push($json['items'], array(
-                            'id' => $zone->getId(),
-                            'code' => $zone->getCode(),
-                            'designation' => $zone->getDesignation(),
-                            'description' => $zone->getDescription(),
-                        ));
-                    }
-                }
-            }
-
-            return $this->json(json_encode($json), 200);
-        }
-
-        if (null !== $transporteur) {
-            $zonesPropres = $transporteur->getZones();
-            $transporteur_zones = $transporteur->getTransporteurZones();
+        $q = $request->query->get('q');
+        $this->designation_filter = $request->request->has('designation_filter') ? $request->request->get('designation_filter') : "";
+        $this->code_filter = $request->request->has('code_filter') ? $request->request->get('code_filter') : "";
+        $this->description_filter = $request->request->has('description_filter') ? $request->request->get('description_filter') : "";
+        $this->adresse_filter = $request->request->has('adresse_filter') ? $request->request->get('adresse_filter') : "";
+        $this->pays_filter = $request->request->has('pays_filter') ? $request->request->get('pays_filter') : "";
+        $this->transporteur_filter = $request->request->has('transporteur_filter') ? $request->request->get('transporteur_filter') : "";
+        $iDisplayLength = $request->request->has('length') ? $request->request->get('length') : -1;
+        $iDisplayStart = $request->request->has('start') ? intval($request->request->get('start')) : 0;
+        $json = array();
+        $json['items'] = array();
+        if ($q === "guest" || $q === "all") {
+            $transporteur_zones = (null !== $transporteur) ? $transporteur->getTransporteurZones() : null;
             if ($transporteur_zones !== null) {
-                $zonesPartagees = null;
+                $zones = array();
                 /** @var Transporteur_zoneintervention $t_z */
                 foreach ($transporteur_zones as $t_z) {
-                    $zonesPartagees[] = $t_z->getZoneIntervention();
+                    array_push($zones, $t_z->getZoneIntervention());
                 }
+                $zones = new ArrayCollection($zones);
+                $iTotalRecords = count($zones);
+                if ($iDisplayLength < 0) $iDisplayLength = $iTotalRecords;
+                $zones = $this->handleResults($zones, $iTotalRecords, $iDisplayStart, $iDisplayLength);
+                $iFilteredRecords = count($zones);
+                $data = $this->get('apm_core.data_serialized')->getFormalData($zones, array("others_list"));
+                $json['totalRecordsGuest'] = $iTotalRecords;
+                $json['filteredRecordsGuest'] = $iFilteredRecords;
+                $json['items'] = $data;
             }
         }
-        return $this->render('APMTransportBundle:zone_intervention:index.html.twig', array(
-            'zoneInterventions' => $zonesPartagees,
-            'zoneInterventionsCreees' => $zonesPropres,
-            'transporteur' => $transporteur,
-        ));
+        if ($q === "owner" || $q === "all") {
+            $zones = (null !== $transporteur) ? $transporteur->getZones() : null;
+            if (null !== $zones) {
+                $iTotalRecords = count($zones);
+                if ($iDisplayLength < 0) $iDisplayLength = $iTotalRecords;
+                $zones = $this->handleResults($zones, $iTotalRecords, $iDisplayStart, $iDisplayLength);
+                $iFilteredRecords = count($zones);
+                $data = $this->get('apm_core.data_serialized')->getFormalData($zones, array("owner_list"));
+                $json['totalRecordsOwner'] = $iTotalRecords;
+                $json['filteredRecordsOwner'] = $iFilteredRecords;
+                $json['items'] = $data;
+            }
+        }
+        return new JsonResponse($json, 200);
     }
 
     private function listeAndShowSecurity()
@@ -276,52 +248,16 @@ class Zone_interventionController extends Controller
 
     /**
      * Finds and displays a Zone_intervention entity.
-     * @param Request $request
      * @param Zone_intervention $zone_intervention
-     * @return Response | JsonResponse
+     * @return JsonResponse
      *
      * @Get("/show/zoneintervention/{id}")
      */
-    public function showAction(Request $request, Zone_intervention $zone_intervention)
+    public function showAction(Zone_intervention $zone_intervention)
     {
         $this->listeAndShowSecurity();
-        if ($request->isXmlHttpRequest()) {
-            $json = array();
-            $json['item'] = array(
-                'id' => $zone_intervention->getId(),
-                'code' => $zone_intervention->getCode(),
-                'description' => $zone_intervention->getDescription(),
-                'designation' => $zone_intervention->getDesignation(),
-                'adresse' => $zone_intervention->getAdresse(),
-                'pays' => $zone_intervention->getPays(),
-                'language' => $zone_intervention->getLanguage(),
-                'ville' => $zone_intervention->getVille(),
-                'createur' => $zone_intervention->getTransporteur()->getId(),
-                'zoneTime' => $zone_intervention->getZoneTime(),
-            );
-            return $this->json(json_encode($json), 200);
-        }
-        $deleteForm = $this->createDeleteForm($zone_intervention);
-
-        return $this->render('APMTransportBundle:zone_intervention:show.html.twig', array(
-            'zone_intervention' => $zone_intervention,
-            'delete_form' => $deleteForm->createView(),
-        ));
-    }
-
-    /**
-     * Creates a form to delete a Zone_intervention entity.
-     *
-     * @param Zone_intervention $zone_intervention The Zone_intervention entity
-     *
-     * @return \Symfony\Component\Form\Form The form
-     */
-    private function createDeleteForm(Zone_intervention $zone_intervention)
-    {
-        return $this->createFormBuilder()
-            ->setAction($this->generateUrl('apm_zone_intervention_delete', array('id' => $zone_intervention->getId())))
-            ->setMethod('DELETE')
-            ->getForm();
+        $data = $this->get('apm_core.data_serialized')->getFormalData($zone_intervention, ["owner_zone_details", "owner_list"]);
+        return new JsonResponse($data, 200);
     }
 
     /**
@@ -420,6 +356,21 @@ class Zone_interventionController extends Controller
         }
 
         //----------------------------------------------------------------------------------------
+    }
+
+    /**
+     * Creates a form to delete a Zone_intervention entity.
+     *
+     * @param Zone_intervention $zone_intervention The Zone_intervention entity
+     *
+     * @return \Symfony\Component\Form\Form The form
+     */
+    private function createDeleteForm(Zone_intervention $zone_intervention)
+    {
+        return $this->createFormBuilder()
+            ->setAction($this->generateUrl('apm_zone_intervention_delete', array('id' => $zone_intervention->getId())))
+            ->setMethod('DELETE')
+            ->getForm();
     }
 
     /**

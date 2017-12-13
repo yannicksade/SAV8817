@@ -112,59 +112,35 @@ class Service_apres_venteController extends Controller
                 }
             }
         }
-
-        if ($request->isXmlHttpRequest() && $request->getMethod() === "POST") {
-            $json = array();
-            $json['items'] = array();
-            $session = $this->get('session');
-            try { //----- Security control  -----
-                //filter parameters
-                $this->code_filter = $request->request->has('code_filter') ? $request->request->get('code_filter') : "";
-                $this->offre_filter = $request->request->has('offre_filter') ? $request->request->get('offre_filter') : "";
-                $this->boutique_filter = $request->request->has('boutique_filter') ? $request->request->get('boutique_filter') : "";
-                $this->desc_filter = $request->request->has('desc_filter') ? $request->request->get('desc_filter') : "";
-                $this->dateFrom_filter = $request->request->has('date_from_filter') ? $request->request->get('date_from_filter') : "";
-                $this->dateTo_filter = $request->request->has('date_to_filter') ? $request->request->get('date_to_filter') : "";
-                $this->etat_filter = $request->request->has('etat_filter') ? $request->request->get('etat_filter') : "";
-                $this->affiliation_filter = $request->request->has('affiliation_filter') ? $request->request->get('affiliation_filter') : "";
-
-                $this->commentaire_filter = $request->request->has('commentaire_filter') ? $request->request->get('commentaire_filter') : "";
-                $this->client_filter = $request->request->has('client_filter') ? $request->request->get('client_filter') : "";
-                $iDisplayLength = intval($request->request->get('length'));
-                $iDisplayStart = intval($request->request->get('start'));
-                $iTotalRecords = count($services); // counting
-                $services = $this->handleResults($services, $iTotalRecords, $iDisplayStart, $iDisplayLength); // filtering
-                $iFilteredRecords = count($services);
-                //------------------------------------
-
-                /** @var Service_apres_vente $service_apres_vente */
-                foreach ($services as $service_apres_vente) {
-                    array_push($json['items'], array(
-                        'id' => $service_apres_vente->getId(),
-                        'code' => $service_apres_vente->getCode(),
-                        'description' => substr($service_apres_vente->getDescriptionPanne(), 100) . "...",
-                    ));
-                }
-                $json["recordsTotal"] = $iTotalRecords;
-                $json["recordsFiltered"] = $iFilteredRecords;
-                return $this->json(json_encode($json), 200);
-            } catch (AccessDeniedException $ads) {
-                $session->getFlashBag()->add('danger', "<strong>Opération interdite!</strong><br/>Pour jouir de ce service, veuillez consulter nos administrateurs.");
-                return $this->json($json);
-            } catch (RuntimeException $rte) {
-                $session->getFlashBag()->add('danger', "<strong>Echec de l'opération: </strong><br>Une erreur systeme s'est produite. bien vouloir réessayer plutard, svp!");
-                return $this->json(json_encode(["item" => null]));
-            }
+        $json = array();
+        $session = $this->get('session');
+        try { //----- Security control  -----
+            //filter parameters
+            $this->code_filter = $request->query->has('code_filter') ? $request->query->get('code_filter') : "";
+            $this->offre_filter = $request->query->has('offre_filter') ? $request->query->get('offre_filter') : "";
+            $this->boutique_filter = $request->query->has('boutique_filter') ? $request->query->get('boutique_filter') : "";
+            $this->desc_filter = $request->query->has('desc_filter') ? $request->query->get('desc_filter') : "";
+            $this->dateFrom_filter = $request->query->has('date_from_filter') ? $request->query->get('date_from_filter') : "";
+            $this->dateTo_filter = $request->query->has('date_to_filter') ? $request->query->get('date_to_filter') : "";
+            $this->etat_filter = $request->query->has('etat_filter') ? $request->query->get('etat_filter') : "";
+            $this->affiliation_filter = $request->query->has('affiliation_filter') ? $request->query->get('affiliation_filter') : "";
+            $this->commentaire_filter = $request->query->has('commentaire_filter') ? $request->query->get('commentaire_filter') : "";
+            $this->client_filter = $request->query->has('client_filter') ? $request->query->get('client_filter') : "";
+            $iDisplayLength = intval($request->query->get('length'));
+            $iDisplayStart = intval($request->query->get('start'));
+            $iTotalRecords = count($services); // counting
+            $services = $this->handleResults($services, $iTotalRecords, $iDisplayStart, $iDisplayLength); // filtering
+            $iFilteredRecords = count($services);
+            //------------------------------------
+            $data = $this->get('apm_core.data_serialized')->getFormalData($services, array("owner_list"));
+            $json['totalRecords'] = $iTotalRecords;
+            $json['filteredRecords'] = $iFilteredRecords;
+            $json['items'] = $data;
+            return new JsonResponse($json, 200);
+        } catch (AccessDeniedException $ads) {
+            $session->getFlashBag()->add('danger', "<strong>Opération interdite!</strong><br/>Pour jouir de ce service, veuillez consulter nos administrateurs.");
+            return new JsonResponse('Access denied', 200);
         }
-        $session = $request->getSession();
-        $session->set('previous_location', $request->getUri());
-        $form = $this->createForm('APM\AchatBundle\Form\Service_apres_venteType');
-        $form2 = $this->createForm('APM\AchatBundle\Form\Service_apres_venteType');
-        return $this->render('APMAchatBundle:service_apres_vente:index_ajax.html.twig', array(
-            //'service_apres_ventes' => $services,
-            'form' => $form->createView(),
-            'form2' => $form2->createView(),
-        ));
     }
 
     /**
@@ -384,50 +360,16 @@ class Service_apres_venteController extends Controller
 
     /**
      * Finds and displays a Service_apres_vente entity.
-     * @param Request $request
      * @param Service_apres_vente $service_apres_vente
-     * @return \Symfony\Component\HttpFoundation\Response| JsonResponse Afficher ls détails d'une SAV
+     * @return JsonResponse Afficher ls détails d'une SAV
      *
      * @Get("/show/sav/{id}")
      */
-    public function showAction(Request $request, Service_apres_vente $service_apres_vente)
+    public function showAction(Service_apres_vente $service_apres_vente)
     {
         $this->listAndShowSecurity();
-        if ($request->isXmlHttpRequest()) {
-            $json = array();
-            $json['item'] = array(
-                'id' => $service_apres_vente->getId(),
-                'code' => $service_apres_vente->getCode(),
-                'description' => $service_apres_vente->getDescriptionPanne(),
-                'etat' => $service_apres_vente->getEtat(),
-                'commentaire' => $service_apres_vente->getCommentaire(),
-                'date' => $service_apres_vente->getDateDue()->format("d/m/Y H:i"),
-                'client' => $service_apres_vente->getClient()->getId(),
-                'offre' => $service_apres_vente->getOffre()->getId(),
-            );
-            return $this->json(json_encode($json), 200);
-        }
-        $deleteForm = $this->createDeleteForm($service_apres_vente);
-        return $this->render('APMAchatBundle:service_apres_vente:show.html.twig', array(
-            'service_apres_vente' => $service_apres_vente,
-            'delete_form' => $deleteForm->createView(),
-        ));
-    }
-
-    /**
-     * Creates a form to delete a Service_apres_vente entity.
-     *
-     * @param Service_apres_vente $service_apres_vente The Service_apres_vente entity
-     *
-     * @return \Symfony\Component\Form\Form The form
-     */
-    private
-    function createDeleteForm(Service_apres_vente $service_apres_vente)
-    {
-        return $this->createFormBuilder()
-            ->setAction($this->generateUrl('apm_achat_service_apres_vente_delete', array('id' => $service_apres_vente->getId())))
-            ->setMethod('DELETE')
-            ->getForm();
+        $data = $this->get('apm_core.data_serialized')->getFormalData($service_apres_vente, ["owner_sav_details", "owner_list"]);
+        return new JsonResponse($data, 200);
     }
 
     /**
@@ -452,8 +394,8 @@ class Service_apres_venteController extends Controller
                 if ($request->isXmlHttpRequest()) {
                     $json = array();
                     $json["item"] = array();
-                    $property = $request->request->get('name');
-                    $value = $request->request->get('value');
+                    $property = $request->query->get('name');
+                    $value = $request->query->get('value');
                     switch ($property) {
                         case 'etat':
                             $service_apres_vente->setEtat($value);
@@ -513,6 +455,22 @@ class Service_apres_venteController extends Controller
         }
         //----------------------------------------------------------------------------------------
     }
+
+    /**
+     * Creates a form to delete a Service_apres_vente entity.
+     *
+     * @param Service_apres_vente $service_apres_vente The Service_apres_vente entity
+     *
+     * @return \Symfony\Component\Form\Form The form
+     */
+    private
+    function createDeleteForm(Service_apres_vente $service_apres_vente)
+    {
+        return $this->createFormBuilder()
+            ->setAction($this->generateUrl('apm_achat_service_apres_vente_delete', array('id' => $service_apres_vente->getId())))
+            ->setMethod('DELETE')
+            ->getForm();
+    }
 //------------------------ End INDEX ACTION --------------------------------------------
 
     /**
@@ -531,7 +489,7 @@ class Service_apres_venteController extends Controller
         $em = $this->getDoctrine()->getManager();
         if ($request->isXmlHttpRequest()) {
             /** @var Service_apres_vente $service_apres_vente */
-            $items = $request->request->get('items');
+            $items = $request->query->get('items');
             $elements = json_decode($items);
             $json = array();
             $json['item'] = array();

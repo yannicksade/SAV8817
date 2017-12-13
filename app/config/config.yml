@@ -16,7 +16,7 @@ parameters:
     #nelmio api docs
     api_name: we-trade
     api_description: The World Electronic Trade for every one
-    cors_allow_origin: http://localhost:[0-9]+
+    cors_allow_origin: ^http://localhost:[0-9]+
 
     # lexik jwt bundle
     jwt_private_key_path: %kernel.root_dir%/var/jwt/private.pem   # ssh private key path

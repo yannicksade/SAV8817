@@ -36,46 +36,52 @@ class Base_documentaireController extends Controller
     /**
      *Liste les documents de l'utilisateur
      * @param Request $request
-     * @return \Symfony\Component\HttpFoundation\Response | JsonResponse
+     * @return JsonResponse
      *
      * @Get("/cget/documents")
      */
     public function getAction(Request $request)
     {
+        $this->listAndShowSecurity();
         /** @var Utilisateur_avm $user */
         $user = $this->getUser();
         $documents = $user->getDocuments();
-        if ($request->isXmlHttpRequest()) {
-            $json = array();
-            $json['items'] = array();
-            $this->objet_filter = $request->request->has('objet_filter') ? $request->request->get('objet_filter') : "";
-            $this->code_filter = $request->request->has('code_filter') ? $request->request->get('code_filter') : "";
-            $this->dateFrom_filter = $request->request->has('dateFrom_filter') ? $request->request->get('dateFrom_filter') : "";
-            $this->dateTo_filter = $request->request->has('dateTo_filter') ? $request->request->get('dateTo_filter') : "";
-            $this->updatedAt_filter = $request->request->has('updatedAt_filter') ? $request->request->get('updatedAt_filter') : "";
-            $this->proprietaire_filter = $request->request->has('proprietaire_filter') ? $request->request->get('proprietaire_filter') : "";
+        $json = array();
+        $this->objet_filter = $request->query->has('objet_filter') ? $request->query->get('objet_filter') : "";
+        $this->code_filter = $request->query->has('code_filter') ? $request->query->get('code_filter') : "";
+        $this->dateFrom_filter = $request->query->has('dateFrom_filter') ? $request->query->get('dateFrom_filter') : "";
+        $this->dateTo_filter = $request->query->has('dateTo_filter') ? $request->query->get('dateTo_filter') : "";
+        $this->updatedAt_filter = $request->query->has('updatedAt_filter') ? $request->query->get('updatedAt_filter') : "";
+        $this->proprietaire_filter = $request->query->has('proprietaire_filter') ? $request->query->get('proprietaire_filter') : "";
+        $iDisplayLength = $request->query->has('length') ? $request->query->get('length') : -1;
+        $iDisplayStart = $request->query->has('start') ? intval($request->query->get('start')) : 0;
+        $iTotalRecords = count($documents);
+        if ($iDisplayLength < 0) $iDisplayLength = $iTotalRecords;
+        $documents = $this->handleResults($documents, $iTotalRecords, $iDisplayStart, $iDisplayLength);
+        $iFilteredRecords = count($documents);
+        $data = $this->get('apm_core.data_serialized')->getFormalData($documents, array("owner_list"));
+        $json['totalRecords'] = $iTotalRecords;
+        $json['filteredRecords'] = $iFilteredRecords;
+        $json['items'] = $data;
 
-            $iDisplayLength = $request->request->has('length') ? $request->request->get('length') : -1;
-            $iDisplayStart = $request->request->has('start') ? intval($request->request->get('start')) : 0;
-
-            $iTotalRecords = count($documents);
-            if ($iDisplayLength < 0) $iDisplayLength = $iTotalRecords;
-            $documents = $this->handleResults($documents, $iTotalRecords, $iDisplayStart, $iDisplayLength);
-            /** @var Base_documentaire $document */
-            foreach ($documents as $document) {
-                array_push($json['items'], array(
-                    'id' => $document->getId(),
-                    'code' => $document->getCode(),
-                    'objet' => $document->getObjet(),
-                    'description' => $document->getDescription()
-                ));
-            }
-            return $this->json(json_encode($json), 200);
-        }
-        return $this->render('APMAnimationBundle:document:index.html.twig', array(
-            'documents' => $documents,
-        ));
+        return new JsonResponse($json, 200);
     }
+
+    private function listAndShowSecurity()
+    {
+        //---------------------------------security-----------------------------------------------
+        // Unable to access the controller unless you have a USERAVM role
+        $this->denyAccessUnlessGranted('ROLE_USERAVM', null, 'Unable to access this page!');
+        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
+            throw $this->createAccessDeniedException();
+        }
+        //----------------------------------------------------------------------------------------
+    }
+
+    /*
+     * Rename and Download a file
+     * @Get("/download/document/{id}")
+     */
 
     /**
      * @param Collection $documents
@@ -155,10 +161,6 @@ class Base_documentaireController extends Controller
         return $documents;
     }
 
-    /*
-     * Rename and Download a file
-     * @Get("/download/document/{id}")
-     */
     public function downloadFileAction(Base_documentaire $document)
     {
         $this->listAndShowSecurity();
@@ -167,17 +169,6 @@ class Base_documentaireController extends Controller
         $fileName = explode('.', $fileName);
         $fileName = $document->getObjet() . '.' . $fileName[1];
         return $downloadHandler->downloadObject($document, $fileField = 'productFile', $objectClass = null, $fileName);
-    }
-
-    private function listAndShowSecurity()
-    {
-        //---------------------------------security-----------------------------------------------
-        // Unable to access the controller unless you have a USERAVM role
-        $this->denyAccessUnlessGranted('ROLE_USERAVM', null, 'Unable to access this page!');
-        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
-            throw $this->createAccessDeniedException();
-        }
-        //----------------------------------------------------------------------------------------
     }
 
     /**
@@ -236,40 +227,8 @@ class Base_documentaireController extends Controller
     public function showAction(Base_documentaire $document)
     {
         $this->listAndShowSecurity();
-        if ($request->isXmlHttpRequest()) {
-            $json = array();
-            $json['item'] = array(
-                'id' => $document->getId(),
-                'code' => $document->getCode(),
-                'objet' => $document->getObjet(),
-                'date' => $document->getDate()->format("d/m/Y - H:i"),
-                'description' => $document->getDescription(),
-                'updatedAt' => $document->getUpdatedAt()->format("d/m/Y - H:i"),
-                'proprietaire' => $document->getProprietaire()->getId(),
-                'brochure' => $document->getBrochure(),
-            );
-            return $this->json(json_encode($json), 200);
-        }
-        $deleteForm = $this->createDeleteForm($document);
-        return $this->render('APMAnimationBundle:document:show.html.twig', array(
-            'document' => $document,
-            'delete_form' => $deleteForm->createView(),
-        ));
-    }
-
-    /**
-     * Creates a form to delete a Base_documentaire entity.
-     *
-     * @param Base_documentaire $document The Base_documentaire entity
-     *
-     * @return \Symfony\Component\Form\Form The form
-     */
-    private function createDeleteForm(Base_documentaire $document)
-    {
-        return $this->createFormBuilder()
-            ->setAction($this->generateUrl('apm_animation_base_documentaire_delete', array('id' => $document->getId())))
-            ->setMethod('DELETE')
-            ->getForm();
+        $data = $this->get('apm_core.data_serialized')->getFormalData($document, ["owner_document_details", "owner_list"]);
+        return new JsonResponse($data, 200);
     }
 
     /**
@@ -288,15 +247,16 @@ class Base_documentaireController extends Controller
         $editForm = $this->createForm('APM\AnimationBundle\Form\Base_documentaireType', $document);
         $editForm->handleRequest($request);
         if ($editForm->isSubmitted() && $editForm->isValid()
-            || $request->isXmlHttpRequest() && $request->isMethod('POST')) {
+            || $request->isXmlHttpRequest() && $request->isMethod('POST')
+        ) {
             $this->editAndDeleteSecurity($document);
             $em = $this->getDoctrine()->getManager();
             try {
                 if ($request->isXmlHttpRequest()) {
                     $json = array();
                     $json['item'] = array();
-                    $property = $request->request->get('name');
-                    $value = $request->request->get('value');
+                    $property = $request->query->get('name');
+                    $value = $request->query->get('value');
                     switch ($property) {
                         case 'objet':
                             $document->setObjet($value);
@@ -348,6 +308,21 @@ class Base_documentaireController extends Controller
             throw $this->createAccessDeniedException();
         }
         //----------------------------------------------------------------------------------------
+    }
+
+    /**
+     * Creates a form to delete a Base_documentaire entity.
+     *
+     * @param Base_documentaire $document The Base_documentaire entity
+     *
+     * @return \Symfony\Component\Form\Form The form
+     */
+    private function createDeleteForm(Base_documentaire $document)
+    {
+        return $this->createFormBuilder()
+            ->setAction($this->generateUrl('apm_animation_base_documentaire_delete', array('id' => $document->getId())))
+            ->setMethod('DELETE')
+            ->getForm();
     }
 
     /**

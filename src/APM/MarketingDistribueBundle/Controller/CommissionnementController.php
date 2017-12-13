@@ -54,7 +54,6 @@ class CommissionnementController extends Controller
      */
     public function getAction(Request $request, Boutique $boutique = null)
     {
-
         if (null !== $boutique) {
             $this->listAndShowSecurity(null, $boutique);
             $boutiques_commissionnements = array();
@@ -81,41 +80,34 @@ class CommissionnementController extends Controller
                 }
             }
         }
-        if ($request->isXmlHttpRequest()) {
-            $json = array();
-            $json['items'] = array();
-            $this->creditDepenseFrom_filter = $request->request->has('creditDepenseFrom_filter') ? $request->request->get('creditDepenseFrom_filter') : "";
-            $this->creditDepenseTo_filter = $request->request->has('creditDepenseTo_filter') ? $request->request->get('creditDepenseTo_filter') : "";
-            $this->code_filter = $request->request->has('code_filter') ? $request->request->get('code_filter') : "";
-            $this->dateFrom_filter = $request->request->has('dateFrom_filter') ? $request->request->get('dateFrom_filter') : "";
-            $this->dateTo_filter = $request->request->has('dateTo_filter') ? $request->request->get('dateTo_filter') : "";
-            $this->libelle_filter = $request->request->has('libelle_filter') ? $request->request->get('libelle_filter') : "";
-            $this->description_filter = $request->request->has('description_filter') ? $request->request->get('description_filter') : "";
-            $this->quantiteFrom_filter = $request->request->has('quantiteFrom_filter') ? $request->request->get('quantiteFrom_filter') : "";
-            $this->quantiteTo_filter = $request->request->has('quantiteTo_filter') ? $request->request->get('quantiteTo_filter') : "";
-            $this->conseiller_filter = $request->request->has('conseiller_filter') ? $request->request->get('conseiller_filter') : "";
-            $this->commission_filter = $request->request->has('commission_filter') ? $request->request->get('commission_filter') : "";
 
-            $iDisplayLength = $request->request->has('length') ? $request->request->get('length') : -1;
-            $iDisplayStart = $request->request->has('start') ? intval($request->request->get('start')) : 0;
+        $json = array();
+        $this->creditDepenseFrom_filter = $request->query->has('creditDepenseFrom_filter') ? $request->query->get('creditDepenseFrom_filter') : "";
+        $this->creditDepenseTo_filter = $request->query->has('creditDepenseTo_filter') ? $request->query->get('creditDepenseTo_filter') : "";
+        $this->code_filter = $request->query->has('code_filter') ? $request->query->get('code_filter') : "";
+        $this->dateFrom_filter = $request->query->has('dateFrom_filter') ? $request->query->get('dateFrom_filter') : "";
+        $this->dateTo_filter = $request->query->has('dateTo_filter') ? $request->query->get('dateTo_filter') : "";
+        $this->libelle_filter = $request->query->has('libelle_filter') ? $request->query->get('libelle_filter') : "";
+        $this->description_filter = $request->query->has('description_filter') ? $request->query->get('description_filter') : "";
+        $this->quantiteFrom_filter = $request->query->has('quantiteFrom_filter') ? $request->query->get('quantiteFrom_filter') : "";
+        $this->quantiteTo_filter = $request->query->has('quantiteTo_filter') ? $request->query->get('quantiteTo_filter') : "";
+        $this->conseiller_filter = $request->query->has('conseiller_filter') ? $request->query->get('conseiller_filter') : "";
+        $this->commission_filter = $request->query->has('commission_filter') ? $request->query->get('commission_filter') : "";
 
-            $boutiques_commissionnements = new ArrayCollection($boutiques_commissionnements);
-            $iTotalRecords = count($boutiques_commissionnements);
-            if ($iDisplayLength < 0) $iDisplayLength = $iTotalRecords;
-            $boutiques_commissionnements = $this->handleResults($boutiques_commissionnements, $iTotalRecords, $iDisplayStart, $iDisplayLength);
-            /** @var Commissionnement $commissionnement */
-            foreach ($boutiques_commissionnements as $commissionnement) {
-                array_push($json['items'], array(
-                    'id' => $commissionnement->getId(),
-                    'code' => $commissionnement->getCode(),
-                    'description' => $commissionnement->getDescription(),
-                ));
-            }
-            return $this->json(json_encode($json), 200);
-        }
-        return $this->render('APMMarketingDistribueBundle:commissionnement:index.html.twig', array(
-            'boutiques_commissionnements' => $boutiques_commissionnements,
-        ));
+        $iDisplayLength = $request->query->has('length') ? $request->query->get('length') : -1;
+        $iDisplayStart = $request->query->has('start') ? intval($request->query->get('start')) : 0;
+
+        $boutiques_commissionnements = new ArrayCollection($boutiques_commissionnements);
+        $iTotalRecords = count($boutiques_commissionnements);
+        if ($iDisplayLength < 0) $iDisplayLength = $iTotalRecords;
+        $boutiques_commissionnements = $this->handleResults($boutiques_commissionnements, $iTotalRecords, $iDisplayStart, $iDisplayLength);
+        $iFilteredRecords = count($boutiques_commissionnements);
+        $data = $this->get('apm_core.data_serialized')->getFormalData($boutiques_commissionnements, array("owner_list"));
+        $json['totalRecords'] = $iTotalRecords;
+        $json['filteredRecords'] = $iFilteredRecords;
+        $json['items'] = $data;
+
+        return new JsonResponse($json, 200);
     }
 
     /**
@@ -314,50 +306,16 @@ class CommissionnementController extends Controller
 
     /**
      * Finds and displays a Commissionnement entity.
-     * @param Request $request
      * @param Commissionnement $commissionnement
      * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
      *
      * @Get("/show/commissionnement/{id}")
      */
-    public function showAction(Request $request, Commissionnement $commissionnement)
+    public function showAction(Commissionnement $commissionnement)
     {
         $this->listAndShowSecurity($commissionnement);
-        if ($request->isXmlHttpRequest()) {
-            $json = array();
-            $json['item'] = array(
-                'id' => $commissionnement->getId(),
-                'code' => $commissionnement->getCode(),
-                'credit' => $commissionnement->getCreditDepense(),
-                'date' => $commissionnement->getDateCreation()->format("d-m-Y - H:i"),
-                'libelle' => $commissionnement->getLibelle(),
-                'description' => $commissionnement->getDescription(),
-                'quantite' => $commissionnement->getQuantite(),
-                'conseillerBoutique' => $commissionnement->getConseillerBoutique()->getId(),
-                'commission' => $commissionnement->getCommission()->getId(),
-            );
-            return $this->json(json_encode($json), 200);
-        }
-        $deleteForm = $this->createDeleteForm($commissionnement);
-        return $this->render('APMMarketingDistribueBundle:commissionnement:show.html.twig', array(
-            'commissionnement' => $commissionnement,
-            'delete_form' => $deleteForm->createView(),
-        ));
-    }
-
-    /**
-     * Creates a form to delete a Commissionnement entity.
-     *
-     * @param Commissionnement $commissionnement The Commissionnement entity
-     *
-     * @return \Symfony\Component\Form\Form The form
-     */
-    private function createDeleteForm(Commissionnement $commissionnement)
-    {
-        return $this->createFormBuilder()
-            ->setAction($this->generateUrl('apm_marketing_commissionnement_delete', array('id' => $commissionnement->getId())))
-            ->setMethod('DELETE')
-            ->getForm();
+        $data = $this->get('apm_core.data_serialized')->getFormalData($transporteur_zoneintervention, ["owner_commissionnement_details", "owner_list"]);
+        return new JsonResponse($data, 200);
     }
 
     /**
@@ -383,8 +341,8 @@ class CommissionnementController extends Controller
                 if ($request->isXmlHttpRequest()) {
                     $json = array();
                     $json['item'] = array();
-                    $property = $request->request->get('name');
-                    $value = $request->request->get('value');
+                    $property = $request->query->get('name');
+                    $value = $request->query->get('value');
                     switch ($property) {
                         case 'creditDepense':
                             $commissionnement->setCreditDepense($value);
@@ -431,6 +389,21 @@ class CommissionnementController extends Controller
         if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY')
             || !($user instanceof Admin)
         ) throw $this->createAccessDeniedException();
+    }
+
+    /**
+     * Creates a form to delete a Commissionnement entity.
+     *
+     * @param Commissionnement $commissionnement The Commissionnement entity
+     *
+     * @return \Symfony\Component\Form\Form The form
+     */
+    private function createDeleteForm(Commissionnement $commissionnement)
+    {
+        return $this->createFormBuilder()
+            ->setAction($this->generateUrl('apm_marketing_commissionnement_delete', array('id' => $commissionnement->getId())))
+            ->setMethod('DELETE')
+            ->getForm();
     }
 
     /**

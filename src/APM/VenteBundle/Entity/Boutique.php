@@ -36,7 +36,7 @@ class Boutique extends TradeFactory
      * @var string
      * @Type("string")
      * @Expose
-     * @Groups({"list", "details"})
+     * @Groups({"owner_list", "owner_boutique_details", "others_boutique_details"})
      * @ORM\Column(name="code", type="string", length=255, nullable=false)
      */
     private $code;
@@ -45,24 +45,24 @@ class Boutique extends TradeFactory
      * @var integer
      * @Type("int")
      * @Expose
-     * @Groups({"details"})
+     * @Groups({"owner_boutique_details", "others_boutique_details"})
      * @ORM\Column(name="etat", type="integer", nullable=false)
      */
     private $etat;
 
     /**
      * @var \DateTime
-     * @Type("DateTimeImmutable<'Y-m-d'>")
+     * @Type("DateTime<'d-m-Y H:i'>")
      * @Expose
-     * @Groups({"details"})
+     * @Groups({"owner_boutique_details"})
      * @ORM\Column(name="dateCreation", type="datetime", nullable=false)
      */
     private $dateCreation;
 
     /**
-     * @Type("DateTimeImmutable<'Y-m-d'>")
+     * @Type("DateTime<'d-m-Y H:i'>")
      * @Expose
-     * @Groups({"details"})
+     * @Groups({"owner_boutique_details"})
      * @ORM\Column(name="updatedAt", type="datetime", nullable= true)
      * @var \DateTime
      */
@@ -72,7 +72,7 @@ class Boutique extends TradeFactory
      * @var string
      * @Type("string")
      * @Expose
-     * @Groups({"details"})
+     * @Groups({"owner_boutique_details", "others_boutique_details", "owner_list", "others_list"})
      * @Assert\Length(min=2, max=254)
      * @ORM\Column(name="description", type="string", length=255, nullable=true)
      */
@@ -82,7 +82,7 @@ class Boutique extends TradeFactory
      * @var string
      * @Type("string")
      * @Expose
-     * @Groups({"details"})
+     * @Groups({"owner_boutique_details", "others_boutique_details"})
      * @Assert\Country
      * @ORM\Column(name="nationalite", type="string", length=255, nullable=true)
      */
@@ -92,7 +92,7 @@ class Boutique extends TradeFactory
      * @var boolean
      * @Type("bool")
      * @Expose
-     * @Groups({"details"})
+     * @Groups({"owner_boutique_details"})
      * @Assert\Choice({0,1})
      * @ORM\Column(name="publiable", type="boolean", nullable=true)
      */
@@ -102,7 +102,7 @@ class Boutique extends TradeFactory
      * @var string
      * @Type("string")
      * @Expose
-     * @Groups({"details"})
+     * @Groups({"owner_boutique_details", "others_boutique_details", "owner_list", "others_list"})
      * @Assert\NotBlank
      * @Assert\Length(min=2, max=105)
      * @ORM\Column(name="designation", type="string", length=255, nullable=true)
@@ -113,7 +113,7 @@ class Boutique extends TradeFactory
      * @var string
      * @Type("string")
      * @Expose
-     * @Groups({"details"})
+     * @Groups({"owner_boutique_details", "others_boutique_details"})
      * @Assert\Length(min=2, max=105)
      * @ORM\Column(name="raisonSociale", type="string", length=255, nullable=true)
      */
@@ -123,7 +123,7 @@ class Boutique extends TradeFactory
      * @var string
      * @Type("string")
      * @Expose
-     * @Groups({"details"})
+     * @Groups({"owner_boutique_details", "others_boutique_details"})
      * @ORM\Column(name="statutSocial", type="string", length=255, nullable=true)
      */
     private $statutSocial;
@@ -133,7 +133,7 @@ class Boutique extends TradeFactory
      * @var integer
      * @Type("int")
      * @Expose
-     * @Groups({"test", "list", "details"})
+     * @Groups({"test", "owner_boutique_details", "others_boutique_details", "owner_list", "others_list"})
      * @ORM\Column(name="id", type="integer", nullable=false)
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
@@ -144,7 +144,7 @@ class Boutique extends TradeFactory
      * @var Utilisateur_avm
      * @Type("APM\UserBundle\Entity\Utilisateur_avm")
      * @Expose
-     * @Groups({"details"})
+     * @Groups({"owner_boutique_details"})
      * @ORM\ManyToOne(targetEntity="APM\UserBundle\Entity\Utilisateur_avm", inversedBy="boutiquesGerant")
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="gerant_id", referencedColumnName="id")
@@ -156,7 +156,7 @@ class Boutique extends TradeFactory
      * @var Utilisateur_avm
      * @Type("APM\UserBundle\Entity\Utilisateur_avm")
      * @Expose
-     * @Groups({"details"})
+     * @Groups({"owner_boutique_details"})
      * @ORM\ManyToOne(targetEntity="APM\UserBundle\Entity\Utilisateur_avm", inversedBy="boutiquesProprietaire")
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="proprietaire_id", referencedColumnName="id", nullable=false)
@@ -168,7 +168,7 @@ class Boutique extends TradeFactory
      * @var string
      * @Type("string")
      * @Expose
-     * @Groups({"details"})
+     * @Groups({"owner_boutique_details", "others_boutique_details", "owner_list", "others_list"})
      * @ORM\Column(name="image", type="string", nullable=true)
      */
     private $image;

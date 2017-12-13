@@ -37,12 +37,10 @@ class Transporteur_zoneInterventionController extends Controller
 
     /**
      * @ParamConverter("zone_intervention", options={"mapping": {"zone_id":"id"}})
-     * Liste les zone d'intervention créées et celles auxquelles appartient le transporteur
-     * Liste aussi les zones d'interventions propres et d'appartenance d'un transporteur donné
      * @param Request $request
      * @param Profile_transporteur $transporteur
      * @param Zone_intervention $zone_intervention
-     * @return \Symfony\Component\HttpFoundation\Response | JsonResponse
+     * @return JsonResponse
      *
      * @Get("/cget/transporteurs/zone/{zone_id}", name="s_zone")
      * @Get("/cget/zones/transporteur/{id}", name="s_transporteur")
@@ -55,30 +53,21 @@ class Transporteur_zoneInterventionController extends Controller
         } else if (null !== $zone_intervention) {
             $transporteurs_zones = $zone_intervention->getZoneTransporteurs();
         }
-        if ($request->isXmlHttpRequest()) {
-            $json = array();
-            $json['items'] = array();
-            $this->transporteur_filter = $request->request->has('transporteur_filter') ? $request->request->get('transporteur_filter') : "";
-            $this->zoneIntervention_filter = $request->request->has('zoneIntervention_filter') ? $request->request->get('zoneIntervention_filter') : "";
-            $iDisplayLength = $request->request->has('length') ? $request->request->get('length') : -1;
-            $iDisplayStart = $request->request->has('start') ? intval($request->request->get('start')) : 0;
-            $iTotalRecords = count($transporteurs_zones);
-            if ($iDisplayLength < 0) $iDisplayLength = $iTotalRecords;
-            $transporteurs_zones = $this->handleResults($transporteurs_zones, $iTotalRecords, $iDisplayStart, $iDisplayLength);
-            /** @var Transporteur_zoneintervention $transporteur_zone */
-            foreach ($transporteurs_zones as $transporteur_zone) {
-                array_push($json['items'], array(
-                    'id' => $transporteur_zone->getId(),
-                    'transporteur' => $transporteur_zone->getTransporteur()->getId(),
-                    'zoneIntervention' => $transporteur_zone->getZoneIntervention()->getId(),
-                ));
-            }
-            return $this->json(json_encode($json), 200);
-        }
-        return $this->render('APMTransportBundle:transporteur_zone:index.html.twig', array(
-                'transporteurs_zones' => $transporteurs_zones,
-            )
-        );
+        $json = array();
+        $this->transporteur_filter = $request->request->has('transporteur_filter') ? $request->request->get('transporteur_filter') : "";
+        $this->zoneIntervention_filter = $request->request->has('zoneIntervention_filter') ? $request->request->get('zoneIntervention_filter') : "";
+        $iDisplayLength = $request->request->has('length') ? $request->request->get('length') : -1;
+        $iDisplayStart = $request->request->has('start') ? intval($request->request->get('start')) : 0;
+        $iTotalRecords = count($transporteurs_zones);
+        if ($iDisplayLength < 0) $iDisplayLength = $iTotalRecords;
+        $transporteurs_zones = $this->handleResults($transporteurs_zones, $iTotalRecords, $iDisplayStart, $iDisplayLength);
+        $iFilteredRecords = count($transporteurs_zones);
+        $data = $this->get('apm_core.data_serialized')->getFormalData($transporteurs_zones, array("owner_list"));
+        $json['totalRecords'] = $iTotalRecords;
+        $json['filteredRecords'] = $iFilteredRecords;
+        $json['items'] = $data;
+
+        return new JsonResponse($json, 200);
     }
 
     private function listeAndShowSecurity()
@@ -201,30 +190,16 @@ class Transporteur_zoneInterventionController extends Controller
     }
 
     /**
-     * @param Request $request
      * @param Transporteur_zoneintervention $transporteur_zoneintervention
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
+     * @return JsonResponse
      *
      * @Get("/show/transporteur-zone/{id}")
      */
-    public function showAction(Request $request, Transporteur_zoneintervention $transporteur_zoneintervention)
+    public function showAction(Transporteur_zoneintervention $transporteur_zoneintervention)
     {
         $this->editAndDeleteSecurity($transporteur_zoneintervention);
-        if ($request->isXmlHttpRequest()) {
-            $json = array();
-            $json['item'] = array(
-                'id' => $transporteur_zoneintervention->getId(),
-                'transporteur' => $transporteur_zoneintervention->getTransporteur()->getId(),
-                'zoneIntervention' => $transporteur_zoneintervention->getZoneIntervention()->getId(),
-                'dateEnregistrement' => $transporteur_zoneintervention->getDateEnregistrement()->format('d-m-Y H:i')
-            );
-            return $this->json(json_encode($json), 200);
-        }
-        $deleteForm = $this->createDeleteForm($transporteur_zoneintervention);
-        return $this->render('APMTransportBundle:transporteur_zoneintervention:show.html.twig', array(
-            'zone_intervention' => $zone_intervention,
-            'delete_form' => $deleteForm->createView(),
-        ));
+        $data = $this->get('apm_core.data_serialized')->getFormalData($transporteur_zoneintervention, ["owner_transporteurZ_details", "owner_list"]);
+        return new JsonResponse($data, 200);
     }
 
     /**
@@ -252,14 +227,6 @@ class Transporteur_zoneInterventionController extends Controller
         } else if ($user !== $transporteur->getUtilisateur()) throw $this->createAccessDeniedException();
 
         //---------------------------------------------------------------------------------------------------------------------------------
-    }
-
-    private function createDeleteForm(Transporteur_zoneintervention $transporteur_zoneintervention)
-    {
-        return $this->createFormBuilder()
-            ->setAction($this->generateUrl('apm_transporteur_zoneintervention_delete', array('id' => $transporteur_zoneintervention->getId())))
-            ->setMethod('DELETE')
-            ->getForm();
     }
 
     /**
@@ -313,6 +280,14 @@ class Transporteur_zoneInterventionController extends Controller
             'transporteur_zoneintervention' => $transporteur_zoneintervention,
             'edit_form' => $editForm->createView(),
             'delete_form' => $deleteForm->createView(),));
+    }
+
+    private function createDeleteForm(Transporteur_zoneintervention $transporteur_zoneintervention)
+    {
+        return $this->createFormBuilder()
+            ->setAction($this->generateUrl('apm_transporteur_zoneintervention_delete', array('id' => $transporteur_zoneintervention->getId())))
+            ->setMethod('DELETE')
+            ->getForm();
     }
 
     /**

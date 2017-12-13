@@ -11,6 +11,9 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use JMS\Serializer\Annotation\ExclusionPolicy;
+use JMS\Serializer\Annotation\Expose;
+use JMS\Serializer\Annotation\Groups;
 
 /**
  * Transaction
@@ -18,11 +21,14 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
  * @ORM\Table(name="Transaction")
  * @ORM\Entity(repositoryClass="APM\VenteBundle\Repository\TransactionRepository")
  * @UniqueEntity("code")
+ * @ExclusionPolicy("all")
  */
 class Transaction extends TradeFactory
 {
     /**
      * @var \DateTime
+     * @Expose
+     * @Groups({"owner_transaction_details", "others_transaction_details"})
      * @Assert\DateTime
      * @ORM\Column(name="date", type="datetime", nullable=false)
      */
@@ -30,13 +36,16 @@ class Transaction extends TradeFactory
 
     /**
      * @var string
-     *
+     * @Expose
+     * @Groups({"owner_list", "owner_transaction_details", "others_transaction_details"})
      * @ORM\Column(name="code", type="string", length=255, nullable=false)
      */
     private $code;
 
     /**
      * @var string
+     * @Expose
+     * @Groups({"owner_transaction_details", "others_transaction_details"})
      * @Assert\Length(min=2, max=254)
      * @ORM\Column(name="destinataireNonAVM", type="string", length=255, nullable=true)
      */
@@ -44,25 +53,31 @@ class Transaction extends TradeFactory
 
     /**
      * @var string
-     *
+     * @Groups({"owner_transaction_details", "others_transaction_details"})
      * @ORM\Column(name="montant", type="decimal", nullable=true)
      */
     private $montant;
 
     /**
      * @var integer
+     * @Expose
+     * @Groups({"owner_transaction_details", "others_transaction_details"})
      * @ORM\Column(name="nature", type="integer", length=255, nullable=true)
      */
     private $nature;
 
     /**
      * @var string
+     * @Expose
+     * @Groups({"owner_list", "others_list", "owner_transaction_details", "others_transaction_details"})
      * @ORM\Column(name="description", type="string", length=255, nullable=true)
      */
     private $description;
 
     /**
      * @var boolean
+     * @Expose
+     * @Groups({"owner_transaction_details", "others_transaction_details"})
      * @ORM\Column(name="is_shipped", type="boolean", nullable=true)
      *
      */
@@ -70,15 +85,17 @@ class Transaction extends TradeFactory
 
     /**
      * @var integer
+     * @Expose
+     * @Groups({"owner_transaction_details", "others_transaction_details"})
      * @ORM\Column(name="statut", type="integer", nullable=true)
      */
     private $statut;
 
     /**
      * Id
-     *
      * @var integer
-     *
+     * @Expose
+     * @Groups({"owner_transaction_details", "others_transaction_details", "owner_list", "others_list"})
      * @ORM\Column(name="id", type="integer", nullable=false)
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
@@ -87,6 +104,8 @@ class Transaction extends TradeFactory
 
     /**
      * @var Utilisateur_avm
+     * @Expose
+     * @Groups({"owner_transaction_details", "others_transaction_details"})
      * @ORM\ManyToOne(targetEntity="APM\UserBundle\Entity\Utilisateur_avm", inversedBy="transactionsEffectues")
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="auteur_id", referencedColumnName="id", nullable=false)
@@ -96,6 +115,8 @@ class Transaction extends TradeFactory
 
     /**
      * @var Utilisateur_avm
+     * @Expose
+     * @Groups({"owner_transaction_details", "others_transaction_details"})
      * @ORM\ManyToOne(targetEntity="APM\UserBundle\Entity\Utilisateur_avm", inversedBy="transactionsRecues")
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="beneficiaire_id", referencedColumnName="id", nullable=false)
@@ -105,6 +126,8 @@ class Transaction extends TradeFactory
 
     /**
      * @var Boutique
+     * @Expose
+     * @Groups({"owner_transaction_details", "others_transaction_details"})
      * @ORM\ManyToOne(targetEntity="APM\VenteBundle\Entity\Boutique", inversedBy="transactionsRecues")
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="boutiqueBeneficiaire_id", referencedColumnName="id")
@@ -114,6 +137,8 @@ class Transaction extends TradeFactory
 
     /**
      * @var Livraison
+     * @Expose
+     * @Groups({"owner_transaction_details"})
      * @ORM\ManyToOne(targetEntity="APM\TransportBundle\Entity\Livraison", inversedBy="operations")
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="livraison_id", referencedColumnName="id")
@@ -132,6 +157,8 @@ class Transaction extends TradeFactory
 
     /**
      * @var Boutique
+     * @Expose
+     * @Groups({"owner_transaction_details", "others_transaction_details"})
      * @ORM\ManyToOne(targetEntity="APM\VenteBundle\Entity\Boutique", inversedBy="transactions")
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="boutique_id", referencedColumnName="id", nullable=true)

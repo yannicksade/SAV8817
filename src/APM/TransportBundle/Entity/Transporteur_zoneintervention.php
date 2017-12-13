@@ -9,11 +9,16 @@ namespace APM\TransportBundle\Entity;
 
 use APM\TransportBundle\Factory\TradeFactory;
 use Doctrine\ORM\Mapping as ORM;
-
+use JMS\Serializer\Annotation\ExclusionPolicy;
+use JMS\Serializer\Annotation\Expose;
+use JMS\Serializer\Annotation\Groups;
+use JMS\Serializer\Annotation\Type;
+use JMS\Serializer\Annotation\Exclude;
 /**
  * Transporteur Zone Intervention
  * @ORM\Table(name="transporteur_zoneintervention")
  * @ORM\Entity(repositoryClass="APM\TransportBundle\Repository\Transporteur_zoneinterventionRepository")
+ * @ExclusionPolicy("all")
  */
 class Transporteur_zoneintervention extends TradeFactory
 {
@@ -21,7 +26,8 @@ class Transporteur_zoneintervention extends TradeFactory
     /**
      * Id
      * @var integer
-     *
+     * @Expose
+     * @Groups({"owner_list", "others_list", "owner_transporteurZ_details", "others_transporteurZ_details"})
      * @ORM\Column(name="id", type="integer", nullable=false)
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
@@ -30,12 +36,16 @@ class Transporteur_zoneintervention extends TradeFactory
 
     /**
      * @var \DateTime
+     * @Expose
+     * @Groups({"owner_transporteurZ_details", "others_transporteurZ_details"})
      * @ORM\Column(name="dateEnregistrement", type="datetime", nullable=false)
      */
     private $dateEnregistrement;
 
     /**
      * @var Profile_transporteur
+     * @Expose
+     * @Groups({"owner_list", "others_list", "owner_transporteurZ_details", "others_transporteurZ_details"})
      * @ORM\ManyToOne(targetEntity="APM\TransportBundle\Entity\Profile_transporteur", inversedBy="transporteur_zones")
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="transporteur_id", referencedColumnName="id", nullable=false)
@@ -45,12 +55,15 @@ class Transporteur_zoneintervention extends TradeFactory
 
     /**
      * @var Zone_intervention
+     * @Expose
+     * @Groups({"owner_list", "others_list", "owner_transporteurZ_details", "others_transporteurZ_details"})
      * @ORM\ManyToOne(targetEntity="APM\TransportBundle\Entity\Zone_intervention", inversedBy="zone_transporteurs")
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="zoneIntervention_id", referencedColumnName="id", nullable=false)
      * })
      */
     private $zoneIntervention;
+
 
     function __construct()
     {
@@ -117,6 +130,16 @@ class Transporteur_zoneintervention extends TradeFactory
     }
 
     /**
+     * Get dateEnregistrement
+     *
+     * @return \DateTime
+     */
+    public function getDateEnregistrement()
+    {
+        return $this->dateEnregistrement;
+    }
+
+    /**
      * Set dateEnregistrement
      *
      * @param \DateTime $dateEnregistrement
@@ -128,15 +151,5 @@ class Transporteur_zoneintervention extends TradeFactory
         $this->dateEnregistrement = $dateEnregistrement;
 
         return $this;
-    }
-
-    /**
-     * Get dateEnregistrement
-     *
-     * @return \DateTime
-     */
-    public function getDateEnregistrement()
-    {
-        return $this->dateEnregistrement;
     }
 }

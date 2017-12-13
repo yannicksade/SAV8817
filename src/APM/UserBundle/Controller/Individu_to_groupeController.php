@@ -37,7 +37,7 @@ class Individu_to_groupeController extends Controller
      *
      * @param Request $request
      * @param Groupe_relationnel $groupe_relationnel
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return JsonResponse
      *
      * @Get("/cget/individus/group/{id}", name="s_groupe")
      */
@@ -45,38 +45,24 @@ class Individu_to_groupeController extends Controller
     {
         $this->listeAndShowSecurity($groupe_relationnel);
         $individu_to_groupes = $groupe_relationnel->getGroupeIndividus();
-        if ($request->isXmlHttpRequest() && $request->getMethod() === "POST") {
-            $this->dateCreationFrom_filter = $request->request->has('dateCreationFrom_filter') ? $request->request->get('dateCreationFrom_filter') : "";
-            $this->dateCreationTo_filter = $request->request->has('dateCreationTo_filter') ? $request->request->get('dateCreationTo_filter') : "";
-            $this->propriete_filter = $request->request->has('propriete_filter') ? $request->request->get('propriete_filter') : "";
-            $this->description_filter = $request->request->has('description_filter') ? $request->request->get('description_filter') : "";
-            $this->utilisateur_filter = $request->request->has('utilisateur_filter') ? $request->request->get('utilisateur_filter') : "";
-            $iDisplayLength = $request->request->has('length') ? $request->request->get('length') : -1;
-            $iDisplayStart = $request->request->has('start') ? intval($request->request->get('start')) : 0;
-            $json = array();
-            $json['items'] = array();
-            $iTotalRecords = count($individu_to_groupes);
-            if ($iDisplayLength < 0) $iDisplayLength = $iTotalRecords;
-            $individu_to_groupes = $this->handleResults($individu_to_groupes, $iTotalRecords, $iDisplayStart, $iDisplayLength);
-            //filtre
-            /** @var Individu_to_groupe $individu_groupe */
-            foreach ($individu_to_groupes as $individu_groupe) {
-                array_push($json['items'], array(
-                    'id' => $individu_groupe->getId(),
-                    'individu' => $individu_groupe->getIndividu()->getId(),
-                    'groupe' => $individu_groupe->getGroupeRelationnel()->getId(),
-                    'propriete' => $individu_groupe->getPropriete()
-                ));
-            }
-            return $this->json(json_encode($json), 200);
-        }
+        $this->dateCreationFrom_filter = $request->request->has('dateCreationFrom_filter') ? $request->request->get('dateCreationFrom_filter') : "";
+        $this->dateCreationTo_filter = $request->request->has('dateCreationTo_filter') ? $request->request->get('dateCreationTo_filter') : "";
+        $this->propriete_filter = $request->request->has('propriete_filter') ? $request->request->get('propriete_filter') : "";
+        $this->description_filter = $request->request->has('description_filter') ? $request->request->get('description_filter') : "";
+        $this->utilisateur_filter = $request->request->has('utilisateur_filter') ? $request->request->get('utilisateur_filter') : "";
+        $iDisplayLength = $request->request->has('length') ? $request->request->get('length') : -1;
+        $iDisplayStart = $request->request->has('start') ? intval($request->request->get('start')) : 0;
+        $json = array();
+        $iTotalRecords = count($individu_to_groupes);
+        if ($iDisplayLength < 0) $iDisplayLength = $iTotalRecords;
+        $individu_to_groupes = $this->handleResults($individu_to_groupes, $iTotalRecords, $iDisplayStart, $iDisplayLength);
+        $iFilteredRecords = count($individu_to_groupes);
+        $data = $this->get('apm_core.data_serialized')->getFormalData($individu_to_groupes, array("owner_list"));
+        $json['totalRecords'] = $iTotalRecords;
+        $json['filteredRecords'] = $iFilteredRecords;
+        $json['items'] = $data;
 
-        return $this->render('APMUserBundle:individu_to_groupe:index.html.twig', [
-                'individu_to_groupes' => $individu_to_groupes,
-                'groupe' => $groupe_relationnel,
-
-            ]
-        );
+        return new JsonResponse($json, 200);
     }
 
     /**
@@ -255,46 +241,16 @@ class Individu_to_groupeController extends Controller
 
     /**
      * Finds and displays a Individu_to_groupe entity.
-     * @param Request $request
      * @param Individu_to_groupe $individu_to_groupe
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return JsonResponse
      *
      * @Get("/show/relation/{id}")
      */
-    public function showAction(Request $request, Individu_to_groupe $individu_to_groupe)
+    public function showAction(Individu_to_groupe $individu_to_groupe)
     {
         $this->listeAndShowSecurity($individu_to_groupe->getGroupeRelationnel());
-        if ($request->isXmlHttpRequest()) {
-            $json = array();
-            $json['item'] = array(
-                'id' => $individu_to_groupe->getId(),
-                'date' => $individu_to_groupe->getDateInsertion(),
-                'propriete' => $individu_to_groupe->getPropriete(),
-                'individu' => $individu_to_groupe->getIndividu()->getId(),
-                'groupe' => $individu_to_groupe->getGroupeRelationnel()->getId(),
-            );
-            return $this->json(json_encode($json), 200);
-        }
-        $deleteForm = $this->createDeleteForm($individu_to_groupe);
-        return $this->render('APMUserBundle:individu_to_groupe:show.html.twig', array(
-            'individu_to_groupe' => $individu_to_groupe,
-            'delete_form' => $deleteForm->createView(),
-        ));
-    }
-
-    /**
-     * Creates a form to delete a Individu_to_groupe entity.
-     *
-     * @param Individu_to_groupe $individu_to_groupe The Individu_to_groupe entity
-     *
-     * @return \Symfony\Component\Form\Form The form
-     */
-    private function createDeleteForm(Individu_to_groupe $individu_to_groupe)
-    {
-        return $this->createFormBuilder()
-            ->setAction($this->generateUrl('apm_user_individu-to-groupe_delete', array('id' => $individu_to_groupe->getId())))
-            ->setMethod('DELETE')
-            ->getForm();
+        $data = $this->get('apm_core.data_serialized')->getFormalData($individu_to_groupe, ["owner_individuToG", "owner_list"]);
+        return new JsonResponse($data, 200);
     }
 
     /**
@@ -364,6 +320,21 @@ class Individu_to_groupeController extends Controller
         if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY') || $individu_groupe->getGroupeRelationnel()->getProprietaire() !== $user) {
             throw $this->createAccessDeniedException();
         }
+    }
+
+    /**
+     * Creates a form to delete a Individu_to_groupe entity.
+     *
+     * @param Individu_to_groupe $individu_to_groupe The Individu_to_groupe entity
+     *
+     * @return \Symfony\Component\Form\Form The form
+     */
+    private function createDeleteForm(Individu_to_groupe $individu_to_groupe)
+    {
+        return $this->createFormBuilder()
+            ->setAction($this->generateUrl('apm_user_individu-to-groupe_delete', array('id' => $individu_to_groupe->getId())))
+            ->setMethod('DELETE')
+            ->getForm();
     }
 
     /**

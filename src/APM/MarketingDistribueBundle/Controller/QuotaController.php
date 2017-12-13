@@ -36,13 +36,11 @@ class QuotaController extends Controller
     private $valeurQuotaFrom_filter;
     private $valeurQuotaTo_filter;
 
-
     /**
-     *
      *  Liste les commissions de la boutique
      * @param Request $request
      * @param Boutique $boutique
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return JsonResponse
      *
      * @Get("/cget/commissions/boutique/{id}", name="s_boutique")
      */
@@ -50,37 +48,25 @@ class QuotaController extends Controller
     {
         $this->listAndShowSecurity($boutique);
         $quotas = $boutique->getCommissionnements();
-        if ($request->isXmlHttpRequest()) {
-            $json = array();
-            $json['items'] = array();
-            $this->valeurQuota_filter = $request->request->has('valeurQuota_filter') ? $request->request->get('valeurQuota_filter') : "";
-            $this->code_filter = $request->request->has('code_filter') ? $request->request->get('code_filter') : "";
-            $this->dateFrom_filter = $request->request->has('dateFrom_filter') ? $request->request->get('dateFrom_filter') : "";
-            $this->dateTo_filter = $request->request->has('dateTo_filter') ? $request->request->get('dateTo_filter') : "";
-            $this->libelle_filter = $request->request->has('libelle_filter') ? $request->request->get('libelle_filter') : "";
-            $this->description_filter = $request->request->has('description_filter') ? $request->request->get('description_filter') : "";
-            $this->boutique_filter = $request->request->has('boutique_filter') ? $request->request->get('boutique_filter') : "";
-            $iDisplayLength = $request->request->has('length') ? $request->request->get('length') : -1;
-            $iDisplayStart = $request->request->has('start') ? intval($request->request->get('start')) : 0;
-
-            $iTotalRecords = count($quotas);
-            if ($iDisplayLength < 0) $iDisplayLength = $iTotalRecords;
-            $quotas = $this->handleResults($quotas, $iTotalRecords, $iDisplayStart, $iDisplayLength);
-            /** @var Quota $commission */
-            foreach ($quotas as $commission) {
-                array_push($json['items'], array(
-                    'id' => $commission->getId(),
-                    'code' => $commission->getCode(),
-                    'libelle' => $commission->getLibelleQuota(),
-                    'description' => $commission->getDescription(),
-                ));
-            }
-            return $this->json(json_encode($json), 200);
-        }
-        return $this->render('APMMarketingDistribueBundle:quota:index.html.twig', array(
-            'quotas' => $quotas,
-            'boutique' => $boutique,
-        ));
+        $this->valeurQuota_filter = $request->query->has('valeurQuota_filter') ? $request->query->get('valeurQuota_filter') : "";
+        $this->code_filter = $request->query->has('code_filter') ? $request->query->get('code_filter') : "";
+        $this->dateFrom_filter = $request->query->has('dateFrom_filter') ? $request->query->get('dateFrom_filter') : "";
+        $this->dateTo_filter = $request->query->has('dateTo_filter') ? $request->query->get('dateTo_filter') : "";
+        $this->libelle_filter = $request->query->has('libelle_filter') ? $request->query->get('libelle_filter') : "";
+        $this->description_filter = $request->query->has('description_filter') ? $request->query->get('description_filter') : "";
+        $this->boutique_filter = $request->query->has('boutique_filter') ? $request->query->get('boutique_filter') : "";
+        $iDisplayLength = $request->query->has('length') ? $request->query->get('length') : -1;
+        $iDisplayStart = $request->query->has('start') ? intval($request->query->get('start')) : 0;
+        $json = array();
+        $iTotalRecords = count($quotas);
+        if ($iDisplayLength < 0) $iDisplayLength = $iTotalRecords;
+        $quotas = $this->handleResults($quotas, $iTotalRecords, $iDisplayStart, $iDisplayLength);
+        $iFilteredRecords = count($quotas);
+        $data = $this->get('apm_core.data_serialized')->getFormalData($quotas, array("owner_list"));
+        $json['totalRecords'] = $iTotalRecords;
+        $json['filteredRecords'] = $iFilteredRecords;
+        $json['items'] = $data;
+        return new JsonResponse($json, 200);
     }
 
     /**
@@ -220,10 +206,10 @@ class QuotaController extends Controller
             $em = $this->getDoctrine()->getManager();
             $em->persist($quotum);
             $em->flush();
-            if($request->isXmlHttpRequest()){
+            if ($request->isXmlHttpRequest()) {
                 $json = array();
                 $json['item'] = array();
-                return $this->json(json_encode($json),200);
+                return $this->json(json_encode($json), 200);
             }
             return $this->redirectToRoute('apm_marketing_quota_show', array('id' => $quotum->getId()));
         }
@@ -259,48 +245,16 @@ class QuotaController extends Controller
 
     /**
      * Finds and displays a Quota entity.
-     * @param Request $request
      * @param Quota $quotum
-     * @return \Symfony\Component\HttpFoundation\Response | JsonResponse
+     * @return JsonResponse
      *
      * @Get("/show/commission/{id}")
      */
-    public function showAction(Request $request, Quota $quotum)
+    public function showAction(Quota $quotum)
     {
         $this->listAndShowSecurity($quotum->getBoutiqueProprietaire());
-        if ($request->isXmlHttpRequest()) {
-            $json = array();
-            $json['item'] = array(
-                'id' => $quotum->getId(),
-                'code' => $quotum->getCode(),
-                'valeurQuota' => $quotum->getValeurQuota(),
-                'date' => $quotum->getDate()->format("d/m/Y - H:i"),
-                'libelle' => $quotum->getLibelleQuota(),
-                'description' => $quotum->getDescription(),
-                'boutique' => $quotum->getBoutiqueProprietaire()->getId(),
-            );
-            return $this->json(json_encode($json), 200);
-        }
-        $deleteForm = $this->createDeleteForm($quotum);
-        return $this->render('APMMarketingDistribueBundle:quota:show.html.twig', array(
-            'quotum' => $quotum,
-            'delete_form' => $deleteForm->createView(),
-        ));
-    }
-
-    /**
-     * Creates a form to delete a Quota entity.
-     *
-     * @param Quota $quotum The Quota entity
-     *
-     * @return \Symfony\Component\Form\Form The form
-     */
-    private function createDeleteForm(Quota $quotum)
-    {
-        return $this->createFormBuilder()
-            ->setAction($this->generateUrl('apm_marketing_quota_delete', array('id' => $quotum->getId())))
-            ->setMethod('DELETE')
-            ->getForm();
+        $data = $this->get('apm_core.data_serialized')->getFormalData($quotum, ["owner_quota_details", "owner_list"]);
+        return new JsonResponse($data, 200);
     }
 
     /**
@@ -318,15 +272,16 @@ class QuotaController extends Controller
         $editForm = $this->createForm('APM\MarketingDistribueBundle\Form\QuotaType', $quotum);
         $editForm->handleRequest($request);
         if ($editForm->isSubmitted() && $editForm->isValid()
-            || $request->isXmlHttpRequest() && $request->isMethod('POST')) {
+            || $request->isXmlHttpRequest() && $request->isMethod('POST')
+        ) {
             $this->editAndDeleteSecurity($quotum);
             $em = $this->getDoctrine()->getManager();
             try {
                 if ($request->isXmlHttpRequest()) {
                     $json = array();
                     $json['item'] = array();
-                    $property = $request->request->get('name');
-                    $value = $request->request->get('value');
+                    $property = $request->query->get('name');
+                    $value = $request->query->get('value');
                     switch ($property) {
                         case 'description':
                             $quotum->setDescription($value);
@@ -381,6 +336,21 @@ class QuotaController extends Controller
         }
         //----------------------------------------------------------------------------------------
 
+    }
+
+    /**
+     * Creates a form to delete a Quota entity.
+     *
+     * @param Quota $quotum The Quota entity
+     *
+     * @return \Symfony\Component\Form\Form The form
+     */
+    private function createDeleteForm(Quota $quotum)
+    {
+        return $this->createFormBuilder()
+            ->setAction($this->generateUrl('apm_marketing_quota_delete', array('id' => $quotum->getId())))
+            ->setMethod('DELETE')
+            ->getForm();
     }
 
     /**

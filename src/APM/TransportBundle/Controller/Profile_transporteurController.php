@@ -34,7 +34,7 @@ class Profile_transporteurController extends Controller
 
     /**
      * @param Request $request
-     * @return \Symfony\Component\HttpFoundation\Response | JsonResponse
+     * @return JsonResponse
      *
      * @Get("/cget/transporteurs", name="s")
      */
@@ -43,35 +43,23 @@ class Profile_transporteurController extends Controller
         $this->listeAndShowSecurity();
         $em = $this->getDoctrine()->getManager();
         $transporteurs = $em->getRepository('APMTransportBundle:Profile_transporteur')->findAll();
-        $profile_transporteurs =  new ArrayCollection($transporteurs);
-        if($request->isXmlHttpRequest()){
-            $json =array();
-            $json['items'] = array();
-            $this->matricule_filter = $request->request->has('matricule_filter') ? $request->request->get('matricule_filter') : "";
-            $this->code_filter = $request->request->has('code_filter') ? $request->request->get('code_filter') : "";
-            $this->livreur_boutique = $request->request->has('livreur_boutique') ? $request->request->get('livreur_boutique') : "";
-            $iDisplayLength = $request->request->has('length') ? $request->request->get('length') : -1;
-            $iDisplayStart = $request->request->has('start') ? intval($request->request->get('start')) : 0;
-            $iTotalRecords = count($profile_transporteurs);
-            if ($iDisplayLength < 0) $iDisplayLength = $iTotalRecords;
-            $profile_transporteurs = $this->handleResults($profile_transporteurs, $iTotalRecords, $iDisplayStart, $iDisplayLength);
-            //filtre
-            /** @var Profile_transporteur $transporteur */
-            foreach ($profile_transporteurs as $transporteur) {
-                array_push($json['items'], array(
-                    'id' => $transporteur->getId(),
-                    'code' => $transporteur->getCode(),
-                    'matricule' => $transporteur->getMatricule(),
-                    'description' => $transporteur->getDescription(),
+        $profile_transporteurs = new ArrayCollection($transporteurs);
+        $json = array();
+        $this->matricule_filter = $request->query->has('matricule_filter') ? $request->query->get('matricule_filter') : "";
+        $this->code_filter = $request->query->has('code_filter') ? $request->query->get('code_filter') : "";
+        $this->livreur_boutique = $request->query->has('livreur_boutique') ? $request->query->get('livreur_boutique') : "";
+        $iDisplayLength = $request->query->has('length') ? $request->query->get('length') : -1;
+        $iDisplayStart = $request->query->has('start') ? intval($request->query->get('start')) : 0;
+        $iTotalRecords = count($profile_transporteurs);
+        if ($iDisplayLength < 0) $iDisplayLength = $iTotalRecords;
+        $profile_transporteurs = $this->handleResults($profile_transporteurs, $iTotalRecords, $iDisplayStart, $iDisplayLength);
+        $iFilteredRecords = count($profile_transporteurs);
+        $data = $this->get('apm_core.data_serialized')->getFormalData($profile_transporteurs, array("owner_list"));
+        $json['totalRecords'] = $iTotalRecords;
+        $json['filteredRecords'] = $iFilteredRecords;
+        $json['items'] = $data;
 
-                ));
-            }
-            return $this->json(json_encode($json),200);
-        }
-        return $this->render('APMTransportBundle:profile_transporteur:index.html.twig', array(
-            'profile_transporteurs' => $profile_transporteurs,
-            'zone' => null,
-        ));
+        return new JsonResponse($json, 200);
     }
 
     private function listeAndShowSecurity()
@@ -106,7 +94,7 @@ class Profile_transporteurController extends Controller
         if ($this->matricule_filter != null) {
             $transporteurs = $transporteurs->filter(function ($e) {//filtrage select
                 /** @var Profile_transporteur $e */
-                return $e->getMatricule() ===  $this->matricule_filter;
+                return $e->getMatricule() === $this->matricule_filter;
             });
         }
 
@@ -197,49 +185,16 @@ class Profile_transporteurController extends Controller
 
     /**
      * Finds and displays a Profile_transporteur entity.
-     * @param Request $request
      * @param Profile_transporteur $profile_transporteur
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
+     * @return JsonResponse
      *
      * @Get("/show/transporteur/{id}")
      */
-    public function showAction(Request $request, Profile_transporteur $profile_transporteur)
+    public function showAction(Profile_transporteur $profile_transporteur)
     {
         $this->listeAndShowSecurity();
-        if ($request->isXmlHttpRequest()) {
-            $json = array();
-            $json['item'] = array(
-                'id' => $profile_transporteur->getId(),
-                'matricule' => $profile_transporteur->getMatricule(),
-                'code' => $profile_transporteur->getCode(),
-                'description' => $profile_transporteur->getDescription(),
-                'dateEnregistrement' => $profile_transporteur->getDateEnregistrement()->format('d-m-Y H:i'),
-                'utilisateur' => $profile_transporteur->getUtilisateur()->getId(),
-                'livreur' => $profile_transporteur->getLivreurBoutique()->getId(),
-
-            );
-            return $this->json(json_encode($json), 200);
-        }
-        $deleteForm = $this->createDeleteForm($profile_transporteur);
-        return $this->render('APMTransportBundle:profile_transporteur:show.html.twig', array(
-            'profile_transporteur' => $profile_transporteur,
-            'delete_form' => $deleteForm->createView(),
-        ));
-    }
-
-    /**
-     * Creates a form to delete a Profile_transporteur entity.
-     *
-     * @param Profile_transporteur $profile_transporteur The Profile_transporteur entity
-     *
-     * @return \Symfony\Component\Form\Form The form
-     */
-    private function createDeleteForm(Profile_transporteur $profile_transporteur)
-    {
-        return $this->createFormBuilder()
-            ->setAction($this->generateUrl('apm_transport_transporteur_delete', array('id' => $profile_transporteur->getId())))
-            ->setMethod('DELETE')
-            ->getForm();
+        $data = $this->get('apm_core.data_serialized')->getFormalData($profile_transporteur, ["owner_transporteur_details", "owner_list"]);
+        return new JsonResponse($data, 200);
     }
 
     /**
@@ -264,8 +219,8 @@ class Profile_transporteurController extends Controller
                 if ($request->isXmlHttpRequest()) {
                     $json = array();
                     $json['item'] = array();
-                    $property = $request->request->get('name');
-                    $value = $request->request->get('value');
+                    $property = $request->query->get('name');
+                    $value = $request->query->get('value');
                     switch ($property) {
                         case 'matricule':
                             $profile_transporteur->setMatricule($value);
@@ -316,6 +271,21 @@ class Profile_transporteurController extends Controller
             throw $this->createAccessDeniedException();
         }
         //----------------------------------------------------------------------------------------
+    }
+
+    /**
+     * Creates a form to delete a Profile_transporteur entity.
+     *
+     * @param Profile_transporteur $profile_transporteur The Profile_transporteur entity
+     *
+     * @return \Symfony\Component\Form\Form The form
+     */
+    private function createDeleteForm(Profile_transporteur $profile_transporteur)
+    {
+        return $this->createFormBuilder()
+            ->setAction($this->generateUrl('apm_transport_transporteur_delete', array('id' => $profile_transporteur->getId())))
+            ->setMethod('DELETE')
+            ->getForm();
     }
 
     /**

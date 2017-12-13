@@ -12,6 +12,10 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Validator\Constraints as Assert;
 use Vich\UploaderBundle\Mapping\Annotation as Vich;
+use JMS\Serializer\Annotation\ExclusionPolicy;
+use JMS\Serializer\Annotation\Expose;
+use JMS\Serializer\Annotation\Exclude;
+use JMS\Serializer\Annotation\Groups;
 
 /**
  * Groupe_Relationnel
@@ -20,18 +24,22 @@ use Vich\UploaderBundle\Mapping\Annotation as Vich;
  * @ORM\Entity(repositoryClass="APM\UserBundle\Repository\Groupe_relationnelRepository")
  * @Vich\Uploadable
  * @UniqueEntity("code")
+ * @ExclusionPolicy("all")
  */
 class Groupe_relationnel extends TradeFactory
 {
     /**
      * @var string
-     *
+     * @Expose
+     * @Groups({"owner_list", "owner_groupeR_details", "others_groupeR_details"})
      * @ORM\Column(name="code", type="string", length=255, nullable=false)
      */
     private $code;
 
     /**
      * @var string
+     * @Expose
+     * @Groups({"others_list", "owner_list", "owner_groupeR_details", "others_groupeR_details"})
      * @Assert\Length(min=2, max=254)
      * @ORM\Column(name="description", type="string", length=255, nullable=true)
      */
@@ -39,6 +47,8 @@ class Groupe_relationnel extends TradeFactory
 
     /**
      * @var string
+     * @Expose
+     * @Groups({"others_list", "owner_list", "owner_groupeR_details", "others_groupeR_details"})
      * @Assert\NotBlank
      * @Assert\Length(min=2, max=155)
      * @ORM\Column(name="designation", type="string", length=255, nullable=false)
@@ -47,12 +57,16 @@ class Groupe_relationnel extends TradeFactory
 
     /**
      * @var boolean
+     * @Expose
+     * @Groups({"owner_groupeR_details"})
      * @ORM\Column(name="isConversationalGroup", type="boolean", nullable= true)
      */
     private $conversationalGroup;
 
     /**
      * @var integer
+     * @Expose
+     * @Groups({"owner_groupeR_details"})
      * @Assert\Choice({0,1,2,3,4,5,6,7,8})
      * @ORM\Column(name="type", type="integer", length=255, nullable=true)
      */
@@ -60,7 +74,8 @@ class Groupe_relationnel extends TradeFactory
 
     /**
      * @var integer
-     *
+     * @Expose
+     * @Groups({"others_list", "owner_list", "owner_groupeR_details", "others_groupeR_details"})
      * @ORM\Column(name="id", type="integer", nullable=false)
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
@@ -69,7 +84,8 @@ class Groupe_relationnel extends TradeFactory
 
     /**
      * @var Utilisateur_avm
-     *
+     * @Expose
+     * @Groups({"owner_groupeR_details", "others_groupeR_details"})
      * @ORM\ManyToOne(targetEntity="APM\UserBundle\Entity\Utilisateur_avm", inversedBy="groupesProprietaire")
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="proprietaire_id", referencedColumnName="id", nullable=false)
@@ -77,17 +93,11 @@ class Groupe_relationnel extends TradeFactory
      */
     private $proprietaire;
 
-    /**
-     * @var Collection
-     *
-     * @ORM\OneToMany(targetEntity="APM\UserBundle\Entity\Individu_to_groupe", mappedBy="groupeRelationnel", cascade={"persist","remove"})
-     *
-     */
-    private $groupeIndividus;
 
     /**
      * @var Boutique
-     *
+     * @Expose
+     * @Groups({"owner_groupeR_details", "others_groupeR_details"})
      * @ORM\ManyToOne(targetEntity="APM\VenteBundle\Entity\Boutique", inversedBy="groupesRelationnels")
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="boutique_id", referencedColumnName="id")
@@ -97,11 +107,14 @@ class Groupe_relationnel extends TradeFactory
 
     /**
      * @var string
+     * @Expose
+     * @Groups({"others_list", "owner_list", "owner_groupeR_details", "others_groupeR_details"})
      * @ORM\Column(name="image", type="string", nullable=true)
      */
     private $image;
 
     /**
+     * @Exclude
      * @Assert\Image()
      * @Vich\UploadableField(mapping="entity_images", fileNameProperty="image")
      * @var File
@@ -109,14 +122,19 @@ class Groupe_relationnel extends TradeFactory
     private $imageFile;
 
     /**
+     * @Expose
+     * @Groups({"owner_groupeR_details"})
      * @ORM\Column(name="updatedAt", type="datetime", nullable= true)
      * @var \DateTime
      */
     private $updatedAt;
 
     /**
-     * @ORM\Column(name="dateCreation", type="datetime", nullable= true)
      * @var \DateTime
+     * @Expose
+     * @Groups({"owner_groupeR_details", "others_groupeR_details"})
+     * @ORM\Column(name="dateCreation", type="datetime", nullable= true)
+     *
      */
     private $dateCreation;
 
@@ -125,6 +143,14 @@ class Groupe_relationnel extends TradeFactory
      * @ORM\OneToMany(targetEntity ="APM\VenteBundle\Entity\Rabais_offre", mappedBy="groupe")
      */
     private $rabais;
+
+    /**
+     * @var Collection
+     * @ORM\OneToMany(targetEntity="APM\UserBundle\Entity\Individu_to_groupe", mappedBy="groupeRelationnel", cascade={"persist","remove"})
+     *
+     */
+    private $groupeIndividus;
+
 
     /**
      * Constructor

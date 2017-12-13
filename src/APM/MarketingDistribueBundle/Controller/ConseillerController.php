@@ -20,6 +20,7 @@ use FOS\RestBundle\Controller\Annotations\Delete;
 use FOS\RestBundle\Controller\Annotations\Put;
 use FOS\RestBundle\Controller\Annotations\Patch;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
+
 /**
  * Conseiller controller.
  * @RouteResource("conseiller", pluralize=false)
@@ -47,41 +48,30 @@ class ConseillerController extends Controller
         $this->listAndShowSecurity();
         $em = $this->getDoctrine()->getManager();
         $conseillers = $em->getRepository('APMMarketingDistribueBundle:conseiller')->findAll();
-        if ($request->isXmlHttpRequest()) {
-            $json = array();
-            $json['items'] = array();
-            $this->matricule_filter = $request->request->has('matricule_filter') ? $request->request->get('matricule_filter') : "";
-            $this->code_filter = $request->request->has('code_filter') ? $request->request->get('code_filter') : "";
-            $this->dateFrom_filter = $request->request->has('dateFrom_filter') ? $request->request->get('dateFrom_filter') : "";
-            $this->dateTo_filter = $request->request->has('dateTo_filter') ? $request->request->get('dateTo_filter') : "";
-            $this->valeurQuota_filter = $request->request->has('valeurQuota_filter') ? $request->request->get('valeurQuota_filter') : "";
-            $this->description_filter = $request->request->has('description_filter') ? $request->request->get('description_filter') : "";
-            $this->dateCreationReseauFrom_filter = $request->request->has('dateCreationReseauFrom_filter') ? $request->request->get('dateCreationReseauFrom_filter') : "";
-            $this->dateCreationReseauTo_filter = $request->request->has('dateCreationReseauTo_filter') ? $request->request->get('dateCreationReseauTo_filter') : "";
-            $iDisplayLength = $request->request->has('length') ? $request->request->get('length') : -1;
-            $iDisplayStart = $request->request->has('start') ? intval($request->request->get('start')) : 0;
-            $iTotalRecords = count($conseillers);
-            if ($iDisplayLength < 0) $iDisplayLength = $iTotalRecords;
-            $_conseillers = new ArrayCollection();
-            foreach ($conseillers as $conseiller) {
-                $_conseillers->add($conseiller);
-            }
-            $conseillers = $this->handleResults($_conseillers, $iTotalRecords, $iDisplayStart, $iDisplayLength);
-
-            /** @var Conseiller $conseiller */
-            foreach ($conseillers as $conseiller) {
-                array_push($json['items'], array(
-                        'id' => $conseiller->getId(),
-                        'code' => $conseiller->getCode(),
-                        'description' => $conseiller->getDescription(),
-                    )
-                );
-            }
-            return $this->json(json_encode($json), 200);
+        $json = array();
+        $this->matricule_filter = $request->request->has('matricule_filter') ? $request->request->get('matricule_filter') : "";
+        $this->code_filter = $request->request->has('code_filter') ? $request->request->get('code_filter') : "";
+        $this->dateFrom_filter = $request->request->has('dateFrom_filter') ? $request->request->get('dateFrom_filter') : "";
+        $this->dateTo_filter = $request->request->has('dateTo_filter') ? $request->request->get('dateTo_filter') : "";
+        $this->valeurQuota_filter = $request->request->has('valeurQuota_filter') ? $request->request->get('valeurQuota_filter') : "";
+        $this->description_filter = $request->request->has('description_filter') ? $request->request->get('description_filter') : "";
+        $this->dateCreationReseauFrom_filter = $request->request->has('dateCreationReseauFrom_filter') ? $request->request->get('dateCreationReseauFrom_filter') : "";
+        $this->dateCreationReseauTo_filter = $request->request->has('dateCreationReseauTo_filter') ? $request->request->get('dateCreationReseauTo_filter') : "";
+        $iDisplayLength = $request->request->has('length') ? $request->request->get('length') : -1;
+        $iDisplayStart = $request->request->has('start') ? intval($request->request->get('start')) : 0;
+        $iTotalRecords = count($conseillers);
+        if ($iDisplayLength < 0) $iDisplayLength = $iTotalRecords;
+        $_conseillers = new ArrayCollection();
+        foreach ($conseillers as $conseiller) {
+            $_conseillers->add($conseiller);
         }
-        return $this->render('APMMarketingDistribueBundle:conseiller:index.html.twig', array(
-            'conseillers' => $conseillers,
-        ));
+        $conseillers = $this->handleResults($_conseillers, $iTotalRecords, $iDisplayStart, $iDisplayLength);
+        $iFilteredRecords = count($conseillers);
+        $data = $this->get('apm_core.data_serialized')->getFormalData($conseillers, array("others_list"));
+        $json['totalRecords'] = $iTotalRecords;
+        $json['filteredRecords'] = $iFilteredRecords;
+        $json['items'] = $data;
+        return new JsonResponse($json, 200);
     }
 
     private function listAndShowSecurity()
@@ -236,60 +226,16 @@ class ConseillerController extends Controller
 
     /**
      * Finds and displays a Conseiller entity.
-     * @param Request $request
      * @param Conseiller $conseiller
      * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
      *
      * @Get("/show/{id}")
      */
-    public function showAction(Request $request, Conseiller $conseiller)
+    public function showAction(Conseiller $conseiller)
     {
         $this->listAndShowSecurity();
-        if ($request->isXmlHttpRequest()) {
-            $json = array();
-            $json['item'] = array(
-                'id' => $conseiller->getId(),
-                'code' => $conseiller->getCode(),
-                'dateEnregistrement' => $conseiller->getDateEnregistrement()->format('d-m-Y H:i'),
-                'dateCreationReseau' => $conseiller->getDateCreationReseau()->format('d-m-Y H:i'),
-                'description' => $conseiller->getDescription(),
-                'isConseillerA2' => $conseiller->getIsConseillerA2(),
-                'matricule' => $conseiller->getMatricule(),
-                'valeurQuota' => $conseiller->getValeurQuota(),
-                'utilisateur' => $conseiller->getUtilisateur()->getId(),
-            );
-            return $this->json(json_encode($json), 200);
-        }
-        $deleteForm = $this->createDeleteForm($conseiller);
-        $reseau_form = $this->createNewForm();
-        return $this->render('APMMarketingDistribueBundle:conseiller:show.html.twig', array(
-            'conseiller' => $conseiller,
-            'delete_form' => $deleteForm->createView(),
-            'reseau_form' => $reseau_form->createView(),
-        ));
-    }
-
-    /**
-     * Creates a form to delete a Conseiller entity.
-     *
-     * @param Conseiller $conseiller The Conseiller entity
-     *
-     * @return \Symfony\Component\Form\Form The form
-     */
-    private function createDeleteForm(Conseiller $conseiller)
-    {
-        return $this->createFormBuilder()
-            ->setAction($this->generateUrl('apm_marketing_conseiller_delete', array('id' => $conseiller->getId())))
-            ->setMethod('DELETE')
-            ->getForm();
-    }
-
-    private function createNewForm()
-    {
-        return $this->createFormBuilder()
-            ->setAction($this->generateUrl('apm_marketing_reseau_new'))
-            ->setMethod('PUT')
-            ->getForm();
+        $data = $this->get('apm_core.data_serialized')->getFormalData($conseiller, ["owner_conseiller_details", "owner_list"]);
+        return new JsonResponse($data, 200);
     }
 
     /**
@@ -392,6 +338,21 @@ class ConseillerController extends Controller
     }
 
     /**
+     * Creates a form to delete a Conseiller entity.
+     *
+     * @param Conseiller $conseiller The Conseiller entity
+     *
+     * @return \Symfony\Component\Form\Form The form
+     */
+    private function createDeleteForm(Conseiller $conseiller)
+    {
+        return $this->createFormBuilder()
+            ->setAction($this->generateUrl('apm_marketing_conseiller_delete', array('id' => $conseiller->getId())))
+            ->setMethod('DELETE')
+            ->getForm();
+    }
+
+    /**
      * Deletes a Conseiller entity.
      * @param Request $request
      * @param Conseiller $conseiller
@@ -420,6 +381,14 @@ class ConseillerController extends Controller
         }
 
         return $this->redirectToRoute('apm_marketing_conseiller_index');
+    }
+
+    private function createNewForm()
+    {
+        return $this->createFormBuilder()
+            ->setAction($this->generateUrl('apm_marketing_reseau_new'))
+            ->setMethod('PUT')
+            ->getForm();
     }
 
 }

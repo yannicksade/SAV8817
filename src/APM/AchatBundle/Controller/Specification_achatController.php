@@ -56,40 +56,31 @@ class Specification_achatController extends Controller
             $user = $this->getUser();
             $specification_achats = $user->getSpecifications();
         }
-        if ($request->isXmlHttpRequest() && $request->getMethod() === "POST") {
-            $this->demandeRabais_filter = $request->request->has('demandeRabais_filter') ? $request->request->get('demandeRabais_filter') : "";
-            $this->code_filter = $request->request->has('code_filter') ? $request->request->get('code_filter') : "";
-            $this->livraison_filter = $request->request->has('livraison_filter') ? $request->request->get('livraison_filter') : "";
-            $this->dateLivraisonFrom_filter = $request->request->has('dateLivraisonFrom_filter') ? $request->request->get('dateLivraisonFrom_filter') : "";
-            $this->dateLivraisonTo_filter = $request->request->has('dateLivraisonTo_filter') ? $request->request->get('dateLivraisonTo_filter') : "";
-            $this->dateFrom_filter = $request->request->has('dateFrom_filter') ? $request->request->get('dateFrom_filter') : "";
-            $this->dateTo_filter = $request->request->has('dateTo_filter') ? $request->request->get('dateTo_filter') : "";
-            $this->avis_filter = $request->request->has('avis_filter') ? $request->request->get('avis_filter') : "";
-            $this->echantillon_filter = $request->request->has('echantillon_filter') ? $request->request->get('echantillon_filter') : "";
-            $this->offre_filter = $request->request->has('offre_filter') ? $request->request->get('offre_filter') : "";
-            $this->utilisateur_filter = $request->request->has('utilisateur_filter') ? $request->request->get('utilisateur_filter') : "";
 
-            $iDisplayLength = $request->request->has('length') ? $request->request->get('length') : -1;
-            $iDisplayStart = $request->request->has('start') ? intval($request->request->get('start')) : 0;
-            $json = array();
-            $json['items'] = array();
-            $iTotalRecords = count($specification_achats);
-            if ($iDisplayLength < 0) $iDisplayLength = $iTotalRecords;
-            $specification_achats = $this->handleResults($specification_achats, $iTotalRecords, $iDisplayStart, $iDisplayLength);
-            /** @var Specification_achat $specification */
-            foreach ($specification_achats as $specification) {
-                array_push($json['items'], array(
-                    'id' => $specification->getId(),
-                    'code' => $specification->getCode(),
-                    'avis' => substr($specification->getAvis(), 100) . "...",
-                ));
-            }
-            return $this->json(json_encode($json), 200);
-        }
-        return $this->render('APMAchatBundle:specification_achat:index.html.twig', array(
-            'specification_achats' => $specification_achats,
-            'offre' => $offre,
-        ));
+        $this->demandeRabais_filter = $request->query->has('demandeRabais_filter') ? $request->query->get('demandeRabais_filter') : "";
+        $this->code_filter = $request->query->has('code_filter') ? $request->query->get('code_filter') : "";
+        $this->livraison_filter = $request->query->has('livraison_filter') ? $request->query->get('livraison_filter') : "";
+        $this->dateLivraisonFrom_filter = $request->query->has('dateLivraisonFrom_filter') ? $request->query->get('dateLivraisonFrom_filter') : "";
+        $this->dateLivraisonTo_filter = $request->query->has('dateLivraisonTo_filter') ? $request->query->get('dateLivraisonTo_filter') : "";
+        $this->dateFrom_filter = $request->query->has('dateFrom_filter') ? $request->query->get('dateFrom_filter') : "";
+        $this->dateTo_filter = $request->query->has('dateTo_filter') ? $request->query->get('dateTo_filter') : "";
+        $this->avis_filter = $request->query->has('avis_filter') ? $request->query->get('avis_filter') : "";
+        $this->echantillon_filter = $request->query->has('echantillon_filter') ? $request->query->get('echantillon_filter') : "";
+        $this->offre_filter = $request->query->has('offre_filter') ? $request->query->get('offre_filter') : "";
+        $this->utilisateur_filter = $request->query->has('utilisateur_filter') ? $request->query->get('utilisateur_filter') : "";
+
+        $iDisplayLength = $request->query->has('length') ? $request->query->get('length') : -1;
+        $iDisplayStart = $request->query->has('start') ? intval($request->query->get('start')) : 0;
+        $json = array();
+        $iTotalRecords = count($specification_achats);
+        if ($iDisplayLength < 0) $iDisplayLength = $iTotalRecords;
+        $specification_achats = $this->handleResults($specification_achats, $iTotalRecords, $iDisplayStart, $iDisplayLength);
+        $iFilteredRecords = count($specification_achats);
+        $data = $this->get('apm_core.data_serialized')->getFormalData($specification_achats, array("owner_list"));
+        $json['totalRecords'] = $iTotalRecords;
+        $json['filteredRecords'] = $iFilteredRecords;
+        $json['items'] = $data;
+        return new JsonResponse($json, 200);
     }
 
     /**
@@ -253,10 +244,10 @@ class Specification_achatController extends Controller
             $em = $this->getDoctrine()->getManager();
             $em->persist($specification_achat);
             $em->flush();
-            if($request->isXmlHttpRequest()){
+            if ($request->isXmlHttpRequest()) {
                 $json = array();
                 $json['item'] = array();
-                return $this->json(json_encode($json),200);
+                return $this->json(json_encode($json), 200);
             }
             return $this->redirectToRoute('apm_achat_specification_achat_show', array('id' => $specification_achat->getId()));
         }
@@ -284,51 +275,16 @@ class Specification_achatController extends Controller
      * Voir une specification faite
      *
      * Finds and displays a Specification_achat entity.
-     * @param Request $request
      * @param Specification_achat $specification
      * @return \Symfony\Component\HttpFoundation\Response| JsonResponse
      *
      * @Get("/show/specification/{id}")
      */
-    public function showAction(Request $request, Specification_achat $specification)
+    public function showAction(Specification_achat $specification)
     {
         $this->listAndShowSecurity();
-        if ($request->isXmlHttpRequest()) {
-            $json = array();
-            $json['item'] = array(
-                'id' => $specification->getId(),
-                'code' => $specification->getCode(),
-                'demandeRabais' => $specification->getDemandeRabais(),
-                'livrable' => $specification->getLivraison(),
-                'dateCreation' => $specification->getDateCreation()->format('d-m-Y H:i'),
-                'dateLivraisonSouhaite' => $specification->getDateLivraisonSouhaite()->format('d-m-Y H:i'),
-                'avis' => $specification->getAvis(),
-                'echantillon' => $specification->getEchantillon(),
-                'offre' => $specification->getOffre()->getId(),
-                'utilisateur' => $specification->getUtilisateur()->getId(),
-            );
-            return $this->json(json_encode($json), 200);
-        }
-        $deleteForm = $this->createDeleteForm($specification);
-        return $this->render('APMAchatBundle:specification_achat:show.html.twig', array(
-            'specification_achat' => $specification,
-            'delete_form' => $deleteForm->createView(),
-        ));
-    }
-
-    /**
-     * Creates a form to delete a Specification_achat entity.
-     *
-     * @param Specification_achat $specification_achat The Specification_achat entity
-     *
-     * @return \Symfony\Component\Form\Form The form
-     */
-    private function createDeleteForm(Specification_achat $specification_achat)
-    {
-        return $this->createFormBuilder()
-            ->setAction($this->generateUrl('apm_achat_specification_achat_delete', array('id' => $specification_achat->getId())))
-            ->setMethod('DELETE')
-            ->getForm();
+        $data = $this->get('apm_core.data_serialized')->getFormalData($specification, ["owner_spA_details", "owner_list"]);
+        return new JsonResponse($data, 200);
     }
 
     /**
@@ -346,13 +302,14 @@ class Specification_achatController extends Controller
         $editForm = $this->createForm('APM\AchatBundle\Form\Specification_achatType', $specification_achat);
         $editForm->handleRequest($request);
         if ($editForm->isSubmitted() && $editForm->isValid()
-            || $request->isXmlHttpRequest() && $request->isMethod('POST')) {
+            || $request->isXmlHttpRequest() && $request->isMethod('POST')
+        ) {
             $em = $this->getDoctrine()->getManager();
             if ($request->isXmlHttpRequest()) {
                 $json = array();
                 $json['item'] = array();
-                $property = $request->request->get('name');
-                $value = $request->request->get('value');
+                $property = $request->query->get('name');
+                $value = $request->query->get('value');
                 switch ($property) {
                     case 'demandeRabais':
                         $specification_achat->setDemandeRabais($value);
@@ -404,6 +361,21 @@ class Specification_achatController extends Controller
             throw $this->createAccessDeniedException();
         }
         //----------------------------------------------------------------------------------------
+    }
+
+    /**
+     * Creates a form to delete a Specification_achat entity.
+     *
+     * @param Specification_achat $specification_achat The Specification_achat entity
+     *
+     * @return \Symfony\Component\Form\Form The form
+     */
+    private function createDeleteForm(Specification_achat $specification_achat)
+    {
+        return $this->createFormBuilder()
+            ->setAction($this->generateUrl('apm_achat_specification_achat_delete', array('id' => $specification_achat->getId())))
+            ->setMethod('DELETE')
+            ->getForm();
     }
 
     /**
