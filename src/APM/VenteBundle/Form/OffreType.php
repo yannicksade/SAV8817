@@ -46,15 +46,10 @@ class OffreType extends AbstractType
 
         $builder
             //recupérer uniquement les catégories des boutiques dont l'utilisateur est, en tant que gérant ou proprietaire
-            ->add('id', TextType::class, [
-                'mapped' => false,
-                'attr' => ['class' => 'id hidden'],
-                'required'=>false,
-            ])
             ->add('code', TextType::class, [
                 'mapped' => false,
                 'attr' => ['class' => 'form-control code'],
-                'required'=>false,
+                'required' => true,
             ])
             ->add('designation', TextType::class, [
                 'required' => true,
@@ -118,7 +113,6 @@ class OffreType extends AbstractType
                     'Vente interdite' => 8,
                 ],
                 'attr' => ['class' => 'form-control etat'],
-                'required'=> true,
             ])
             ->add('apparenceNeuf', ChoiceType::class, [
                 'choices' => [
@@ -136,7 +130,6 @@ class OffreType extends AbstractType
                     'VENTE RESTREINTE' => 3,
                 ),
                 'attr' => ['class' => 'form-control modeVente'],
-                'required' => true,
             ])
             ->add('modelDeSerie', TextType::class, [
                 'required' => false,
@@ -167,7 +160,6 @@ class OffreType extends AbstractType
                     'SERVICE' => 2
                 ],
                 'attr' => ['class' => 'form-control type'],
-                    'required' => true,
                 ]
 
             )

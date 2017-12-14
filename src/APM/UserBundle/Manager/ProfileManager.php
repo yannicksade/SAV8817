@@ -53,7 +53,10 @@ class ProfileManager implements ContainerAwareInterface
         $form = $formFactory->createForm();
 
         if (!$request->request->has('current_password')) {
-            return $form;
+            return new JsonResponse([
+                "status" => 400,
+                "message" => $this->container->get('translator')->trans($form->getErrors(true, false), [], 'FOSUserBundle')
+            ], Response::HTTP_BAD_REQUEST);
         }
         $form->setData($user);
         $form->submit($request->request->all(), $clearMissing);

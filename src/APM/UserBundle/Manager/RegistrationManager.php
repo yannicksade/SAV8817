@@ -77,7 +77,10 @@ class RegistrationManager implements ContainerAwareInterface
                 return $response;
             }
 
-            return new JsonResponse("invalid data", 400);
+            return new JsonResponse([
+                "status" => 400,
+                "message" => $this->container->get('translator')->trans($form->getErrors(true, false), [], 'FOSUserBundle')
+            ], Response::HTTP_BAD_REQUEST);
         }
         $event = new FormEvent($form, $request);
 

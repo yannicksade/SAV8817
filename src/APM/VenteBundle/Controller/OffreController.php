@@ -32,6 +32,7 @@ use FOS\RestBundle\Controller\Annotations\Delete;
 use FOS\RestBundle\Controller\Annotations\Put;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 /**
  * Offre controller.
@@ -302,8 +303,7 @@ class OffreController extends FOSRestController implements ClassResourceInterfac
 
     /**
      * @param Request $request
-     * @return JsonResponse | Form | View
-     *
+     * @return View|JsonResponse
      * @Post("/new/offre")
      */
     public function newAction(Request $request)
@@ -313,13 +313,15 @@ class OffreController extends FOSRestController implements ClassResourceInterfac
         $session = $request->getSession();
         /** @var Offre $offre */
         $offre = TradeFactory::getTradeProvider('offre');
-        $form = $this->createForm('APM\VenteBundle\Form\OffreType', $offre, [
-            'csrf_protection' => true
-        ]);
-        //$form->handleRequest($request);
+        $form = $this->createForm('APM\VenteBundle\Form\OffreType', $offre);
         $form->submit($request->request->all());
+        $error = "";
+
         if (!$form->isValid()) {
-            return $form;
+            return new JsonResponse([
+                "status" => 400,
+                "message" => $this->get('translator')->trans($form->getErrors(true, false), [], 'FOSUserBundle')
+            ], Response::HTTP_BAD_REQUEST);
         }
         try {
             $this->createSecurity($offre->getBoutique(), $offre->getCategorie());
@@ -327,42 +329,19 @@ class OffreController extends FOSRestController implements ClassResourceInterfac
             $offre->setVendeur($this->getUser());
             $em->persist($offre);
             $em->flush();
-            $routeOption = [
-                'id' => $offre->getId(),
-                '_format' => $request->get('_format')
-            ];
-            // return $this->routeRedirectView('apm_', $routeOption, Response::HTTP_CREATED);
-            /*if ($request->isXmlHttpRequest()) {
-                $json["item"] = array(//permet au client de différencier les nouveaux éléments des élements juste modifiés
-                    "action" => 0,
-                    "id" => null, //it is null because the table will be reload automatically
-                );*/
             $session->getFlashBag()->add('success', "<strong> Création de l'Offre. réf:" . $offre->getCode() . "</strong><br> Opération effectuée avec succès!");
-            return $this->json(null, Response::HTTP_CREATED);
-            //--------------
-            // }
-            /* $this->get('apm_core.crop_image')->liipImageResolver($offre->getImage());//resouds tout en créant l'image
-             if (null !== $offre->getImage()) {
-                 return $this->redirectToRoute('apm_vente_offre_show-image', array('id' => $offre->getId()));
-             } else {
-                 return $this->redirectToRoute('apm_vente_offre_show', array('id' => $offre->getId()));
-             }*/
-            //---
+            return $this->routeRedirectView("api_vente_show_offre", ['id' => $offre->getId()], Response::HTTP_CREATED);
+            /* $this->get('apm_core.crop_image')->liipImageResolver($offre->getImage());*/ //resouds tout en créant l'image
         } catch (ConstraintViolationException $cve) {
             $session->getFlashBag()->add('danger', "<strong>Echec de l'enregistrement. </strong><br>L'enregistrement a échoué dû à une contrainte de données!");
-            return $this->json(json_encode(["item" => null]));
-        } catch (RuntimeException $rte) {
-            $session->getFlashBag()->add('danger', "<strong>Echec de l'opération.</strong><br>L'enregistrement a échoué. bien vouloir réessayer plutard, svp!");
-            return $this->json(json_encode(["item" => null]));
+            return new JsonResponse([
+                "status" => 400,
+                "message" => $this->get('translator')->trans("impossible d'enregistrer, vérifiez vos données", [], 'FOSUserBundle')
+            ], Response::HTTP_BAD_REQUEST);
         } catch (AccessDeniedException $ads) {
             $session->getFlashBag()->add('danger', "<strong>Action interdite.</strong><br>Vous n'êtes pas autorisez à effectuer cette opération!");
-            return $this->json(json_encode(["item" => null]));
+            return $this->json("Access denied", Response::HTTP_FORBIDDEN);
         }
-        /*return $this->render('APMVenteBundle:offre:new.html.twig', array(
-            'form' => $form->createView(),
-            'offre' => $offre,
-            'url_image' => $this->get('apm_core.packages_maker')->getPackages()->getUrl('/', 'img'),
-        ));*/
     }
 
     /**
@@ -436,7 +415,6 @@ class OffreController extends FOSRestController implements ClassResourceInterfac
 
     /**
      * Tout utilisateur AVM peut voir une offre
-     * @param Request $request
      * @param Offre $offre
      * @return JsonResponse
      *

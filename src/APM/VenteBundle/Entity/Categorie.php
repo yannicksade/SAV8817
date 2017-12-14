@@ -38,6 +38,7 @@ class Categorie extends TradeFactory
      * @var string
      * @Expose
      * @Type("string")
+     * @Assert\NotBlank
      * @Groups({"owner_categorie_details", "others_categorie_details", "owner_list"})
      * @ORM\Column(name="code", type="string", length=255, nullable=false)
      */

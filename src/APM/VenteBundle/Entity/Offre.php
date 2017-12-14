@@ -57,6 +57,7 @@ class Offre extends TradeFactory
      * @Type("DateTime<'d-m-Y H:i'>")
      * @Groups({"owner_offre_details"})
      * @var \DateTime
+     * @Assert\NotNull
      * @Assert\DateTime
      * @ORM\Column(name="dateCreation", type="datetime", nullable=false)
      */
@@ -87,7 +88,7 @@ class Offre extends TradeFactory
      * @Type("string")
      * @Expose
      * @Groups({"owner_list", "others_list", "owner_offre_details", "others_offre_details"})
-     * @Assert\NotNull
+     * @Assert\NotBlank
      * @Assert\Length(min=2)
      * @ORM\Column(name="designation", type="string", length=255, nullable=false)
      */
@@ -125,6 +126,7 @@ class Offre extends TradeFactory
      * @Expose
      * @Groups({"owner_offre_details", "others_offre_details"})
      * @var integer
+     * @Assert\NotNull
      * @Type("integer")
      * @ORM\Column(name="etat", type="integer", nullable=false)
      */
@@ -160,6 +162,8 @@ class Offre extends TradeFactory
      * @Expose
      * @Type("DateTime<'d-m-Y H:i'>")
      * @Groups({"owner_offre_details"})
+     * @Assert\NotNull
+     * @Assert\DateTime
      * @ORM\Column(name="updatedAt", type="datetime", nullable= false)
      * @var \DateTime
      */
@@ -169,6 +173,7 @@ class Offre extends TradeFactory
      * @Expose
      * @Groups({"owner_offre_details","others_offre_details"})
      * @var integer
+     * @Assert\NotNull
      * @Type("int")
      * @ORM\Column(name="modeVente", type="integer", nullable=false)
      */
@@ -237,6 +242,7 @@ class Offre extends TradeFactory
      * @Groups({"owner_offre_details", "others_offre_details"})
      * @var integer
      * @Type("int")
+     * @Assert\NotNull
      * @ORM\Column(name="typeOffre", type="integer", nullable=false)
      */
     private $typeOffre;

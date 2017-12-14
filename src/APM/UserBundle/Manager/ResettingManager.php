@@ -216,7 +216,10 @@ class ResettingManager implements ContainerAwareInterface
         $form->submit($request->request->all());
 
         if (!$form->isValid()) {
-            return $form;
+            return new JsonResponse([
+                "status" => 400,
+                "message" => $this->container->get('translator')->trans($form->getErrors(true, false), [], 'FOSUserBundle')
+            ], Response::HTTP_BAD_REQUEST);
         }
 
         /** @var $userManager UserManagerInterface */
