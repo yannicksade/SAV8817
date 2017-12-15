@@ -42,6 +42,7 @@ class Livreur_boutique extends TradeFactory
 
     /**
      * @var string
+     * @Assert\NotBlank
      * @Expose
      * @Groups({"owner_livreur_details", "others_livreur_details"})
      * @Assert\Length(min=2, max=254)

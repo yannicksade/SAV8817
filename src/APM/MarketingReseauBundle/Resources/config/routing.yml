@@ -2,4 +2,4 @@
 apm_marketing_reseau:
     type: rest
     resource: APM\MarketingReseauBundle\Controller\Reseau_conseillersController
-    name_prefix:   api_marketing_reseau
+    name_prefix:   api_marketing_

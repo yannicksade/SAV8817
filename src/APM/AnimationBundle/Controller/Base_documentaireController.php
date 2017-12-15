@@ -7,9 +7,11 @@ use APM\AnimationBundle\Factory\TradeFactory;
 use APM\UserBundle\Entity\Utilisateur_avm;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Exception\ConstraintViolationException;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use FOS\RestBundle\Controller\FOSRestController;
+use FOS\RestBundle\View\View;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use FOS\RestBundle\Controller\Annotations\RouteResource;
 use FOS\RestBundle\Controller\Annotations\Get;
@@ -23,7 +25,7 @@ use Nelmio\ApiDocBundle\Annotation\ApiDoc;
  * Base_documentaire controller.
  * @RouteResource("document")
  */
-class Base_documentaireController extends Controller
+class Base_documentaireController extends FOSRestController
 {
     private $objet_filter;
     private $code_filter;
@@ -38,33 +40,41 @@ class Base_documentaireController extends Controller
      * @param Request $request
      * @return JsonResponse
      *
-     * @Get("/cget/documents")
+     * @Get("/cget/documents", name="s")
      */
     public function getAction(Request $request)
     {
-        $this->listAndShowSecurity();
-        /** @var Utilisateur_avm $user */
-        $user = $this->getUser();
-        $documents = $user->getDocuments();
-        $json = array();
-        $this->objet_filter = $request->query->has('objet_filter') ? $request->query->get('objet_filter') : "";
-        $this->code_filter = $request->query->has('code_filter') ? $request->query->get('code_filter') : "";
-        $this->dateFrom_filter = $request->query->has('dateFrom_filter') ? $request->query->get('dateFrom_filter') : "";
-        $this->dateTo_filter = $request->query->has('dateTo_filter') ? $request->query->get('dateTo_filter') : "";
-        $this->updatedAt_filter = $request->query->has('updatedAt_filter') ? $request->query->get('updatedAt_filter') : "";
-        $this->proprietaire_filter = $request->query->has('proprietaire_filter') ? $request->query->get('proprietaire_filter') : "";
-        $iDisplayLength = $request->query->has('length') ? $request->query->get('length') : -1;
-        $iDisplayStart = $request->query->has('start') ? intval($request->query->get('start')) : 0;
-        $iTotalRecords = count($documents);
-        if ($iDisplayLength < 0) $iDisplayLength = $iTotalRecords;
-        $documents = $this->handleResults($documents, $iTotalRecords, $iDisplayStart, $iDisplayLength);
-        $iFilteredRecords = count($documents);
-        $data = $this->get('apm_core.data_serialized')->getFormalData($documents, array("owner_list"));
-        $json['totalRecords'] = $iTotalRecords;
-        $json['filteredRecords'] = $iFilteredRecords;
-        $json['items'] = $data;
-
-        return new JsonResponse($json, 200);
+        try {
+            $this->listAndShowSecurity();
+            /** @var Utilisateur_avm $user */
+            $user = $this->getUser();
+            $documents = $user->getDocuments();
+            $json = array();
+            $this->objet_filter = $request->query->has('objet_filter') ? $request->query->get('objet_filter') : "";
+            $this->code_filter = $request->query->has('code_filter') ? $request->query->get('code_filter') : "";
+            $this->dateFrom_filter = $request->query->has('dateFrom_filter') ? $request->query->get('dateFrom_filter') : "";
+            $this->dateTo_filter = $request->query->has('dateTo_filter') ? $request->query->get('dateTo_filter') : "";
+            $this->updatedAt_filter = $request->query->has('updatedAt_filter') ? $request->query->get('updatedAt_filter') : "";
+            $this->proprietaire_filter = $request->query->has('proprietaire_filter') ? $request->query->get('proprietaire_filter') : "";
+            $iDisplayLength = $request->query->has('length') ? $request->query->get('length') : -1;
+            $iDisplayStart = $request->query->has('start') ? intval($request->query->get('start')) : 0;
+            $iTotalRecords = count($documents);
+            if ($iDisplayLength < 0) $iDisplayLength = $iTotalRecords;
+            $documents = $this->handleResults($documents, $iTotalRecords, $iDisplayStart, $iDisplayLength);
+            $iFilteredRecords = count($documents);
+            $data = $this->get('apm_core.data_serialized')->getFormalData($documents, array("owner_list"));
+            $json['totalRecords'] = $iTotalRecords;
+            $json['filteredRecords'] = $iFilteredRecords;
+            $json['items'] = $data;
+            return new JsonResponse($json, 200);
+        } catch (AccessDeniedException $ads) {
+            return new JsonResponse([
+                    "status" => 403,
+                    "message" => $this->get('translator')->trans("Access denied", [], 'FOSUserBundle'),
+                ]
+                , Response::HTTP_FORBIDDEN
+            );
+        }
     }
 
     private function listAndShowSecurity()
@@ -174,35 +184,44 @@ class Base_documentaireController extends Controller
     /**
      * Creates a new Base_documentaire entity.
      * @param Request $request
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response| JsonResponse
+     * @return View| JsonResponse
      *
      * @Post("/new/document")
      */
     public function newAction(Request $request)
     {
-        $this->createSecurity();
-        /** @var Base_documentaire $document */
-        $document = TradeFactory::getTradeProvider("base_documentaire");
-        $form = $this->createForm('APM\AnimationBundle\Form\Base_documentaireType', $document);
-        $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
+        try {
             $this->createSecurity();
+            /** @var Base_documentaire $document */
+            $document = TradeFactory::getTradeProvider("base_documentaire");
+            $form = $this->createForm('APM\AnimationBundle\Form\Base_documentaireType', $document);
+            $form->submit($request->request->all());
+            if (!$form->isValid()) {
+                return new JsonResponse([
+                    "status" => 400,
+                    "message" => $this->get('translator')->trans($form->getErrors(true, false), [], 'FOSUserBundle')
+                ], Response::HTTP_BAD_REQUEST);
+            }
             $document->setProprietaire($this->getUser());
             $em = $this->getDoctrine()->getManager();
             $em->persist($document);
             $em->flush();
-            if ($request->isXmlHttpRequest()) {
-                $json = array();
-                $json['item'] = array();
-                return $this->json(json_encode($json), 200);
-            }
-            return $this->redirectToRoute('apm_animation_base_documentaire_show', array('id' => $document->getId()));
-        }
 
-        return $this->render('APMAnimationBundle:document:new.html.twig', array(
-            'document' => $document,
-            'form' => $form->createView(),
-        ));
+            return $this->routeRedirectView("api_documentation_show_document ", ['id' => $document->getId()], Response::HTTP_CREATED);
+
+        } catch (ConstraintViolationException $cve) {
+            return new JsonResponse([
+                "status" => 400,
+                "message" => $this->get('translator')->trans("impossible d'enregistrer, vérifiez vos données", [], 'FOSUserBundle')
+            ], Response::HTTP_BAD_REQUEST);
+        } catch (AccessDeniedException $ads) {
+            return new JsonResponse([
+                    "status" => 403,
+                    "message" => $this->get('translator')->trans("Access denied", [], 'FOSUserBundle'),
+                ]
+                , Response::HTTP_FORBIDDEN
+            );
+        }
     }
 
     private function createSecurity()
@@ -235,61 +254,47 @@ class Base_documentaireController extends Controller
      * Displays a form to edit an existing Base_documentaire entity.
      * @param Request $request
      * @param Base_documentaire $document
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @return View | JsonResponse
      *
      * @Put("/edit/document/{id}")
      */
     public function editAction(Request $request, Base_documentaire $document)
     {
-        $this->editAndDeleteSecurity($document);
-
-        $deleteForm = $this->createDeleteForm($document);
-        $editForm = $this->createForm('APM\AnimationBundle\Form\Base_documentaireType', $document);
-        $editForm->handleRequest($request);
-        if ($editForm->isSubmitted() && $editForm->isValid()
-            || $request->isXmlHttpRequest() && $request->isMethod('POST')
-        ) {
+        try {
             $this->editAndDeleteSecurity($document);
-            $em = $this->getDoctrine()->getManager();
-            try {
-                if ($request->isXmlHttpRequest()) {
-                    $json = array();
-                    $json['item'] = array();
-                    $property = $request->query->get('name');
-                    $value = $request->query->get('value');
-                    switch ($property) {
-                        case 'objet':
-                            $document->setObjet($value);
-                            break;
-                        case 'brochure':
-                            $document->setBrochure($value);
-                            break;
-                        case 'description':
-                            $document->setDescription($value);
-                            break;
-                        default:
-                            $session->getFlashBag()->add('info', "<strong> Aucune mise à jour effectuée </strong>");
-                            return $this->json(json_encode(["item" => null]), 205);
-                    }
-                    $em->flush();
-                    $session->getFlashBag()->add('success', "Modification du conseiller boutique : <strong>" . $property . "</strong> <br> Opération effectuée avec succès!");
-                    return $this->json(json_encode($json), 200);
-                }
-                $em->flush();
-                return $this->redirectToRoute('apm_animation_base_documentaire_show', array('id' => $document->getId()));
-            } catch (ConstraintViolationException $cve) {
-                $session->getFlashBag()->add('danger', "<strong>Echec de l'enregistrement. </strong><br>L'enregistrement a échoué dû à une contrainte de données!");
-                return $this->json(json_encode(["item" => null]));
-            } catch (AccessDeniedException $ads) {
-                $session->getFlashBag()->add('danger', "<strong>Action interdite.</strong><br>Vous n'êtes pas autorisez à effectuer cette opération!");
-                return $this->json(json_encode(["item" => null]));
+            $form = $this->createForm('APM\AnimationBundle\Form\Base_documentaireType', $document);
+            $form->submit($request->request->all(), false);
+            if (!$form->isValid()) {
+                return new JsonResponse(
+                    [
+                        "status" => 400,
+                        "message" => $this->get('translator')->trans($form->getErrors(true, false), [], 'FOSUserBundle')
+                    ], Response::HTTP_BAD_REQUEST
+                );
             }
+
+            $em = $this->getDoctrine()->getManager();
+            $em->flush();
+
+            return $this->routeRedirectView("api_documentation_show_document", ["id" => $document->getId()], Response::HTTP_OK);
+
+        } catch (ConstraintViolationException $cve) {
+            return new JsonResponse(
+                [
+                    "status" => 400,
+                    "message" => $this->get('translator')->trans("impossible d'enregistrer, vérifiez vos données", [], 'FOSUserBundle')
+                ], Response::HTTP_BAD_REQUEST
+            );
+        } catch (AccessDeniedException $ads) {
+            return new JsonResponse(
+                [
+                    "status" => 403,
+                    "message" => $this->get('translator')->trans("Access denied", [], 'FOSUserBundle'),
+                ]
+                , Response::HTTP_FORBIDDEN
+            );
         }
-        return $this->render('APMAnimationBundle:document:edit.html.twig', array(
-            'document' => $document,
-            'edit_form' => $editForm->createView(),
-            'delete_form' => $deleteForm->createView(),
-        ));
+
     }
 
     /**
@@ -311,48 +316,46 @@ class Base_documentaireController extends Controller
     }
 
     /**
-     * Creates a form to delete a Base_documentaire entity.
-     *
-     * @param Base_documentaire $document The Base_documentaire entity
-     *
-     * @return \Symfony\Component\Form\Form The form
-     */
-    private function createDeleteForm(Base_documentaire $document)
-    {
-        return $this->createFormBuilder()
-            ->setAction($this->generateUrl('apm_animation_base_documentaire_delete', array('id' => $document->getId())))
-            ->setMethod('DELETE')
-            ->getForm();
-    }
-
-    /**
-     * Deletes a Base_documentaire entity.
      * @param Request $request
      * @param Base_documentaire $document
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse | JsonResponse
+     * @return View | JsonResponse
      *
      * @Delete("/delete/document/{id}")
      */
     public function deleteAction(Request $request, Base_documentaire $document)
     {
-        $this->editAndDeleteSecurity($document);
-        $em = $this->getDoctrine()->getManager();
-        if ($request->isXmlHttpRequest()) {
-            $em->remove($document);
-            $em->flush();
-            $json = array();
-            $json['item'] = array();
-            return $this->json(json_encode($json), 200);
-        }
-        $form = $this->createDeleteForm($document);
-        $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
+        try {
             $this->editAndDeleteSecurity($document);
+            if (!$request->request->has('exec') || $request->request->get('exec') !== 'go') {
+                return new JsonResponse([
+                    "status" => 400,
+                    "message" => $this->get('translator')->trans('impossible de supprimer', [], 'FOSUserBundle')
+                ], Response::HTTP_BAD_REQUEST);
+            }
+
+            $em = $this->getDoctrine()->getManager();
             $em->remove($document);
             $em->flush();
-        }
 
-        return $this->redirectToRoute('apm_animation_base_documentaire_index');
+            return $this->routeRedirectView("api_documentation_get_documents", [], Response::HTTP_OK);
+
+        } catch (ConstraintViolationException $cve) {
+            return new JsonResponse(
+                [
+                    "status" => 400,
+                    "message" => $this->get('translator')->trans("impossible de supprimer, vérifiez vos données", [], 'FOSUserBundle')
+                ], Response::HTTP_FAILED_DEPENDENCY
+            );
+        } catch (AccessDeniedException $ads) {
+            return new JsonResponse(
+                [
+                    "status" => 403,
+                    "message" => $this->get('translator')->trans("Access denied", [], 'FOSUserBundle'),
+                ]
+                , Response::HTTP_FORBIDDEN
+            );
+        }
     }
+
 
 }

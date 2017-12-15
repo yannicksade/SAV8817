@@ -43,6 +43,7 @@ class Boutique extends TradeFactory
 
     /**
      * @var integer
+     * @Assert\NotNull
      * @Type("int")
      * @Expose
      * @Groups({"owner_boutique_details", "others_boutique_details"})

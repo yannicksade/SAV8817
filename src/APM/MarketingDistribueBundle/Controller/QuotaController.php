@@ -8,7 +8,8 @@ use APM\UserBundle\Entity\Utilisateur_avm;
 use APM\VenteBundle\Entity\Boutique;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Exception\ConstraintViolationException;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use FOS\RestBundle\Controller\FOSRestController;
+use FOS\RestBundle\View\View;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
@@ -24,7 +25,7 @@ use Nelmio\ApiDocBundle\Annotation\ApiDoc;
  * Quota controller.
  * @RouteResource("commission")
  */
-class QuotaController extends Controller
+class QuotaController extends FOSRestController
 {
     private $valeurQuota_filter;
     private $code_filter;
@@ -46,27 +47,37 @@ class QuotaController extends Controller
      */
     public function getAction(Request $request, Boutique $boutique)
     {
-        $this->listAndShowSecurity($boutique);
-        $quotas = $boutique->getCommissionnements();
-        $this->valeurQuota_filter = $request->query->has('valeurQuota_filter') ? $request->query->get('valeurQuota_filter') : "";
-        $this->code_filter = $request->query->has('code_filter') ? $request->query->get('code_filter') : "";
-        $this->dateFrom_filter = $request->query->has('dateFrom_filter') ? $request->query->get('dateFrom_filter') : "";
-        $this->dateTo_filter = $request->query->has('dateTo_filter') ? $request->query->get('dateTo_filter') : "";
-        $this->libelle_filter = $request->query->has('libelle_filter') ? $request->query->get('libelle_filter') : "";
-        $this->description_filter = $request->query->has('description_filter') ? $request->query->get('description_filter') : "";
-        $this->boutique_filter = $request->query->has('boutique_filter') ? $request->query->get('boutique_filter') : "";
-        $iDisplayLength = $request->query->has('length') ? $request->query->get('length') : -1;
-        $iDisplayStart = $request->query->has('start') ? intval($request->query->get('start')) : 0;
-        $json = array();
-        $iTotalRecords = count($quotas);
-        if ($iDisplayLength < 0) $iDisplayLength = $iTotalRecords;
-        $quotas = $this->handleResults($quotas, $iTotalRecords, $iDisplayStart, $iDisplayLength);
-        $iFilteredRecords = count($quotas);
-        $data = $this->get('apm_core.data_serialized')->getFormalData($quotas, array("owner_list"));
-        $json['totalRecords'] = $iTotalRecords;
-        $json['filteredRecords'] = $iFilteredRecords;
-        $json['items'] = $data;
-        return new JsonResponse($json, 200);
+        try {
+            $this->listAndShowSecurity($boutique);
+            $quotas = $boutique->getCommissionnements();
+            $this->valeurQuota_filter = $request->query->has('valeurQuota_filter') ? $request->query->get('valeurQuota_filter') : "";
+            $this->code_filter = $request->query->has('code_filter') ? $request->query->get('code_filter') : "";
+            $this->dateFrom_filter = $request->query->has('dateFrom_filter') ? $request->query->get('dateFrom_filter') : "";
+            $this->dateTo_filter = $request->query->has('dateTo_filter') ? $request->query->get('dateTo_filter') : "";
+            $this->libelle_filter = $request->query->has('libelle_filter') ? $request->query->get('libelle_filter') : "";
+            $this->description_filter = $request->query->has('description_filter') ? $request->query->get('description_filter') : "";
+            $this->boutique_filter = $request->query->has('boutique_filter') ? $request->query->get('boutique_filter') : "";
+            $iDisplayLength = $request->query->has('length') ? $request->query->get('length') : -1;
+            $iDisplayStart = $request->query->has('start') ? intval($request->query->get('start')) : 0;
+            $json = array();
+            $iTotalRecords = count($quotas);
+            if ($iDisplayLength < 0) $iDisplayLength = $iTotalRecords;
+            $quotas = $this->handleResults($quotas, $iTotalRecords, $iDisplayStart, $iDisplayLength);
+            $iFilteredRecords = count($quotas);
+            $data = $this->get('apm_core.data_serialized')->getFormalData($quotas, array("owner_list"));
+            $json['totalRecords'] = $iTotalRecords;
+            $json['filteredRecords'] = $iFilteredRecords;
+            $json['items'] = $data;
+            return new JsonResponse($json, 200);
+
+        } catch (AccessDeniedException $ads) {
+            return new JsonResponse([
+                    "status" => 403,
+                    "message" => $this->get('translator')->trans("Access denied", [], 'FOSUserBundle'),
+                ]
+                , Response::HTTP_FORBIDDEN
+            );
+        }
     }
 
     /**
@@ -188,37 +199,44 @@ class QuotaController extends Controller
      * Creates a new Quota entity.
      * @param Request $request
      * @param Boutique $boutique
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response | JsonResponse
+     * @return View | JsonResponse
      *
      * @Post("/new/commission/boutique/{id}", name="_boutique")
      */
     public function newAction(Request $request, Boutique $boutique)
     {
-        $this->createSecurity($boutique);
-
-        /** @var Quota $quotum */
-        $quotum = TradeFactory::getTradeProvider("quota");
-        $form = $this->createForm('APM\MarketingDistribueBundle\Form\QuotaType', $quotum);
-        $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
+        try {
             $this->createSecurity($boutique);
+            /** @var Quota $quotum */
+            $quotum = TradeFactory::getTradeProvider("quota");
+            $form = $this->createForm('APM\MarketingDistribueBundle\Form\QuotaType', $quotum);
+            $form->submit($request->request->all());
+            if (!$form->isValid()) {
+                return new JsonResponse([
+                    "status" => 400,
+                    "message" => $this->get('translator')->trans($form->getErrors(true, false), [], 'FOSUserBundle')
+                ], Response::HTTP_BAD_REQUEST);
+            }
             $quotum->setBoutiqueProprietaire($boutique);
             $em = $this->getDoctrine()->getManager();
             $em->persist($quotum);
             $em->flush();
-            if ($request->isXmlHttpRequest()) {
-                $json = array();
-                $json['item'] = array();
-                return $this->json(json_encode($json), 200);
-            }
-            return $this->redirectToRoute('apm_marketing_quota_show', array('id' => $quotum->getId()));
-        }
 
-        return $this->render('APMMarketingDistribueBundle:quota:new.html.twig', array(
-            'quotum' => $quotum,
-            'form' => $form->createView(),
-            'boutique' => $boutique,
-        ));
+            return $this->routeRedirectView("api_marketing_show_commission", ['id' => $quotum->getId()], Response::HTTP_CREATED);
+
+        } catch (ConstraintViolationException $cve) {
+            return new JsonResponse([
+                "status" => 400,
+                "message" => $this->get('translator')->trans("impossible d'enregistrer, vérifiez vos données", [], 'FOSUserBundle')
+            ], Response::HTTP_BAD_REQUEST);
+        } catch (AccessDeniedException $ads) {
+            return new JsonResponse([
+                    "status" => 403,
+                    "message" => $this->get('translator')->trans("Access denied", [], 'FOSUserBundle'),
+                ]
+                , Response::HTTP_FORBIDDEN
+            );
+        }
     }
 
     /**
@@ -258,63 +276,45 @@ class QuotaController extends Controller
     }
 
     /**
-     * Displays a form to edit an existing Quota entity.
      * @param Request $request
      * @param Quota $quotum
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response| JsonResponse
+     * @return View | JsonResponse
      *
      * @Patch("/edit/commission/{id}")
      */
     public function editAction(Request $request, Quota $quotum)
     {
-        $this->editAndDeleteSecurity($quotum);
-        $deleteForm = $this->createDeleteForm($quotum);
-        $editForm = $this->createForm('APM\MarketingDistribueBundle\Form\QuotaType', $quotum);
-        $editForm->handleRequest($request);
-        if ($editForm->isSubmitted() && $editForm->isValid()
-            || $request->isXmlHttpRequest() && $request->isMethod('POST')
-        ) {
+        try {
             $this->editAndDeleteSecurity($quotum);
-            $em = $this->getDoctrine()->getManager();
-            try {
-                if ($request->isXmlHttpRequest()) {
-                    $json = array();
-                    $json['item'] = array();
-                    $property = $request->query->get('name');
-                    $value = $request->query->get('value');
-                    switch ($property) {
-                        case 'description':
-                            $quotum->setDescription($value);
-                            break;
-                        case 'libelle':
-                            $quotum->setLibelleQuota($value);
-                            break;
-                        case 'valeur':
-                            $quotum->setValeurQuota($value);
-                            break;
-                        default:
-                            $session->getFlashBag()->add('info', "<strong> Aucune mise à jour effectuée </strong>");
-                            return $this->json(json_encode(["item" => null]), 205);
-                    }
-                    $em->flush();
-                    $session->getFlashBag()->add('success', "Modification du commission : <strong>" . $property . "</strong> <br> Opération effectuée avec succès!");
-                    return $this->json(json_encode($json), 200);
-                }
-                $em->flush();
-                return $this->redirectToRoute('apm_marketing_quota_show', array('id' => $quotum->getId()));
-            } catch (ConstraintViolationException $cve) {
-                $session->getFlashBag()->add('danger', "<strong>Echec de l'enregistrement. </strong><br>L'enregistrement a échoué dû à une contrainte de données!");
-                return $this->json(json_encode(["item" => null]));
-            } catch (AccessDeniedException $ads) {
-                $session->getFlashBag()->add('danger', "<strong>Action interdite.</strong><br>Vous n'êtes pas autorisez à effectuer cette opération!");
-                return $this->json(json_encode(["item" => null]));
+            $form = $this->createForm('APM\MarketingDistribueBundle\Form\QuotaType', $quotum);
+            $form->submit($request->request->all(), false);
+            if (!$form->isValid()) {
+                return new JsonResponse(
+                    [
+                        "status" => 400,
+                        "message" => $this->get('translator')->trans($form->getErrors(true, false), [], 'FOSUserBundle')
+                    ], Response::HTTP_BAD_REQUEST
+                );
             }
+            $em = $this->getDoctrine()->getManager();
+            $em->flush();
+            return $this->routeRedirectView("api_marketing_show_commission", [$quotum->getId()], Response::HTTP_OK);
+        } catch (ConstraintViolationException $cve) {
+            return new JsonResponse(
+                [
+                    "status" => 400,
+                    "message" => $this->get('translator')->trans("impossible d'enregistrer, vérifiez vos données", [], 'FOSUserBundle')
+                ], Response::HTTP_BAD_REQUEST
+            );
+        } catch (AccessDeniedException $ads) {
+            return new JsonResponse(
+                [
+                    "status" => 403,
+                    "message" => $this->get('translator')->trans("Access denied", [], 'FOSUserBundle'),
+                ]
+                , Response::HTTP_FORBIDDEN
+            );
         }
-        return $this->render('APMMarketingDistribueBundle:quota:edit.html.twig', array(
-            'quotum' => $quotum,
-            'edit_form' => $editForm->createView(),
-            'delete_form' => $deleteForm->createView(),
-        ));
     }
 
     /**
@@ -338,48 +338,45 @@ class QuotaController extends Controller
 
     }
 
-    /**
-     * Creates a form to delete a Quota entity.
-     *
-     * @param Quota $quotum The Quota entity
-     *
-     * @return \Symfony\Component\Form\Form The form
-     */
-    private function createDeleteForm(Quota $quotum)
-    {
-        return $this->createFormBuilder()
-            ->setAction($this->generateUrl('apm_marketing_quota_delete', array('id' => $quotum->getId())))
-            ->setMethod('DELETE')
-            ->getForm();
-    }
 
     /**
-     * Deletes a Quota entity.
      * @param Request $request
      * @param Quota $quotum
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse| JsonResponse
+     * @return View | JsonResponse
      *
      * @delete("/delete/commission/{id}")
      */
     public function deleteAction(Request $request, Quota $quotum)
     {
-        $this->editAndDeleteSecurity($quotum);
-        $em = $this->getDoctrine()->getManager();
-        if ($request->isXmlHttpRequest()) {
-            $em->remove($conseiller_boutique);
-            $em->flush();
-            $json = array();
-            $json['item'] = array();
-            return $this->json(json_encode($json), 200);
-        }
-        $form = $this->createDeleteForm($quotum);
-        $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
+        try {
             $this->editAndDeleteSecurity($quotum);
+            if (!$request->request->has('exec') || $request->request->get('exec') !== 'go') {
+                return new JsonResponse([
+                    "status" => 400,
+                    "message" => $this->get('translator')->trans('impossible de supprimer', [], 'FOSUserBundle')
+                ], Response::HTTP_BAD_REQUEST);
+            }
+            $boutique = $quotum->getBoutiqueProprietaire();
+            $em = $this->getDoctrine()->getManager();
             $em->remove($quotum);
             $em->flush();
-        }
 
-        return $this->redirectToRoute('apm_marketing_quota_index', ['id' => $quotum->getBoutiqueProprietaire()->getId()]);
+            return $this->routeRedirectView("api_marketing_get_commissions_boutique", [$boutique->getId()], Response::HTTP_OK);
+        } catch (ConstraintViolationException $cve) {
+            return new JsonResponse(
+                [
+                    "status" => 400,
+                    "message" => $this->get('translator')->trans("impossible de supprimer, vérifiez vos données", [], 'FOSUserBundle')
+                ], Response::HTTP_FAILED_DEPENDENCY
+            );
+        } catch (AccessDeniedException $ads) {
+            return new JsonResponse(
+                [
+                    "status" => 403,
+                    "message" => $this->get('translator')->trans("Access denied", [], 'FOSUserBundle'),
+                ]
+                , Response::HTTP_FORBIDDEN
+            );
+        }
     }
 }

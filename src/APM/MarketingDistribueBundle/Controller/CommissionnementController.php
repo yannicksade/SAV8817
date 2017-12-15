@@ -12,9 +12,11 @@ use APM\VenteBundle\Entity\Boutique;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Exception\ConstraintViolationException;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use FOS\RestBundle\Controller\FOSRestController;
+use FOS\RestBundle\View\View;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use FOS\RestBundle\Controller\Annotations\RouteResource;
 use FOS\RestBundle\Controller\Annotations\Get;
@@ -26,9 +28,9 @@ use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
 /**
  * Commissionnement controller.
- * @RouteResource("marketing", pluralize=false)
+ * @RouteResource("commissionnement", pluralize=false)
  */
-class CommissionnementController extends Controller
+class CommissionnementController extends FOSRestController
 {
     private $code_filter;
     private $dateFrom_filter;
@@ -54,67 +56,78 @@ class CommissionnementController extends Controller
      */
     public function getAction(Request $request, Boutique $boutique = null)
     {
-        if (null !== $boutique) {
-            $this->listAndShowSecurity(null, $boutique);
-            $boutiques_commissionnements = array();
-            $boutiqueConseillers = $boutique->getBoutiqueConseillers();
-            if (null !== $boutiqueConseillers) {
-                /** @var Conseiller_boutique $boutiqueConseiller */
-                foreach ($boutiqueConseillers as $boutiqueConseiller) {
-                    $boutiques_commissionnements [] = $boutiqueConseiller->getCommissionnements();
+        try {
+            if (null !== $boutique) {
+                $this->listAndShowSecurity(null, $boutique);
+                $boutiques_commissionnements = array();
+                $boutiqueConseillers = $boutique->getBoutiqueConseillers();
+                if (null !== $boutiqueConseillers) {
+                    /** @var Conseiller_boutique $boutiqueConseiller */
+                    foreach ($boutiqueConseillers as $boutiqueConseiller) {
+                        $boutiques_commissionnements [] = $boutiqueConseiller->getCommissionnements();
+                    }
                 }
-            }
-        } else {
-            $this->listAndShowSecurity();
-            $boutiques_commissionnements = array();
-            /** @var Utilisateur_avm $user */
-            $user = $this->getUser();
-            $conseiller = $user->getProfileConseiller();
-            if (null !== $conseiller) {
-                $conseiller_boutiques = $conseiller->getConseillerBoutiques();
-                if (null !== $conseiller_boutiques) {
-                    /** @var Conseiller_boutique $conseiller_boutique */
-                    foreach ($conseiller_boutiques as $conseiller_boutique) {
-                        $boutiques_commissionnements [] = $conseiller_boutique->getCommissionnements();
+            } else {
+                $this->listAndShowSecurity();
+                $boutiques_commissionnements = array();
+                /** @var Utilisateur_avm $user */
+                $user = $this->getUser();
+                $conseiller = $user->getProfileConseiller();
+                if (null !== $conseiller) {
+                    $conseiller_boutiques = $conseiller->getConseillerBoutiques();
+                    if (null !== $conseiller_boutiques) {
+                        /** @var Conseiller_boutique $conseiller_boutique */
+                        foreach ($conseiller_boutiques as $conseiller_boutique) {
+                            $boutiques_commissionnements [] = $conseiller_boutique->getCommissionnements();
+                        }
                     }
                 }
             }
+
+            $json = array();
+            $this->creditDepenseFrom_filter = $request->query->has('creditDepenseFrom_filter') ? $request->query->get('creditDepenseFrom_filter') : "";
+            $this->creditDepenseTo_filter = $request->query->has('creditDepenseTo_filter') ? $request->query->get('creditDepenseTo_filter') : "";
+            $this->code_filter = $request->query->has('code_filter') ? $request->query->get('code_filter') : "";
+            $this->dateFrom_filter = $request->query->has('dateFrom_filter') ? $request->query->get('dateFrom_filter') : "";
+            $this->dateTo_filter = $request->query->has('dateTo_filter') ? $request->query->get('dateTo_filter') : "";
+            $this->libelle_filter = $request->query->has('libelle_filter') ? $request->query->get('libelle_filter') : "";
+            $this->description_filter = $request->query->has('description_filter') ? $request->query->get('description_filter') : "";
+            $this->quantiteFrom_filter = $request->query->has('quantiteFrom_filter') ? $request->query->get('quantiteFrom_filter') : "";
+            $this->quantiteTo_filter = $request->query->has('quantiteTo_filter') ? $request->query->get('quantiteTo_filter') : "";
+            $this->conseiller_filter = $request->query->has('conseiller_filter') ? $request->query->get('conseiller_filter') : "";
+            $this->commission_filter = $request->query->has('commission_filter') ? $request->query->get('commission_filter') : "";
+
+            $iDisplayLength = $request->query->has('length') ? $request->query->get('length') : -1;
+            $iDisplayStart = $request->query->has('start') ? intval($request->query->get('start')) : 0;
+
+            $boutiques_commissionnements = new ArrayCollection($boutiques_commissionnements);
+            $iTotalRecords = count($boutiques_commissionnements);
+            if ($iDisplayLength < 0) $iDisplayLength = $iTotalRecords;
+            $boutiques_commissionnements = $this->handleResults($boutiques_commissionnements, $iTotalRecords, $iDisplayStart, $iDisplayLength);
+            $iFilteredRecords = count($boutiques_commissionnements);
+            $data = $this->get('apm_core.data_serialized')->getFormalData($boutiques_commissionnements, array("owner_list"));
+            $json['totalRecords'] = $iTotalRecords;
+            $json['filteredRecords'] = $iFilteredRecords;
+            $json['items'] = $data;
+
+            return new JsonResponse($json, 200);
+
+        } catch (AccessDeniedException $ads) {
+            return new JsonResponse([
+                    "status" => 403,
+                    "message" => $this->get('translator')->trans("Access denied", [], 'FOSUserBundle'),
+                ]
+                , Response::HTTP_FORBIDDEN
+            );
         }
-
-        $json = array();
-        $this->creditDepenseFrom_filter = $request->query->has('creditDepenseFrom_filter') ? $request->query->get('creditDepenseFrom_filter') : "";
-        $this->creditDepenseTo_filter = $request->query->has('creditDepenseTo_filter') ? $request->query->get('creditDepenseTo_filter') : "";
-        $this->code_filter = $request->query->has('code_filter') ? $request->query->get('code_filter') : "";
-        $this->dateFrom_filter = $request->query->has('dateFrom_filter') ? $request->query->get('dateFrom_filter') : "";
-        $this->dateTo_filter = $request->query->has('dateTo_filter') ? $request->query->get('dateTo_filter') : "";
-        $this->libelle_filter = $request->query->has('libelle_filter') ? $request->query->get('libelle_filter') : "";
-        $this->description_filter = $request->query->has('description_filter') ? $request->query->get('description_filter') : "";
-        $this->quantiteFrom_filter = $request->query->has('quantiteFrom_filter') ? $request->query->get('quantiteFrom_filter') : "";
-        $this->quantiteTo_filter = $request->query->has('quantiteTo_filter') ? $request->query->get('quantiteTo_filter') : "";
-        $this->conseiller_filter = $request->query->has('conseiller_filter') ? $request->query->get('conseiller_filter') : "";
-        $this->commission_filter = $request->query->has('commission_filter') ? $request->query->get('commission_filter') : "";
-
-        $iDisplayLength = $request->query->has('length') ? $request->query->get('length') : -1;
-        $iDisplayStart = $request->query->has('start') ? intval($request->query->get('start')) : 0;
-
-        $boutiques_commissionnements = new ArrayCollection($boutiques_commissionnements);
-        $iTotalRecords = count($boutiques_commissionnements);
-        if ($iDisplayLength < 0) $iDisplayLength = $iTotalRecords;
-        $boutiques_commissionnements = $this->handleResults($boutiques_commissionnements, $iTotalRecords, $iDisplayStart, $iDisplayLength);
-        $iFilteredRecords = count($boutiques_commissionnements);
-        $data = $this->get('apm_core.data_serialized')->getFormalData($boutiques_commissionnements, array("owner_list"));
-        $json['totalRecords'] = $iTotalRecords;
-        $json['filteredRecords'] = $iFilteredRecords;
-        $json['items'] = $data;
-
-        return new JsonResponse($json, 200);
     }
 
     /**
      * @param Commissionnement |null $commissionnement
      * @param Boutique $boutique
      */
-    private function listAndShowSecurity($commissionnement = null, $boutique = null)
+    private
+    function listAndShowSecurity($commissionnement = null, $boutique = null)
     {
         //---------------------------------security-----------------------------------------------
         $this->denyAccessUnlessGranted(['ROLE_CONSEILLER', 'ROLE_BOUTIQUE'], null, 'Unable to access this page!');
@@ -150,7 +163,8 @@ class CommissionnementController extends Controller
      * @param $iDisplayLength
      * @return array
      */
-    private function handleResults($commissionnements, $iTotalRecords, $iDisplayStart, $iDisplayLength)
+    private
+    function handleResults($commissionnements, $iTotalRecords, $iDisplayStart, $iDisplayLength)
     {
         //filtering
         if ($commissionnements === null) return array();
@@ -245,46 +259,56 @@ class CommissionnementController extends Controller
     }
 
     /**
-     * Une boutique créé des commissionnements pour des conseiller de la boutique
      * @param Request $request
      * @param Boutique $boutique
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response | JsonResponse
+     * @return View | JsonResponse
      *
      *
      * @Post("/new/commissionnement/boutique/{id}")
      */
-    public function newAction(Request $request, Boutique $boutique)
+    public
+    function newAction(Request $request, Boutique $boutique)
     {
-        $this->createSecurity($boutique);
-        /** @var Commissionnement $commissionnement */
-        $commissionnement = TradeFactory::getTradeProvider("commissionnement");
-        $form = $this->createForm('APM\MarketingDistribueBundle\Form\CommissionnementType', $commissionnement);
-        $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
+        try {
+            $this->createSecurity($boutique);
+            /** @var Commissionnement $commissionnement */
+            $commissionnement = TradeFactory::getTradeProvider("commissionnement");
+            $form = $this->createForm('APM\MarketingDistribueBundle\Form\CommissionnementType', $commissionnement);
+            $form->submit($request->request->all());
+            if (!$form->isValid()) {
+                return new JsonResponse([
+                    "status" => 400,
+                    "message" => $this->get('translator')->trans($form->getErrors(true, false), [], 'FOSUserBundle')
+                ], Response::HTTP_BAD_REQUEST);
+            }
             $this->createSecurity($boutique, $commissionnement->getCommission());
             $em = $this->getDoctrine()->getManager();
             $em->persist($commissionnement);
             $em->flush();
-            if ($request->isXmlHttpRequest()) {
-                $json = array();
-                $json['item'] = array();
-                return $this->json(json_encode($json), 200);
-            }
-            return $this->redirectToRoute('apm_marketing_commissionnement_show', array('id' => $commissionnement->getId()));
-        }
 
-        return $this->render('APMMarketingDistribueBundle:commissionnement:new.html.twig', array(
-            'commissionnement' => $commissionnement,
-            'form' => $form->createView(),
-            'boutique' => $boutique,
-        ));
+            return $this->routeRedirectView("api_marketing_show_commissionnement", ['id' => $commissionnement->getId()], Response::HTTP_CREATED);
+
+        } catch (ConstraintViolationException $cve) {
+            return new JsonResponse([
+                "status" => 400,
+                "message" => $this->get('translator')->trans("impossible d'enregistrer, vérifiez vos données", [], 'FOSUserBundle')
+            ], Response::HTTP_BAD_REQUEST);
+        } catch (AccessDeniedException $ads) {
+            return new JsonResponse([
+                    "status" => 403,
+                    "message" => $this->get('translator')->trans("Access denied", [], 'FOSUserBundle'),
+                ]
+                , Response::HTTP_FORBIDDEN
+            );
+        }
     }
 
     /**
      * @param Boutique $boutique
      * @param Quota $quota
      */
-    private function createSecurity($boutique, $quota = null)
+    private
+    function createSecurity($boutique, $quota = null)
     {
         //---------------------------------security-----------------------------------------------
         // Unable to access the controller unless you have the required role
@@ -311,7 +335,8 @@ class CommissionnementController extends Controller
      *
      * @Get("/show/commissionnement/{id}")
      */
-    public function showAction(Commissionnement $commissionnement)
+    public
+    function showAction(Commissionnement $commissionnement)
     {
         $this->listAndShowSecurity($commissionnement);
         $data = $this->get('apm_core.data_serialized')->getFormalData($transporteur_zoneintervention, ["owner_commissionnement_details", "owner_list"]);
@@ -322,66 +347,50 @@ class CommissionnementController extends Controller
      * Displays a form to edit an existing Commissionnement entity.
      * @param Request $request
      * @param Commissionnement $commissionnement
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response | JsonResponse
+     * @return View | JsonResponse
      *
      * @Patch("/edit/commissionnement/{id}")
      */
-    public function editAction(Request $request, Commissionnement $commissionnement)
+    public
+    function editAction(Request $request, Commissionnement $commissionnement)
     {
-        $this->editSecurity();
-        $deleteForm = $this->createDeleteForm($commissionnement);
-        $editForm = $this->createForm('APM\MarketingDistribueBundle\Form\CommissionnementType', $commissionnement);
-        $editForm->handleRequest($request);
-        if ($editForm->isSubmitted() && $editForm->isValid() ||
-            $request->isXmlHttpRequest() && $request->isMethod('POST')
-        ) {
+        try {
             $this->editSecurity();
-            $em = $this->getDoctrine()->getManager();
-            try {
-                if ($request->isXmlHttpRequest()) {
-                    $json = array();
-                    $json['item'] = array();
-                    $property = $request->query->get('name');
-                    $value = $request->query->get('value');
-                    switch ($property) {
-                        case 'creditDepense':
-                            $commissionnement->setCreditDepense($value);
-                            break;
-                        case 'libelle':
-                            $commissionnement->setLibelle($value);
-                            break;
-                        case 'quantite':
-                            $commissionnement->setQuantite($value);
-                            break;
-                        case 'description':
-                            $commissionnement->setDescription($value);
-                            break;
-                        default:
-                            $session->getFlashBag()->add('info', "<strong> Aucune mise à jour effectuée </strong>");
-                            return $this->json(json_encode(["item" => null]), 205);
-                    }
-                    $em->flush();
-                    $session->getFlashBag()->add('success', "Modification du conseiller boutique : <strong>" . $property . "</strong> <br> Opération effectuée avec succès!");
-                    return $this->json(json_encode($json), 200);
-                }
-                $em->flush();
-                return $this->redirectToRoute('apm_marketing_commissionnement_show', array('id' => $commissionnement->getId()));
-            } catch (ConstraintViolationException $cve) {
-                $session->getFlashBag()->add('danger', "<strong>Echec de l'enregistrement. </strong><br>L'enregistrement a échoué dû à une contrainte de données!");
-                return $this->json(json_encode(["item" => null]));
-            } catch (AccessDeniedException $ads) {
-                $session->getFlashBag()->add('danger', "<strong>Action interdite.</strong><br>Vous n'êtes pas autorisez à effectuer cette opération!");
-                return $this->json(json_encode(["item" => null]));
+            $form = $this->createForm('APM\MarketingDistribueBundle\Form\CommissionnementType', $commissionnement);
+            $form->submit($request->request->all(), false);
+            if (!$form->isValid()) {
+                return new JsonResponse(
+                    [
+                        "status" => 400,
+                        "message" => $this->get('translator')->trans($form->getErrors(true, false), [], 'FOSUserBundle')
+                    ], Response::HTTP_BAD_REQUEST
+                );
             }
+            $em = $this->getDoctrine()->getManager();
+            $em->flush();
+
+            return $this->routeRedirectView("api_marketing_show_commissionnement", ['id' => $commissionnement->getId()], Response::HTTP_OK);
+
+        } catch (ConstraintViolationException $cve) {
+            return new JsonResponse(
+                [
+                    "status" => 400,
+                    "message" => $this->get('translator')->trans("impossible d'enregistrer, vérifiez vos données", [], 'FOSUserBundle')
+                ], Response::HTTP_BAD_REQUEST
+            );
+        } catch (AccessDeniedException $ads) {
+            return new JsonResponse(
+                [
+                    "status" => 403,
+                    "message" => $this->get('translator')->trans("Access denied", [], 'FOSUserBundle'),
+                ]
+                , Response::HTTP_FORBIDDEN
+            );
         }
-        return $this->render('APMMarketingDistribueBundle:commissionnement:edit.html.twig', array(
-            'commissionnement' => $commissionnement,
-            'edit_form' => $editForm->createView(),
-            'delete_form' => $deleteForm->createView(),
-        ));
     }
 
-    private function editSecurity()
+    private
+    function editSecurity()
     {
         //---------------------------------security-----------------------------------------------
         $this->denyAccessUnlessGranted('ROLE_SUPER_ADMIN', null, 'Unable to access this page!');
@@ -392,57 +401,54 @@ class CommissionnementController extends Controller
     }
 
     /**
-     * Creates a form to delete a Commissionnement entity.
-     *
-     * @param Commissionnement $commissionnement The Commissionnement entity
-     *
-     * @return \Symfony\Component\Form\Form The form
-     */
-    private function createDeleteForm(Commissionnement $commissionnement)
-    {
-        return $this->createFormBuilder()
-            ->setAction($this->generateUrl('apm_marketing_commissionnement_delete', array('id' => $commissionnement->getId())))
-            ->setMethod('DELETE')
-            ->getForm();
-    }
-
-    /**
      * Supprimer à partir d'un formulaire
      * @param Request $request
      * @param Commissionnement $commissionnement
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse | JsonResponse
+     * @return View | JsonResponse
      *
      * @Delete("/delete/commissionnement/{id}")
      */
-    public function deleteAction(Request $request, Commissionnement $commissionnement)
+    public
+    function deleteAction(Request $request, Commissionnement $commissionnement)
     {
-        $this->deleteSecurity($commissionnement);
-        $em = $this->getDoctrine()->getManager();
-        if ($request->isXmlHttpRequest()) {
-            $em->remove($conseiller_boutique);
-            $em->flush();
-            $json = array();
-            $json['item'] = array();
-            return $this->json(json_encode($json), 200);
-        }
-
-        $form = $this->createDeleteForm($commissionnement);
-        $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
+        try {
             $this->deleteSecurity($commissionnement);
+            if (!$request->request->has('exec') || $request->request->get('exec') !== 'go') {
+                return new JsonResponse([
+                    "status" => 400,
+                    "message" => $this->get('translator')->trans('impossible de supprimer', [], 'FOSUserBundle')
+                ], Response::HTTP_BAD_REQUEST);
+            }
+            $em = $this->getDoctrine()->getManager();
             $em->remove($commissionnement);
             $em->flush();
+            return $this->routeRedirectView("api_marketing_get_commissionnements", [], Response::HTTP_OK);
+        } catch (ConstraintViolationException $cve) {
+            return new JsonResponse(
+                [
+                    "status" => 400,
+                    "message" => $this->get('translator')->trans("impossible de supprimer, vérifiez vos données", [], 'FOSUserBundle')
+                ], Response::HTTP_FAILED_DEPENDENCY
+            );
+        } catch (AccessDeniedException $ads) {
+            return new JsonResponse(
+                [
+                    "status" => 403,
+                    "message" => $this->get('translator')->trans("Access denied", [], 'FOSUserBundle'),
+                ]
+                , Response::HTTP_FORBIDDEN
+            );
         }
-
-        return $this->redirectToRoute('apm_marketing_commissionnement_index');
     }
-    //-------------------------------------------------------
+
+//-------------------------------------------------------
 
     /**
      * Le conseiller peut supprimer ses commissionnement
      * @param Commissionnement $commissionnement
      */
-    private function deleteSecurity($commissionnement)
+    private
+    function deleteSecurity($commissionnement)
     {
         //---------------------------------security-----------------------------------------------
         $this->denyAccessUnlessGranted('ROLE_CONSEILLER', null, 'Unable to access this page!');

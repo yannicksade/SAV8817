@@ -5,6 +5,9 @@ namespace APM\MarketingReseauBundle\Controller;
 use APM\MarketingDistribueBundle\Entity\Conseiller;
 use APM\UserBundle\Entity\Utilisateur_avm;
 use APM\MarketingDistribueBundle\Factory\TradeFactory;
+use Doctrine\DBAL\Exception\ConstraintViolationException;
+use FOS\RestBundle\Controller\FOSRestController;
+use FOS\RestBundle\View\View;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -16,33 +19,46 @@ use FOS\RestBundle\Controller\Annotations\Delete;
 use FOS\RestBundle\Controller\Annotations\Put;
 use FOS\RestBundle\Controller\Annotations\Patch;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 /**
  * Reseau_conseillers controller.
- *
- * @RouteResource("network", pluralize=false)
+ * @RouteResource("reseau", pluralize=false)
  */
-class Reseau_conseillersController extends Controller
+class Reseau_conseillersController extends FOSRestController
 {
     /** Liste les binômes du réseau du conseiller (2 par 2) pour dessiner l'arbre
-     * @param Request $request
      * @param Conseiller|null $conseiller
      * @return JsonResponse
      *
-     * @Get("/network")
-     * @Put("/new-network/conseiller{id}", name="_conseiller")
+     * @Get("/")
+     * @Put("/conseiller/{id}", name="_conseiller")
      */
-    public function getAction(Request $request, Conseiller $conseiller = null)
+    public function getAction(Conseiller $conseiller = null)
     {
-        $this->listAndShowSecurity($conseiller);
-        /** @var Utilisateur_avm $user */
-        if (null === $conseiller) {
-            $user = $this->getUser();
-            $conseiller = $user->getProfileConseiller();
-            if (null === $conseiller) return $this->json("not found", 404);
+        try {
+            $this->listAndShowSecurity($conseiller);
+            /** @var Utilisateur_avm $user */
+            if (null === $conseiller) {
+                $user = $this->getUser();
+                $conseiller = $user->getProfileConseiller();
+                if (null === $conseiller) {
+                    return new JsonResponse([
+                        "status" => 404,
+                        "message" => $this->get('translator')->trans("Conseiller not found", [], 'FOSUserBundle'),
+                    ], Response::HTTP_NOT_FOUND);
+                }
+            }
+            $data = $this->get('apm_core.data_serialized')->getFormalData($conseiller, array("net", "owner_list"));
+            return new JsonResponse($data, 200);
+        } catch (AccessDeniedException $ads) {
+            return new JsonResponse([
+                    "status" => 403,
+                    "message" => $this->get('translator')->trans("Access denied", [], 'FOSUserBundle'),
+                ]
+                , Response::HTTP_FORBIDDEN
+            );
         }
-        $data = $this->get('apm_core.data_serialized')->getFormalData($conseiller, array("net", "owner_list"));
-        return new JsonResponse($data, 200);
     }
 
     /**
@@ -69,24 +85,30 @@ class Reseau_conseillersController extends Controller
      * Ajoute ou modifie le conseiller de droite ou de gauche
      * @param Request $request
      * @param Conseiller $conseiller maître du reseau courant
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response|JsonResponse
+     * @return View | JsonResponse
      *
-     * @Post("/network/add-member/conseiller/{id}", name="_conseiller")
+     * @Post("/add-member/conseiller/{id}", name="_conseiller")
      */
     public function handleNetworkingMembersAction(Request $request, Conseiller $conseiller)
     {
-        $this->addSecurity($conseiller);
-        /** @var Utilisateur_avm $user */
-        $user = $this->getUser();
-        $selfConseiller = $user->getProfileConseiller();
-        $form = $this->createForm('APM\MarketingReseauBundle\Form\Reseau_conseillersType');
-        if ($selfConseiller !== $conseiller) {
-            $form->remove('conseiller');
-            $form->remove('modification');
-            $form->remove('position');
-        }
-        $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
+        try {
+            $this->addSecurity($conseiller);
+            /** @var Utilisateur_avm $user */
+            $user = $this->getUser();
+            $selfConseiller = $user->getProfileConseiller();
+            $form = $this->createForm('APM\MarketingReseauBundle\Form\Reseau_conseillersType');
+            if ($selfConseiller !== $conseiller) {
+                $form->remove('conseiller');
+                $form->remove('modification');
+                $form->remove('position');
+            }
+            $form->submit($request->request->all());
+            if (!$form->isValid()) {
+                return new JsonResponse([
+                    "status" => 400,
+                    "message" => $this->get('translator')->trans($form->getErrors(true, false), [], 'FOSUserBundle')
+                ], Response::HTTP_BAD_REQUEST);
+            }
             /** @var Conseiller $advisor */
             $advisor = ($selfConseiller !== $conseiller) ? null : $form->get('conseiller')->getData();
             $modification = $form->has('modification') ? $form->get('modification')->getData() : 1;
@@ -190,26 +212,32 @@ class Reseau_conseillersController extends Controller
                 }
                 $em->flush();
                 $conseiller = $user->getProfileConseiller();
-                if($request->isXmlHttpRequest()){
-                    $json = array();
-                    $json['item'] = array();
-                    return $this->json(json_encode($json), 200);
-                }
                 if (null === $conseiller->getMasterConseiller()) {
-                    $route = 'apm_marketing_conseiller_show';
+                    $route = 'api_marketing_get_reseau_conseiller';
                     $param = array('id' => $conseiller->getId());
                 } else {
-                    $route = 'apm_marketing_reseau_index';
+                    $route = 'api_marketing_get_reseau';
                     $param = [];
                 }
 
-                return $this->redirectToRoute($route, $param);
+                return $this->routeRedirectView($route, $param, Response::HTTP_CREATED);
             }
+
+            return $this->routeRedirectView("api_marketing_get_reseau", [], Response::HTTP_CREATED);
+
+        } catch (ConstraintViolationException $cve) {
+            return new JsonResponse([
+                "status" => 400,
+                "message" => $this->get('translator')->trans("impossible d'enregistrer, vérifiez vos données", [], 'FOSUserBundle')
+            ], Response::HTTP_BAD_REQUEST);
+        } catch (AccessDeniedException $ads) {
+            return new JsonResponse([
+                    "status" => 403,
+                    "message" => $this->get('translator')->trans("Access denied", [], 'FOSUserBundle'),
+                ]
+                , Response::HTTP_FORBIDDEN
+            );
         }
-        return $this->render('APMMarketingReseauBundle:reseau_conseillers:new.html.twig', array(
-            'conseiller' => $conseiller,
-            'form' => $form->createView(),
-        ));
     }
 
 
@@ -242,18 +270,24 @@ class Reseau_conseillersController extends Controller
     /**
      * @param Request $request
      * @param Conseiller $advisorFictif
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse | JsonResponse | Response
+     * @return View | JsonResponse
      *
-     * @Put("/network/promote-member/conseiller/{id}", name="_conseiller")
+     * @Put("/promote-member/conseiller/{id}", name="_conseiller")
      */
     public function PromoteMemberAction(Request $request, Conseiller $advisorFictif)
     {
-        $this->promotionSecurity($advisorFictif);
-        $form = $this->createForm('APM\MarketingReseauBundle\Form\Reseau_conseillersType');
-        $form->remove('conseiller');
-        $form->remove('modification');
-        $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
+        try {
+            $this->promotionSecurity($advisorFictif);
+            $form = $this->createForm('APM\MarketingReseauBundle\Form\Reseau_conseillersType');
+            $form->remove('conseiller');
+            $form->remove('modification');
+            $form->submit($request->request->all());
+            if (!$form->isValid()) {
+                return new JsonResponse([
+                    "status" => 400,
+                    "message" => $this->get('translator')->trans($form->getErrors(true, false), [], 'FOSUserBundle')
+                ], Response::HTTP_BAD_REQUEST);
+            }
             $em = $this->getDoctrine()->getManager();
             $position = boolval($form->get('position')->getData());
             if ($position) {
@@ -298,17 +332,21 @@ class Reseau_conseillersController extends Controller
 
                 $em->flush();
             }
-            if($request->isXmlHttpRequest()){
-                $json = array();
-                $json['item'] = array();
-                return $this->json(json_encode($json), 200);
-            }
-            return $this->redirectToRoute('apm_marketing_reseau_index');
+            return $this->routeRedirectView("api_marketing_get_reseau", [], Response::HTTP_CREATED);
+
+        } catch (ConstraintViolationException $cve) {
+            return new JsonResponse([
+                "status" => 400,
+                "message" => $this->get('translator')->trans("impossible d'enregistrer, vérifiez vos données", [], 'FOSUserBundle')
+            ], Response::HTTP_BAD_REQUEST);
+        } catch (AccessDeniedException $ads) {
+            return new JsonResponse([
+                    "status" => 403,
+                    "message" => $this->get('translator')->trans("Access denied", [], 'FOSUserBundle'),
+                ]
+                , Response::HTTP_FORBIDDEN
+            );
         }
-        return $this->render('APMMarketingReseauBundle:reseau_conseillers:new.html.twig', array(
-            'conseiller' => null,
-            'form' => $form->createView(),
-        ));
     }
 
     /**
@@ -333,26 +371,37 @@ class Reseau_conseillersController extends Controller
     /**
      * Activer son profile de manager de réseau conseiller
      * @param Request $request
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response |JsonResponse
+     * @return View  | JsonResponse
      *
-     * @Post("/new/network")
+     * @Post("/new")
      */
-    public function newAction(Request $request)
+    public function newAction()
     {
-        $this->createSecurity();
-        /** @var Utilisateur_avm $user */
-        $user = $this->getUser();
-        $conseiller = $user->getProfileConseiller();
-        $conseiller->setMasterConseiller($conseiller);
-        $conseiller->setNombreInstanceReseau(1);
-        $em = $this->getEM();
-        $em->flush();
-        if ($request->isXmlHttpRequest()) {
-            $json = array();
-            $json['item'] = array();
-            return $this->json(json_encode($json), 200);
+        try {
+            $this->createSecurity();
+            /** @var Utilisateur_avm $user */
+            $user = $this->getUser();
+            $conseiller = $user->getProfileConseiller();
+            $conseiller->setMasterConseiller($conseiller);
+            $conseiller->setNombreInstanceReseau(1);
+            $em = $this->getEM();
+            $em->flush();
+
+            return $this->routeRedirectView("api_marketing_get_reseau_conseiller", ['id' => $conseiller->getId()], Response::HTTP_CREATED);
+
+        } catch (ConstraintViolationException $cve) {
+            return new JsonResponse([
+                "status" => 400,
+                "message" => $this->get('translator')->trans("impossible d'enregistrer, vérifiez vos données", [], 'FOSUserBundle')
+            ], Response::HTTP_BAD_REQUEST);
+        } catch (AccessDeniedException $ads) {
+            return new JsonResponse([
+                    "status" => 403,
+                    "message" => $this->get('translator')->trans("Access denied", [], 'FOSUserBundle'),
+                ]
+                , Response::HTTP_FORBIDDEN
+            );
         }
-        return $this->redirectToRoute('apm_marketing_reseau_index');
     }
 
     private function createSecurity()

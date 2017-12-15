@@ -29,6 +29,7 @@ class Remise extends TradeFactory
 
     /**
      * @var integer
+     * @Assert\NotNull
      * @Expose
      * @Groups({"owner_remise_details", "others_remise_details"})
      * @ORM\Column(name="etat", type="integer", nullable=false)

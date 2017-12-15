@@ -10,10 +10,12 @@ use APM\VenteBundle\Entity\Transaction;
 use APM\VenteBundle\Entity\Transaction_produit;
 use APM\VenteBundle\Factory\TradeFactory;
 use Doctrine\Common\Collections\Collection;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Doctrine\DBAL\Exception\ConstraintViolationException;
+use FOS\RestBundle\Controller\FOSRestController;
+use FOS\RestBundle\View\View;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\HttpFoundation\Response;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use FOS\RestBundle\Controller\Annotations\RouteResource;
 use FOS\RestBundle\Controller\Annotations\Get;
@@ -22,12 +24,13 @@ use FOS\RestBundle\Controller\Annotations\Patch;
 use FOS\RestBundle\Controller\Annotations\Delete;
 use FOS\RestBundle\Controller\Annotations\Put;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 /**
  * Transaction controller.
  * @RouteResource("transaction", pluralize=false)
  */
-class TransactionController extends Controller
+class TransactionController extends FOSRestController
 {
     private $beneficiaire_filter;
     private $montant_filter;
@@ -53,62 +56,71 @@ class TransactionController extends Controller
      */
     public function getAction(Request $request, Boutique $boutique = null, Livraison $livraison = null)
     {
-        $this->listAndShowSecurity($boutique);
-        /** @var Utilisateur_avm $user */
-        $user = $this->getUser();
-        $q = $request->get('q');
-        $this->beneficiaire_filter = $request->query->has('beneficiaire_filter') ? $request->query->get('beneficiaire_filter') : "";
-        $this->code_filter = $request->query->has('code_filter') ? $request->query->get('code_filter') : "";
-        $this->nature_filter = $request->query->has('nature_filter') ? $request->query->get('nature_filter') : "";
-        $this->etat_filter = $request->query->has('etat_filter') ? $request->query->get('etat_filter') : "";
-        $this->montant_filter = $request->query->has('montant_filter') ? $request->query->get('montant_filter') : "";
+        try {
+            $this->listAndShowSecurity($boutique);
+            /** @var Utilisateur_avm $user */
+            $user = $this->getUser();
+            $q = $request->get('q');
+            $this->beneficiaire_filter = $request->query->has('beneficiaire_filter') ? $request->query->get('beneficiaire_filter') : "";
+            $this->code_filter = $request->query->has('code_filter') ? $request->query->get('code_filter') : "";
+            $this->nature_filter = $request->query->has('nature_filter') ? $request->query->get('nature_filter') : "";
+            $this->etat_filter = $request->query->has('etat_filter') ? $request->query->get('etat_filter') : "";
+            $this->montant_filter = $request->query->has('montant_filter') ? $request->query->get('montant_filter') : "";
 
-        $this->shipped_filter = $request->query->has('shipped_filter') ? $request->query->get('shipped_filter') : "";
-        $this->boutiqueBeneficiaire_filter = $request->query->has('boutiqueBeneficiaire_filter') ? $request->query->get('boutiqueBeneficiaire_filter') : "";
-        $this->boutique_filter = $request->query->has('boutique_filter') ? $request->query->get('boutique_filter') : "";
-        $this->transactionProduit_filter = $request->query->has('transactionProduit_filter') ? $request->query->get('transactionProduit_filter') : "";
-        $this->produit_filter = $request->query->has('produit_filter') ? $request->query->get('produit_filter') : "";
+            $this->shipped_filter = $request->query->has('shipped_filter') ? $request->query->get('shipped_filter') : "";
+            $this->boutiqueBeneficiaire_filter = $request->query->has('boutiqueBeneficiaire_filter') ? $request->query->get('boutiqueBeneficiaire_filter') : "";
+            $this->boutique_filter = $request->query->has('boutique_filter') ? $request->query->get('boutique_filter') : "";
+            $this->transactionProduit_filter = $request->query->has('transactionProduit_filter') ? $request->query->get('transactionProduit_filter') : "";
+            $this->produit_filter = $request->query->has('produit_filter') ? $request->query->get('produit_filter') : "";
 
-        $iDisplayLength = $request->query->has('length') ? $request->query->get('length') : -1;
-        $iDisplayStart = $request->query->has('start') ? intval($request->query->get('start')) : 0;
-        $json = array();
-        $json['items'] = array();
-        if ($q === "sent" || $q === "all") {
-            $transactionsEffectues = (null !== $boutique) ? $boutique->getTransactions() : $user->getTransactionsEffectues();
-            $iTotalRecords = count($transactionsEffectues);
-            if ($iDisplayLength < 0) $iDisplayLength = $iTotalRecords;
-            $transactionsEffectues = $this->handleResults($transactionsEffectues, $iTotalRecords, $iDisplayStart, $iDisplayLength);
-            $iFilteredRecords = count($transactionsEffectues);
-            $data = $this->get('apm_core.data_serialized')->getFormalData($transactionsEffectues, array("owner_list"));
-            $json['totalRecordsSent'] = $iTotalRecords;
-            $json['filteredRecordsSent'] = $iFilteredRecords;
-            $json['items'] = $data;
+            $iDisplayLength = $request->query->has('length') ? $request->query->get('length') : -1;
+            $iDisplayStart = $request->query->has('start') ? intval($request->query->get('start')) : 0;
+            $json = array();
+            $json['items'] = array();
+            if ($q === "sent" || $q === "all") {
+                $transactionsEffectues = (null !== $boutique) ? $boutique->getTransactions() : $user->getTransactionsEffectues();
+                $iTotalRecords = count($transactionsEffectues);
+                if ($iDisplayLength < 0) $iDisplayLength = $iTotalRecords;
+                $transactionsEffectues = $this->handleResults($transactionsEffectues, $iTotalRecords, $iDisplayStart, $iDisplayLength);
+                $iFilteredRecords = count($transactionsEffectues);
+                $data = $this->get('apm_core.data_serialized')->getFormalData($transactionsEffectues, array("owner_list"));
+                $json['totalRecordsSent'] = $iTotalRecords;
+                $json['filteredRecordsSent'] = $iFilteredRecords;
+                $json['items'] = $data;
+            }
+            if ($q === "received" || $q === "all") {
+                $transactionsRecues = (null !== $boutique) ? $boutique->getTransactionsRecues() : $user->getTransactionsRecues();
+                $iTotalRecords = count($transactionsRecues);
+                if ($iDisplayLength < 0) $iDisplayLength = $iTotalRecords;
+                $transactionsRecues = $this->handleResults($transactionsRecues, $iTotalRecords, $iDisplayStart, $iDisplayLength);
+                $iFilteredRecords = count($transactionsRecues);
+                $data = $this->get('apm_core.data_serialized')->getFormalData($transactionsRecues, array("owner_list"));
+                $json['totalRecordsReceived'] = $iTotalRecords;
+                $json['filteredRecordsReceived'] = $iFilteredRecords;
+                $json['items'] = $data;
+            }
+            if ($q === "done" || $q === "all") {
+                $transactions = $livraison->getOperations();
+                $iTotalRecords = count($transactions);
+                if ($iDisplayLength < 0) $iDisplayLength = $iTotalRecords;
+                $transactions = $this->handleResults($transactions, $iTotalRecords, $iDisplayStart, $iDisplayLength);
+                $iFilteredRecords = count($transactions);
+                $data = $this->get('apm_core.data_serialized')->getFormalData($transactions, array("owner_list"));
+                $json['totalRecordsDone'] = $iTotalRecords;
+                $json['filteredRecordsDone'] = $iFilteredRecords;
+                $json['items'] = $data;
+            }
+            return new JsonResponse($json, 200);
+
+        } catch (AccessDeniedException $ads) {
+            return new JsonResponse(
+                [
+                    "status" => 403,
+                    "message" => $this->get('translator')->trans("Access denied", [], 'FOSUserBundle'),
+                ]
+                , Response::HTTP_FORBIDDEN
+            );
         }
-        if ($q === "received" || $q === "all") {
-            $transactionsRecues = (null !== $boutique) ? $boutique->getTransactionsRecues() : $user->getTransactionsRecues();
-            $iTotalRecords = count($transactionsRecues);
-            if ($iDisplayLength < 0) $iDisplayLength = $iTotalRecords;
-            $transactionsRecues = $this->handleResults($transactionsRecues, $iTotalRecords, $iDisplayStart, $iDisplayLength);
-            $iFilteredRecords = count($transactionsRecues);
-            $data = $this->get('apm_core.data_serialized')->getFormalData($transactionsRecues, array("owner_list"));
-            $json['totalRecordsReceived'] = $iTotalRecords;
-            $json['filteredRecordsReceived'] = $iFilteredRecords;
-            $json['items'] = $data;
-        }
-        if ($q === "done" || $q === "all") {
-            $transactions = $livraison->getOperations();
-            $iTotalRecords = count($transactions);
-            if ($iDisplayLength < 0) $iDisplayLength = $iTotalRecords;
-            $transactions = $this->handleResults($transactions, $iTotalRecords, $iDisplayStart, $iDisplayLength);
-            $iFilteredRecords = count($transactions);
-            $data = $this->get('apm_core.data_serialized')->getFormalData($transactions, array("owner_list"));
-            $json['totalRecordsDone'] = $iTotalRecords;
-            $json['filteredRecordsDone'] = $iFilteredRecords;
-            $json['items'] = $data;
-        }
-
-        return new JsonResponse($json, 200);
-
     }
 
     /**
@@ -265,52 +277,44 @@ class TransactionController extends Controller
      * Creates a new Transaction entity.
      * @param Request $request
      * @param Boutique $boutique
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response | JsonResponse
+     * @return View | JsonResponse
      *
      * @Post("/new/transaction")
      * @Post("/new/transaction/boutique/{id}", name="_boutique")
      */
     public function newAction(Request $request, Boutique $boutique = null)
     {
-        $this->createSecurity($boutique);
-        /** @var Session $session */
-        $session = $request->getSession();
-        /** @var Transaction $transaction */
-        $transaction = TradeFactory::getTradeProvider('transaction');
-        $form = $this->createForm('APM\VenteBundle\Form\TransactionType', $transaction);
-        $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
-            try {
-                $transaction->setBoutique($boutique);
-                $transaction->setAuteur($this->getUser());
-                $em = $this->getDoctrine()->getManager();
-                $em->persist($transaction);
-                $em->flush();
-                if ($request->isXmlHttpRequest()) {
-                    $json = array();
-                    $json["item"] = array(//prevenir le client
-                        "action" => 0,
-                    );
-                    $session->getFlashBag()->add('success', "<strong> transaction créée. réf:" . $transaction->getCode() . "</strong><br> Opération effectuée avec succès!");
-                    return $this->json(json_encode($json), 200);
-                }
-                return $this->redirectToRoute('apm_vente_transaction_show', array('id' => $transaction->getId()));
-            } catch (ConstraintViolationException $cve) {
-                $session->getFlashBag()->add('danger', "<strong>Echec de l'enregistrement. </strong><br>L'enregistrement a échoué dû à une contrainte de données!");
-                return $this->json(json_encode(["item" => null]));
-            } catch (RuntimeException $rte) {
-                $session->getFlashBag()->add('danger', "<strong>Echec de l'opération.</strong><br>L'enregistrement a échoué. bien vouloir réessayer plutard, svp!");
-                return $this->json(json_encode(["item" => null]));
-            } catch (AccessDeniedException $ads) {
-                $session->getFlashBag()->add('danger', "<strong>Action interdite.</strong><br>Vous n'êtes pas autorisez à effectuer cette opération!");
-                return $this->json(json_encode(["item" => null]));
+        try {
+            $this->createSecurity($boutique);
+            /** @var Transaction $transaction */
+            $transaction = TradeFactory::getTradeProvider('transaction');
+            $form = $this->createForm('APM\VenteBundle\Form\TransactionType', $transaction);
+            $form->submit($request->request->all());
+            if (!$form->isValid()) {
+                return new JsonResponse([
+                    "status" => 400,
+                    "message" => $this->get('translator')->trans($form->getErrors(true, false), [], 'FOSUserBundle')
+                ], Response::HTTP_BAD_REQUEST);
             }
+            $transaction->setBoutique($boutique);
+            $transaction->setAuteur($this->getUser());
+            $em = $this->getDoctrine()->getManager();
+            $em->persist($transaction);
+            $em->flush();
+            return $this->routeRedirectView("api_vente_show_transaction", ['id' => $transaction->getId()], Response::HTTP_CREATED);
+        } catch (ConstraintViolationException $cve) {
+            return new JsonResponse([
+                "status" => 400,
+                "message" => $this->get('translator')->trans("impossible d'enregistrer, vérifiez vos données", [], 'FOSUserBundle')
+            ], Response::HTTP_BAD_REQUEST);
+        } catch (AccessDeniedException $ads) {
+            return new JsonResponse([
+                    "status" => 403,
+                    "message" => $this->get('translator')->trans("Access denied", [], 'FOSUserBundle'),
+                ]
+                , Response::HTTP_FORBIDDEN
+            );
         }
-        $session->set('previous_location', $request->getUri());
-        return $this->render('APMVenteBundle:transaction:new.html.twig', array(
-            'transaction' => $transaction,
-            'form' => $form->createView(),
-        ));
     }
 
     /**
@@ -356,68 +360,39 @@ class TransactionController extends Controller
      * Displays a form to edit an existing Transaction entity.
      * @param Request $request
      * @param Transaction $transaction
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @return View | JsonResponse
      *
      * @Put("/edit/transaction/{id}")
      */
     public function editAction(Request $request, Transaction $transaction)
     {
-        $this->editAndDeleteSecurity($transaction);
-        if ($request->isXmlHttpRequest() && $request->getMethod() === "POST") {
-            $json = array();
-            $json['item'] = array();
-            /** @var Session $session */
-            $session = $request->getSession();
-            $em = $this->getDoctrine()->getManager();
-            $property = $request->request->get('name');
-            $value = $request->request->get('value');
-            switch ($property) {
-                case 'etat':
-                    $transaction->setStatut($value);
-                    $json["item"] = array(//pour actualiser la table
-                        "action" => 1,
-                    );
-                    break;
-                case 'destinataireNonAvm':
-                    $transaction->setDestinataireNonAvm($value);
-                    break;
-                case 'montant':
-                    $transaction->setMontant($value);
-                    break;
-                case 'nature' :
-                    $transaction->setNature($value);
-                    break;
-                case 'beneficiaire':
-                    /** @var Utilisateur_avm $beneficiaire */
-                    $beneficiaire = $em->getRepository('APMUserBundle:Utilisateur_avm')->find($value);
-                    $transaction->setBeneficiaire($beneficiaire);
-                    break;
-                default:
-                    $session->getFlashBag()->add('info', "<strong> Aucune mis à jour effectuée</strong>");
-                    return $this->json(json_encode(["item" => null]), 205);
-            }
-            $em->flush();
-            $session->getFlashBag()->add('success', "Mis à jour propriété : <strong>" . $property . "</strong> réf. transaction :" . $transaction->getCode() . "<br> Opération effectuée avec succès!");
-            return $this->json(json_encode($json), 200);
-        }
-        $deleteForm = $this->createDeleteForm($transaction);
-        $editForm = $this->createForm('APM\VenteBundle\Form\TransactionType', $transaction);
-        $editForm->handleRequest($request);
-
-        if ($editForm->isSubmitted() && $editForm->isValid()) {
+        try {
             $this->editAndDeleteSecurity($transaction);
+            $form = $this->createForm('APM\VenteBundle\Form\TransactionType', $transaction);
+            $form->submit($request->request->all(), false);
+            if (!$form->isValid()) {
+                return new JsonResponse([
+                    "status" => 400,
+                    "message" => $this->get('translator')->trans($form->getErrors(true, false), [], 'FOSUserBundle')
+                ], Response::HTTP_BAD_REQUEST);
+            }
             $em = $this->getDoctrine()->getManager();
-            $em->persist($transaction);
             $em->flush();
 
-            return $this->redirectToRoute('apm_vente_transaction_show', array('id' => $transaction->getId()));
+            return $this->routeRedirectView("api_vente_show_transaction", ['id' => $transaction->getId()], Response::HTTP_OK);
+        } catch (ConstraintViolationException $cve) {
+            return new JsonResponse([
+                "status" => 400,
+                "message" => $this->get('translator')->trans("impossible d'enregistrer, vérifiez vos données", [], 'FOSUserBundle')
+            ], Response::HTTP_BAD_REQUEST);
+        } catch (AccessDeniedException $ads) {
+            return new JsonResponse([
+                    "status" => 403,
+                    "message" => $this->get('translator')->trans("Access denied", [], 'FOSUserBundle'),
+                ]
+                , Response::HTTP_FORBIDDEN
+            );
         }
-
-        return $this->render('APMVenteBundle:transaction:edit.html.twig', array(
-            'transaction' => $transaction,
-            'edit_form' => $editForm->createView(),
-            'delete_form' => $deleteForm->createView(),
-        ));
     }
 
     /**
@@ -452,49 +427,51 @@ class TransactionController extends Controller
         //----------------------------------------------------------------------------------------
     }
 
-    /**
-     * Creates a form to delete a Transaction entity.
-     *
-     * @param Transaction $transaction The Transaction entity
-     *
-     * @return \Symfony\Component\Form\Form The form
-     */
-    private function createDeleteForm(Transaction $transaction)
-    {
-        return $this->createFormBuilder()
-            ->setAction($this->generateUrl('apm_vente_transaction_delete', array('id' => $transaction->getId())))
-            ->setMethod('DELETE')
-            ->getForm();
-    }
 
     /**
      * Deletes a Transaction entity.
      * @param Request $request
      * @param Transaction $transaction
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse | JsonResponse
+     * @return View | JsonResponse
      *
      * @Delete("/delete/transaction/{id}")
      */
     public function deleteAction(Request $request, Transaction $transaction)
     {
-        $this->editAndDeleteSecurity($transaction);
-
-        $em = $this->getDoctrine()->getManager();
-        if ($request->isXmlHttpRequest() && $request->getMethod() === "POST") {
+        try {
+            $this->editAndDeleteSecurity($transaction);
+            if (!$request->request->has('exec') || $request->request->get('exec') !== 'go') {
+                return new JsonResponse([
+                    "status" => 400,
+                    "message" => $this->get('translator')->trans('impossible de supprimer', [], 'FOSUserBundle')
+                ], Response::HTTP_BAD_REQUEST);
+            }
+            if ($boutique = $transaction->getBoutique()) {
+                $route = "api_vente_get_transactions_boutique";
+                $param = ["id" => $boutique->getId()];
+            } else {
+                $route = "api_vente_get_transactions";
+                $param = [];
+            }
+            $em = $this->getDoctrine()->getManager();
             $em->remove($transaction);
             $em->flush();
-            $json = array();
-            return $this->json($json, 200);
+            return $this->routeRedirectView($route, $param, Response::HTTP_OK);
+        } catch (ConstraintViolationException $cve) {
+            return new JsonResponse(
+                [
+                    "status" => 400,
+                    "message" => $this->get('translator')->trans("impossible de supprimer, vérifiez vos données", [], 'FOSUserBundle')
+                ], Response::HTTP_FAILED_DEPENDENCY);
+        } catch (AccessDeniedException $ads) {
+            return new JsonResponse(
+                [
+                    "status" => 403,
+                    "message" => $this->get('translator')->trans("Access denied", [], 'FOSUserBundle'),
+                ]
+                , Response::HTTP_FORBIDDEN
+            );
         }
 
-        $form = $this->createDeleteForm($transaction);
-        $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
-            $em->remove($transaction);
-            $em->flush();
-        }
-
-        return $this->redirectToRoute('apm_vente_transaction_index');
     }
-
 }

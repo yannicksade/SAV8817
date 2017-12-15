@@ -19,6 +19,7 @@ use FOS\RestBundle\Controller\Annotations\Post;
 use FOS\RestBundle\Controller\Annotations\Get;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use FOS\RestBundle\Controller\Annotations\RouteResource;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 /**
  * Class RegistrationUtilisateurAVMController
@@ -35,9 +36,17 @@ class RegistrationStaffController extends FOSRestController
      */
     public function registerAction(Request $request)
     {
-        $this->security($this->getUser());
-        return $this->get('apm_user.registration_manager')->register(Admin::class, $request);
-
+        try {
+            $this->security($this->getUser());
+            return $this->get('apm_user.registration_manager')->register(Admin::class, $request);
+        } catch (AccessDeniedException $ads) {
+            return new JsonResponse([
+                    "status" => 403,
+                    "message" => $this->get('translator')->trans("Access denied", [], 'FOSUserBundle'),
+                ]
+                , Response::HTTP_FORBIDDEN
+            );
+        }
     }
 
     private function security($user)
@@ -58,7 +67,6 @@ class RegistrationStaffController extends FOSRestController
      */
     public function registrationConfirmationAction(Request $request)
     {
-
         return $this->get('apm_user.registration_manager')->confirm(Admin::class, $request);
     }
 

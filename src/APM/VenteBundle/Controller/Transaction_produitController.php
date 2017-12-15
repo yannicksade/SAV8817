@@ -7,11 +7,13 @@ use APM\VenteBundle\Entity\Transaction;
 use APM\VenteBundle\Entity\Transaction_produit;
 use APM\VenteBundle\Factory\TradeFactory;
 use Doctrine\Common\Collections\Collection;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Doctrine\DBAL\Exception\ConstraintViolationException;
+use FOS\RestBundle\Controller\FOSRestController;
+use FOS\RestBundle\View\View;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
-use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\HttpFoundation\Response;
 use FOS\RestBundle\Controller\Annotations\RouteResource;
 use FOS\RestBundle\Controller\Annotations\Get;
 use FOS\RestBundle\Controller\Annotations\Post;
@@ -19,12 +21,13 @@ use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use FOS\RestBundle\Controller\Annotations\Put;
 use FOS\RestBundle\Controller\Annotations\Patch;
 use FOS\RestBundle\Controller\Annotations\Delete;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 /**
  * Transaction_produit controller.
- * @RouteResource("transaction_produit", pluralize=false)
+ * @RouteResource("transaction-produit", pluralize=false)
  */
-class Transaction_produitController extends Controller
+class Transaction_produitController extends FOSRestController
 {
     private $reference_filter;
     private $quantiteTo_filter;
@@ -36,38 +39,44 @@ class Transaction_produitController extends Controller
     private $dateInsertionFrom_filter;
 
     /**
-     * Liste les transactions produits d'une offre, d'une boutique ou d'un individu
-     * @ParamConverter("offre", options={"mapping": {"offre_id":"id"}})
      * @param Request $request
      * @param Transaction $transaction
      * @return JsonResponse
-     *
      * Get("/cget/transaction-produits/transaction/{id}", name="s")
      */
     public function getAction(Request $request, Transaction $transaction)
     {
-        $this->listAndShowSecurity($transaction, null);
-        $transaction_produits = $transaction->getTransactionProduits();
-
-        $this->reference_filter = $request->query->has('reference_filter') ? $request->query->get('reference_filter') : "";
-        $this->designation_filter = $request->query->has('designation_filter') ? $request->query->get('designation_filter') : "";
-        $this->quantiteFrom_filter = $request->query->has('quantiteFrom_filter') ? $request->query->get('quantiteFrom_filter') : "";
-        $this->quantiteTo_filter = $request->query->has('quantiteTo_filter') ? $request->query->get('quantiteTo_filter') : "";
-        $this->codeTransaction_filter = $request->query->has('codeTransaction_filter') ? $request->query->get('codeTransaction_filter') : "";
-        $this->dateInsertionFrom_filter = $request->query->has('dateInsertionFrom_filter') ? $request->query->get('dateInsertionFrom_filter') : "";
-        $this->dateInsertionTo_filter = $request->query->has('dateInsertionTo_filter') ? $request->query->get('dateInsertionTo_filter') : "";
-        $iDisplayLength = $request->query->has('length') ? $request->query->get('length') : -1;
-        $iDisplayStart = $request->query->has('start') ? intval($request->query->get('start')) : 0;
-        $json = array();
-        $iTotalRecords = count($transaction_produits);
-        if ($iDisplayLength < 0) $iDisplayLength = $iTotalRecords;
-        $transaction_produits = $this->handleResults($transaction_produits, $iTotalRecords, $iDisplayStart, $iDisplayLength);
-        $iFilteredRecords = count($transaction_produits);
-        $data = $this->get('apm_core.data_serialized')->getFormalData($transaction_produits, array("owner_list"));
-        $json['totalRecords'] = $iTotalRecords;
-        $json['filteredRecords'] = $iFilteredRecords;
-        $json['items'] = $data;
-        return new JsonResponse($json, 200);
+        try {
+            $this->listAndShowSecurity($transaction, null);
+            $transaction_produits = $transaction->getTransactionProduits();
+            $this->reference_filter = $request->query->has('reference_filter') ? $request->query->get('reference_filter') : "";
+            $this->designation_filter = $request->query->has('designation_filter') ? $request->query->get('designation_filter') : "";
+            $this->quantiteFrom_filter = $request->query->has('quantiteFrom_filter') ? $request->query->get('quantiteFrom_filter') : "";
+            $this->quantiteTo_filter = $request->query->has('quantiteTo_filter') ? $request->query->get('quantiteTo_filter') : "";
+            $this->codeTransaction_filter = $request->query->has('codeTransaction_filter') ? $request->query->get('codeTransaction_filter') : "";
+            $this->dateInsertionFrom_filter = $request->query->has('dateInsertionFrom_filter') ? $request->query->get('dateInsertionFrom_filter') : "";
+            $this->dateInsertionTo_filter = $request->query->has('dateInsertionTo_filter') ? $request->query->get('dateInsertionTo_filter') : "";
+            $iDisplayLength = $request->query->has('length') ? $request->query->get('length') : -1;
+            $iDisplayStart = $request->query->has('start') ? intval($request->query->get('start')) : 0;
+            $json = array();
+            $iTotalRecords = count($transaction_produits);
+            if ($iDisplayLength < 0) $iDisplayLength = $iTotalRecords;
+            $transaction_produits = $this->handleResults($transaction_produits, $iTotalRecords, $iDisplayStart, $iDisplayLength);
+            $iFilteredRecords = count($transaction_produits);
+            $data = $this->get('apm_core.data_serialized')->getFormalData($transaction_produits, array("owner_list"));
+            $json['totalRecords'] = $iTotalRecords;
+            $json['filteredRecords'] = $iFilteredRecords;
+            $json['items'] = $data;
+            return new JsonResponse($json, 200);
+        } catch (AccessDeniedException $ads) {
+            return new JsonResponse(
+                [
+                    "status" => 403,
+                    "message" => $this->get('translator')->trans("Access denied", [], 'FOSUserBundle'),
+                ]
+                , Response::HTTP_FORBIDDEN
+            );
+        }
     }
 
     /**
@@ -82,7 +91,6 @@ class Transaction_produitController extends Controller
         if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
             throw $this->createAccessDeniedException();
         }
-
         $user = $this->getUser();
         $vendeur = null;
         $gerant = null;
@@ -191,67 +199,62 @@ class Transaction_produitController extends Controller
     /**
      * @param Request $request
      * @param Transaction $transaction
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response | JsonResponse
+     * @return View | JsonResponse
      *
      * @Post("/new/transaction-produit")
      * @Post("/new/transaction-produit/transaction/{id}", name="_transaction")
      */
     public function newAction(Request $request, Transaction $transaction = null)
     {
-        $this->createSecurity();
-        /** @var Session $session */
-        $session = $request->getSession();
-        $em = $this->getDoctrine()->getManager();
-        /** @var Transaction_produit $transaction_produit */
-        $transaction_produit = TradeFactory::getTradeProvider('transaction_produit');
-        $trans = null;
-        if (null === $transaction) {
-            /** @var Transaction $trans */
-            $trans = TradeFactory::getTradeProvider('transaction');
-            $trans->setAuteur($this->getUser());
-            $transaction_produit->setTransaction($trans);
-        }
-        $form = $this->createForm('APM\VenteBundle\Form\Transaction_produitType', $transaction_produit);
-        if (null !== $transaction) $form->remove('transaction'); else $transaction = $trans;
-        $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
-            try {
-                $this->createSecurity($transaction_produit->getProduit());
-                $transaction_produit->setTransaction($transaction);
-                $em->persist($transaction);
-                $em->persist($transaction_produit);
-                $em->flush();
-                if ($request->isXmlHttpRequest()) {
-                    $json = array();
-                    $json["item"] = array(//prevenir le client
-                        "action" => 0,
-                    );
-                    $session->getFlashBag()->add('success', "<strong> préparation de la transaction réf:" . $transaction_produit->getReference() . "</strong><br> Opération effectuée avec succès!");
-                    return $this->json(json_encode($json), 200);
-                }
-                return $this->redirectToRoute('apm_vente_transaction_produit_show', array('id' => $transaction_produit->getId()));
-            } catch (ConstraintViolationException $cve) {
-                $session->getFlashBag()->add('danger', "<strong>Echec de l'enregistrement. </strong><br>L'enregistrement a échoué dû à une contrainte de données!");
-                return $this->json(json_encode(["item" => null]));
-            } catch (RuntimeException $rte) {
-                $session->getFlashBag()->add('danger', "<strong>Echec de l'opération.</strong><br>L'enregistrement a échoué. bien vouloir réessayer plutard, svp!");
-                return $this->json(json_encode(["item" => null]));
-            } catch (AccessDeniedException $ads) {
-                $session->getFlashBag()->add('danger', "<strong>Action interdite.</strong><br>Vous n'êtes pas autorisez à effectuer cette opération!");
-                return $this->json(json_encode(["item" => null]));
+        try {
+            $this->createSecurity();
+            $em = $this->getDoctrine()->getManager();
+            /** @var Transaction_produit $transaction_produit */
+            $transaction_produit = TradeFactory::getTradeProvider('transaction_produit');
+            $trans = null;
+            if (null === $transaction) {
+                /** @var Transaction $trans */
+                $trans = TradeFactory::getTradeProvider('transaction');
+                $trans->setAuteur($this->getUser());
+                $transaction_produit->setTransaction($trans);
             }
+            $form = $this->createForm('APM\VenteBundle\Form\Transaction_produitType', $transaction_produit);
+            if (null !== $transaction) $form->remove('transaction'); else $transaction = $trans;
+            $form->submit($request->request->all());
+            if (!$form->isValid()) {
+                return new JsonResponse([
+                    "status" => 400,
+                    "message" => $this->get('translator')->trans($form->getErrors(true, false), [], 'FOSUserBundle')
+                ], Response::HTTP_BAD_REQUEST);
+            }
+            $this->createSecurity($transaction_produit->getProduit());
+            $transaction_produit->setTransaction($transaction);
+            $em->persist($transaction);
+            $em->persist($transaction_produit);
+            $em->flush();
+
+            return $this->routeRedirectView("api_vente_show_transaction-produit", ['id' => $transaction_produit->getId()], Response::HTTP_CREATED);
+
+        } catch (ConstraintViolationException $cve) {
+            return new JsonResponse([
+                "status" => 400,
+                "message" => $this->get('translator')->trans("impossible d'enregistrer, vérifiez vos données", [], 'FOSUserBundle')
+            ], Response::HTTP_BAD_REQUEST);
+        } catch (AccessDeniedException $ads) {
+            return new JsonResponse([
+                    "status" => 403,
+                    "message" => $this->get('translator')->trans("Access denied", [], 'FOSUserBundle'),
+                ]
+                , Response::HTTP_FORBIDDEN
+            );
         }
-        $session->set('previous_location', $request->getUri());
-        return $this->render('APMVenteBundle:transaction_produit:new.html.twig', array(
-            'transaction' => $transaction,
-            'form' => $form->createView(),
-        ));
     }
 
     /**
      * @param Offre $offre
      */
-    private function createSecurity($offre = null)
+    private
+    function createSecurity($offre = null)
     {
         //---------------------------------security-----------------------------------------------
         // Unable to access the controller unless you have a USERAVM role
@@ -280,13 +283,13 @@ class Transaction_produitController extends Controller
     }
 
     /**
-     * Finds and displays a Transaction_produit entity.
      * @param Transaction_produit $transaction_produit
      * @return \Symfony\Component\HttpFoundation\Response
      *
      * @Get("/show/transaction-produit/{id}")
      */
-    public function showAction(Transaction_produit $transaction_produit)
+    public
+    function showAction(Transaction_produit $transaction_produit)
     {
         $this->listAndShowSecurity($transaction_produit->getTransaction(), $transaction_produit->getProduit());
         $data = $this->get('apm_core.data_serialized')->getFormalData($transaction_produit, ["owner_transactionP_details", "owner_list"]);
@@ -294,63 +297,48 @@ class Transaction_produitController extends Controller
     }
 
     /**
-     * Une Transaction produit ne peut être modifier ni supprimer car elle portant sur une offre AVM contrairement à une transaction
      * @param Request $request
      * @param Transaction_produit $transaction_produit
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @return View | JsonResponse
      *
      * @Put("/edit/transaction-produit/{id}")
      */
-    public function editAction(Request $request, Transaction_produit $transaction_produit)
+    public
+    function editAction(Request $request, Transaction_produit $transaction_produit)
     {
-        $this->editAndDeleteSecurity($transaction_produit);
-        if ($request->isXmlHttpRequest() && $request->getMethod() === "POST") {
-            $json = array();
-            $json['item'] = array();
-            /** @var Session $session */
-            $session = $request->getSession();
-            $em = $this->getDoctrine()->getManager();
-            $property = $request->query->get('name');
-            $value = $request->query->get('value');
-            switch ($property) {
-                case 'reference':
-                    $transaction_produit->setReference($value);
-                    break;
-                case 'quantite':
-                    $transaction_produit->setQuantite($value);
-                    break;
-                default:
-                    $session->getFlashBag()->add('info', "<strong> Aucune mis à jour effectuée</strong>");
-                    return $this->json(json_encode(["item" => null]), 205);
+        try {
+            $this->editAndDeleteSecurity($transaction_produit);
+            $form = $this->createForm('APM\VenteBundle\Form\Transaction_produitType', $transaction_produit);
+            $form->submit($request->request->all(), false);
+            if (!$form->isValid()) {
+                return new JsonResponse([
+                    "status" => 400,
+                    "message" => $this->get('translator')->trans($form->getErrors(true, false), [], 'FOSUserBundle')
+                ], Response::HTTP_BAD_REQUEST);
             }
-            $em->flush();
-            $session->getFlashBag()->add('success', "Mis à jour propriété : <strong>" . $property . "</strong> réf. transaction :" . $transaction_produit->getReference() . "<br> Opération effectuée avec succès!");
-            return $this->json(json_encode($json), 200);
-        }
-
-        $deleteForm = $this->createDeleteForm($transaction_produit);
-        $editForm = $this->createForm('APM\VenteBundle\Form\Transaction_produitType', $transaction_produit);
-        $editForm->handleRequest($request);
-        if ($editForm->isSubmitted() && $editForm->isValid()) {
             $em = $this->getDoctrine()->getManager();
-            $em->persist($transaction_produit);
             $em->flush();
-
-            return $this->redirectToRoute('apm_vente_transaction_produit_show', array('id' => $transaction_produit->getId()));
+            return $this->routeRedirectView("api_vente_show_transaction-produit", ['id' => $transaction_produit->getId()], Response::HTTP_OK);
+        } catch (ConstraintViolationException $cve) {
+            return new JsonResponse([
+                "status" => 400,
+                "message" => $this->get('translator')->trans("impossible d'enregistrer, vérifiez vos données", [], 'FOSUserBundle')
+            ], Response::HTTP_BAD_REQUEST);
+        } catch (AccessDeniedException $ads) {
+            return new JsonResponse([
+                    "status" => 403,
+                    "message" => $this->get('translator')->trans("Access denied", [], 'FOSUserBundle'),
+                ]
+                , Response::HTTP_FORBIDDEN
+            );
         }
-
-        return $this->render('APMVenteBundle:transaction_produit:edit.html.twig', array(
-            'transaction_produit' => $transaction_produit,
-            'edit_form' => $editForm->createView(),
-            'delete_form' => $deleteForm->createView(),
-        ));
     }
 
     /**
-     * Une Transaction produit portant sur une offre ne peut être modifiée ni supprimée par l'utilisateur. Contrairement à une transaction
      * @param Transaction_produit $transaction_produit
      */
-    private function editAndDeleteSecurity($transaction_produit)
+    private
+    function editAndDeleteSecurity($transaction_produit)
     {
         //---------------------------------security-----------------------------------------------
         $this->denyAccessUnlessGranted('ROLE_USERAVM', null, 'Unable to access this page!');
@@ -360,48 +348,46 @@ class Transaction_produitController extends Controller
         //----------------------------------------------------------------------------------------
     }
 
-    /**
-     * Creates a form to delete a Transaction_produit entity.
-     *
-     * @param Transaction_produit $transaction_produit The Transaction_produit entity
-     *
-     * @return \Symfony\Component\Form\Form The form
-     */
-    private function createDeleteForm(Transaction_produit $transaction_produit)
-    {
-        return $this->createFormBuilder()
-            ->setAction($this->generateUrl('apm_vente_transaction_produit_delete', array('id' => $transaction_produit->getId())))
-            ->setMethod('DELETE')
-            ->getForm();
-    }
 
     /**
      * Deletes a Transaction_produit entity.
      * @param Request $request
      * @param Transaction_produit $transaction_produit
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse | JsonResponse
+     * @return View| JsonResponse
      *
      * @Delete("/delete/transaction-produit/{id}")
      */
-    public function deleteAction(Request $request, Transaction_produit $transaction_produit)
+    public
+    function deleteAction(Request $request, Transaction_produit $transaction_produit)
     {
-        $this->editAndDeleteSecurity($transaction_produit);
-        $em = $this->getDoctrine()->getManager();
-        if ($request->isXmlHttpRequest()) {
-            $json = array();
-            $json['item'] = array();
+        try {
+            $this->editAndDeleteSecurity($transaction_produit);
+            if (!$request->request->has('exec') || $request->request->get('exec') !== 'go') {
+                return new JsonResponse([
+                    "status" => 400,
+                    "message" => $this->get('translator')->trans('impossible de supprimer', [], 'FOSUserBundle')
+                ], Response::HTTP_BAD_REQUEST);
+            }
+            $transaction = $transaction_produit->getTransaction();
+            $em = $this->getDoctrine()->getManager();
             $em->remove($transaction_produit);
             $em->flush();
-            return $this->json($json, 200);
+            return $this->routeRedirectView("api_vente_new_transaction-produit_transaction", [$transaction->getId()], Response::HTTP_OK);
+        } catch (ConstraintViolationException $cve) {
+            return new JsonResponse(
+                [
+                    "status" => 400,
+                    "message" => $this->get('translator')->trans("impossible de supprimer, vérifiez vos données", [], 'FOSUserBundle')
+                ], Response::HTTP_FAILED_DEPENDENCY);
+        } catch (AccessDeniedException $ads) {
+            return new JsonResponse(
+                [
+                    "status" => 403,
+                    "message" => $this->get('translator')->trans("Access denied", [], 'FOSUserBundle'),
+                ]
+                , Response::HTTP_FORBIDDEN
+            );
         }
 
-        $form = $this->createDeleteForm($transaction_produit);
-        $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
-            $em->remove($transaction_produit);
-            $em->flush();
-        }
-
-        return $this->redirectToRoute('apm_vente_transaction_produit_index', ['id' => $transaction_produit->getTransaction()->getId()]);
     }
 }

@@ -7,10 +7,12 @@ use APM\VenteBundle\Entity\Categorie;
 use APM\VenteBundle\Factory\TradeFactory;
 use APM\VenteBundle\Form\CategorieType;
 use Doctrine\Common\Collections\Collection;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Doctrine\DBAL\Exception\ConstraintViolationException;
+use FOS\RestBundle\Controller\FOSRestController;
+use FOS\RestBundle\View\View;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\HttpFoundation\Response;
 use FOS\RestBundle\Controller\Annotations\RouteResource;
 use FOS\RestBundle\Controller\Annotations\Get;
 use FOS\RestBundle\Controller\Annotations\Post;
@@ -18,13 +20,14 @@ use FOS\RestBundle\Controller\Annotations\Put;
 use FOS\RestBundle\Controller\Annotations\Patch;
 use FOS\RestBundle\Controller\Annotations\Delete;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 /**
  * Categorie controller.
- * @RouteResource("boutique", pluralize=false)
+ * @RouteResource("categorie", pluralize=false)
  *
  */
-class CategorieController extends Controller
+class CategorieController extends FOSRestController
 {
     private $code_filter;
     private $designation_filter;
@@ -41,38 +44,43 @@ class CategorieController extends Controller
      * Liste les catégories par Boutique
      * @param Request $request
      * @param Boutique $boutique
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
+     * @return JsonResponse
      *
      * @Get("/cget/categories/boutique/{id}", name="s")
      */
     public function getAction(Request $request, Boutique $boutique)
     {
-        $this->listAndShowSecurity($boutique);
-        $categories = $boutique->getCategories();
-        $this->code_filter = $request->query->has('code_filter') ? $request->query->get('code_filter') : "";
-        $this->designation_filter = $request->query->has('designation_filter') ? $request->query->get('designation_filter') : "";
-        $this->description_filter = $request->query->has('description_filter') ? $request->query->get('description_filter') : "";
-        $this->livrable_filter = $request->query->has('livrable_filter') ? $request->query->get('livrable_filter') : "";
-        $this->publiable_filter = $request->query->has('publiable_filter') ? $request->query->get('publiable_filter') : "";
-        $this->etat_filter = $request->query->has('etat_filter') ? $request->query->get('etat_filter') : "";
-        $this->categorieCourante_filter = $request->query->has('categorieCourante_filter') ? $request->query->get('categorieCourante_filter') : "";
-        $this->dateFrom_filter = $request->query->has('date_from_filter') ? $request->query->get('date_from_filter') : "";
-        $this->dateTo_filter = $request->query->has('date_to_filter') ? $request->query->get('date_to_filter') : "";
-        $iDisplayLength = $request->query->has('length') ? $request->query->get('length') : -1;
-        $iDisplayStart = $request->query->has('start') ? intval($request->query->get('start')) : 0;
-        $json = array();
-        $selectedGroup = array("owner_list");
-        $iTotalRecords = count($categories);
-        if ($iDisplayLength < 0) $iDisplayLength = $iTotalRecords;
-        $categories = $this->handleResults($categories, $iTotalRecords, $iDisplayStart, $iDisplayLength);
-        $iFilteredRecords = count($categories);
-        $data = $this->get('apm_core.data_serialized')->getFormalData($categories, $selectedGroup);
-        $json['totalRecords'] = $iTotalRecords;
-        $json['filteredRecords'] = $iFilteredRecords;
-        $json['items'] = $data;
-
-        return new JsonResponse($json, 200);
-
+        try {
+            $this->listAndShowSecurity($boutique);
+            $categories = $boutique->getCategories();
+            $this->code_filter = $request->query->has('code_filter') ? $request->query->get('code_filter') : "";
+            $this->designation_filter = $request->query->has('designation_filter') ? $request->query->get('designation_filter') : "";
+            $this->description_filter = $request->query->has('description_filter') ? $request->query->get('description_filter') : "";
+            $this->livrable_filter = $request->query->has('livrable_filter') ? $request->query->get('livrable_filter') : "";
+            $this->publiable_filter = $request->query->has('publiable_filter') ? $request->query->get('publiable_filter') : "";
+            $this->etat_filter = $request->query->has('etat_filter') ? $request->query->get('etat_filter') : "";
+            $this->categorieCourante_filter = $request->query->has('categorieCourante_filter') ? $request->query->get('categorieCourante_filter') : "";
+            $this->dateFrom_filter = $request->query->has('date_from_filter') ? $request->query->get('date_from_filter') : "";
+            $this->dateTo_filter = $request->query->has('date_to_filter') ? $request->query->get('date_to_filter') : "";
+            $iDisplayLength = $request->query->has('length') ? $request->query->get('length') : -1;
+            $iDisplayStart = $request->query->has('start') ? intval($request->query->get('start')) : 0;
+            $json = array();
+            $selectedGroup = array("owner_list");
+            $iTotalRecords = count($categories);
+            if ($iDisplayLength < 0) $iDisplayLength = $iTotalRecords;
+            $categories = $this->handleResults($categories, $iTotalRecords, $iDisplayStart, $iDisplayLength);
+            $iFilteredRecords = count($categories);
+            $data = $this->get('apm_core.data_serialized')->getFormalData($categories, $selectedGroup);
+            $json['totalRecords'] = $iTotalRecords;
+            $json['filteredRecords'] = $iFilteredRecords;
+            $json['items'] = $data;
+            return new JsonResponse($json, 200);
+        } catch (AccessDeniedException $ads) {
+            return new JsonResponse([
+                "status" => 403,
+                "message" => $this->get('translator')->trans("Accès refusé", [], 'FOSUserBundle')
+            ], Response::HTTP_FORBIDDEN);
+        }
     }
 
     /**
@@ -197,50 +205,44 @@ class CategorieController extends Controller
      * Creates les catégories sont créées uniquement dans les boutiques
      * @param Request $request
      * @param Boutique $boutique
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response | JsonResponse
-     *
      * @Post("/new/categorie")
      * @Post("/new/categorie/boutique/{id}", name="_boutique")
+     *
+     * @return JsonResponse | View
      */
     public function newAction(Request $request, Boutique $boutique = null)
     {
-        $this->createSecurity($boutique);
-        /** @var Categorie $categorie */
-        $categorie = TradeFactory::getTradeProvider('categorie');
-        $form = $this->createForm(CategorieType::class, $categorie);
-        $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
-            try {
-                $this->createSecurity($boutique, $categorie->getCategorieCourante());
-                $categorie->setBoutique($boutique);
-                $em = $this->getEM();
-                $em->persist($categorie);
-                $em->flush();
-                if ($request->isXmlHttpRequest()) {
-                    $json['item'] = array();
-                    $json["item"] = array(//prevenir le client
-                        "action" => 0,
-                    );
-                    $session->getFlashBag()->add('success', "<strong> Mis à jour de la catécorie: réf:" . $categorie->getCode() . "</strong><br> Opération effectuée avec succès!");
-                    return $this->json(json_encode($json), 200);
-
-                }
-                return $this->redirectToRoute('apm_vente_categorie_show', array('id' => $categorie->getId()));
-            } catch (ConstraintViolationException $cve) {
-                $session->getFlashBag()->add('danger', "<strong>Echec de l'enregistrement. </strong><br>L'enregistrement a échoué dû à une contrainte de données!");
-                return $this->json(json_encode(["item" => null]));
-            } catch (RuntimeException $rte) {
-                $session->getFlashBag()->add('danger', "<strong>Echec de l'opération.</strong><br>L'enregistrement a échoué. bien vouloir réessayer plutard, svp!");
-                return $this->json(json_encode(["item" => null]));
-            } catch (AccessDeniedException $ads) {
-                $session->getFlashBag()->add('danger', "<strong>Action interdite.</strong><br>Vous n'êtes pas autorisez à effectuer cette opération!");
-                return $this->json(json_encode(["item" => null]));
+        try {
+            $this->createSecurity($boutique);
+            /** @var Categorie $categorie */
+            $categorie = TradeFactory::getTradeProvider('categorie');
+            $form = $this->createForm(CategorieType::class, $categorie);
+            $form->submit($request->request->all());
+            if (!$form->isValid()) {
+                return new JsonResponse([
+                    "status" => 400,
+                    "message" => $this->get('translator')->trans($form->getErrors(true, false), [], 'FOSUserBundle')
+                ], Response::HTTP_BAD_REQUEST);
             }
+            $this->createSecurity($boutique, $categorie->getCategorieCourante());
+            $categorie->setBoutique($boutique);
+            $em = $this->getEM();
+            $em->persist($categorie);
+            $em->flush();
+            return $this->routeRedirectView("api_vente_show_categorie", ['id' => $categorie->getId()], Response::HTTP_CREATED);
+        } catch (ConstraintViolationException $cve) {
+            return new JsonResponse([
+                "status" => 400,
+                "message" => $this->get('translator')->trans("impossible d'enregistrer, vérifiez vos données", [], 'FOSUserBundle')
+            ], Response::HTTP_BAD_REQUEST);
+        } catch (AccessDeniedException $ads) {
+            return new JsonResponse([
+                    "status" => 403,
+                    "message" => $this->get('translator')->trans("Access denied", [], 'FOSUserBundle'),
+                ]
+                , Response::HTTP_FORBIDDEN
+            );
         }
-        return $this->render('APMVenteBundle:categorie:new.html.twig', array(
-            'form' => $form->createView(),
-            'boutique' => $boutique
-        ));
     }
 
     /**
@@ -297,68 +299,41 @@ class CategorieController extends Controller
      * Displays a form to edit an existing Categorie entity.
      * @param Request $request
      * @param Categorie $categorie
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @return View |JsonResponse
      *
      * @Put("/edit/categorie/{id}")
      */
     public function editAction(Request $request, Categorie $categorie)
     {
-        $this->editAndDeleteSecurity($categorie);
-        if ($request->isXmlHttpRequest() && $request->getMethod() === "POST") {
-            $json = array();
-            $json['item'] = array();
-            /** @var Session $session */
-            $session = $request->getSession();
-            $em = $this->getDoctrine()->getManager();
-            $property = $request->request->get('name');
-            $value = $request->request->get('value');
-            switch ($property) {
-                case 'designation':
-                    $categorie->setDesignation($value);
-                    break;
-                case 'description':
-                    $categorie->setDescription($value);
-                    break;
-                case 'livrable':
-                    $categorie->setLivrable($value);
-                    break;
-                case 'publiable':
-                    $categorie->setPubliable($value);
-                    break;
-                case 'etat':
-                    $categorie->setEtat($value);
-                    break;
-                case 'categorieCourante':
-                    /** @var Categorie $categorieCourante */
-                    $categorieCourante = $em->getRepository('APMVenteBundle:Categorie')->find($value);
-                    $categorie->setCategorieCourante($categorieCourante);
-                    break;
-                default:
-                    $session->getFlashBag()->add('info', "<strong> Aucune mis à jour effectuée</strong>");
-                    return $this->json(json_encode(["item" => null]), 205);
-            }
-            $em->flush();
-            $session->getFlashBag()->add('success', "Mis à jour propriété : <strong>" . $property . "</strong> réf. catégorie :" . $categorie->getCode() . "<br> Opération effectuée avec succès!");
-            return $this->json(json_encode($json), 200);
-        }
-        $deleteForm = $this->createDeleteForm($categorie);
-        $editForm = $this->createForm(CategorieType::class, $categorie);
-        $editForm->handleRequest($request);
-        if ($editForm->isSubmitted() && $editForm->isValid()) {
+        try {
             $this->editAndDeleteSecurity($categorie);
+            $form = $this->createForm('APM\VenteBundle\Form\CategorieType', $categorie);
+            $form->submit($request->request->all(), false);
+            if (!$form->isValid()) {
+                return new JsonResponse([
+                    "status" => 400,
+                    "message" => $this->get('translator')->trans($form->getErrors(true, false), [], 'FOSUserBundle')
+                ], Response::HTTP_BAD_REQUEST);
+            }
             $em = $this->getEM();
-            $em->persist($categorie);
             $em->flush();
-
-            return $this->redirectToRoute('apm_vente_categorie_show', array('id' => $categorie->getId()));
+            return $this->routeRedirectView("api_vente_show_categorie", ['id' => $categorie->getId()], Response::HTTP_OK);
+        } catch (ConstraintViolationException $cve) {
+            return new JsonResponse(
+                [
+                    "status" => 400,
+                    "message" => $this->get('translator')->trans("impossible d'enregistrer, vérifiez vos données", [], 'FOSUserBundle')
+                ], Response::HTTP_BAD_REQUEST
+            );
+        } catch (AccessDeniedException $ads) {
+            return new JsonResponse(
+                [
+                    "status" => 403,
+                    "message" => $this->get('translator')->trans("Access denied", [], 'FOSUserBundle'),
+                ]
+                , Response::HTTP_FORBIDDEN
+            );
         }
-
-        return $this->render('APMVenteBundle:categorie:edit.html.twig', array(
-            'categorie' => $categorie,
-            'delete_form' => $deleteForm->createView(),
-            'edit_form' => $editForm->createView()
-
-        ));
     }
 
     /**
@@ -369,11 +344,6 @@ class CategorieController extends Controller
         //---------------------------------security-----------------------------------------------
         // Unable to access the controller unless you have a USERAVM role
         $this->denyAccessUnlessGranted('ROLE_BOUTIQUE', null, 'Unable to access this page!');
-
-        /* ensure that the user is logged in
-        *  and that the one is the owner
-         * Interdire tout utilisateur si ce n'est pas le gerant ou le proprietaire
-        */
         $user = $this->getUser();
         $boutique = $categorie->getBoutique();
         $gerant = $boutique->getGerant();
@@ -386,46 +356,40 @@ class CategorieController extends Controller
     }
 
     /**
-     * Creates a form to delete a Categorie entity.
-     *
-     * @param Categorie $categorie The Categorie entity
-     *
-     * @return \Symfony\Component\Form\Form The form
-     */
-    private function createDeleteForm(Categorie $categorie)
-    {
-        return $this->createFormBuilder()
-            ->setAction($this->generateUrl('apm_vente_categorie_delete', array('id' => $categorie->getId())))
-            ->setMethod('DELETE')
-            ->getForm();
-    }
-
-    /**
      * Deletes a Categorie entity.
      * @param Request $request
      * @param Categorie $categorie
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse| JsonResponse
+     * @return View | JsonResponse
      *
      * @Delete("/delete/categorie/{id}")
      */
     public function deleteAction(Request $request, Categorie $categorie)
     {
-        $this->editAndDeleteSecurity($categorie);
-        $em = $this->getEM();
-        if ($request->isXmlHttpRequest()) {
-            $json = array();
+        try {
+            $this->editAndDeleteSecurity($categorie);
+            if (!$request->request->has('exec') || $request->request->get('exec') !== 'go') {
+                return new JsonResponse([
+                    "status" => 400,
+                    "message" => $this->get('translator')->trans('impossible de supprimer', [], 'FOSUserBundle')
+                ], Response::HTTP_BAD_REQUEST);
+            }
+            $boutique = $categorie->getBoutique();
             $em->remove($categorie);
             $em->flush();
-            return $this->json($json, 200);
+            return $this->routeRedirectView("api_vente_get_categories", [$boutique->getId()], Response::HTTP_OK);
+        } catch (ConstraintViolationException $cve) {
+            return new JsonResponse([
+                "status" => 400,
+                "message" => $this->get('translator')->trans("impossible d'enregistrer, vérifiez vos données", [], 'FOSUserBundle')
+            ], Response::HTTP_FAILED_DEPENDENCY);
+        } catch (AccessDeniedException $ads) {
+            return new JsonResponse([
+                    "status" => 403,
+                    "message" => $this->get('translator')->trans("Access denied", [], 'FOSUserBundle'),
+                ]
+                , Response::HTTP_FORBIDDEN
+            );
         }
-        $form = $this->createDeleteForm($categorie);
-        $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
-            $em->remove($categorie);
-            $em->flush();
-        }
-
-        return $this->redirectToRoute('apm_vente_categorie_index', ['id' => $categorie->getBoutique()->getId()]);
     }
 
 }

@@ -36,7 +36,7 @@ class Specification_achat extends TradeFactory
      * @Expose
      * @Groups({"others_spA_details", "owner_spA_details"})
      * @Assert\Choice({0,1})
-     * @ORM\Column(name="avecDemandeRabais", type="boolean", nullable=false)
+     * @ORM\Column(name="avecDemandeRabais", type="boolean", nullable=true)
      */
     private $demandeRabais;
 
@@ -45,7 +45,7 @@ class Specification_achat extends TradeFactory
      * @Expose
      * @Groups({"others_spA_details", "owner_spA_details"})
      * @Assert\Choice({0,1})
-     * @ORM\Column(name="avecLivraison", type="boolean", nullable=false)
+     * @ORM\Column(name="avecLivraison", type="boolean", nullable=true)
      */
     private $livraison;
 

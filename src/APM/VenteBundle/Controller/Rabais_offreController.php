@@ -8,10 +8,12 @@ use APM\VenteBundle\Entity\Offre;
 use APM\VenteBundle\Entity\Rabais_offre;
 use APM\VenteBundle\Factory\TradeFactory;
 use Doctrine\Common\Collections\Collection;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Doctrine\DBAL\Exception\ConstraintViolationException;
+use FOS\RestBundle\Controller\FOSRestController;
+use FOS\RestBundle\View\View;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\HttpFoundation\Response;
 use FOS\RestBundle\Controller\Annotations\RouteResource;
 use FOS\RestBundle\Controller\Annotations\Get;
 use FOS\RestBundle\Controller\Annotations\Post;
@@ -19,12 +21,13 @@ use FOS\RestBundle\Controller\Annotations\Put;
 use FOS\RestBundle\Controller\Annotations\Patch;
 use FOS\RestBundle\Controller\Annotations\Delete;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 /**
  * Rabais_offre controller.
- * @RouteResource("discount", pluralize=false)
+ * @RouteResource("rabais", pluralize=false)
  */
-class Rabais_offreController extends Controller
+class Rabais_offreController extends FOSRestController
 {
     private $beneficiaire_filter;
     private $code_filter;
@@ -46,14 +49,15 @@ class Rabais_offreController extends Controller
      * @param Offre $offre
      * @return \Symfony\Component\HttpFoundation\Response
      *
-     * @Get("/cget/rabaisoffres/utilisateur", name="s")
-     * @Get("/cget/rabaisoffres/offre/{id}", name="s_offre")
+     * @Get("/cget/rabaisoffres/utilisateur")
+     * @Get("/cget/rabaisoffres/offre/{id}", name="_offre")
      */
     public function getAction(Request $request, Offre $offre = null)
     {
-        $this->listAndShowSecurity($offre);
-        /** @var Utilisateur_avm $user */
-        $user = $this->getUser();
+        try {
+            $this->listAndShowSecurity($offre);
+            /** @var Utilisateur_avm $user */
+            $user = $this->getUser();
             $q = $request->get('q');
             $this->beneficiaire_filter = $request->query->has('beneficiaire_filter') ? $request->query->get('beneficiaire_filter') : "";
             $this->code_filter = $request->query->has('code_filter') ? $request->query->get('code_filter') : "";
@@ -70,7 +74,7 @@ class Rabais_offreController extends Controller
             $iDisplayStart = $request->query->has('start') ? intval($request->query->get('start')) : 0;
             $json = array();
             $rabais_offres = null;
-        $json['items'] = array();
+            $json['items'] = array();
             if ($q === "fromProduct" || $q === "all") {
                 if (null !== $offre) $rabais_offres = $offre->getRabais();
                 if (null !== $rabais_offres) {
@@ -112,7 +116,13 @@ class Rabais_offreController extends Controller
                     $json['items'] = $data;
                 }
             }
-        return new JsonResponse($json, 200);
+            return new JsonResponse($json, 200);
+        } catch (AccessDeniedException $ads) {
+            return new JsonResponse([
+                "status" => 403,
+                "message" => $this->get('translator')->trans("Accès refusé", [], 'FOSUserBundle')
+            ], Response::HTTP_FORBIDDEN);
+        }
     }
 
     /**
@@ -257,52 +267,43 @@ class Rabais_offreController extends Controller
      * Creates a new Rabais_offre entity.
      * @param Request $request
      * @param Offre $offre
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response | JsonResponse
-     *
-     * @Post("/new/rabaioffre/{id}")
+     * @Post("/new/rabaisoffre/{id}")
+     * @return View|JsonResponse
      */
     public function newAction(Request $request, Offre $offre)
     {
-        $this->createSecurity($offre);
-        /** @var Session $session */
-        $session = $request->getSession();
-        /** @var Rabais_offre $rabais_offre */
-        $rabais_offre = TradeFactory::getTradeProvider('rabais');
-        $form = $this->createForm('APM\VenteBundle\Form\Rabais_offreType', $rabais_offre);
-        $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
-            try {
-                $this->createSecurity($offre, $rabais);
-                $rabais_offre->setVendeur($this->getUser());
-                $rabais_offre->setOffre($offre);
-                $em = $this->getDoctrine()->getManager();
-                $em->persist($rabais_offre);
-                $em->flush();
-                if ($request->isXmlHttpRequest()) {
-                    $json = array();
-                    $json["item"] = array(//prevenir le client
-                        "action" => 0,
-                    );
-                    $session->getFlashBag()->add('success', "<strong> rabais d'offre créée. réf:" . $rabais_offre->getCode() . "</strong><br> Opération effectuée avec succès!");
-                    return $this->json(json_encode($json), 200);
-                }
-                return $this->redirectToRoute('apm_vente_rabais_offre_show', array('id' => $rabais_offre->getId()));
-            } catch (ConstraintViolationException $cve) {
-                $session->getFlashBag()->add('danger', "<strong>Echec de l'enregistrement. </strong><br>L'enregistrement a échoué dû à une contrainte de données!");
-                return $this->json(json_encode(["item" => null]));
-            } catch (RuntimeException $rte) {
-                $session->getFlashBag()->add('danger', "<strong>Echec de l'opération.</strong><br>L'enregistrement a échoué. bien vouloir réessayer plutard, svp!");
-                return $this->json(json_encode(["item" => null]));
-            } catch (AccessDeniedException $ads) {
-                $session->getFlashBag()->add('danger', "<strong>Action interdite.</strong><br>Vous n'êtes pas autorisez à effectuer cette opération!");
-                return $this->json(json_encode(["item" => null]));
+        try {
+            $this->createSecurity($offre);
+            /** @var Rabais_offre $rabais_offre */
+            $rabais_offre = TradeFactory::getTradeProvider('rabais');
+            $form = $this->createForm('APM\VenteBundle\Form\Rabais_offreType', $rabais_offre);
+            $form->submit($request->request->all());
+            if (!$form->isValid()) {
+                return new JsonResponse([
+                    "status" => 400,
+                    "message" => $this->get('translator')->trans($form->getErrors(true, false), [], 'FOSUserBundle')
+                ], Response::HTTP_BAD_REQUEST);
             }
+            $this->createSecurity($offre, $rabais);
+            $rabais_offre->setVendeur($this->getUser());
+            $rabais_offre->setOffre($offre);
+            $em = $this->getDoctrine()->getManager();
+            $em->persist($rabais_offre);
+            $em->flush();
+            return $this->routeRedirectView("api_vente_show_rabais", ['id' => $rabais_offre->getId()], Response::HTTP_CREATED);
+        } catch (ConstraintViolationException $cve) {
+            return new JsonResponse([
+                "status" => 400,
+                "message" => $this->get('translator')->trans("impossible d'enregistrer, vérifiez vos données", [], 'FOSUserBundle')
+            ], Response::HTTP_BAD_REQUEST);
+        } catch (AccessDeniedException $ads) {
+            return new JsonResponse([
+                    "status" => 403,
+                    "message" => $this->get('translator')->trans("Access denied", [], 'FOSUserBundle'),
+                ]
+                , Response::HTTP_FORBIDDEN
+            );
         }
-        $session->set('previous_location', $request->getUri());
-        return $this->render('APMVenteBundle:rabais_offre:new.html.twig', array(
-            'offre' => $offre,
-            'form' => $form->createView(),
-        ));
     }
 
     /**
@@ -343,7 +344,7 @@ class Rabais_offreController extends Controller
      * @param Rabais_offre $rabais_offre
      * @return JsonResponse
      *
-     * @Get("/show/rabaioffre/{id}")
+     * @Get("/show/rabaisoffre/{id}")
      */
     public function showAction(Rabais_offre $rabais_offre)
     {
@@ -356,74 +357,38 @@ class Rabais_offreController extends Controller
      * Displays a form to edit an existing Rabais_offre entity.
      * @param Request $request
      * @param Rabais_offre $rabais_offre
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @return View|JsonResponse
      *
-     * @Put("/edit/rabaioffre/{id}")
+     * @Put("/edit/rabaisoffre/{id}")
      */
     public function editAction(Request $request, Rabais_offre $rabais_offre)
     {
-        $this->editAndDeleteSecurity($rabais_offre);
-        if ($request->isXmlHttpRequest() && $request->getMethod() === "POST") {
-            $json = array();
-            $json['item'] = array();
-            /** @var Session $session */
-            $session = $request->getSession();
-            $em = $this->getDoctrine()->getManager();
-            $property = $request->request->get('name');
-            $value = $request->request->get('value');
-            switch ($property) {
-                case 'dateLimite':
-                    $rabais_offre->setDateLimite($value);
-                    break;
-                case 'nombreDeFois':
-                    $rabais_offre->setNombreDefois($value);
-                    break;
-                case 'prixUpdate':
-                    $rabais_offre->setPrixUpdate($value);
-                    break;
-                case 'quantiteMin' :
-                    $rabais_offre->setQuantiteMin($value);
-                    break;
-                case 'offre' :
-                    /** @var Offre $offre */
-                    $offre = $em->getRepository('APMVenteBundle:Offre')->find($value);
-                    $rabais_offre->setOffre($offre);
-                    break;
-                case 'groupe' :
-                    $groupe = $em->getRepository('APMUserBundle:Groupe_relationnel')->find($value);
-                    $rabais_offre->setGroupe($groupe);
-                    break;
-                case 'beneficiaire':
-                    /** @var Utilisateur_avm $beneficiaire */
-                    $beneficiaire = $em->getRepository('APMUserBundle:Utilisateur_avm')->find($value);
-                    $rabais_offre->setBeneficiaireRabais($beneficiaire);
-                    break;
-                default:
-                    $session->getFlashBag()->add('info', "<strong> Aucune mis à jour effectuée</strong>");
-                    return $this->json(json_encode(["item" => null]), 205);
-            }
-            $em->flush();
-            $session->getFlashBag()->add('success', "Mis à jour propriété : <strong>" . $property . "</strong> réf. rabais d'offre:" . $rabais_offre->getCode() . "<br> Opération effectuée avec succès!");
-            return $this->json(json_encode($json), 200);
-        }
-        $deleteForm = $this->createDeleteForm($rabais_offre);
-        $editForm = $this->createForm('APM\VenteBundle\Form\Rabais_offreType', $rabais_offre);
-        $editForm->handleRequest($request);
-
-        if ($editForm->isSubmitted() && $editForm->isValid()) {
+        try {
             $this->editAndDeleteSecurity($rabais_offre);
+            $form = $this->createForm('APM\VenteBundle\Form\Rabais_offreType', $rabais_offre);
+            $form->submit($request->request->all(), false);
+            if (!$form->isValid()) {
+                return new JsonResponse([
+                    "status" => 400,
+                    "message" => $this->get('translator')->trans($form->getErrors(true, false), [], 'FOSUserBundle')
+                ], Response::HTTP_BAD_REQUEST);
+            }
             $em = $this->getDoctrine()->getManager();
-            $em->persist($rabais_offre);
             $em->flush();
-
-            return $this->redirectToRoute('apm_vente_rabais_offre_show', array('id' => $rabais_offre->getId()));
+            return $this->routeRedirectView("api_vente_show_rabais", ['id' => $rabais_offre->getId()], Response::HTTP_OK);
+        } catch (ConstraintViolationException $cve) {
+            return new JsonResponse([
+                "status" => 400,
+                "message" => $this->get('translator')->trans("impossible d'enregistrer, vérifiez vos données", [], 'FOSUserBundle')
+            ], Response::HTTP_BAD_REQUEST);
+        } catch (AccessDeniedException $ads) {
+            return new JsonResponse([
+                    "status" => 403,
+                    "message" => $this->get('translator')->trans("Access denied", [], 'FOSUserBundle'),
+                ]
+                , Response::HTTP_FORBIDDEN
+            );
         }
-
-        return $this->render('APMVenteBundle:rabais_offre:edit.html.twig', array(
-            'rabais_offre' => $rabais_offre,
-            'edit_form' => $editForm->createView(),
-            'delete_form' => $deleteForm->createView(),
-        ));
     }
 
     /**
@@ -456,47 +421,44 @@ class Rabais_offreController extends Controller
 
     }
 
-    /**
-     * Creates a form to delete a Rabais_offre entity.
-     *
-     * @param Rabais_offre $rabais_offre The Rabais_offre entity
-     *
-     * @return \Symfony\Component\Form\Form The form
-     */
-    private function createDeleteForm(Rabais_offre $rabais_offre)
-    {
-        return $this->createFormBuilder()
-            ->setAction($this->generateUrl('apm_vente_rabais_offre_delete', array('id' => $rabais_offre->getId())))
-            ->setMethod('DELETE')
-            ->getForm();
-    }
 
     /**
      * Deletes a Rabais_offre entity.
      * @param Request $request
      * @param Rabais_offre $rabais_offre
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse | JsonResponse
+     * @return View | JsonResponse
      *
-     * @Delete("/delete/rabaioffre/{id}")
+     * @Delete("/delete/rabaisoffre/{id}")
      */
     public function deleteAction(Request $request, Rabais_offre $rabais_offre)
     {
-        $this->editAndDeleteSecurity($rabais_offre);
-        $em = $this->getDoctrine()->getManager();
-        if ($request->isXmlHttpRequest() && $request->getMethod() === "POST") {
-            $em->remove($rabais_offre);
-            $em->flush();
-            $json = array();
-            return $this->json($json, 200);
-        }
-        $form = $this->createDeleteForm($rabais_offre);
-        $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
+        try {
             $this->editAndDeleteSecurity($rabais_offre);
+            if (!$request->request->has('exec') || $request->request->get('exec') !== 'go') {
+                return new JsonResponse([
+                    "status" => 400,
+                    "message" => $this->get('translator')->trans('impossible de supprimer', [], 'FOSUserBundle')
+                ], Response::HTTP_BAD_REQUEST);
+            }
+            $offre = $rabais_offre->getOffre();
+            $em = $this->getDoctrine()->getManager();
             $em->remove($rabais_offre);
             $em->flush();
+            return $this->routeRedirectView("api_vente_get_rabais_offre", [$offre->getId()], Response::HTTP_OK);
+        } catch (ConstraintViolationException $cve) {
+            return new JsonResponse(
+                [
+                    "status" => 400,
+                    "message" => $this->get('translator')->trans("impossible de supprimer, vérifiez vos données", [], 'FOSUserBundle')
+                ], Response::HTTP_FAILED_DEPENDENCY);
+        } catch (AccessDeniedException $ads) {
+            return new JsonResponse(
+                [
+                    "status" => 403,
+                    "message" => $this->get('translator')->trans("Access denied", [], 'FOSUserBundle'),
+                ]
+                , Response::HTTP_FORBIDDEN
+            );
         }
-
-        return $this->redirectToRoute('apm_vente_rabais_offre_index', ['id' => $rabais_offre->getOffre()->getId()]);
     }
 }

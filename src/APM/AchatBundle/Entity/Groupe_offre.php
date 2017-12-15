@@ -76,6 +76,7 @@ class Groupe_offre extends TradeFactory
      * @var boolean
      * @Expose
      * @Groups({"owner_groupeO_details"})
+     * @Assert\NotNull
      * @Assert\Choice({0,1})
      * @ORM\Column(name="estRecurrent", type="boolean", nullable=false)
      */
@@ -85,7 +86,7 @@ class Groupe_offre extends TradeFactory
      * @var string
      * @Expose
      * @Groups({"owner_list", "others_list", "others_groupeO_details", "owner_groupeO_details"})
-     * @Assert\NotNull()
+     * @Assert\NotBlank()
      * @Assert\Length(min=2, max=50)
      * @ORM\Column(name="designation", type="string", length=255, nullable=false)
      */

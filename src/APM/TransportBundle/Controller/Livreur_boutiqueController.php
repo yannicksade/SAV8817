@@ -7,7 +7,9 @@ use APM\TransportBundle\Entity\Profile_transporteur;
 use APM\TransportBundle\Factory\TradeFactory;
 use APM\VenteBundle\Entity\Boutique;
 use Doctrine\Common\Collections\Collection;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Doctrine\DBAL\Exception\ConstraintViolationException;
+use FOS\RestBundle\Controller\FOSRestController;
+use FOS\RestBundle\View\View;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use FOS\RestBundle\Controller\Annotations\RouteResource;
@@ -18,21 +20,19 @@ use FOS\RestBundle\Controller\Annotations\Patch;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 /**
  * Livreur_boutique controller.
  * @RouteResource("livreur", pluralize=false)
  */
-class Livreur_boutiqueController extends Controller
+class Livreur_boutiqueController extends FOSRestController
 {
     private $reference_filter;
     private $transporteur_filter;
     private $boutique_filter;
 
     /**
-     * Tout le monde peut Lister les livreurs d'une boutique
-     * un livreur peut appartenir à plusieurs boutiques
-     *
      * @param Boutique $boutique
      * @return JsonResponse
      *
@@ -40,43 +40,53 @@ class Livreur_boutiqueController extends Controller
      */
     public function getAction(Boutique $boutique)
     {
-        $this->listeAndShowSecurity();
-        $json = array();
-        $json['items'] = array();
-        $q = $request->query->get('q');
-        $this->reference_filter = $request->query->has('reference_filter') ? $request->query->get('reference_filter') : "";
-        $this->transporteur_filter = $request->query->has('transporteur_filter') ? $request->query->get('transporteur_filter') : "";
-        $this->boutique_filter = $request->query->has('boutique_filter') ? $request->query->get('boutique_filter') : "";
-        $iDisplayLength = $request->query->has('length') ? $request->query->get('length') : -1;
-        $iDisplayStart = $request->query->has('start') ? intval($request->query->get('start')) : 0;
-        if ($q === "guest" || $q === "all") {
-            $livreurs = $boutique->getLivreurs();//livreurs étrangers: empruntés
-            if (null !== $livreurs) {
-                $iTotalRecords = count($livreurs);
-                if ($iDisplayLength < 0) $iDisplayLength = $iTotalRecords;
-                $livreurs = $this->handleResults($livreurs, $iTotalRecords, $iDisplayStart, $iDisplayLength);
-                $iFilteredRecords = count($livreurs);
-                $data = $this->get('apm_core.data_serialized')->getFormalData($livreurs, array("others_list"));
-                $json['totalRecordsGuest'] = $iTotalRecords;
-                $json['filteredRecordsGuest'] = $iFilteredRecords;
-                $json['items'] = $data;
+        try {
+            $this->listeAndShowSecurity();
+            $json = array();
+            $json['items'] = array();
+            $q = $request->query->get('q');
+            $this->reference_filter = $request->query->has('reference_filter') ? $request->query->get('reference_filter') : "";
+            $this->transporteur_filter = $request->query->has('transporteur_filter') ? $request->query->get('transporteur_filter') : "";
+            $this->boutique_filter = $request->query->has('boutique_filter') ? $request->query->get('boutique_filter') : "";
+            $iDisplayLength = $request->query->has('length') ? $request->query->get('length') : -1;
+            $iDisplayStart = $request->query->has('start') ? intval($request->query->get('start')) : 0;
+            if ($q === "guest" || $q === "all") {
+                $livreurs = $boutique->getLivreurs();//livreurs étrangers: empruntés
+                if (null !== $livreurs) {
+                    $iTotalRecords = count($livreurs);
+                    if ($iDisplayLength < 0) $iDisplayLength = $iTotalRecords;
+                    $livreurs = $this->handleResults($livreurs, $iTotalRecords, $iDisplayStart, $iDisplayLength);
+                    $iFilteredRecords = count($livreurs);
+                    $data = $this->get('apm_core.data_serialized')->getFormalData($livreurs, array("others_list"));
+                    $json['totalRecordsGuest'] = $iTotalRecords;
+                    $json['filteredRecordsGuest'] = $iFilteredRecords;
+                    $json['items'] = $data;
+                }
             }
-        }
-        if ($q === "owner" || $q === "all") {
-            $livreurs = $boutique->getLivreurBoutiques();
-            if (null !== $livreurs) {
-                $iTotalRecords = count($livreurs);
-                if ($iDisplayLength < 0) $iDisplayLength = $iTotalRecords;
-                $livreurs = $this->handleResults($livreurs, $iTotalRecords, $iDisplayStart, $iDisplayLength);
-                $iFilteredRecords = count($livreurs);
-                $data = $this->get('apm_core.data_serialized')->getFormalData($livreurs, array("owner_list"));
-                $json['totalRecordsOwner'] = $iTotalRecords;
-                $json['filteredRecordsOwner'] = $iFilteredRecords;
-                $json['items'] = $data;
+            if ($q === "owner" || $q === "all") {
+                $livreurs = $boutique->getLivreurBoutiques();
+                if (null !== $livreurs) {
+                    $iTotalRecords = count($livreurs);
+                    if ($iDisplayLength < 0) $iDisplayLength = $iTotalRecords;
+                    $livreurs = $this->handleResults($livreurs, $iTotalRecords, $iDisplayStart, $iDisplayLength);
+                    $iFilteredRecords = count($livreurs);
+                    $data = $this->get('apm_core.data_serialized')->getFormalData($livreurs, array("owner_list"));
+                    $json['totalRecordsOwner'] = $iTotalRecords;
+                    $json['filteredRecordsOwner'] = $iFilteredRecords;
+                    $json['items'] = $data;
+                }
             }
-        }
 
-        return new JsonResponse($json, 200);
+            return new JsonResponse($json, 200);
+
+        } catch (AccessDeniedException $ads) {
+            return new JsonResponse([
+                    "status" => 403,
+                    "message" => $this->get('translator')->trans("Access denied", [], 'FOSUserBundle'),
+                ]
+                , Response::HTTP_FORBIDDEN
+            );
+        }
     }
 
     private function listeAndShowSecurity()
@@ -141,25 +151,29 @@ class Livreur_boutiqueController extends Controller
         return $livreurs;
     }
 
-    // les boutiques sont responsables de la création des livreur_boutiques
 
     /**
      * @ParamConverter("transporteur", options={"mapping":{"transporteur_id":"id"}})
      * @param Request $request
      * @param Boutique $boutique
      * @param Profile_transporteur $transporteur
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
-     *
+     * @return JsonResponse| View
      * @Post("/new/livreur/boutique/{id}/transporteur/{transporteur_id}")
      */
     public function newAction(Request $request, Boutique $boutique, Profile_transporteur $transporteur)
     {
-        $this->createSecurity($boutique);
-        /** @var Livreur_boutique $livreur_boutique */
-        $livreur_boutique = TradeFactory::getTradeProvider("livreur_boutique");
-        $form = $this->createForm('APM\TransportBundle\Form\Livreur_boutiqueType', $livreur_boutique);
-        $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
+        try {
+            $this->createSecurity($boutique);
+            /** @var Livreur_boutique $livreur_boutique */
+            $livreur_boutique = TradeFactory::getTradeProvider("livreur_boutique");
+            $form = $this->createForm('APM\TransportBundle\Form\Livreur_boutiqueType', $livreur_boutique);
+            $form->submit($request->request->all());
+            if (!$form->isValid()) {
+                return new JsonResponse([
+                    "status" => 400,
+                    "message" => $this->get('translator')->trans($form->getErrors(true, false), [], 'FOSUserBundle')
+                ], Response::HTTP_BAD_REQUEST);
+            }
             /** @var Profile_transporteur $transporteur */
             $livreur_boutique->setTransporteur($transporteur);
             $livreur_boutique->setBoutiqueProprietaire($boutique);
@@ -167,23 +181,23 @@ class Livreur_boutiqueController extends Controller
             $em = $this->getDoctrine()->getManager();
             $em->persist($livreur_boutique);
             $em->flush();
-            if ($request->isXmlHttpRequest()) {
-                $json = array();
-                $json['item'] = array();
-                return $this->json(json_encode($json), 200);
-            }
-            return $this->redirectToRoute('apm_transport_livreur_boutique_show', array('id' => $livreur_boutique->getId()));
+            return $this->routeRedirectView("api_transport_show_livreur", ['id' => $livreur_boutique->getId()], Response::HTTP_CREATED);
+        } catch (ConstraintViolationException $cve) {
+            return new JsonResponse([
+                "status" => 400,
+                "message" => $this->get('translator')->trans("impossible d'enregistrer, vérifiez vos données", [], 'FOSUserBundle')
+            ], Response::HTTP_BAD_REQUEST);
+        } catch (AccessDeniedException $ads) {
+            return new JsonResponse([
+                    "status" => 403,
+                    "message" => $this->get('translator')->trans("Access denied", [], 'FOSUserBundle'),
+                ]
+                , Response::HTTP_FORBIDDEN
+            );
         }
-
-        return $this->render('APMTransportBundle:livreur_boutique:new.html.twig', array(
-            'livreur_boutique' => $livreur_boutique,
-            'boutique' => $boutique,
-            'form' => $form->createView(),
-        ));
     }
 
     /**
-     * uniquement les gerants et proprietaires de boutique sont autorisées à créer des livreurs boutique
      * @param Boutique $boutique
      */
     private function createSecurity($boutique)
@@ -204,7 +218,6 @@ class Livreur_boutiqueController extends Controller
     }
 
     /**
-     * Tout le monde peut voir les détail d'un livreur boutique
      * @param Livreur_boutique $livreur_boutique
      * @return JsonResponse
      *
@@ -218,61 +231,43 @@ class Livreur_boutiqueController extends Controller
     }
 
     /**
-     * Displays a form to edit an existing Livreur_boutique entity.
      * @param Request $request
      * @param Livreur_boutique $livreur_boutique
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response|JsonResponse
+     * @return View | JsonResponse
      *
      * @Post("/edit/livreur/{id}")
      */
     public function editAction(Request $request, Livreur_boutique $livreur_boutique)
     {
-        $this->editAndDeleteSecurity($livreur_boutique);
-        $deleteForm = $this->createDeleteForm($livreur_boutique);
-        $editForm = $this->createForm('APM\TransportBundle\Form\Livreur_boutiqueType', $livreur_boutique);
-        $editForm->handleRequest($request);
-        if ($editForm->isSubmitted() && $editForm->isValid()
-            || $request->isXmlHttpRequest() && $request->isMethod('POST')
-        ) {
-            $em = $this->getDoctrine()->getManager();
-            if ($request->isXmlHttpRequest()) {
-                try {
-                    if ($request->isXmlHttpRequest()) {
-                        $json = array();
-                        $json['item'] = array();
-                        $property = $request->query->get('name');
-                        $value = $request->query->get('value');
-                        switch ($property) {
-                            case 'boutique':
-                                /** @var Boutique $boutique */
-                                $boutique = $em->getRepository('APMVenteBundle:Boutique')->find($value);
-                                $livreur_boutique->addBoutique($boutique);
-                                break;
-                            default:
-                                $session->getFlashBag()->add('info', "<strong> Aucune mise à jour effectuée</strong>");
-                                return $this->json(json_encode(["item" => null]), 205);
-                        }
-                        $em->flush();
-                        $session->getFlashBag()->add('success', "Ajout d'une <strong>" . $property . "</strong> réf. livreur :" . $livreur_boutique->getReference() . "<br> Opération effectuée avec succès!");
-                        return $this->json(json_encode($json), 200);
-                    }
-                    $em->flush();
-                    return $this->redirectToRoute('apm_transport_transporteur_show', array('id' => $livreur_boutique->getId()));
-                } catch (ConstraintViolationException $cve) {
-                    $session->getFlashBag()->add('danger', "<strong>Echec de l'enregistrement. </strong><br>L'enregistrement a échoué dû à une contrainte de données!");
-                    return $this->json(json_encode(["item" => null]));
-                } catch (AccessDeniedException $ads) {
-                    $session->getFlashBag()->add('danger', "<strong>Action interdite.</strong><br>Vous n'êtes pas autorisez à effectuer cette opération!");
-                    return $this->json(json_encode(["item" => null]));
-                }
+        try {
+            $this->editAndDeleteSecurity($livreur_boutique);
+            $form = $this->createForm('APM\TransportBundle\Form\Livreur_boutiqueType', $livreur_boutique);
+            $form->submit($request->request->all(), false);
+            if (!$form->isValid()) {
+                return new JsonResponse([
+                    "status" => 400,
+                    "message" => $this->get('translator')->trans($form->getErrors(true, false), [], 'FOSUserBundle')
+                ], Response::HTTP_BAD_REQUEST);
             }
+            $em = $this->getDoctrine()->getManager();
+            $em->flush();
+            return $this->routeRedirectView("api_transport_show_livreur", ['id' => $livreur_boutique->getId()], Response::HTTP_OK);
+        } catch (ConstraintViolationException $cve) {
+            return new JsonResponse(
+                [
+                    "status" => 400,
+                    "message" => $this->get('translator')->trans("impossible d'enregistrer, vérifiez vos données", [], 'FOSUserBundle')
+                ], Response::HTTP_BAD_REQUEST
+            );
+        } catch (AccessDeniedException $ads) {
+            return new JsonResponse(
+                [
+                    "status" => 403,
+                    "message" => $this->get('translator')->trans("Access denied", [], 'FOSUserBundle'),
+                ]
+                , Response::HTTP_FORBIDDEN
+            );
         }
-
-        return $this->render('APMTransportBundle:livreur_boutique:edit.html.twig', array(
-            'livreur_boutique' => $livreur_boutique,
-            'edit_form' => $editForm->createView(),
-            'delete_form' => $deleteForm->createView(),
-        ));
     }
 
     /**
@@ -297,48 +292,43 @@ class Livreur_boutiqueController extends Controller
     }
 
     /**
-     * Creates a form to delete a Livreur_boutique entity.
-     *
-     * @param Livreur_boutique $livreur_boutique The Livreur_boutique entity
-     *
-     * @return \Symfony\Component\Form\Form The form
-     */
-    private
-    function createDeleteForm(Livreur_boutique $livreur_boutique)
-    {
-        return $this->createFormBuilder()
-            ->setAction($this->generateUrl('apm_transport_livreur_boutique_delete', array('id' => $livreur_boutique->getId())))
-            ->setMethod('DELETE')
-            ->getForm();
-    }
-
-    /**
-     * Deletes a Livreur_boutique entity.
      * @param Request $request
      * @param Livreur_boutique $livreur_boutique
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse | JsonResponse
+     * @return View | JsonResponse
      *
      * @Delete("/delete/livreur/{id}")
      */
     public function deleteAction(Request $request, Livreur_boutique $livreur_boutique)
     {
-        $this->editAndDeleteSecurity($livreur_boutique);
-        $em = $this->getDoctrine()->getManager();
-        if ($request->isXmlHttpRequest()) {
-            $json = array();
-            $json['item'] = array();
-            $em->remove($profile_transporteur);
-            $em->flush();
-            return $this->json(json_encode($json), 200);
-        }
-        $form = $this->createDeleteForm($livreur_boutique);
-        $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
+        try {
+            $this->editAndDeleteSecurity($livreur_boutique);
+            if (!$request->request->has('exec') || $request->request->get('exec') !== 'go') {
+                return new JsonResponse([
+                    "status" => 400,
+                    "message" => $this->get('translator')->trans('impossible de supprimer', [], 'FOSUserBundle')
+                ], Response::HTTP_BAD_REQUEST);
+            }
+            $boutique = $livreur_boutique->getBoutiqueProprietaire();
+            $em = $this->getDoctrine()->getManager();
             $em->remove($livreur_boutique);
             $em->flush();
+            return $this->routeRedirectView("api_transport_get_livreurs_boutique", [$boutique->getId()], Response::HTTP_OK);
+        } catch (ConstraintViolationException $cve) {
+            return new JsonResponse(
+                [
+                    "status" => 400,
+                    "message" => $this->get('translator')->trans("impossible de supprimer, vérifiez vos données", [], 'FOSUserBundle')
+                ], Response::HTTP_FAILED_DEPENDENCY
+            );
+        } catch (AccessDeniedException $ads) {
+            return new JsonResponse(
+                [
+                    "status" => 403,
+                    "message" => $this->get('translator')->trans("Access denied", [], 'FOSUserBundle'),
+                ]
+                , Response::HTTP_FORBIDDEN
+            );
         }
-
-        return $this->redirectToRoute('apm_transport_livreur_boutique_index', ['id' => $livreur_boutique->getBoutiqueProprietaire()->getId()]);
     }
 
 }

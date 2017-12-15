@@ -9,6 +9,7 @@
 namespace APM\UserBundle\Manager;
 
 
+use Doctrine\DBAL\Exception\ConstraintViolationException;
 use FOS\RestBundle\Controller\FOSRestController;
 use FOS\UserBundle\Model\UserInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -46,58 +47,67 @@ class RegistrationManager implements ContainerAwareInterface
 
     public function register($class, $request)
     {
-        // $this->security();
-        /** @var $userManager UserManagerInterface */
-        $userManager = $this->discriminateAndGetManager($class);
+        try {
+            // $this->security();
+            /** @var $userManager UserManagerInterface */
+            $userManager = $this->discriminateAndGetManager($class);
 
-        /** @var $dispatcher EventDispatcherInterface */
-        $dispatcher = $this->container->get('event_dispatcher');
+            /** @var $dispatcher EventDispatcherInterface */
+            $dispatcher = $this->container->get('event_dispatcher');
 
-        $user = $userManager->createUser();
-        $user->setEnabled(false);
+            $user = $userManager->createUser();
+            $user->setEnabled(false);
 
-        $event = new GetResponseUserEvent($user, $request);
-        $dispatcher->dispatch(FOSUserEvents::REGISTRATION_INITIALIZE, $event);
+            $event = new GetResponseUserEvent($user, $request);
+            $dispatcher->dispatch(FOSUserEvents::REGISTRATION_INITIALIZE, $event);
 
-        if (null !== $event->getResponse()) {
-            return $event->getResponse();
-        }
-
-        /** @var $formFactory FactoryInterface */
-        $formFactory = $this->container->get('pugx_multi_user.registration_form_factory');
-        $form = $formFactory->createForm();
-        $form->setData($user);
-        $form->submit($request->request->all());
-
-        if (!$form->isValid()) {
-            $event = new FormEvent($form, $request);
-            $dispatcher->dispatch(FOSUserEvents::REGISTRATION_FAILURE, $event);
-
-            if (null !== $response = $event->getResponse()) {
-                return $response;
+            if (null !== $event->getResponse()) {
+                return new JsonResponse([
+                    "status" => 400,
+                    "message" => $this->container->get('translator')->trans("Bad response", [], 'FOSUserBundle')
+                ]);
             }
 
-            return new JsonResponse([
+            /** @var $formFactory FactoryInterface */
+            $formFactory = $this->container->get('pugx_multi_user.registration_form_factory');
+            $form = $formFactory->createForm();
+            $form->setData($user);
+            $form->submit($request->request->all());
+
+            if (!$form->isValid()) {
+                $event = new FormEvent($form, $request);
+                $dispatcher->dispatch(FOSUserEvents::REGISTRATION_FAILURE, $event);
+
+                if (null !== $response = $event->getResponse()) {
+                    return $response;
+                }
+                return new JsonResponse([
+                    "status" => 400,
+                    "message" => $this->container->get('translator')->trans($form->getErrors(true, false), [], 'FOSUserBundle')
+                ], Response::HTTP_BAD_REQUEST);
+            }
+            $event = new FormEvent($form, $request);
+
+            if ($event->getResponse()) {
+                return $event->getResponse();
+            }
+            $dispatcher->dispatch(FOSUserEvents::REGISTRATION_SUCCESS, $event);
+            $userManager->updateUser($user);
+
+            return new JsonResponse(
+                $this->container->get('translator')->trans(
+                    'registration.check_email',
+                    ['%email%' => $user->getEmail()],
+                    'FOSUserBundle'
+                ),
+                JsonResponse::HTTP_OK
+            );
+        } catch (ConstraintViolationException $cve) {
+            return [
                 "status" => 400,
-                "message" => $this->container->get('translator')->trans($form->getErrors(true, false), [], 'FOSUserBundle')
-            ], Response::HTTP_BAD_REQUEST);
+                "message" => $this->container->get('translator')->trans("impossible d'enregistrer, vérifiez vos données", [], 'FOSUserBundle')
+            ];
         }
-        $event = new FormEvent($form, $request);
-
-        if ($event->getResponse()) {
-            return $event->getResponse();
-        }
-        $dispatcher->dispatch(FOSUserEvents::REGISTRATION_SUCCESS, $event);
-        $userManager->updateUser($user);
-
-        return new JsonResponse(
-            $this->container->get('translator')->trans(
-                'registration.check_email',
-                ['%email%' => $user->getEmail()],
-                'FOSUserBundle'
-            ),
-            JsonResponse::HTTP_OK
-        );
     }
 
     private function discriminateAndGetManager($class)
@@ -132,7 +142,6 @@ class RegistrationManager implements ContainerAwareInterface
 
         $userManager->updateUser($user);
 
-        //$location = $this->container->get("fos_rest.router")->generate('api_user_show', ['id' => $user->getId()], UrlGeneratorInterface::RELATIVE_PATH);
         $data = array(
             "username" => $user->getUsername(),
             'message' => $this->container->get('translator')->trans('registration.flash.user_created', [], 'FOSUserBundle'),

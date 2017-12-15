@@ -9,6 +9,7 @@
 namespace APM\UserBundle\Manager;
 
 use APM\UserBundle\Entity\Admin;
+use Doctrine\DBAL\Exception\ConstraintViolationException;
 use FOS\UserBundle\Event\FilterUserResponseEvent;
 use FOS\UserBundle\Event\FormEvent;
 use FOS\UserBundle\Event\GetResponseNullableUserEvent;
@@ -198,51 +199,63 @@ class ResettingManager implements ContainerAwareInterface
 
     public function change($class, $request, $user)
     {
-        /** @var $dispatcher EventDispatcherInterface */
-        $dispatcher = $this->container->get('event_dispatcher');
+        try {
+            /** @var $dispatcher EventDispatcherInterface */
+            $dispatcher = $this->container->get('event_dispatcher');
 
-        $event = new GetResponseUserEvent($user, $request);
-        $dispatcher->dispatch(FOSUserEvents::CHANGE_PASSWORD_INITIALIZE, $event);
+            $event = new GetResponseUserEvent($user, $request);
+            $dispatcher->dispatch(FOSUserEvents::CHANGE_PASSWORD_INITIALIZE, $event);
 
-        if (null !== $event->getResponse()) {
-            return $event->getResponse();
-        }
+            if (null !== $event->getResponse()) {
+                return new JsonResponse([
+                    "status" => 400,
+                    "message" => $this->container->get('translator')->trans("Bad response", [], 'FOSUserBundle')
+                ]);
+            }
 
-        /** @var $formFactory FactoryInterface */
-        $formFactory = $this->container->get('fos_user.change_password.form.factory');
+            /** @var $formFactory FactoryInterface */
+            $formFactory = $this->container->get('fos_user.change_password.form.factory');
 
-        $form = $formFactory->createForm();
-        $form->setData($user);
-        $form->submit($request->request->all());
+            $form = $formFactory->createForm();
+            $form->setData($user);
+            $form->submit($request->request->all());
 
-        if (!$form->isValid()) {
-            return new JsonResponse([
-                "status" => 400,
-                "message" => $this->container->get('translator')->trans($form->getErrors(true, false), [], 'FOSUserBundle')
-            ], Response::HTTP_BAD_REQUEST);
-        }
+            if (!$form->isValid()) {
+                return new JsonResponse([
+                    "status" => 400,
+                    "message" => $this->container->get('translator')->trans($form->getErrors(true, false), [], 'FOSUserBundle')
+                ], Response::HTTP_BAD_REQUEST);
+            }
 
-        /** @var $userManager UserManagerInterface */
-        $userManager = $this->discriminateAndGetManager($class);
+            /** @var $userManager UserManagerInterface */
+            $userManager = $this->discriminateAndGetManager($class);
 
-        $event = new FormEvent($form, $request);
-        $dispatcher->dispatch(FOSUserEvents::CHANGE_PASSWORD_SUCCESS, $event);
+            $event = new FormEvent($form, $request);
+            $dispatcher->dispatch(FOSUserEvents::CHANGE_PASSWORD_SUCCESS, $event);
 
-        $userManager->updateUser($user);
+            $userManager->updateUser($user);
 
-        if (null === $response = $event->getResponse()) {
+            if (null === $response = $event->getResponse()) {
+                return new JsonResponse(
+                    $this->container->get('translator')->trans('change_password.flash.success', [], 'FOSUserBundle'),
+                    JsonResponse::HTTP_OK
+                );
+            }
+
+            $dispatcher->dispatch(FOSUserEvents::CHANGE_PASSWORD_COMPLETED, new FilterUserResponseEvent($user, $request, $response));
+
             return new JsonResponse(
                 $this->container->get('translator')->trans('change_password.flash.success', [], 'FOSUserBundle'),
                 JsonResponse::HTTP_OK
             );
+
+        } catch (ConstraintViolationException $cve) {
+            return [
+                "status" => 400,
+                "message" => $this->container->get('translator')->trans("impossible d'enregistrer, vérifiez vos données", [], 'FOSUserBundle')
+            ];
         }
-
-        $dispatcher->dispatch(FOSUserEvents::CHANGE_PASSWORD_COMPLETED, new FilterUserResponseEvent($user, $request, $response));
-
-        return new JsonResponse(
-            $this->container->get('translator')->trans('change_password.flash.success', [], 'FOSUserBundle'),
-            JsonResponse::HTTP_OK
-        );
     }
+
 
 }

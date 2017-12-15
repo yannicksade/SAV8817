@@ -7,10 +7,11 @@ use APM\AchatBundle\Factory\TradeFactory;
 use APM\UserBundle\Entity\Utilisateur_avm;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Exception\ConstraintViolationException;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use FOS\RestBundle\Controller\FOSRestController;
+use FOS\RestBundle\View\View;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use FOS\RestBundle\Controller\Annotations\RouteResource;
 use FOS\RestBundle\Controller\Annotations\Get;
@@ -25,7 +26,7 @@ use Nelmio\ApiDocBundle\Annotation\ApiDoc;
  * Liste les Groupe d'offre crees par l'utilisateur
  * @RouteResource("groupeoffre",  pluralize=false)
  */
-class Groupe_offreController extends Controller
+class Groupe_offreController extends FOSRestController
 {
     private $code_filter;
     private $propriete_filter;
@@ -47,35 +48,44 @@ class Groupe_offreController extends Controller
      */
     public function getAction(Request $request)
     {
-        $this->listAndShowSecurity();
+        try {
+            $this->listAndShowSecurity();
+            /** @var Utilisateur_avm $user */
+            $user = $this->getUser();
+            $groupe_offres = $user->getGroupesOffres();//liste
+            $this->propriete_filter = $request->query->has('propriete_filter') ? $request->query->get('propriete_filter') : "";
+            $this->code_filter = $request->query->has('code_filter') ? $request->query->get('code_filter') : "";
+            $this->designation_filter = $request->query->has('designation_filter') ? $request->query->get('designation_filter') : "";
+            $this->dateFrom_filter = $request->query->has('dateFrom_filter') ? $request->query->get('dateFrom_filter') : "";
+            $this->dateTo_filter = $request->query->has('dateTo_filter') ? $request->query->get('dateTo_filter') : "";
+            $this->dateVigueurFrom_filter = $request->query->has('dateVigueurFrom_filter') ? $request->query->get('dateVigueurFrom_filter') : "";
+            $this->dateVigueurTo_filter = $request->query->has('dateVigueurTo_filter') ? $request->query->get('dateVigueurTo_filter') : "";
+            $this->description_filter = $request->query->has('description_filter') ? $request->query->get('description_filter') : "";
+            $this->createur_filter = $request->query->has('createur_filter') ? $request->query->get('createur_filter') : "";
+            $this->recurrent_filter = $request->query->has('recurrent_filter') ? $request->query->get('recurrent_filter') : "";
 
-        /** @var Utilisateur_avm $user */
-        $user = $this->getUser();
-        $groupe_offres = $user->getGroupesOffres();//liste
-        $this->propriete_filter = $request->query->has('propriete_filter') ? $request->query->get('propriete_filter') : "";
-        $this->code_filter = $request->query->has('code_filter') ? $request->query->get('code_filter') : "";
-        $this->designation_filter = $request->query->has('designation_filter') ? $request->query->get('designation_filter') : "";
-        $this->dateFrom_filter = $request->query->has('dateFrom_filter') ? $request->query->get('dateFrom_filter') : "";
-        $this->dateTo_filter = $request->query->has('dateTo_filter') ? $request->query->get('dateTo_filter') : "";
-        $this->dateVigueurFrom_filter = $request->query->has('dateVigueurFrom_filter') ? $request->query->get('dateVigueurFrom_filter') : "";
-        $this->dateVigueurTo_filter = $request->query->has('dateVigueurTo_filter') ? $request->query->get('dateVigueurTo_filter') : "";
-        $this->description_filter = $request->query->has('description_filter') ? $request->query->get('description_filter') : "";
-        $this->createur_filter = $request->query->has('createur_filter') ? $request->query->get('createur_filter') : "";
-        $this->recurrent_filter = $request->query->has('recurrent_filter') ? $request->query->get('recurrent_filter') : "";
+            $iDisplayLength = $request->query->has('length') ? $request->query->get('length') : -1;
+            $iDisplayStart = $request->query->has('start') ? intval($request->query->get('start')) : 0;
+            $json = array();
+            $iTotalRecords = count($groupe_offres);
+            if ($iDisplayLength < 0) $iDisplayLength = $iTotalRecords;
+            $groupe_offres = $this->handleResults($groupe_offres, $iTotalRecords, $iDisplayStart, $iDisplayLength);
+            $iFilteredRecords = count($groupe_offres);
+            $data = $this->get('apm_core.data_serialized')->getFormalData($groupe_offres, array("owner_list"));
+            $json['totalRecords'] = $iTotalRecords;
+            $json['filteredRecords'] = $iFilteredRecords;
+            $json['items'] = $data;
 
-        $iDisplayLength = $request->query->has('length') ? $request->query->get('length') : -1;
-        $iDisplayStart = $request->query->has('start') ? intval($request->query->get('start')) : 0;
-        $json = array();
-        $iTotalRecords = count($groupe_offres);
-        if ($iDisplayLength < 0) $iDisplayLength = $iTotalRecords;
-        $groupe_offres = $this->handleResults($groupe_offres, $iTotalRecords, $iDisplayStart, $iDisplayLength);
-        $iFilteredRecords = count($groupe_offres);
-        $data = $this->get('apm_core.data_serialized')->getFormalData($groupe_offres, array("owner_list"));
-        $json['totalRecords'] = $iTotalRecords;
-        $json['filteredRecords'] = $iFilteredRecords;
-        $json['items'] = $data;
+            return new JsonResponse($json, 200);
 
-        return new JsonResponse($json, 200);
+        } catch (AccessDeniedException $ads) {
+            return new JsonResponse([
+                    "status" => 403,
+                    "message" => $this->get('translator')->trans("Access denied", [], 'FOSUserBundle'),
+                ]
+                , Response::HTTP_FORBIDDEN
+            );
+        }
     }
 
     private function listAndShowSecurity(Groupe_offre $groupe_offre = null)
@@ -202,45 +212,45 @@ class Groupe_offreController extends Controller
 
     /**
      * @param Request $request
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @return JsonResponse|View
      *
      * @Post("/new/collectionoffre")
      */
     public function newAction(Request $request)
     {
-        $this->createSecurity();
-        /** @var Session $session */
-        $session = $request->getSession();
-        /** @var Groupe_offre $groupe_offre */
-        $groupe_offre = TradeFactory::getTradeProvider("groupe_offre");
-        $form = $this->createForm('APM\AchatBundle\Form\Groupe_offreType', $groupe_offre);
-        $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) { //save
+        try {
+            $this->createSecurity();
+            /** @var Groupe_offre $groupe_offre */
+            $groupe_offre = TradeFactory::getTradeProvider("groupe_offre");
+            $form = $this->createForm('APM\AchatBundle\Form\Groupe_offreType', $groupe_offre);
+            $form->submit($request->request->all());
+            if (!$form->isValid()) {
+                return new JsonResponse([
+                    "status" => 400,
+                    "message" => $this->get('translator')->trans($form->getErrors(true, false), [], 'FOSUserBundle')
+                ], Response::HTTP_BAD_REQUEST);
+            }
+
             $groupe_offre->setCreateur($this->getUser());
             $em = $this->getDoctrine()->getManager();
-            try {
-                $em->persist($groupe_offre);
-                $em->flush();
-                if ($request->isXmlHttpRequest()) {
-                    $json = array();
-                    $json['item'] = array();
-                    $session->getFlashBag()->add('success', "Enregistrement du groupe d'offres : " . "<strong>" . $groupe_offre . "</strong><br>Opération effectuée avec succès!");
-                    return $this->json(json_encode($json), 200);
-                }
-                $session->getFlashBag()->add('success', "Enregistrement du groupe d'offres : " . "<strong>" . $groupe_offre . "</strong><br>Opération effectuée avec succès!");
-                return $this->redirectToRoute('apm_achat_groupe_show', ['id' => $groupe_offre->getId()]);
-            } catch (ConstraintViolationException $cve) {
-                $session->getFlashBag()->add('danger', "Echec de l'enregistrement: " . "<strong>" . $groupe_offre . "</strong><br>La création ou la modification du groupe d'offre a échoué!");
-                return $this->json(json_encode(["item" => null]));
-            } catch (AccessDeniedException $ads) {
-                $session->getFlashBag()->add('danger', "<strong>Action interdite.</strong><br>Vous n'êtes pas autorisez à effectuer cette opération!");
-                return $this->json(json_encode(["item" => null]));
-            }
+            $em->persist($groupe_offre);
+            $em->flush();
+
+            return $this->routeRedirectView("api_achat_show_groupeoffre", ['id' => $groupe_offre->getId()], Response::HTTP_CREATED);
+
+        } catch (ConstraintViolationException $cve) {
+            return new JsonResponse([
+                "status" => 400,
+                "message" => $this->get('translator')->trans("impossible d'enregistrer, vérifiez vos données", [], 'FOSUserBundle')
+            ], Response::HTTP_BAD_REQUEST);
+        } catch (AccessDeniedException $ads) {
+            return new JsonResponse([
+                    "status" => 403,
+                    "message" => $this->get('translator')->trans("Access denied", [], 'FOSUserBundle'),
+                ]
+                , Response::HTTP_FORBIDDEN
+            );
         }
-        return $this->render('APMAchatBundle:groupe_offre:new.html.twig', array(
-            'form' => $form->createView(),
-            'url_image' => $this->get('apm_core.packages_maker')->getPackages()->getUrl('/', 'resolve_img'),
-        ));
     }
 
     private function createSecurity()
@@ -259,58 +269,44 @@ class Groupe_offreController extends Controller
     /**
      * @param Request $request
      * @param Groupe_offre $groupe_offre
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
+     * @return JsonResponse | View
      * @Patch("/edit/collectionoffre/{id}")
      */
     public function editAction(Request $request, Groupe_offre $groupe_offre)
     {
-        $this->editAndDeleteSecurity($groupe_offre);
-        /** @var Session $session */
-        $session = $request->getSession();
-        $editForm = $this->createForm('APM\AchatBundle\Form\Groupe_offreType', $groupe_offre);
-        $editForm->handleRequest($request);
-        if ($editForm->isSubmitted() && $editForm->isValid()
-            || $request->isXmlHttpRequest() && $request->isMethod('POST')
-        ) {
-            $em = $this->getDoctrine()->getManager();
-            if ($request->isXmlHttpRequest()) {
-                $json = array();
-                $json['item'] = array();
-                $property = $request->query->get('name');
-                $value = $request->query->get('value');
-                switch ($property) {
-                    case 'dateDeVigueur':
-                        $groupe_offre->setDateDeVigueur($value);
-                        break;
-                    case 'propriete':
-                        $groupe_offre->setPropriete($value);
-                        break;
-                    case 'description':
-                        $groupe_offre->setDescription($value);
-                        break;
-                    case 'designation' :
-                        $groupe_offre->setDesignation($value);
-                        break;
-                    case 'recurrent' :
-                        $groupe_offre->setRecurrent($value);
-                        break;
-                    default:
-                        $session->getFlashBag()->add('info', "<strong> Aucune mis à jour effectuée</strong>");
-                        return $this->json(json_encode(["item" => null]), 205);
-                }
-                $em->flush();
-                $session->getFlashBag()->add('success', "Mise à jour propriété : <strong>" . $property . "</strong> réf. Groupe d'offre :" . $groupe_offre->getCode() . "<br> Opération effectuée avec succès!");
-                return $this->json(json_encode($json), 200);
+        try {
+            $this->editAndDeleteSecurity($groupe_offre);
+            $form = $this->createForm('APM\AchatBundle\Form\Groupe_offreType', $groupe_offre);
+            $form->submit($request->request->all(), false);
+            if (!$form->isValid()) {
+                return new JsonResponse(
+                    [
+                        "status" => 400,
+                        "message" => $this->get('translator')->trans($form->getErrors(true, false), [], 'FOSUserBundle')
+                    ], Response::HTTP_BAD_REQUEST
+                );
             }
+            $em = $this->getDoctrine()->getManager();
             $em->flush();
+
+            return $this->routeRedirectView("api_achat_show_groupeoffre", ["id" => $groupe_offre->getId()], Response::HTTP_OK);
+
+        } catch (ConstraintViolationException $cve) {
+            return new JsonResponse(
+                [
+                    "status" => 400,
+                    "message" => $this->get('translator')->trans("impossible d'enregistrer, vérifiez vos données", [], 'FOSUserBundle')
+                ], Response::HTTP_BAD_REQUEST
+            );
+        } catch (AccessDeniedException $ads) {
+            return new JsonResponse(
+                [
+                    "status" => 403,
+                    "message" => $this->get('translator')->trans("Access denied", [], 'FOSUserBundle'),
+                ]
+                , Response::HTTP_FORBIDDEN
+            );
         }
-        $deleteForm = $this->createDeleteForm($groupe_offre);
-        return $this->render('APMAchatBundle:groupe_offre:edit.html.twig', array(
-            'groupe_offre' => $groupe_offre,
-            'edit_form' => $editForm->createView(),
-            'delete_form' => $deleteForm->createView(),
-            'url_image' => $this->get('apm_core.packages_maker')->getPackages()->getUrl('/', 'resolve_img'),
-        ));
     }
 
     /**
@@ -336,18 +332,6 @@ class Groupe_offreController extends Controller
 
     /**
      * @param Groupe_offre $groupe_offre
-     * @return \Symfony\Component\Form\Form|\Symfony\Component\Form\FormInterface
-     */
-    private function createDeleteForm(Groupe_offre $groupe_offre)
-    {
-        return $this->createFormBuilder()
-            ->setAction($this->generateUrl('apm_achat_groupe_delete', array('id' => $groupe_offre->getId())))
-            ->setMethod('DELETE')
-            ->getForm();
-    }
-
-    /**
-     * @param Groupe_offre $groupe_offre
      * @return JsonResponse
      * @Get("/show/collectionoffre/{id}")
      */
@@ -361,31 +345,39 @@ class Groupe_offreController extends Controller
     /**
      * @param Request $request
      * @param Groupe_offre $groupe_offre
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
+     * @return JsonResponse| View
      * @Delete("/delete/collectionoffre/{id}")
      */
     public function deleteAction(Request $request, Groupe_offre $groupe_offre)
     {
-        $this->editAndDeleteSecurity($groupe_offre);
-        /** @var Session $session */
-        $session = $request->getSession();
-        $em = $this->getDoctrine()->getManager();
         try {
+            $this->editAndDeleteSecurity($groupe_offre);
+            if (!$request->request->has('exec') || $request->request->get('exec') !== 'go') {
+                return new JsonResponse([
+                    "status" => 400,
+                    "message" => $this->get('translator')->trans('impossible de supprimer', [], 'FOSUserBundle')
+                ], Response::HTTP_BAD_REQUEST);
+            }
+            $em = $this->getDoctrine()->getManager();
             $em->remove($groupe_offre);
             $em->flush();
-            if ($request->isXmlHttpRequest()) {
-                $json = array();
-                $json['item'];
-                return $this->json(json_encode($json), 200);
-            }
-            $session->getFlashBag()->add('success', "Suppression du groupe d'offres: " . "<strong>" . $groupe_offre . "</strong><br>Opération effectuée avec succès!");
-            return $this->redirectToRoute('apm_achat_groupe_index');
+            return $this->routeRedirectView("api_achat_get_groupeoffres", [], Response::HTTP_OK);
+
         } catch (ConstraintViolationException $cve) {
-            $session->getFlashBag()->add('danger', "Echec de la suppression de: " . "<strong>" . $groupe_offre . "</strong><br>L'opération de suppression du groupe d'offre a échoué!");
-            return $this->redirectToRoute('apm_achat_groupe_index');
+            return new JsonResponse(
+                [
+                    "status" => 400,
+                    "message" => $this->get('translator')->trans("impossible de supprimer, vérifiez vos données", [], 'FOSUserBundle')
+                ], Response::HTTP_FAILED_DEPENDENCY
+            );
         } catch (AccessDeniedException $ads) {
-            $session->getFlashBag()->add('danger', "<strong>Action interdite.</strong><br>Vous n'êtes pas autorisez à effectuer cette opération!");
-            return $this->json(json_encode(["item" => null]));
+            return new JsonResponse(
+                [
+                    "status" => 403,
+                    "message" => $this->get('translator')->trans("Access denied", [], 'FOSUserBundle'),
+                ]
+                , Response::HTTP_FORBIDDEN
+            );
         }
     }
 }

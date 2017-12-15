@@ -53,15 +53,24 @@ class ProfileController extends FOSRestController
      */
     public function patchUserAction(Request $request, Utilisateur_avm $user)
     {
-        $this->securityUser($user);
-        /** @var Utilisateur_avm $utilisateur */
-        $response = $this->get('apm_user.update_profile_manager')->updateUser(Utilisateur_avm::class, $request, false, $user);
-        if (is_object($response) && $response instanceof Utilisateur_avm) {
-            $utilisateur = $response;
-            return $this->routeRedirectView('api_user_show', ['id' => $utilisateur->getId()], Response::HTTP_NO_CONTENT);
-        }
+        try {
+            $this->securityUser($user);
+            /** @var Utilisateur_avm $utilisateur */
+            $response = $this->get('apm_user.update_profile_manager')->updateUser(Utilisateur_avm::class, $request, false, $user);
+            if (is_object($response) && $response instanceof Utilisateur_avm) {
+                $utilisateur = $response;
+                return $this->routeRedirectView('api_user_show', ['id' => $utilisateur->getId()], Response::HTTP_NO_CONTENT);
+            }
+            return new JsonResponse($response, Response::HTTP_BAD_REQUEST);
 
-        return $response;
+        } catch (AccessDeniedException $ads) {
+            return new JsonResponse([
+                    "status" => 403,
+                    "message" => $this->get('translator')->trans("Access denied", [], 'FOSUserBundle'),
+                ]
+                , Response::HTTP_FORBIDDEN
+            );
+        }
     }
 
     private function securityUser($user)
@@ -83,13 +92,24 @@ class ProfileController extends FOSRestController
      */
     public function patchStaffAction(Request $request, Admin $user)
     {
-        $this->securityStaff($user);
-        $response = $this->get('apm_user.update_profile_manager')->updateUser(Admin::class, $request, false, $user);
-        if (is_object($response) && $response instanceof Admin) {
-            $utilisateur = $response;
-            return $this->routeRedirectView('api_user_show', ['id' => $utilisateur->getId()], Response::HTTP_NO_CONTENT);
+        try {
+            $this->securityStaff($user);
+            $response = $this->get('apm_user.update_profile_manager')->updateUser(Admin::class, $request, false, $user);
+            if (is_object($response) && $response instanceof Admin) {
+                $utilisateur = $response;
+                return $this->routeRedirectView('api_user_show', ['id' => $utilisateur->getId()], Response::HTTP_NO_CONTENT);
+            }
+
+            return new JsonResponse($response, Response::HTTP_BAD_REQUEST);
+
+        } catch (AccessDeniedException $ads) {
+            return new JsonResponse([
+                    "status" => 403,
+                    "message" => $this->get('translator')->trans("Access denied", [], 'FOSUserBundle'),
+                ]
+                , Response::HTTP_FORBIDDEN
+            );
         }
-        return $response;
     }
 
     private function securityStaff($user)
@@ -112,15 +132,25 @@ class ProfileController extends FOSRestController
      */
     public function changepasswordUserAction(Request $request, Utilisateur_avm $user)
     {
-        $this->securityUser($user);
-        if ($user !== $this->getUser()) {
-            throw new AccessDeniedHttpException("This user does not have access to this section");
+        try {
+            $this->securityUser($user);
+            if ($user !== $this->getUser()) {
+                throw new AccessDeniedHttpException("This user does not have access to this section");
+            }
+            return $this->get('apm_user.resetting_manager')->change(Utilisateur_avm::class, $request, $user);
+
+        } catch (AccessDeniedException $ads) {
+            return new JsonResponse([
+                    "status" => 403,
+                    "message" => $this->get('translator')->trans("Access denied", [], 'FOSUserBundle'),
+                ]
+                , Response::HTTP_FORBIDDEN
+            );
         }
-        return $this->get('apm_user.resetting_manager')->change(Utilisateur_avm::class, $request, $user);
     }
 
     /**
-     * Change user password
+     * Change staff password
      *
      * @Post("/change-password/staff/{id}")
      * @param Request $request
@@ -129,37 +159,21 @@ class ProfileController extends FOSRestController
      */
     public function changepasswordStaffAction(Request $request, Admin $user)
     {
-        $this->securityStaff($user);
-        if ($user !== $this->getUser()) {
-            throw new AccessDeniedHttpException("This user does not have access to this section");
+        try {
+            $this->securityStaff($user);
+            if ($user !== $this->getUser()) {
+                throw new AccessDeniedHttpException("This user does not have access to this section");
+            }
+            return $this->get('apm_user.resetting_manager')->change(Admin::class, $request, $user);
+
+        } catch (AccessDeniedException $ads) {
+            return new JsonResponse([
+                    "status" => 403,
+                    "message" => $this->get('translator')->trans("Access denied", [], 'FOSUserBundle'),
+                ]
+                , Response::HTTP_FORBIDDEN
+            );
         }
-        return $this->get('apm_user.resetting_manager')->change(Admin::class, $request, $user);
     }
-
-    /*public function showImageAction(Request $request)
-     {
-         $user = $this->getUser();
-         if (!is_object($user) || !$user instanceof UserInterface) {
-             throw new AccessDeniedException('This user does not have access to this section.');
-         }
-
-         $form = $this->createCrobForm($user);
-         $form->handleRequest($request);
-         if ($form->isSubmitted() && $form->isValid()) {
-             $this->get('apm_core.crop_image')->setCropParameters(intval($_POST['x']), intval($_POST['y']), intval($_POST['w']), intval($_POST['h']), $user->getImage(), $user);
-             $event = new FormEvent($form, $request);
-             if (null === $response = $event->getResponse()) {
-                 $url = $this->generateUrl('fos_user_profile_show');
-                 $response = new RedirectResponse($url);
-             }
-
-             return $response;
-         }
-
-         return $this->render('APMUserBundle:utilisateur_avm:image.html.twig', array(
-             'user' => $user,
-             'crop_form' => $form->createView(),
-         ));
-     }*/
 
 }

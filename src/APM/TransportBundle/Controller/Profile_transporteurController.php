@@ -9,9 +9,11 @@ use APM\UserBundle\Entity\Utilisateur_avm;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Exception\ConstraintViolationException;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use FOS\RestBundle\Controller\FOSRestController;
+use FOS\RestBundle\View\View;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use FOS\RestBundle\Controller\Annotations\RouteResource;
 use FOS\RestBundle\Controller\Annotations\Get;
@@ -25,7 +27,7 @@ use Nelmio\ApiDocBundle\Annotation\ApiDoc;
  * Profile_transporteur controller.
  * @RouteResource("transporteur", pluralize=false)
  */
-class Profile_transporteurController extends Controller
+class Profile_transporteurController extends FOSRestController
 {
     private $matricule_filter;
     private $code_filter;
@@ -40,26 +42,36 @@ class Profile_transporteurController extends Controller
      */
     public function getAction(Request $request)
     {
-        $this->listeAndShowSecurity();
-        $em = $this->getDoctrine()->getManager();
-        $transporteurs = $em->getRepository('APMTransportBundle:Profile_transporteur')->findAll();
-        $profile_transporteurs = new ArrayCollection($transporteurs);
-        $json = array();
-        $this->matricule_filter = $request->query->has('matricule_filter') ? $request->query->get('matricule_filter') : "";
-        $this->code_filter = $request->query->has('code_filter') ? $request->query->get('code_filter') : "";
-        $this->livreur_boutique = $request->query->has('livreur_boutique') ? $request->query->get('livreur_boutique') : "";
-        $iDisplayLength = $request->query->has('length') ? $request->query->get('length') : -1;
-        $iDisplayStart = $request->query->has('start') ? intval($request->query->get('start')) : 0;
-        $iTotalRecords = count($profile_transporteurs);
-        if ($iDisplayLength < 0) $iDisplayLength = $iTotalRecords;
-        $profile_transporteurs = $this->handleResults($profile_transporteurs, $iTotalRecords, $iDisplayStart, $iDisplayLength);
-        $iFilteredRecords = count($profile_transporteurs);
-        $data = $this->get('apm_core.data_serialized')->getFormalData($profile_transporteurs, array("owner_list"));
-        $json['totalRecords'] = $iTotalRecords;
-        $json['filteredRecords'] = $iFilteredRecords;
-        $json['items'] = $data;
+        try {
+            $this->listeAndShowSecurity();
+            $em = $this->getDoctrine()->getManager();
+            $transporteurs = $em->getRepository('APMTransportBundle:Profile_transporteur')->findAll();
+            $profile_transporteurs = new ArrayCollection($transporteurs);
+            $json = array();
+            $this->matricule_filter = $request->query->has('matricule_filter') ? $request->query->get('matricule_filter') : "";
+            $this->code_filter = $request->query->has('code_filter') ? $request->query->get('code_filter') : "";
+            $this->livreur_boutique = $request->query->has('livreur_boutique') ? $request->query->get('livreur_boutique') : "";
+            $iDisplayLength = $request->query->has('length') ? $request->query->get('length') : -1;
+            $iDisplayStart = $request->query->has('start') ? intval($request->query->get('start')) : 0;
+            $iTotalRecords = count($profile_transporteurs);
+            if ($iDisplayLength < 0) $iDisplayLength = $iTotalRecords;
+            $profile_transporteurs = $this->handleResults($profile_transporteurs, $iTotalRecords, $iDisplayStart, $iDisplayLength);
+            $iFilteredRecords = count($profile_transporteurs);
+            $data = $this->get('apm_core.data_serialized')->getFormalData($profile_transporteurs, array("owner_list"));
+            $json['totalRecords'] = $iTotalRecords;
+            $json['filteredRecords'] = $iFilteredRecords;
+            $json['items'] = $data;
 
-        return new JsonResponse($json, 200);
+            return new JsonResponse($json, 200);
+
+        } catch (AccessDeniedException $ads) {
+            return new JsonResponse([
+                    "status" => 403,
+                    "message" => $this->get('translator')->trans("Access denied", [], 'FOSUserBundle'),
+                ]
+                , Response::HTTP_FORBIDDEN
+            );
+        }
     }
 
     private function listeAndShowSecurity()
@@ -127,42 +139,43 @@ class Profile_transporteurController extends Controller
     /**
      * Creates a new Profile_transporteur entity.
      * @param Request $request
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response| JsonResponse
+     * @return View | JsonResponse
      *
      * @Post("/new/transporteur")
      */
     public function newAction(Request $request)
     {
-        $this->createSecurity();
-        /** @var Profile_transporteur $profile_transporteur */
-        $profile_transporteur = TradeFactory::getTradeProvider("transporteur");
-        $form = $this->createForm('APM\TransportBundle\Form\Profile_transporteurType', $profile_transporteur);
-        $form->remove('utilisateur');
-        $form->handleRequest($request);
-        $em = $this->getDoctrine()->getManager();
-        if ($form->isSubmitted() && $form->isValid()) {
-            try {
-                $profile_transporteur->setUtilisateur($this->getUser());
-                $em->persist($profile_transporteur);
-                $em->flush();
-                if ($request->isXmlHttpRequest()) {
-                    $json = array();
-                    $json['item'] = array();
-                    return $this->json(json_encode($json), 200);
-                }
-                return $this->redirectToRoute('apm_transport_transporteur_show', array('id' => $profile_transporteur->getId()));
-            } catch (ConstraintViolationException $cve) {
-                $session->getFlashBag()->add('danger', "<strong>Echec de l'enregistrement. </strong><br>L'enregistrement a échoué dû à une contrainte de données!");
-                return $this->json(json_encode(["item" => null]));
-            } catch (AccessDeniedException $ads) {
-                $session->getFlashBag()->add('danger', "<strong>Action interdite.</strong><br>Vous n'êtes pas autorisez à effectuer cette opération!");
-                return $this->json(json_encode(["item" => null]));
+        try {
+            $this->createSecurity();
+            /** @var Profile_transporteur $profile_transporteur */
+            $profile_transporteur = TradeFactory::getTradeProvider("transporteur");
+            $form = $this->createForm('APM\TransportBundle\Form\Profile_transporteurType', $profile_transporteur);
+            $form->remove('utilisateur');
+            $form->submit($request->request->all());
+            if (!$form->isValid()) {
+                return new JsonResponse([
+                    "status" => 400,
+                    "message" => $this->get('translator')->trans($form->getErrors(true, false), [], 'FOSUserBundle')
+                ], Response::HTTP_BAD_REQUEST);
             }
+            $profile_transporteur->setUtilisateur($this->getUser());
+            $em = $this->getDoctrine()->getManager();
+            $em->persist($profile_transporteur);
+            $em->flush();
+            return $this->routeRedirectView("api_transport_show_transporteur", ['id' => $profile_transporteur->getId()], Response::HTTP_CREATED);
+        } catch (ConstraintViolationException $cve) {
+            return new JsonResponse([
+                "status" => 400,
+                "message" => $this->get('translator')->trans("impossible d'enregistrer, vérifiez vos données", [], 'FOSUserBundle')
+            ], Response::HTTP_BAD_REQUEST);
+        } catch (AccessDeniedException $ads) {
+            return new JsonResponse([
+                    "status" => 403,
+                    "message" => $this->get('translator')->trans("Access denied", [], 'FOSUserBundle'),
+                ]
+                , Response::HTTP_FORBIDDEN
+            );
         }
-        return $this->render('APMTransportBundle:profile_transporteur:new.html.twig', array(
-            'profile_transporteur' => $profile_transporteur,
-            'form' => $form->createView(),
-        ));
     }
 
     private function createSecurity()
@@ -198,60 +211,42 @@ class Profile_transporteurController extends Controller
     }
 
     /**
-     * Displays a form to edit an existing Profile_transporteur entity.
      * @param Request $request
      * @param Profile_transporteur $profile_transporteur
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response | JsonResponse
-     *
+     * @return View | JsonResponse
      * @Post("/edit/transporteur/{id}")
      */
     public function editAction(Request $request, Profile_transporteur $profile_transporteur)
     {
-        $this->editAndDeleteSecurity($profile_transporteur);
-        $deleteForm = $this->createDeleteForm($profile_transporteur);
-        $editForm = $this->createForm('APM\TransportBundle\Form\Profile_transporteurType', $profile_transporteur);
-        $editForm->handleRequest($request);
-        $em = $this->getDoctrine()->getManager();
-        if ($editForm->isSubmitted() && $editForm->isValid() ||
-            $request->isXmlHttpRequest() && $request->getMethod() === "POST"
-        ) {
-            try {
-                if ($request->isXmlHttpRequest()) {
-                    $json = array();
-                    $json['item'] = array();
-                    $property = $request->query->get('name');
-                    $value = $request->query->get('value');
-                    switch ($property) {
-                        case 'matricule':
-                            $profile_transporteur->setMatricule($value);
-                            break;
-                        case 'livreurBoutique':
-                            $transporteur = $em->getRepository('APMTransportBundle:Livreur_boutique')->find($value);
-                            $profile_transporteur->setLivreurBoutique($transporteur);
-                            break;
-                        default:
-                            $session->getFlashBag()->add('info', "<strong> Aucune mise à jour effectuée</strong>");
-                            return $this->json(json_encode(["item" => null]), 205);
-                    }
-                    $em->flush();
-                    $session->getFlashBag()->add('success', "Mis à jour propriété : <strong>" . $property . "</strong> réf. profile_transporteur :" . $boutique->getCode() . "<br> Opération effectuée avec succès!");
-                    return $this->json(json_encode($json), 200);
-                }
-                $em->flush();
-                return $this->redirectToRoute('apm_transport_transporteur_show', array('id' => $profile_transporteur->getId()));
-            } catch (ConstraintViolationException $cve) {
-                $session->getFlashBag()->add('danger', "<strong>Echec de l'enregistrement. </strong><br>L'enregistrement a échoué dû à une contrainte de données!");
-                return $this->json(json_encode(["item" => null]));
-            } catch (AccessDeniedException $ads) {
-                $session->getFlashBag()->add('danger', "<strong>Action interdite.</strong><br>Vous n'êtes pas autorisez à effectuer cette opération!");
-                return $this->json(json_encode(["item" => null]));
+        try {
+            $this->editAndDeleteSecurity($profile_transporteur);
+            $form = $this->createForm('APM\TransportBundle\Form\Profile_transporteurType', $profile_transporteur);
+            $form->submit($request->request->all(), false);
+            if (!$form->isValid()) {
+                return new JsonResponse([
+                    "status" => 400,
+                    "message" => $this->get('translator')->trans($form->getErrors(true, false), [], 'FOSUserBundle')
+                ], Response::HTTP_BAD_REQUEST);
             }
+            $em = $this->getDoctrine()->getManager();
+            $em->flush();
+            return $this->routeRedirectView("api_transport_show_transporteur", ['id' => $profile_transporteur->getId()], Response::HTTP_OK);
+        } catch (ConstraintViolationException $cve) {
+            return new JsonResponse(
+                [
+                    "status" => 400,
+                    "message" => $this->get('translator')->trans("impossible d'enregistrer, vérifiez vos données", [], 'FOSUserBundle')
+                ], Response::HTTP_BAD_REQUEST
+            );
+        } catch (AccessDeniedException $ads) {
+            return new JsonResponse(
+                [
+                    "status" => 403,
+                    "message" => $this->get('translator')->trans("Access denied", [], 'FOSUserBundle'),
+                ]
+                , Response::HTTP_FORBIDDEN
+            );
         }
-        return $this->render('APMTransportBundle:profile_transporteur:edit.html.twig', array(
-            'profile_transporteur' => $profile_transporteur,
-            'edit_form' => $editForm->createView(),
-            'delete_form' => $deleteForm->createView(),
-        ));
     }
 
     /**
@@ -274,48 +269,44 @@ class Profile_transporteurController extends Controller
     }
 
     /**
-     * Creates a form to delete a Profile_transporteur entity.
-     *
-     * @param Profile_transporteur $profile_transporteur The Profile_transporteur entity
-     *
-     * @return \Symfony\Component\Form\Form The form
-     */
-    private function createDeleteForm(Profile_transporteur $profile_transporteur)
-    {
-        return $this->createFormBuilder()
-            ->setAction($this->generateUrl('apm_transport_transporteur_delete', array('id' => $profile_transporteur->getId())))
-            ->setMethod('DELETE')
-            ->getForm();
-    }
-
-    /**
      * Deletes a Profile_transporteur entity.
      * @param Request $request
      * @param Profile_transporteur $profile_transporteur
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse | JsonResponse
+     * @return View | JsonResponse
      *
      * @Delete("/delete/transporteur/{id}")
      */
     public function deleteAction(Request $request, Profile_transporteur $profile_transporteur)
     {
-        $this->editAndDeleteSecurity($profile_transporteur);
-        $em = $this->getDoctrine()->getManager();
-        if ($request->isXmlHttpRequest()) {
+        try {
+            $this->editAndDeleteSecurity($profile_transporteur);
+            if (!$request->request->has('exec') || $request->request->get('exec') !== 'go') {
+                return new JsonResponse([
+                    "status" => 400,
+                    "message" => $this->get('translator')->trans('impossible de supprimer', [], 'FOSUserBundle')
+                ], Response::HTTP_BAD_REQUEST);
+            }
+            $user = $profile_transporteur->getUtilisateur();
+            $em = $this->getDoctrine()->getManager();
             $em->remove($profile_transporteur);
             $em->flush();
-            $json = array();
-            $json['item'] = array();
-            return $this->json(json_encode($json), 200);
+            return $this->routeRedirectView("api_user_show", [$user->getId()], Response::HTTP_OK);
+        } catch (ConstraintViolationException $cve) {
+            return new JsonResponse(
+                [
+                    "status" => 400,
+                    "message" => $this->get('translator')->trans("impossible de supprimer, vérifiez vos données", [], 'FOSUserBundle')
+                ], Response::HTTP_FAILED_DEPENDENCY
+            );
+        } catch (AccessDeniedException $ads) {
+            return new JsonResponse(
+                [
+                    "status" => 403,
+                    "message" => $this->get('translator')->trans("Access denied", [], 'FOSUserBundle'),
+                ]
+                , Response::HTTP_FORBIDDEN
+            );
         }
-        $form = $this->createDeleteForm($profile_transporteur);
-        $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
-            $em->remove($profile_transporteur);
-            $em->flush();
-            return $this->redirectToRoute('apm_transport_transporteur_index');
-        }
-
-        return $this->redirectToRoute('apm_transport_transporteur_index');
     }
 
 }

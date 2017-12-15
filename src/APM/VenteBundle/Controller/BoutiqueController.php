@@ -9,12 +9,13 @@ use APM\VenteBundle\Entity\Boutique;
 use APM\VenteBundle\Entity\Offre;
 use APM\VenteBundle\Factory\TradeFactory;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Exception\ConstraintViolationException;
 use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\Routing\ClassResourceInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use FOS\RestBundle\View\View;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\HttpFoundation\Response;
 use FOS\RestBundle\Controller\Annotations\RouteResource;
 use FOS\RestBundle\Controller\Annotations\Get;
 use FOS\RestBundle\Controller\Annotations\Post;
@@ -22,6 +23,7 @@ use FOS\RestBundle\Controller\Annotations\Put;
 use FOS\RestBundle\Controller\Annotations\Patch;
 use FOS\RestBundle\Controller\Annotations\Delete;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 /**
  * Boutique controller.
@@ -38,59 +40,64 @@ class BoutiqueController extends FOSRestController implements ClassResourceInter
     #private $dateFrom_filter;
 
     /**
-     * récupérer ou lister toutes les boutiques appartenant ou gérées par l'utilisateur courrant ou fourni en argument
      * @param Request $request
      * @param Utilisateur_avm|null $user
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
+     * @return JsonResponse
      *
      * @Get("/cget/boutiques", name="s")
      * @Get("/cget/boutiques/user/{id}", name="s_user")
      */
     public function getAction(Request $request, Utilisateur_avm $user = null)
     {
-        $this->personalSecurity();
-        /** @var Utilisateur_avm $user */
-        if (null === $user) {
-            $user = $this->getUser();
-        } else {
-            $this->adminSecurity();
+        try {
+            $this->personalSecurity();
+            /** @var Utilisateur_avm $user */
+            if (null === $user) {
+                $user = $this->getUser();
+            } else {
+                $this->adminSecurity();
+            }
+            //filtre
+            /** @var Boutique $boutique */
+            $this->nationalite_filter = $request->query->has('nationalite_filter') ? $request->query->get('nationalite_filter') : "";
+            $this->code_filter = $request->query->has('code_filter') ? $request->query->get('code_filter') : "";
+            $this->designation_filter = $request->query->has('designation_filter') ? $request->query->get('designation_filter') : "";
+            $this->etat_filter = $request->query->has('etat_filter') ? $request->query->get('etat_filter') : "";
+            $iDisplayLength = $request->query->has('length') ? $request->query->get('length') : -1;
+            $iDisplayStart = $request->query->has('start') ? intval($request->query->get('start')) : 0;
+            $selectedGroup = array("owner_list");
+            $json = array();
+            $json['items'] = array();
+            $p = $request->query->has('p') ? $request->query->get('p') : "all";
+            if ($p === "owner" || $p === "all") {
+                $boutiques = $user->getBoutiquesProprietaire();
+                $iTotalRecords = count($boutiques);
+                if ($iDisplayLength < 0) $iDisplayLength = $iTotalRecords;
+                $boutiques = $this->handleResults($boutiques, $iTotalRecords, $iDisplayStart, $iDisplayLength);
+                $iFilteredRecords = count($boutiques);
+                $data = $this->get('apm_core.data_serialized')->getFormalData($boutiques, $selectedGroup);
+                $json['items']['owner'] = $data;
+                $json['totalRecordsOwner'] = $iTotalRecords;
+                $json['filteredRecordsOwner'] = $iFilteredRecords;
+            }
+            if ($p === "shopkeeper" || $p === "all") {
+                $boutiquesGerant = $user->getBoutiquesGerant();
+                $iTotalRecords = count($boutiquesGerant);
+                if ($iDisplayLength < 0) $iDisplayLength = $iTotalRecords;
+                $boutiquesGerant = $this->handleResults($boutiquesGerant, $iTotalRecords, $iDisplayStart, $iDisplayLength);
+                $iFilteredRecords = count($boutiquesGerant);
+                $data = $this->get('apm_core.data_serialized')->getFormalData($boutiquesGerant, $selectedGroup);
+                $json['totalRecordsShopkeeper'] = $iTotalRecords;
+                $json['filteredRecordsShopkeeper'] = $iFilteredRecords;
+                $json['items']['shopkeeper'] = $data;
+            }
+            return new JsonResponse($json, 200);
+        } catch (AccessDeniedException $ads) {
+            return new JsonResponse([
+                "status" => 403,
+                "message" => $this->get('translator')->trans("Accès refusé", [], 'FOSUserBundle')
+            ], Response::HTTP_FORBIDDEN);
         }
-        //filtre
-        /** @var Boutique $boutique */
-        $boutiques = $user->getBoutiquesProprietaire();
-        $boutiquesGerant = $user->getBoutiquesGerant();
-        $p = $request->get('p');
-        $this->nationalite_filter = $request->query->has('nationalite_filter') ? $request->query->get('nationalite_filter') : "";
-        $this->code_filter = $request->query->has('code_filter') ? $request->query->get('code_filter') : "";
-        $this->designation_filter = $request->query->has('designation_filter') ? $request->query->get('designation_filter') : "";
-        $this->etat_filter = $request->query->has('etat_filter') ? $request->query->get('etat_filter') : "";
-        $iDisplayLength = $request->query->has('length') ? $request->query->get('length') : -1;
-        $iDisplayStart = $request->query->has('start') ? intval($request->query->get('start')) : 0;
-        $selectedGroup = array("owner_list");
-        $json = array();
-        $json['items'] = array();
-        if (($p === "owner" || $p === "both") && null !== $boutiques) {
-            $iTotalRecords = count($boutiques);
-            if ($iDisplayLength < 0) $iDisplayLength = $iTotalRecords;
-            $boutiques = $this->handleResults($boutiques, $iTotalRecords, $iDisplayStart, $iDisplayLength);
-            $iFilteredRecords = count($boutiques);
-            $data = $this->get('apm_core.data_serialized')->getFormalData($boutiques, $selectedGroup);
-            $json['items'] = $data;
-            $json['totalRecordsOwner'] = $iTotalRecords;
-            $json['filteredRecordsOwner'] = $iFilteredRecords;
-        }
-        if (($p === "shopkeeper" || $p === "both") && null !== $boutiquesGerant) {
-            $iTotalRecords = count($boutiquesGerant);
-            if ($iDisplayLength < 0) $iDisplayLength = $iTotalRecords;
-            $boutiquesGerant = $this->handleResults($boutiquesGerant, $iTotalRecords, $iDisplayStart, $iDisplayLength);
-            $iFilteredRecords = count($boutiques);
-            $data = $this->get('apm_core.data_serialized')->getFormalData($boutiquesGerant, $selectedGroup);
-            $json['totalRecordsShopkeeper'] = $iTotalRecords;
-            $json['filteredRecordsShopkeeper'] = $iFilteredRecords;
-            $json['items'] = $data;
-        }
-
-        return new JsonResponse($json, 200);
     }
 
     private
@@ -187,58 +194,41 @@ class BoutiqueController extends FOSRestController implements ClassResourceInter
     /**
      * Creates a new Boutique entity.
      * @param Request $request
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response | JsonResponse
-     *
      * @Post("/new/boutique")
+     * @return View|JsonResponse
      */
     public function newAction(Request $request)
     {
         $this->createSecurity();
-        /** @var Session $session */
-        $session = $request->getSession();
         /** @var Boutique $boutique */
         $boutique = TradeFactory::getTradeProvider('boutique');
         $form = $this->createForm('APM\VenteBundle\Form\BoutiqueType', $boutique);
-        $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
-            try {
-                $boutique->setProprietaire($this->getUser());
-                $em = $this->getEM();
-                $em->persist($boutique);
-                $em->flush();
-                if ($request->isXmlHttpRequest()) {
-                    $json = array();
-                    $json["item"] = array(//prevenir le client
-                        "action" => 0,
-                        "id" => null,
-                    );
-                    $session->getFlashBag()->add('success', "<strong> Boutique créée. réf:" . $boutique->getCode() . "</strong><br> Opération effectuée avec succès!");
-                    return $this->json(json_encode($json));
-                }
-                $this->get('apm_core.crop_image')->liipImageResolver($boutique->getImage());
-                //$dist = dirname(__DIR__, 4);
-                //$file = $dist . '/web/' . $this->getParameter('images_url') . '/' . $boutique->getImage();
-                if (null !== $boutique->getImage()) {
-                    return $this->redirectToRoute('apm_vente_boutique_show-image', array('id' => $boutique->getId()));
-                } else {
-                    return $this->redirectToRoute('apm_vente_boutique_show', array('id' => $boutique->getId()));
-                }
-            } catch (ConstraintViolationException $cve) {
-                $session->getFlashBag()->add('danger', "<strong>Echec de l'enregistrement. </strong><br>L'enregistrement a échoué dû à une contrainte de données!");
-                return $this->json(json_encode(["item" => null]));
-            } catch (RuntimeException $rte) {
-                $session->getFlashBag()->add('danger', "<strong>Echec de l'opération.</strong><br>L'enregistrement a échoué. bien vouloir réessayer plutard, svp!");
-                return $this->json(json_encode(["item" => null]));
-            } catch (AccessDeniedException $ads) {
-                $session->getFlashBag()->add('danger', "<strong>Action interdite.</strong><br>Vous n'êtes pas autorisez à effectuer cette opération!");
-                return $this->json(json_encode(["item" => null]));
-            }
+        $form->submit($request->request->all());
+        if (!$form->isValid()) {
+            return new JsonResponse([
+                "status" => 400,
+                "message" => $this->get('translator')->trans($form->getErrors(true, false), [], 'FOSUserBundle')
+            ], Response::HTTP_BAD_REQUEST);
         }
-        $session->set('previous_location', $request->getUri());
-        return $this->render('APMVenteBundle:boutique:new.html.twig', array(
-            'form' => $form->createView(),
-            'url_image' => $this->get('apm_core.packages_maker')->getPackages()->getUrl('/', 'resolve_img'),
-        ));
+        try {
+            $boutique->setProprietaire($this->getUser());
+            $em = $this->getEM();
+            $em->persist($boutique);
+            $em->flush();
+            return $this->routeRedirectView("api_vente_show_boutique", ['id' => $boutique->getId()], Response::HTTP_CREATED);
+        } catch (ConstraintViolationException $cve) {
+            return new JsonResponse([
+                "status" => 400,
+                "message" => $this->get('translator')->trans("impossible d'enregistrer, vérifiez vos données", [], 'FOSUserBundle')
+            ], Response::HTTP_BAD_REQUEST);
+        } catch (AccessDeniedException $ads) {
+            return new JsonResponse([
+                    "status" => 403,
+                    "message" => $this->get('translator')->trans("Access denied", [], 'FOSUserBundle'),
+                ]
+                , Response::HTTP_FORBIDDEN
+            );
+        }
     }
 
     private
@@ -315,93 +305,44 @@ class BoutiqueController extends FOSRestController implements ClassResourceInter
     }
 
     /**
-     * Displays a form to edit an existing Boutique entity.
      * @param Request $request
      * @param Boutique $boutique
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @return View | JsonResponse
      *
      * @Put("/edit/boutique/{id}")
      */
     public
     function editAction(Request $request, Boutique $boutique)
     {
-        $this->editAndDeleteSecurity($boutique);
-        $oldGerant = $boutique->getGerant();
-        $em = $this->getEM();
-        /** @var Session $session */
-        $session = $request->getSession();
-        if ($request->isXmlHttpRequest() && $request->getMethod() === "POST") {
-            $json = array();
-            $json['item'] = array();
-            $property = $request->request->get('name');
-            $value = $request->request->get('value');
-            switch ($property) {
-                case 'etat':
-                    $boutique->setEtat($value);
-                    $json["item"] = array(//pour actualiser la table
-                        "action" => 1,
-                    );
-                    break;
-                case 'publiable':
-                    $boutique->setPubliable($value);
-                    break;
-                case 'nationalite':
-                    $boutique->setNationalite($value);
-                    break;
-                case 'raisonSociale' :
-                    $boutique->setRaisonSociale($value);
-                    break;
-                case 'statuSociale' :
-                    $boutique->setStatutSocial($value);
-                    break;
-                case 'description':
-                    $boutique->setDescription($value);
-                    break;
-                case 'designation':
-                    $boutique->setDesignation($value);
-                    $json["item"] = array(//pour actualiser la table
-                        "action" => 1,
-                    );
-                    break;
-                case 'gerant':
-                    $newGerant = $em->getRepository('APMUserBundle:Utilisateur_avm')->find($value);
-                    $this->personnelBoutique($boutique, $oldGerant, $newGerant);
-                    $boutique->setGerant($newGerant);
-                    break;
-                default:
-                    $session->getFlashBag()->add('info', "<strong> Aucune mis à jour effectuée</strong>");
-                    return $this->json(json_encode(["item" => null]), 205);
-            }
-            $em->flush();
-            $session->getFlashBag()->add('success', "Mis à jour propriété : <strong>" . $property . "</strong> réf. Boutique :" . $boutique->getCode() . "<br> Opération effectuée avec succès!");
-            return $this->json(json_encode($json), 200);
-        }
-        $deleteForm = $this->createDeleteForm($boutique);
-        $editForm = $this->createForm('APM\VenteBundle\Form\BoutiqueType', $boutique);
-        $editForm->handleRequest($request);
-        if ($editForm->isSubmitted() && $editForm->isValid()) {
+        try {
             $this->editAndDeleteSecurity($boutique);
-            //si le proprietaire change de gerant, il est remplacé dans touts les offres de la boutique
-            $this->personnelBoutique($boutique, $oldGerant, $editForm->get('gerant')->getData());
-            $em->persist($boutique);
-            $em->flush();
-            //---
-            $dist = dirname(__DIR__, 4);
-            $file = $dist . '/web/' . $this->getParameter('images_url') . '/' . $boutique->getImage();
-            if (file_exists($file)) {
-                return $this->redirectToRoute('apm_vente_boutique_show-image', array('id' => $boutique->getId()));
-            } else {
-                return $this->redirectToRoute('apm_vente_boutique_show', array('id' => $boutique->getId()));
+            $form = $this->createForm('APM\VenteBundle\Form\BoutiqueType', $boutique);
+            $form->submit($request->request->all(), false);
+            if (!$form->isValid()) {
+                return new JsonResponse([
+                    "status" => 400,
+                    "message" => $this->get('translator')->trans($form->getErrors(true, false), [], 'FOSUserBundle')
+                ], Response::HTTP_BAD_REQUEST);
             }
-            //---
+            //si le proprietaire change de gerant, il est remplacé dans touts les offres de la boutique
+            $oldGerant = $boutique->getGerant();
+            $this->personnelBoutique($boutique, $oldGerant, $editForm->get('gerant')->getData());
+            $em = $this->getEM();
+            $em->flush();
+            return $this->routeRedirectView("api_vente_show_boutique", ['id' => $boutique->getId()], Response::HTTP_OK);
+        } catch (ConstraintViolationException $cve) {
+            return new JsonResponse([
+                "status" => 400,
+                "message" => $this->get('translator')->trans("impossible d'enregistrer, vérifiez vos données", [], 'FOSUserBundle')
+            ], Response::HTTP_BAD_REQUEST);
+        } catch (AccessDeniedException $ads) {
+            return new JsonResponse([
+                    "status" => 403,
+                    "message" => $this->get('translator')->trans("Access denied", [], 'FOSUserBundle'),
+                ]
+                , Response::HTTP_FORBIDDEN
+            );
         }
-
-        return $this->render('APMVenteBundle:boutique:edit.html.twig', array(
-            'boutique' => $boutique,
-            'edit_form' => $editForm->createView(),
-            'delete_form' => $deleteForm->createView(),
-            'url_image' => $this->get('apm_core.packages_maker')->getPackages()->getUrl('/', 'resolve_img'),
-        ));
     }
 
     /*changer le personnel ayant le droit sur les produits de la
@@ -415,12 +356,7 @@ class BoutiqueController extends FOSRestController implements ClassResourceInter
     function editAndDeleteSecurity($boutique)
     {
         //---------------------------------security-----------------------------------------------
-        // Unable to access the controller unless you have a USERAVM role
         $this->denyAccessUnlessGranted('ROLE_BOUTIQUE', null, 'Unable to access this page!');
-
-        /* ensure that the user is logged in  # granted even through remembering cookies
-        *  and that the one is the owner
-        */
         $user = $this->getUser();
         if ((!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY')) || !$user instanceof Utilisateur || ($boutique->getProprietaire() !== $user)) {
             throw $this->createAccessDeniedException();
@@ -428,7 +364,7 @@ class BoutiqueController extends FOSRestController implements ClassResourceInter
         //----------------------------------------------------------------------------------------
     }
 
-    /** Cette fonction remplace le vendeur des offres d'une boutique par un nouvel utilisateur
+    /**
      * @param Boutique $boutique
      * @param $oldGerant
      * @param $newGerant
@@ -446,48 +382,42 @@ class BoutiqueController extends FOSRestController implements ClassResourceInter
         }
     }
 
-    /**
-     * Creates a form to delete a Boutique entity.
-     *
-     * @param Boutique $boutique The Boutique entity
-     *
-     * @return \Symfony\Component\Form\Form The form
-     */
-    private
-    function createDeleteForm(Boutique $boutique)
-    {
-        return $this->createFormBuilder()
-            ->setAction($this->generateUrl('apm_vente_boutique_delete', array('id' => $boutique->getId())))
-            ->setMethod('DELETE')
-            ->getForm();
-    }
 
     /**
      * Deletes a Boutique entity.
      * @param Request $request
      * @param Boutique $boutique
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
+     * @return JsonResponse| View
      *
      * @Delete("/delete/boutique/{id}")
      */
     public
     function deleteAction(Request $request, Boutique $boutique)
     {
-        $this->editAndDeleteSecurity($boutique);
-        $em = $this->getEM();
-        if ($request->isXmlHttpRequest()) {
+        try {
+            $this->editAndDeleteSecurity($boutique);
+            if (!$request->request->has('exec') || $request->request->get('exec') !== 'go') {
+                return new JsonResponse([
+                    "status" => 400,
+                    "message" => $this->get('translator')->trans('impossible de supprimer', [], 'FOSUserBundle')
+                ], Response::HTTP_BAD_REQUEST);
+            }
+            $em = $this->getEM();
             $em->remove($boutique);
             $em->flush();
-            $json = array();
-            $json['item'];
-            return $this->json(json_encode($json), 200);
+            return $this->routeRedirectView("api_vente_get_boutiques", [], Response::HTTP_OK);
+        } catch (ConstraintViolationException $cve) {
+            return new JsonResponse([
+                "status" => 400,
+                "message" => $this->get('translator')->trans("impossible d'enregistrer, vérifiez vos données", [], 'FOSUserBundle')
+            ], Response::HTTP_FAILED_DEPENDENCY);
+        } catch (AccessDeniedException $ads) {
+            return new JsonResponse([
+                    "status" => 403,
+                    "message" => $this->get('translator')->trans("Access denied", [], 'FOSUserBundle'),
+                ]
+                , Response::HTTP_FORBIDDEN
+            );
         }
-        $form = $this->createDeleteForm($boutique);
-        $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
-            $em->remove($boutique);
-            $em->flush();
-        }
-        return $this->redirectToRoute('apm_vente_boutique_index');
     }
 }

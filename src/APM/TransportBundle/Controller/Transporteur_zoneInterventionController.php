@@ -14,7 +14,9 @@ use APM\TransportBundle\Entity\Zone_intervention;
 use APM\TransportBundle\Factory\TradeFactory;
 use APM\UserBundle\Entity\Utilisateur_avm;
 use Doctrine\Common\Collections\Collection;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Doctrine\DBAL\Exception\ConstraintViolationException;
+use FOS\RestBundle\Controller\FOSRestController;
+use FOS\RestBundle\View\View;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
@@ -25,12 +27,13 @@ use FOS\RestBundle\Controller\Annotations\Delete;
 use FOS\RestBundle\Controller\Annotations\Put;
 use FOS\RestBundle\Controller\Annotations\Patch;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 /**
  * Class Transporteur_zoneInterventionController
  * @RouteResource("transporteur-zoneIntervention", pluralize=false)
  */
-class Transporteur_zoneInterventionController extends Controller
+class Transporteur_zoneInterventionController extends FOSRestController
 {
     private $transporteur_filter;
     private $zoneIntervention_filter;
@@ -47,27 +50,37 @@ class Transporteur_zoneInterventionController extends Controller
      */
     public function getAction(Request $request, Profile_transporteur $transporteur = null, Zone_intervention $zone_intervention = null)
     {
-        $this->listeAndShowSecurity();
-        if (null !== $transporteur) {
-            $transporteurs_zones = $transporteur->getTransporteurZones();
-        } else if (null !== $zone_intervention) {
-            $transporteurs_zones = $zone_intervention->getZoneTransporteurs();
-        }
-        $json = array();
-        $this->transporteur_filter = $request->request->has('transporteur_filter') ? $request->request->get('transporteur_filter') : "";
-        $this->zoneIntervention_filter = $request->request->has('zoneIntervention_filter') ? $request->request->get('zoneIntervention_filter') : "";
-        $iDisplayLength = $request->request->has('length') ? $request->request->get('length') : -1;
-        $iDisplayStart = $request->request->has('start') ? intval($request->request->get('start')) : 0;
-        $iTotalRecords = count($transporteurs_zones);
-        if ($iDisplayLength < 0) $iDisplayLength = $iTotalRecords;
-        $transporteurs_zones = $this->handleResults($transporteurs_zones, $iTotalRecords, $iDisplayStart, $iDisplayLength);
-        $iFilteredRecords = count($transporteurs_zones);
-        $data = $this->get('apm_core.data_serialized')->getFormalData($transporteurs_zones, array("owner_list"));
-        $json['totalRecords'] = $iTotalRecords;
-        $json['filteredRecords'] = $iFilteredRecords;
-        $json['items'] = $data;
+        try {
+            $this->listeAndShowSecurity();
+            if (null !== $transporteur) {
+                $transporteurs_zones = $transporteur->getTransporteurZones();
+            } else if (null !== $zone_intervention) {
+                $transporteurs_zones = $zone_intervention->getZoneTransporteurs();
+            }
+            $json = array();
+            $this->transporteur_filter = $request->request->has('transporteur_filter') ? $request->request->get('transporteur_filter') : "";
+            $this->zoneIntervention_filter = $request->request->has('zoneIntervention_filter') ? $request->request->get('zoneIntervention_filter') : "";
+            $iDisplayLength = $request->request->has('length') ? $request->request->get('length') : -1;
+            $iDisplayStart = $request->request->has('start') ? intval($request->request->get('start')) : 0;
+            $iTotalRecords = count($transporteurs_zones);
+            if ($iDisplayLength < 0) $iDisplayLength = $iTotalRecords;
+            $transporteurs_zones = $this->handleResults($transporteurs_zones, $iTotalRecords, $iDisplayStart, $iDisplayLength);
+            $iFilteredRecords = count($transporteurs_zones);
+            $data = $this->get('apm_core.data_serialized')->getFormalData($transporteurs_zones, array("owner_list"));
+            $json['totalRecords'] = $iTotalRecords;
+            $json['filteredRecords'] = $iFilteredRecords;
+            $json['items'] = $data;
 
-        return new JsonResponse($json, 200);
+            return new JsonResponse($json, 200);
+
+        } catch (AccessDeniedException $ads) {
+            return new JsonResponse([
+                    "status" => 403,
+                    "message" => $this->get('translator')->trans("Access denied", [], 'FOSUserBundle'),
+                ]
+                , Response::HTTP_FORBIDDEN
+            );
+        }
     }
 
     private function listeAndShowSecurity()
@@ -134,31 +147,46 @@ class Transporteur_zoneInterventionController extends Controller
      * @param Request $request
      * @param Profile_transporteur $transporteur
      * @param Zone_intervention|null $zone_intervention
-     * @return \Symfony\Component\HttpFoundation\Response | JsonResponse
+     * @return View | JsonResponse
      *
      * @Post("/new/transporteur/{id}/zone/{zone_id}", name="_transporteur_zone")
      *
      */
     public function newAction(Request $request, Profile_transporteur $transporteur, Zone_intervention $zone_intervention)
     {
-        $this->createSecurity($transporteur);
-        /** @var Transporteur_zoneintervention $transporteur_zoneIntervention */
-        $transporteur_zoneIntervention = TradeFactory::getTradeProvider('transporteur_zoneIntervention');
-        $form = $this->createForm('APM\TransportBundle\Transporteur_zoneInterventionType', $transporteur_zoneIntervention);
-        $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
+        try {
+            $this->createSecurity($transporteur);
+            /** @var Transporteur_zoneintervention $transporteur_zoneIntervention */
+            $transporteur_zoneIntervention = TradeFactory::getTradeProvider('transporteur_zoneIntervention');
+            $form = $this->createForm('APM\TransportBundle\Transporteur_zoneInterventionType', $transporteur_zoneIntervention);
+            $form->submit($request->request->all());
+            if (!$form->isValid()) {
+                return new JsonResponse([
+                    "status" => 400,
+                    "message" => $this->get('translator')->trans($form->getErrors(true, false), [], 'FOSUserBundle')
+                ], Response::HTTP_BAD_REQUEST);
+            }
             if (null !== $zone_intervention) $transporteur_zoneIntervention->setZoneIntervention($zone_intervention);
             if (null !== $transporteur) $transporteur_zoneIntervention->setTransporteur($transporteur);
             $em = $this->getDoctrine()->getManager();
             $em->persist($transporteur_zoneIntervention);
             $em->flush();
-            if ($request->isXmlHttpRequest()) {
-                $json = array();
-                $json['item'] = array();
-                return $this->json(json_encode($json), 200);
-            }
+
+            return $this->routeRedirectView("api_transport_show_transporteur-zoneintervention ", ['id' => $transporteur_zoneIntervention->getId()], Response::HTTP_CREATED);
+
+        } catch (ConstraintViolationException $cve) {
+            return new JsonResponse([
+                "status" => 400,
+                "message" => $this->get('translator')->trans("impossible d'enregistrer, vérifiez vos données", [], 'FOSUserBundle')
+            ], Response::HTTP_BAD_REQUEST);
+        } catch (AccessDeniedException $ads) {
+            return new JsonResponse([
+                    "status" => 403,
+                    "message" => $this->get('translator')->trans("Access denied", [], 'FOSUserBundle'),
+                ]
+                , Response::HTTP_FORBIDDEN
+            );
         }
-        return $this->render('APMTransportBundle:zone_intervention:new.html.twig', array('transporteur_zoneIntervention' => $transporteur_zoneIntervention));
     }
 
     /**
@@ -232,86 +260,82 @@ class Transporteur_zoneInterventionController extends Controller
     /**
      * @param Request $request
      * @param Transporteur_zoneintervention $transporteur_zoneintervention
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @return JsonResponse| View
      *
      * @Post("/edit/transporteur-zone/{id}")
      */
     public function editAction(Request $request, Transporteur_zoneintervention $transporteur_zoneintervention)
     {
-        $this->editAndDeleteSecurity($transporteur_zoneintervention);
-
-        $deleteForm = $this->createDeleteForm($transporteur_zoneintervention);
-        $editForm = $this->createForm('APM\TransportBundle\Form\Transporteur_zoneInterventionType', $transporteur_zoneintervention);
-        $editForm->handleRequest($request);
-
-        if ($editForm->isSubmitted() && $editForm->isValid() || $request->isXmlHttpRequest() && $request->getMethod() === "POST") {
+        try {
             $this->editAndDeleteSecurity($transporteur_zoneintervention);
-            $em = $this->getDoctrine()->getManager();
-            if ($request->isXmlHttpRequest()) {
-                $json = array();
-                $json["item"] = array();
-                $property = $request->request->get('name');
-                $value = $request->request->get('value');
-                switch ($property) {
-                    case 'transporteur':
-                        /** @var Profile_transporteur $transporteur */
-                        $transporteur = $em->getRepository('APMTransportBundle:Profile_transporteur')->find($value);
-                        $transporteur_zoneintervention->setTransporteur($transporteur);
-                        break;
-                    case 'zone':
-                        /** @var Zone_intervention $zone */
-                        $zone = $em->getRepository('APMTransportBundle:Zone_intervention')->find($value);
-                        $transporteur_zoneintervention->setZoneIntervention($zone);
-                        break;
-                    default:
-                        $session->getFlashBag()->add('info', "<strong> Aucune mise à jour effectuée</strong>");
-                        return $this->json(json_encode(["item" => null]), 205);
-                }
-                $em->flush();
-                $session->getFlashBag()->add('success', "Mise à jour propriété : <strong>" . $property . "</strong> <br> Opération effectuée avec succès!");
-                return $this->json(json_encode($json), 200);
+            $form = $this->createForm('APM\TransportBundle\Form\Transporteur_zoneInterventionType', $transporteur_zoneintervention);
+            $form->submit($request->request->all(), false);
+            if (!$form->isValid()) {
+                return new JsonResponse([
+                    "status" => 400,
+                    "message" => $this->get('translator')->trans($form->getErrors(true, false), [], 'FOSUserBundle')
+                ], Response::HTTP_BAD_REQUEST);
             }
-            $em->persist($transporteur_zoneintervention);
+            $em = $this->getDoctrine()->getManager();
             $em->flush();
-            return $this->redirectToRoute('apm_transporteur_zoneintervention_show', array('id' => $transporteur_zoneintervention->getId()));
+
+            return $this->routeRedirectView("api_transport_show_transporteur-zoneintervention", ['id' => $transporteur_zoneintervention->getId()], Response::HTTP_OK);
+
+        } catch (ConstraintViolationException $cve) {
+            return new JsonResponse(
+                [
+                    "status" => 400,
+                    "message" => $this->get('translator')->trans("impossible d'enregistrer, vérifiez vos données", [], 'FOSUserBundle')
+                ], Response::HTTP_BAD_REQUEST
+            );
+        } catch (AccessDeniedException $ads) {
+            return new JsonResponse(
+                [
+                    "status" => 403,
+                    "message" => $this->get('translator')->trans("Access denied", [], 'FOSUserBundle'),
+                ]
+                , Response::HTTP_FORBIDDEN
+            );
         }
-
-        return $this->render('APMTransportBundle:transporteur_zoneintervention:edit.html.twig', array(
-            'transporteur_zoneintervention' => $transporteur_zoneintervention,
-            'edit_form' => $editForm->createView(),
-            'delete_form' => $deleteForm->createView(),));
-    }
-
-    private function createDeleteForm(Transporteur_zoneintervention $transporteur_zoneintervention)
-    {
-        return $this->createFormBuilder()
-            ->setAction($this->generateUrl('apm_transporteur_zoneintervention_delete', array('id' => $transporteur_zoneintervention->getId())))
-            ->setMethod('DELETE')
-            ->getForm();
     }
 
     /**
-     * Deletes a Transporteur_zoneintervention entity.
      * @param Request $request
      * @param Transporteur_zoneintervention $transporteur_zoneintervention
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse | JsonResponse
+     * @return View | JsonResponse
      *
      * @Post("/delete/transporteur-zone/{id}")
      */
     public function deleteAction(Request $request, Transporteur_zoneintervention $transporteur_zoneintervention)
     {
-        $this->editAndDeleteSecurity($transporteur_zoneintervention);
-        $em = $this->getDoctrine()->getManager();
-        $em->remove($transporteur_zoneintervention);
-        $em->flush();
-
-        if ($request->isXmlHttpRequest()) {
-            $json = array();
-            $json['item'] = array();
-            return $this->json(json_encode($json), 200);
+        try {
+            $this->editAndDeleteSecurity($transporteur_zoneintervention);
+            if (!$request->request->has('exec') || $request->request->get('exec') !== 'go') {
+                return new JsonResponse([
+                    "status" => 400,
+                    "message" => $this->get('translator')->trans('impossible de supprimer', [], 'FOSUserBundle')
+                ], Response::HTTP_BAD_REQUEST);
+            }
+            $transporteur = $transporteur_zoneintervention->getTransporteur();
+            $em = $this->getDoctrine()->getManager();
+            $em->remove($transporteur_zoneintervention);
+            $em->flush();
+            return $this->routeRedirectView("api_transport_get_transporteur-zoneinterventions_transporteur", [$transporteur->getId()], Response::HTTP_OK);
+        } catch (ConstraintViolationException $cve) {
+            return new JsonResponse(
+                [
+                    "status" => 400,
+                    "message" => $this->get('translator')->trans("impossible de supprimer, vérifiez vos données", [], 'FOSUserBundle')
+                ], Response::HTTP_FAILED_DEPENDENCY
+            );
+        } catch (AccessDeniedException $ads) {
+            return new JsonResponse(
+                [
+                    "status" => 403,
+                    "message" => $this->get('translator')->trans("Access denied", [], 'FOSUserBundle'),
+                ]
+                , Response::HTTP_FORBIDDEN
+            );
         }
-
-        return $this->redirectToRoute('apm_transport_transporteur_index');
     }
-
 }

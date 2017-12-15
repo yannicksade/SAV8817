@@ -34,7 +34,7 @@ class Commentaire extends TradeFactory
      * @var boolean
      * @Expose
      * @Groups({"owner_commentaire_details"})
-     * @ORM\Column(name="publiable", type="boolean", nullable=false)
+     * @ORM\Column(name="publiable", type="boolean", nullable=true)
      */
     private $publiable;
 

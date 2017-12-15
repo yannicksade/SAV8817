@@ -8,10 +8,10 @@ use APM\UserBundle\Entity\Utilisateur_avm;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Exception\ConstraintViolationException;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use FOS\RestBundle\Controller\FOSRestController;
+use FOS\RestBundle\View\View;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use FOS\RestBundle\Controller\Annotations\RouteResource;
 use FOS\RestBundle\Controller\Annotations\Get;
@@ -25,7 +25,7 @@ use Nelmio\ApiDocBundle\Annotation\ApiDoc;
  * Conseiller controller.
  * @RouteResource("conseiller", pluralize=false)
  */
-class ConseillerController extends Controller
+class ConseillerController extends FOSRestController
 {
     private $matricule_filter;
     private $code_filter;
@@ -39,39 +39,49 @@ class ConseillerController extends Controller
 
     /**
      * Liste tous les conseillers
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return JsonResponse
      *
      * @Get("/cget/conseiller")
      */
     public function getAction()
     {
-        $this->listAndShowSecurity();
-        $em = $this->getDoctrine()->getManager();
-        $conseillers = $em->getRepository('APMMarketingDistribueBundle:conseiller')->findAll();
-        $json = array();
-        $this->matricule_filter = $request->request->has('matricule_filter') ? $request->request->get('matricule_filter') : "";
-        $this->code_filter = $request->request->has('code_filter') ? $request->request->get('code_filter') : "";
-        $this->dateFrom_filter = $request->request->has('dateFrom_filter') ? $request->request->get('dateFrom_filter') : "";
-        $this->dateTo_filter = $request->request->has('dateTo_filter') ? $request->request->get('dateTo_filter') : "";
-        $this->valeurQuota_filter = $request->request->has('valeurQuota_filter') ? $request->request->get('valeurQuota_filter') : "";
-        $this->description_filter = $request->request->has('description_filter') ? $request->request->get('description_filter') : "";
-        $this->dateCreationReseauFrom_filter = $request->request->has('dateCreationReseauFrom_filter') ? $request->request->get('dateCreationReseauFrom_filter') : "";
-        $this->dateCreationReseauTo_filter = $request->request->has('dateCreationReseauTo_filter') ? $request->request->get('dateCreationReseauTo_filter') : "";
-        $iDisplayLength = $request->request->has('length') ? $request->request->get('length') : -1;
-        $iDisplayStart = $request->request->has('start') ? intval($request->request->get('start')) : 0;
-        $iTotalRecords = count($conseillers);
-        if ($iDisplayLength < 0) $iDisplayLength = $iTotalRecords;
-        $_conseillers = new ArrayCollection();
-        foreach ($conseillers as $conseiller) {
-            $_conseillers->add($conseiller);
+        try {
+            $this->listAndShowSecurity();
+            $em = $this->getDoctrine()->getManager();
+            $conseillers = $em->getRepository('APMMarketingDistribueBundle:conseiller')->findAll();
+            $json = array();
+            $this->matricule_filter = $request->request->has('matricule_filter') ? $request->request->get('matricule_filter') : "";
+            $this->code_filter = $request->request->has('code_filter') ? $request->request->get('code_filter') : "";
+            $this->dateFrom_filter = $request->request->has('dateFrom_filter') ? $request->request->get('dateFrom_filter') : "";
+            $this->dateTo_filter = $request->request->has('dateTo_filter') ? $request->request->get('dateTo_filter') : "";
+            $this->valeurQuota_filter = $request->request->has('valeurQuota_filter') ? $request->request->get('valeurQuota_filter') : "";
+            $this->description_filter = $request->request->has('description_filter') ? $request->request->get('description_filter') : "";
+            $this->dateCreationReseauFrom_filter = $request->request->has('dateCreationReseauFrom_filter') ? $request->request->get('dateCreationReseauFrom_filter') : "";
+            $this->dateCreationReseauTo_filter = $request->request->has('dateCreationReseauTo_filter') ? $request->request->get('dateCreationReseauTo_filter') : "";
+            $iDisplayLength = $request->request->has('length') ? $request->request->get('length') : -1;
+            $iDisplayStart = $request->request->has('start') ? intval($request->request->get('start')) : 0;
+            $iTotalRecords = count($conseillers);
+            if ($iDisplayLength < 0) $iDisplayLength = $iTotalRecords;
+            $_conseillers = new ArrayCollection();
+            foreach ($conseillers as $conseiller) {
+                $_conseillers->add($conseiller);
+            }
+            $conseillers = $this->handleResults($_conseillers, $iTotalRecords, $iDisplayStart, $iDisplayLength);
+            $iFilteredRecords = count($conseillers);
+            $data = $this->get('apm_core.data_serialized')->getFormalData($conseillers, array("others_list"));
+            $json['totalRecords'] = $iTotalRecords;
+            $json['filteredRecords'] = $iFilteredRecords;
+            $json['items'] = $data;
+            return new JsonResponse($json, 200);
+
+        } catch (AccessDeniedException $ads) {
+            return new JsonResponse([
+                    "status" => 403,
+                    "message" => $this->get('translator')->trans("Access denied", [], 'FOSUserBundle'),
+                ]
+                , Response::HTTP_FORBIDDEN
+            );
         }
-        $conseillers = $this->handleResults($_conseillers, $iTotalRecords, $iDisplayStart, $iDisplayLength);
-        $iFilteredRecords = count($conseillers);
-        $data = $this->get('apm_core.data_serialized')->getFormalData($conseillers, array("others_list"));
-        $json['totalRecords'] = $iTotalRecords;
-        $json['filteredRecords'] = $iFilteredRecords;
-        $json['items'] = $data;
-        return new JsonResponse($json, 200);
     }
 
     private function listAndShowSecurity()
@@ -178,37 +188,45 @@ class ConseillerController extends Controller
     /**
      * Creates a new Conseiller entity.
      * @param Request $request
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response | JsonResponse
+     * @return View | JsonResponse
      *
      * @Post("/new")
      */
     public function newAction(Request $request)
     {
-        $this->createSecurity();
-        /** @var Session $session */
-        $session = $request->getSession();
-        /** @var Conseiller $conseiller */
-        $conseiller = TradeFactory::getTradeProvider("conseiller");
-        $form = $this->createForm('APM\MarketingDistribueBundle\Form\ConseillerType', $conseiller);
-        $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
+        try {
+            $this->createSecurity();
+            /** @var Conseiller $conseiller */
+            $conseiller = TradeFactory::getTradeProvider("conseiller");
+            $form = $this->createForm('APM\MarketingDistribueBundle\Form\ConseillerType', $conseiller);
+            $form->submit($request->request->all());
+            if (!$form->isValid()) {
+                return new JsonResponse([
+                    "status" => 400,
+                    "message" => $this->get('translator')->trans($form->getErrors(true, false), [], 'FOSUserBundle')
+                ], Response::HTTP_BAD_REQUEST);
+            }
+
             $conseiller->setUtilisateur($this->getUser());
             $em = $this->getDoctrine()->getManager();
             $em->persist($conseiller);
             $em->flush();
-            if ($request->isXmlHttpRequest()) {
-                $json = array();
-                $json['item'] = array();
-                $session->getFlashBag()->add('success', "<strong> conseiller. réf:" . $conseiller->getCode() . "</strong><br> Opération effectuée avec succès!");
-                return $this->json(json_encode($json), 200);
-            }
-            return $this->redirectToRoute('apm_marketing_conseiller_show', array('id' => $conseiller->getId()));
-        }
 
-        return $this->render('APMMarketingDistribueBundle:conseiller:new.html.twig', array(
-            'conseiller' => $conseiller,
-            'form' => $form->createView(),
-        ));
+            return $this->routeRedirectView("api_marketing_show_conseiller", ['id' => $conseiller->getId()], Response::HTTP_CREATED);
+
+        } catch (ConstraintViolationException $cve) {
+            return new JsonResponse([
+                "status" => 400,
+                "message" => $this->get('translator')->trans("impossible d'enregistrer, vérifiez vos données", [], 'FOSUserBundle')
+            ], Response::HTTP_BAD_REQUEST);
+        } catch (AccessDeniedException $ads) {
+            return new JsonResponse([
+                    "status" => 403,
+                    "message" => $this->get('translator')->trans("Access denied", [], 'FOSUserBundle'),
+                ]
+                , Response::HTTP_FORBIDDEN
+            );
+        }
     }
 
     private function createSecurity()
@@ -227,7 +245,7 @@ class ConseillerController extends Controller
     /**
      * Finds and displays a Conseiller entity.
      * @param Conseiller $conseiller
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
+     * @return JsonResponse
      *
      * @Get("/show/{id}")
      */
@@ -239,85 +257,47 @@ class ConseillerController extends Controller
     }
 
     /**
-     * Displays a form to edit an existing Conseiller entity.
      * @param Request $request
      * @param Conseiller $conseiller
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response | JsonResponse
+     * @return View | JsonResponse
      *
      * @Get("/edit/conseiller/{id}")
      */
     public function editAction(Request $request, Conseiller $conseiller)
     {
-        $this->editAndDeleteSecurity($conseiller);
-        $editForm = $this->createForm('APM\MarketingDistribueBundle\Form\ConseillerType', $conseiller);
-        $editForm->handleRequest($request);
-        /** @var Session $session */
-        $session = $request->getSession();
-        if ($editForm->isSubmitted() && $editForm->isValid()
-            || $request->isXmlHttpRequest() && $request->isMethod('POST')
-        ) {
-            $em = $this->getDoctrine()->getManager();
-            try {
-                if ($request->isXmlHttpRequest()) {
-                    $json = array();
-                    $json['item'] = array();
-                    $property = $request->request->get('name');
-                    $value = $request->request->get('value');
-                    switch ($property) {
-                        case 'isConseillerA2':
-                            $conseiller->setIsConseillerA2($value);
-                            break;
-                        case 'description':
-                            $conseiller->setDescription($value);
-                            break;
-                        case 'nombreInstanceReseau':
-                            $conseiller->setNombreInstanceReseau($value);
-                            break;
-                        case 'matricule':
-                            $conseiller->setMatricule($value);
-                            break;
-                        case 'valeurQuota':
-                            $conseiller->setValeurQuota($value);
-                            break;
-                        case 'masterConseiller':
-                            /** @var Conseiller $conseiller */
-                            $conseiller = $em->getRepository('APMMarketingDistribueBundle:Conseiller')->find($value);
-                            $conseiller->setMasterConseiller($conseiller);
-                            break;
-                        case 'conseillerDroite':
-                            /** @var Conseiller $conseiller */
-                            $conseiller = $em->getRepository('APMMarketingDistribueBundle:Conseiller')->find($value);
-                            $conseiller->setConseillerDroite($conseiller);
-                            break;
-                        case 'conseillerGauche':
-                            /** @var Conseiller $conseiller */
-                            $conseiller = $em->getRepository('APMMarketingDistribueBundle:Conseiller')->find($value);
-                            $conseiller->setConseillerGauche($conseiller);
-                            break;
-                        default:
-                            $session->getFlashBag()->add('info', "<strong> Aucune mise à jour effectuée</strong>");
-                            return $this->json(json_encode(["item" => null]), 205);
-                    }
-                    $em->flush();
-                    $session->getFlashBag()->add('success', "Mise à jour du profile conseiller : <strong>" . $property . "</strong> réf. Conseiller :" . $conseiller->getMatricule() . "<br> Opération effectuée avec succès!");
-                    return $this->json(json_encode($json), 200);
-                }
-                $em->flush();
-                return $this->redirectToRoute('apm_marketing_conseiller_show', array('id' => $conseiller->getId()));
-            } catch (ConstraintViolationException $cve) {
-                $session->getFlashBag()->add('danger', "<strong>Echec de l'enregistrement. </strong><br>L'enregistrement a échoué dû à une contrainte de données!");
-                return $this->json(json_encode(["item" => null]));
-            } catch (AccessDeniedException $ads) {
-                $session->getFlashBag()->add('danger', "<strong>Action interdite.</strong><br>Vous n'êtes pas autorisez à effectuer cette opération!");
-                return $this->json(json_encode(["item" => null]));
+        try {
+            $this->editAndDeleteSecurity($conseiller);
+            $form = $this->createForm('APM\MarketingDistribueBundle\Form\ConseillerType', $conseiller);
+            $form->submit($request->request->all(), false);
+            if (!$form->isValid()) {
+                return new JsonResponse(
+                    [
+                        "status" => 400,
+                        "message" => $this->get('translator')->trans($form->getErrors(true, false), [], 'FOSUserBundle')
+                    ], Response::HTTP_BAD_REQUEST
+                );
             }
+            $em = $this->getDoctrine()->getManager();
+            $em->flush();
+
+            return $this->routeRedirectView("api_marketing_show_conseiller", ['id' => $conseiller->getId()], Response::HTTP_OK);
+
+        } catch (ConstraintViolationException $cve) {
+            return new JsonResponse(
+                [
+                    "status" => 400,
+                    "message" => $this->get('translator')->trans("impossible d'enregistrer, vérifiez vos données", [], 'FOSUserBundle')
+                ], Response::HTTP_BAD_REQUEST
+            );
+        } catch (AccessDeniedException $ads) {
+            return new JsonResponse(
+                [
+                    "status" => 403,
+                    "message" => $this->get('translator')->trans("Access denied", [], 'FOSUserBundle'),
+                ]
+                , Response::HTTP_FORBIDDEN
+            );
         }
-        $deleteForm = $this->createDeleteForm($conseiller);
-        return $this->render('APMMarketingDistribueBundle:conseiller:edit.html.twig', array(
-            'conseiller' => $conseiller,
-            'edit_form' => $editForm->createView(),
-            'delete_form' => $deleteForm->createView(),
-        ));
     }
 
     /**
@@ -337,58 +317,45 @@ class ConseillerController extends Controller
         //----------------------------------------------------------------------------------------
     }
 
-    /**
-     * Creates a form to delete a Conseiller entity.
-     *
-     * @param Conseiller $conseiller The Conseiller entity
-     *
-     * @return \Symfony\Component\Form\Form The form
-     */
-    private function createDeleteForm(Conseiller $conseiller)
-    {
-        return $this->createFormBuilder()
-            ->setAction($this->generateUrl('apm_marketing_conseiller_delete', array('id' => $conseiller->getId())))
-            ->setMethod('DELETE')
-            ->getForm();
-    }
 
     /**
-     * Deletes a Conseiller entity.
      * @param Request $request
      * @param Conseiller $conseiller
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse | JsonResponse
+     * @return View | JsonResponse
      *
      * @Delete("/delete/profile-conseiller/{id}")
      */
     public function deleteAction(Request $request, Conseiller $conseiller)
     {
-        $this->editAndDeleteSecurity($conseiller);
-        $em = $this->getDoctrine()->getManager();
-        if ($request->isXmlHttpRequest()) {
-            $em->remove($conseiller);
-            $em->flush();
-            $json = array();
-            $json['item'] = array();
-            return $this->json(json_encode($json), 200);
-        }
-        $form = $this->createDeleteForm($conseiller);
-        $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
+        try {
             $this->editAndDeleteSecurity($conseiller);
+            if (!$request->request->has('exec') || $request->request->get('exec') !== 'go') {
+                return new JsonResponse([
+                    "status" => 400,
+                    "message" => $this->get('translator')->trans('impossible de supprimer', [], 'FOSUserBundle')
+                ], Response::HTTP_BAD_REQUEST);
+            }
+            $user = $conseiller->getUtilisateur();
             $em = $this->getDoctrine()->getManager();
             $em->remove($conseiller);
             $em->flush();
+            return $this->routeRedirectView("api_user_show", [$user->getId()], Response::HTTP_OK);
+        } catch (ConstraintViolationException $cve) {
+            return new JsonResponse(
+                [
+                    "status" => 400,
+                    "message" => $this->get('translator')->trans("impossible de supprimer, vérifiez vos données", [], 'FOSUserBundle')
+                ], Response::HTTP_FAILED_DEPENDENCY
+            );
+        } catch (AccessDeniedException $ads) {
+            return new JsonResponse(
+                [
+                    "status" => 403,
+                    "message" => $this->get('translator')->trans("Access denied", [], 'FOSUserBundle'),
+                ]
+                , Response::HTTP_FORBIDDEN
+            );
         }
-
-        return $this->redirectToRoute('apm_marketing_conseiller_index');
-    }
-
-    private function createNewForm()
-    {
-        return $this->createFormBuilder()
-            ->setAction($this->generateUrl('apm_marketing_reseau_new'))
-            ->setMethod('PUT')
-            ->getForm();
     }
 
 }

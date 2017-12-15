@@ -16,8 +16,6 @@ use Doctrine\DBAL\Exception\ConstraintViolationException;
 use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\Routing\ClassResourceInterface;
 use FOS\RestBundle\View\View;
-use SebastianBergmann\CodeCoverage\RuntimeException;
-use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -79,8 +77,6 @@ class OffreController extends FOSRestController implements ClassResourceInterfac
     public function getAction(Request $request, Boutique $boutique = null, Categorie $categorie = null, Utilisateur_avm $user = null, Groupe_offre $groupe_offre = null, Transaction $transaction = null)
     {
         try {
-            /** @var Session $session */
-            $session = $request->getSession();
             $vendeur = null;
             $selectedGroup = array("others_list");
             if (null !== $transaction) {
@@ -120,25 +116,20 @@ class OffreController extends FOSRestController implements ClassResourceInterfac
             $iDisplayStart = intval($request->query->has('start') ? $request->query->get('start') : 0);
             //-----Source -------
             $iTotalRecords = count($offres);
-            // filtering
             $iDisplayLength = $iDisplayLength < 0 ? $iTotalRecords : $iDisplayLength;
             $offres = $this->handleResults($offres, $iTotalRecords, $iDisplayStart, $iDisplayLength);
             $iFilteredRecords = count($offres);
-            //------------------------------------
-            //$id = 0; // identity of rows in the table
-            //$url_image = $this->get('apm_core.packages_maker')->getPackages()->getUrl('/', 'resolve_img');
-            //$id += 1;
-            //$session->set('offre_'.$id, $offre->getId()); //convert id before sending them to client
             $data = $this->get('apm_core.data_serialized')->getFormalData($offres, $selectedGroup);
             $json['totalRecords'] = $iTotalRecords;
             $json['filteredRecords'] = $iFilteredRecords; //nbre d'unité
             $json['items'] = $data;
             return new JsonResponse($json, 200);
         } catch (AccessDeniedException $ads) {
-            $session->getFlashBag()->add('danger', "<strong>Action interdite!</strong><br/>Pour jouir de ce service, veuillez consulter nos administrateurs.");
-            return new JsonResponse("Access denied", 403);
+            return new JsonResponse([
+                "status" => 403,
+                "message" => $this->get('translator')->trans("Accès refusé", [], 'FOSUserBundle')
+            ], Response::HTTP_FORBIDDEN);
         }
-        //$session->set('previous_location', $request->getUri());
 
     }
 
@@ -148,8 +139,6 @@ class OffreController extends FOSRestController implements ClassResourceInterfac
      */
     private function listOfrresSecurity($boutique, $transaction)
     {
-        //-----------------------------------security-------------------------------------------
-
         $this->denyAccessUnlessGranted('ROLE_USERAVM', null, 'Unable to access this page!');
         if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
             throw $this->createAccessDeniedException();
@@ -308,39 +297,38 @@ class OffreController extends FOSRestController implements ClassResourceInterfac
      */
     public function newAction(Request $request)
     {
-        $this->createSecurity();
-        /** @var Session $session */
-        $session = $request->getSession();
-        /** @var Offre $offre */
-        $offre = TradeFactory::getTradeProvider('offre');
-        $form = $this->createForm('APM\VenteBundle\Form\OffreType', $offre);
-        $form->submit($request->request->all());
-        $error = "";
-
-        if (!$form->isValid()) {
-            return new JsonResponse([
-                "status" => 400,
-                "message" => $this->get('translator')->trans($form->getErrors(true, false), [], 'FOSUserBundle')
-            ], Response::HTTP_BAD_REQUEST);
-        }
         try {
+            $this->createSecurity();
+            /** @var Session $session */
+            $session = $request->getSession();
+            /** @var Offre $offre */
+            $offre = TradeFactory::getTradeProvider('offre');
+            $form = $this->createForm('APM\VenteBundle\Form\OffreType', $offre);
+            $form->submit($request->request->all());
+            if (!$form->isValid()) {
+                return new JsonResponse([
+                    "status" => 400,
+                    "message" => $this->get('translator')->trans($form->getErrors(true, false), [], 'FOSUserBundle')
+                ], Response::HTTP_BAD_REQUEST);
+            }
             $this->createSecurity($offre->getBoutique(), $offre->getCategorie());
             $em = $this->getDoctrine()->getManager();
             $offre->setVendeur($this->getUser());
             $em->persist($offre);
             $em->flush();
-            $session->getFlashBag()->add('success', "<strong> Création de l'Offre. réf:" . $offre->getCode() . "</strong><br> Opération effectuée avec succès!");
             return $this->routeRedirectView("api_vente_show_offre", ['id' => $offre->getId()], Response::HTTP_CREATED);
-            /* $this->get('apm_core.crop_image')->liipImageResolver($offre->getImage());*/ //resouds tout en créant l'image
         } catch (ConstraintViolationException $cve) {
-            $session->getFlashBag()->add('danger', "<strong>Echec de l'enregistrement. </strong><br>L'enregistrement a échoué dû à une contrainte de données!");
             return new JsonResponse([
                 "status" => 400,
                 "message" => $this->get('translator')->trans("impossible d'enregistrer, vérifiez vos données", [], 'FOSUserBundle')
             ], Response::HTTP_BAD_REQUEST);
         } catch (AccessDeniedException $ads) {
-            $session->getFlashBag()->add('danger', "<strong>Action interdite.</strong><br>Vous n'êtes pas autorisez à effectuer cette opération!");
-            return $this->json("Access denied", Response::HTTP_FORBIDDEN);
+            return new JsonResponse([
+                    "status" => 403,
+                    "message" => $this->get('translator')->trans("Access denied", [], 'FOSUserBundle'),
+                ]
+                , Response::HTTP_FORBIDDEN
+            );
         }
     }
 
@@ -357,10 +345,6 @@ class OffreController extends FOSRestController implements ClassResourceInterfac
         if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY') || !$this->getUser() instanceof Utilisateur_avm) {
             throw $this->createAccessDeniedException();
         }
-        /* ensure that the user is logged in  # granted even through remembering cookies
-        *  and that the one is the owner
-        */
-        //Autoriser l'accès à la boutique uniquement au gerant et au proprietaire
         if ($boutique) {
             $user = $this->getUser();
             $gerant = $boutique->getGerant();
@@ -434,116 +418,45 @@ class OffreController extends FOSRestController implements ClassResourceInterfac
      * Displays a form to edit an existing Offre entity.
      * @param Request $request
      * @param Offre $offre
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response | JsonResponse
+     * @return View | JsonResponse
      *
      * @Put("/edit/offre/{id}")
      */
-    public
-    function editAction(Request $request, Offre $offre)
+    public function editAction(Request $request, Offre $offre)
     {
-        $this->editAndDeleteSecurity($offre);
-        /** @var Session $session */
-        $session = $request->getSession();
-        $deleteForm = $this->createDeleteForm($offre);
-        $editForm = $this->createForm('APM\VenteBundle\Form\OffreType', $offre);
-        $editForm->handleRequest($request);
-        if ($editForm->isSubmitted() && $editForm->isValid()
-            || $request->isXmlHttpRequest() && $request->getMethod() === "POST"
-        ) {
-            try {
-                $em = $this->getDoctrine()->getManager();
-                if ($request->isXmlHttpRequest()) {
-                    $json = array();
-                    $json["item"] = array();
-                    $property = $request->request->get('name');
-                    $value = $request->request->get('value');
-                    switch ($property) {
-                        case 'etat':
-                            $offre->setEtat($value);
-                            break;
-                        case 'designation':
-                            $offre->setDesignation($value);
-                            break;
-                        case 'categorie':
-                            $categorie = $em->getRepository('APMVenteBundle:Categorie')->find($value);
-                            $offre->setCategorie($categorie);
-                            break;
-                        case 'publiable':
-                            $offre->setPubliable($value);
-                            break;
-                        case 'apparenceNeuf':
-                            $offre->setApparenceNeuf($value);
-                            break;
-                        case 'modeVente' :
-                            $offre->setModeVente($value);
-                            break;
-                        case 'typeOffre' :
-                            $offre->setTypeOffre($value);
-                            break;
-                        case 'description':
-                            $offre->setDescription($value);
-                            break;
-                        case 'dateExpiration':
-                            $offre->setDateExpiration($value);
-                            break;
-                        case 'dureeGarantie':
-                            $offre->setDureeGarantie($value);
-                            break;
-                        case 'modelDeSerie':
-                            $offre->setModelDeSerie($value);
-                            break;
-                        case 'prixUnitaire':
-                            $offre->setPrixUnitaire($value);
-                            break;
-                        case 'quantite':
-                            $offre->setQuantite($value);
-                            break;
-                        case 'remiseProduit':
-                            $offre->setRemiseProduit($value);
-                            break;
-                        case 'unite':
-                            $offre->setUnite($value);
-                            break;
-                        default:
-                            $session->getFlashBag()->add('info', "<strong> Aucune mise à jour effectuée</strong>");
-                            return $this->json(json_encode(["item" => null]), 205);
-                    }
-                    $em->flush();
-                    $session->getFlashBag()->add('success', "Mise à jour propriété : <strong>" . $property . "</strong> réf. offre :" . $offre->getCode() . "<br> Opération effectuée avec succès!");
-                    return $this->json(json_encode($json), 200);
-                }
-                $em->persist($offre);
-                $em->flush();
-                if (null !== $offre->getImage()) {
-                    return $this->redirectToRoute('apm_vente_offre_show-image', array('id' => $offre->getId()));
-                } else {
-                    return $this->redirectToRoute('apm_vente_offre_show', array('id' => $offre->getId()));
-                }
-                //---
-            } catch (ConstraintViolationException $cve) {
-                $session->getFlashBag()->add('danger', "Echec de la Modification <br>L'enregistrement a échoué dû à une contrainte de données!");
-                return $this->json(json_encode(["item" => null]));
-            } catch (RuntimeException $rte) {
-                $session->getFlashBag()->add('danger', "Echec de la Modification <br>L'enregistrement a échoué. bien vouloir réessayer plutard, svp!");
-                return $this->json(json_encode(["item" => null]));
-            } catch (AccessDeniedException $ads) {
-                $session->getFlashBag()->add('danger', "Action interdite!<br>Vous n'êtes pas autorisés à effectuer cette opération!");
-                return $this->json(json_encode(["item" => null]));
+        try {
+            $this->editAndDeleteSecurity($offre);
+            $form = $this->createForm('APM\VenteBundle\Form\OffreType', $offre);
+            $form->submit($request->request->all(), false);
+            if (!$form->isValid()) {
+                return new JsonResponse([
+                    "status" => 400,
+                    "message" => $this->get('translator')->trans($form->getErrors(true, false), [], 'FOSUserBundle')
+                ], Response::HTTP_BAD_REQUEST);
             }
+            $em = $this->getDoctrine()->getManager();
+            $em->flush();
+            return $this->routeRedirectView("api_vente_show_offre", ['id' => $offre->getId()], Response::HTTP_OK);
+        } catch (ConstraintViolationException $cve) {
+            return new JsonResponse([
+                "status" => 400,
+                "message" => $this->get('translator')->trans("impossible d'enregistrer, vérifiez vos données", [], 'FOSUserBundle')
+            ], Response::HTTP_BAD_REQUEST);
+        } catch (AccessDeniedException $ads) {
+            return new JsonResponse([
+                    "status" => 403,
+                    "message" => $this->get('translator')->trans("Access denied", [], 'FOSUserBundle'),
+                ]
+                , Response::HTTP_FORBIDDEN
+            );
         }
-        return $this->render('APMVenteBundle:offre:edit.html.twig', array(
-            'offre' => $offre,
-            'edit_form' => $editForm->createView(),
-            'delete_form' => $deleteForm->createView(),
-            'url_image' => $this->get('apm_core.packages_maker')->getPackages()->getUrl('/', 'resolve_img'),
-        ));
     }
 
     /**
      * @param Offre $offre
      */
     private
-    function editAndDeleteSecurity($offre = null)
+    function editAndDeleteSecurity($offre)
     {
         //---------------------------------security-----------------------------------------------
         // Unable to access the controller unless you have a USERAVM role
@@ -566,70 +479,53 @@ class OffreController extends FOSRestController implements ClassResourceInterfac
 
     }
 
-    /**
-     * Creates a form to delete a Offre entity.
-     *
-     * @param Offre $offre The Offre entity
-     *
-     * @return \Symfony\Component\Form\Form The form
-     */
-    private
-    function createDeleteForm(Offre $offre)
-    {
-        return $this->createFormBuilder()
-            ->setAction($this->generateUrl('apm_vente_offre_delete', array('id' => $offre->getId())))
-            ->setMethod('DELETE')
-            ->getForm();
-    }
 
     /**
      * Deletes an Offre entity.
      * @param Request $request
      * @param Offre $offre
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse | JsonResponse
-     *
+     * @return View|JsonResponse
      * @Delete("/delete/offre/{id}")
      */
     public
-    function deleteAction(Request $request, Offre $offre = null)
+    function deleteAction(Request $request, Offre $offre)
     {
-        $this->editAndDeleteSecurity($offre);
-        /** @var Session $session */
-        $session = $request->getSession();
         try {
-            $em = $this->getDoctrine()->getManager();
-            if ($request->isXmlHttpRequest()) {
-                /** @var Offre $offre */
-                $items = $request->request->get('items');
-                $elements = json_decode($items);
-                $json = null;
-                $j = 0;
-                $count = count($elements);
-                for ($i = 0; $i < $count; $i++) {
-                    $offre = null;
-                    $id = $elements[$i];
-                    $offre = $em->getRepository('APMVenteBundle:Offre')->find($id);
-                    if (null !== $offre) {
-                        $this->editAndDeleteSecurity($offre);
-                        $em->remove($offre);
-                        $em->flush();
-                        $json[] = $id;//$session->get('offre_' . $id);
-                        $j++;
-                    }
-                }
-                $json = json_encode(['ids' => $json, 'action' => 3]);
-                $session->getFlashBag()->add('danger', "<strong>" . $j . "</strong> Element(s) supprimé(s)<br> Opération effectuée avec succès!");
-                return $this->json($json);
+            $this->editAndDeleteSecurity($offre);
+            if (!$request->request->has('exec') || $request->request->get('exec') !== 'go') {
+                return new JsonResponse([
+                    "status" => 400,
+                    "message" => $this->get('translator')->trans('impossible de supprimer', [], 'FOSUserBundle')
+                ], Response::HTTP_BAD_REQUEST);
             }
+            $boutique = $offre->getBoutique();
+            if ($boutique && $categorie = $offre->getCategorie()) {
+                $route = "api_vente_get_offres_categorie";
+                $param = array("categorie_id" => $categorie->getId());
+            } elseif ($boutique) {
+                $route = "api_vente_get_offres_boutique";
+                $param = array("id" => $boutique->getId());
+            } else {
+                $route = "api_vente_get_offres";
+                $param = array();
+            }
+
+            $em = $this->getDoctrine()->getManager();
             $em->remove($offre);
             $em->flush();
-            return $this->redirectToRoute('apm_vente_offre_index');
-        } catch (AccessDeniedException $ads) {
-            $session->getFlashBag()->add('danger', "<strong>Action interdite!</strong><br/>Pour jouir de ce service, veuillez consulter nos administrateurs.");
-            return $this->json(json_encode(["ids" => null]));
+            return $this->routeRedirectView($route, $param, Response::HTTP_OK);
         } catch (ConstraintViolationException $cve) {
-            $session->getFlashBag()->add('danger', "<strong>Echec de la suppression</strong><br> <b>" . ($j) . " element(s) supprimé(s); " . ($count - $j) . " échoué(s) </b>, il se peut qu'une d'elle soit utilisée par d'autre ressource");
-            return $this->json(json_encode(['ids' => $json, 'action' => 3]));
+            return new JsonResponse([
+                "status" => 400,
+                "message" => $this->get('translator')->trans("impossible de supprimer, vérifiez vos données", [], 'FOSUserBundle')
+            ], Response::HTTP_FAILED_DEPENDENCY);
+        } catch (AccessDeniedException $ads) {
+            return new JsonResponse([
+                    "status" => 403,
+                    "message" => $this->get('translator')->trans("Access denied", [], 'FOSUserBundle'),
+                ]
+                , Response::HTTP_FORBIDDEN
+            );
         }
     }
 
@@ -696,9 +592,6 @@ class OffreController extends FOSRestController implements ClassResourceInterfac
                     return $this->json(json_encode(["item" => null]));
                 } catch (AccessDeniedException $ads) {
                     $session->getFlashBag()->add('danger', "Action interdite!<br>Vous n'êtes pas autorisés à effectuer cette opération!");
-                    return $this->json(json_encode(["item" => null]));
-                } catch (RuntimeException $rte) {
-                    $session->getFlashBag()->add('danger', "<strong>Echec de l'opération.</strong><br>L'enregistrement a échoué. bien vouloir réessayer plutard, svp!");
                     return $this->json(json_encode(["item" => null]));
                 }
             }

@@ -7,10 +7,12 @@ use APM\UserBundle\Entity\Individu_to_groupe;
 use APM\UserBundle\Entity\Utilisateur_avm;
 use APM\UserBundle\Factory\TradeFactory;
 use Doctrine\Common\Collections\Collection;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Doctrine\DBAL\Exception\ConstraintViolationException;
+use FOS\RestBundle\Controller\FOSRestController;
+use FOS\RestBundle\View\View;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\HttpFoundation\Response;
 use FOS\RestBundle\Controller\Annotations\RouteResource;
 use FOS\RestBundle\Controller\Annotations\Get;
 use FOS\RestBundle\Controller\Annotations\Post;
@@ -18,13 +20,15 @@ use FOS\RestBundle\Controller\Annotations\Patch;
 use FOS\RestBundle\Controller\Annotations\Delete;
 use FOS\RestBundle\Controller\Annotations\Put;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 
 /**
  * Individu_to_groupe controller.
  * @RouteResource("individu-group", pluralize=false)
  */
-class Individu_to_groupeController extends Controller
+class Individu_to_groupeController extends FOSRestController
 {
     private $dateCreationFrom_filter;
     private $dateCreationTo_filter;
@@ -33,42 +37,58 @@ class Individu_to_groupeController extends Controller
     private $utilisateur_filter;
 
     /**
-     * Liste un ou (tous) les groupes de son proprietaire contenant des individus
-     *
+     * @ParamConverter("utilisateur_avm", options={"mapping": {"user_id":"id"}})
      * @param Request $request
      * @param Groupe_relationnel $groupe_relationnel
+     * @param Utilisateur_avm $utilisateur_avm
      * @return JsonResponse
-     *
-     * @Get("/cget/individus/group/{id}", name="s_groupe")
+     * @Get("/cget/individus/group/{id}", name="s_group")
+     * @Get("/cget/groups/user/{user_id}", name="s_user")
      */
-    public function getAction(Request $request, Groupe_relationnel $groupe_relationnel)
+    public function getAction(Request $request, Groupe_relationnel $groupe_relationnel = null, Utilisateur_avm $utilisateur_avm = null)
     {
-        $this->listeAndShowSecurity($groupe_relationnel);
-        $individu_to_groupes = $groupe_relationnel->getGroupeIndividus();
-        $this->dateCreationFrom_filter = $request->request->has('dateCreationFrom_filter') ? $request->request->get('dateCreationFrom_filter') : "";
-        $this->dateCreationTo_filter = $request->request->has('dateCreationTo_filter') ? $request->request->get('dateCreationTo_filter') : "";
-        $this->propriete_filter = $request->request->has('propriete_filter') ? $request->request->get('propriete_filter') : "";
-        $this->description_filter = $request->request->has('description_filter') ? $request->request->get('description_filter') : "";
-        $this->utilisateur_filter = $request->request->has('utilisateur_filter') ? $request->request->get('utilisateur_filter') : "";
-        $iDisplayLength = $request->request->has('length') ? $request->request->get('length') : -1;
-        $iDisplayStart = $request->request->has('start') ? intval($request->request->get('start')) : 0;
-        $json = array();
-        $iTotalRecords = count($individu_to_groupes);
-        if ($iDisplayLength < 0) $iDisplayLength = $iTotalRecords;
-        $individu_to_groupes = $this->handleResults($individu_to_groupes, $iTotalRecords, $iDisplayStart, $iDisplayLength);
-        $iFilteredRecords = count($individu_to_groupes);
-        $data = $this->get('apm_core.data_serialized')->getFormalData($individu_to_groupes, array("owner_list"));
-        $json['totalRecords'] = $iTotalRecords;
-        $json['filteredRecords'] = $iFilteredRecords;
-        $json['items'] = $data;
+        try {
+            if (null !== $groupe_relationnel) {
+                $this->listeAndShowSecurity($groupe_relationnel);
+                $individu_to_groupes = $groupe_relationnel->getGroupeIndividus();
+            } else {
+                $this->listeAndShowSecurity(null, $utilisateur_avm);
+                $individu_to_groupes = $utilisateur_avm->getIndividuGroupes();
+            }
+            $this->dateCreationFrom_filter = $request->request->has('dateCreationFrom_filter') ? $request->request->get('dateCreationFrom_filter') : "";
+            $this->dateCreationTo_filter = $request->request->has('dateCreationTo_filter') ? $request->request->get('dateCreationTo_filter') : "";
+            $this->propriete_filter = $request->request->has('propriete_filter') ? $request->request->get('propriete_filter') : "";
+            $this->description_filter = $request->request->has('description_filter') ? $request->request->get('description_filter') : "";
+            $this->utilisateur_filter = $request->request->has('utilisateur_filter') ? $request->request->get('utilisateur_filter') : "";
+            $iDisplayLength = $request->request->has('length') ? $request->request->get('length') : -1;
+            $iDisplayStart = $request->request->has('start') ? intval($request->request->get('start')) : 0;
+            $json = array();
+            $iTotalRecords = count($individu_to_groupes);
+            if ($iDisplayLength < 0) $iDisplayLength = $iTotalRecords;
+            $individu_to_groupes = $this->handleResults($individu_to_groupes, $iTotalRecords, $iDisplayStart, $iDisplayLength);
+            $iFilteredRecords = count($individu_to_groupes);
+            $data = $this->get('apm_core.data_serialized')->getFormalData($individu_to_groupes, array("owner_list"));
+            $json['totalRecords'] = $iTotalRecords;
+            $json['filteredRecords'] = $iFilteredRecords;
+            $json['items'] = $data;
 
-        return new JsonResponse($json, 200);
+            return new JsonResponse($json, 200);
+
+        } catch (AccessDeniedException $ads) {
+            return new JsonResponse([
+                    "status" => 403,
+                    "message" => $this->get('translator')->trans("Access denied", [], 'FOSUserBundle'),
+                ]
+                , Response::HTTP_FORBIDDEN
+            );
+        }
     }
 
     /**
      * @param Groupe_relationnel $groupe
+     * @param $utilisateur
      */
-    private function listeAndShowSecurity($groupe)
+    private function listeAndShowSecurity($groupe, $utilisateur = null)
     {
         //---------------------------------security-----------------------------------------------
         // Liste tous les groupes auxquels l'utilisateur appartient
@@ -76,10 +96,15 @@ class Individu_to_groupeController extends Controller
         if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
             throw $this->createAccessDeniedException();
         }
-        if ($groupe) {
+        /** @var Utilisateur_avm $user */
+        $user = $this->getUser();
+        if (null !== $utilisateur) {
+            if ($user !== $utilisateur) {
+                throw $this->createAccessDeniedException();
+            }
+        }
+        if (null !== $groupe) {
             $isGroupMember = false;
-            /** @var Utilisateur_avm $user */
-            $user = $this->getUser();
             $groupe_individus = $groupe->getGroupeIndividus();
             /** @var Individu_to_groupe $groupe_individu */
             foreach ($groupe_individus as $groupe_individu) {
@@ -161,51 +186,42 @@ class Individu_to_groupeController extends Controller
      *  Affecter l'utilisateur à un groupe
      * @param Request $request
      * @param Groupe_relationnel $groupe_relationnel
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @return View | JsonResponse
      *
      * @Get("/new/relation/group/{id}", name="_group")
      */
     public function newAction(Request $request, Groupe_relationnel $groupe_relationnel)
     {
-        $this->createSecurity($groupe_relationnel);
-        /** @var Session $session */
-        $session = $request->getSession();
-        /** @var Individu_to_groupe $individu_to_groupe */
-        $individu_to_groupe = TradeFactory::getTradeProvider("individu_to_groupe");
-        $form = $this->createForm('APM\UserBundle\Form\Individu_to_groupeType', $individu_to_groupe);
-        $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
-            try {
-                $this->createSecurity($groupe_relationnel, $individu_to_groupe->getIndividu());
-                $individu_to_groupe->setGroupeRelationnel($groupe_relationnel);
-                $em = $this->getDoctrine()->getManager();
-                if ($request->isXmlHttpRequest()) {
-                    $json = array();
-                    $json["item"] = array(//prevenir le client
-                        "action" => 0,
-                    );
-                    $session->getFlashBag()->add('success', "insertion d'un individu dans le groupe: <strong> " . $groupe_relationnel->getDesignation() . "</strong><br> Opération effectuée avec succès!");
-                    return $this->json(json_encode($json), 200);
-                }
-                $em->persist($individu_to_groupe);
-                $em->flush();
-                return $this->redirectToRoute('apm_user_individu-to-groupe_show', array('id' => $individu_to_groupe->getId()));
-            } catch (ConstraintViolationException $cve) {
-                $session->getFlashBag()->add('danger', "<strong>Echec de l'enregistrement. </strong><br>L'enregistrement a échoué dû à une contrainte de données!");
-                return $this->json(json_encode(["item" => null]));
-            } catch (RuntimeException $rte) {
-                $session->getFlashBag()->add('danger', "<strong>Echec de l'opération.</strong><br>L'enregistrement a échoué. bien vouloir réessayer plutard, svp!");
-                return $this->json(json_encode(["item" => null]));
-            } catch (AccessDeniedException $ads) {
-                $session->getFlashBag()->add('danger', "<strong>Action interdite.</strong><br>Vous n'êtes pas autorisez à effectuer cette opération!");
-                return $this->json(json_encode(["item" => null]));
+        try {
+            $this->createSecurity($groupe_relationnel);
+            /** @var Individu_to_groupe $individu_to_groupe */
+            $individu_to_groupe = TradeFactory::getTradeProvider("individu_to_groupe");
+            $form = $this->createForm('APM\UserBundle\Form\Individu_to_groupeType', $individu_to_groupe);
+            $form->submit($request->request->all());
+            if (!$form->isValid()) {
+                return new JsonResponse([
+                    "status" => 400,
+                    "message" => $this->get('translator')->trans($form->getErrors(true, false), [], 'FOSUserBundle')
+                ], Response::HTTP_BAD_REQUEST);
             }
+            $this->createSecurity($groupe_relationnel, $individu_to_groupe->getIndividu());
+            $individu_to_groupe->setGroupeRelationnel($groupe_relationnel);
+            $em = $this->getDoctrine()->getManager();
+            $em->persist($individu_to_groupe);
+            return $this->routeRedirectView("api_user_show_individu-group", ['id' => $individu_to_groupe->getId()], Response::HTTP_CREATED);
+        } catch (ConstraintViolationException $cve) {
+            return new JsonResponse([
+                "status" => 400,
+                "message" => $this->get('translator')->trans("impossible d'enregistrer, vérifiez vos données", [], 'FOSUserBundle')
+            ], Response::HTTP_BAD_REQUEST);
+        } catch (AccessDeniedException $ads) {
+            return new JsonResponse([
+                    "status" => 403,
+                    "message" => $this->get('translator')->trans("Access denied", [], 'FOSUserBundle'),
+                ]
+                , Response::HTTP_FORBIDDEN
+            );
         }
-        $session->set('previous_location', $request->getUri());
-        return $this->render('APMUserBundle:individu_to_groupe:new.html.twig', array(
-            'groupe_relationnel' => $groupe_relationnel,
-            'form' => $form->createView(),
-        ));
     }
 
     /**
@@ -254,56 +270,43 @@ class Individu_to_groupeController extends Controller
     }
 
     /**
-     * Displays a form to edit an existing Individu_to_groupe entity.
      * @param Request $request
      * @param Individu_to_groupe $individu_to_groupe
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @return View | JsonResponse
      *
      * @Put("/edit/relation/{id}")
      */
     public function editAction(Request $request, Individu_to_groupe $individu_to_groupe)
     {
-        $this->editAndDeleteSecurity($individu_to_groupe);
-        if ($request->isXmlHttpRequest() && $request->getMethod() === "POST") {
-            $json = array();
-            $json['item'] = array();
-            /** @var Session $session */
-            $session = $request->getSession();
-            $em = $this->getDoctrine()->getManager();
-            $property = $request->request->get('name');
-            $value = $request->request->get('value');
-            switch ($property) {
-                case 'designation':
-                    $individu_to_groupe->setPropriete($value);
-                    break;
-                case 'propriete' :
-                    $individu_to_groupe->setPropriete($value);
-                    break;
-                default:
-                    $session->getFlashBag()->add('info', "<strong> Aucune mis à jour effectuée</strong>");
-                    return $this->json(json_encode(["item" => null]), 205);
-            }
-            $em->flush();
-            $session->getFlashBag()->add('success', "Mis à jour propriété de l'individu : <strong>" . $property . "</strong>  <br> Opération effectuée avec succès!");
-            return $this->json(json_encode($json), 200);
-        }
-        $deleteForm = $this->createDeleteForm($individu_to_groupe);
-        $editForm = $this->createForm('APM\UserBundle\Form\Individu_to_groupeType', $individu_to_groupe);
-        $editForm->handleRequest($request);
-        if ($editForm->isSubmitted() && $editForm->isValid()) {
+        try {
             $this->editAndDeleteSecurity($individu_to_groupe);
+            $form = $this->createForm('APM\UserBundle\Form\Individu_to_groupeType', $individu_to_groupe);
+            $form->submit($request->request->all(), false);
+            if (!$form->isValid()) {
+                return new JsonResponse([
+                    "status" => 400,
+                    "message" => $this->get('translator')->trans($form->getErrors(true, false), [], 'FOSUserBundle')
+                ], Response::HTTP_BAD_REQUEST);
+            }
             $em = $this->getDoctrine()->getManager();
-            $em->persist($individu_to_groupe);
             $em->flush();
-
-            return $this->redirectToRoute('apm_user_individu-to-groupe_show', array('id' => $individu_to_groupe->getId()));
+            return $this->routeRedirectView("api_user_show_individu-group", ['id' => $individu_to_groupe->getId()], Response::HTTP_OK);
+        } catch (ConstraintViolationException $cve) {
+            return new JsonResponse(
+                [
+                    "status" => 400,
+                    "message" => $this->get('translator')->trans("impossible d'enregistrer, vérifiez vos données", [], 'FOSUserBundle')
+                ], Response::HTTP_BAD_REQUEST
+            );
+        } catch (AccessDeniedException $ads) {
+            return new JsonResponse(
+                [
+                    "status" => 403,
+                    "message" => $this->get('translator')->trans("Access denied", [], 'FOSUserBundle'),
+                ]
+                , Response::HTTP_FORBIDDEN
+            );
         }
-
-        return $this->render('APMUserBundle:individu_to_groupe:edit.html.twig', array(
-            'individu_to_groupe' => $individu_to_groupe,
-            'edit_form' => $editForm->createView(),
-            'delete_form' => $deleteForm->createView(),
-        ));
     }
 
     /**
@@ -322,47 +325,44 @@ class Individu_to_groupeController extends Controller
         }
     }
 
-    /**
-     * Creates a form to delete a Individu_to_groupe entity.
-     *
-     * @param Individu_to_groupe $individu_to_groupe The Individu_to_groupe entity
-     *
-     * @return \Symfony\Component\Form\Form The form
-     */
-    private function createDeleteForm(Individu_to_groupe $individu_to_groupe)
-    {
-        return $this->createFormBuilder()
-            ->setAction($this->generateUrl('apm_user_individu-to-groupe_delete', array('id' => $individu_to_groupe->getId())))
-            ->setMethod('DELETE')
-            ->getForm();
-    }
 
     /**
-     * Deletes a Individu_to_groupe entity.
      * @param Request $request
      * @param Individu_to_groupe $individu_to_groupe
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse | JsonResponse
+     * @return View | JsonResponse
      *
      * @Delete("/delete/relation/{id}")
      */
     public function deleteAction(Request $request, Individu_to_groupe $individu_to_groupe)
     {
-        $this->editAndDeleteSecurity($individu_to_groupe);
-        $em = $this->getDoctrine()->getManager();
-        if ($request->isXmlHttpRequest()) {
-            $json = array();
-            $json['item'] = array();
+        try {
+            $this->editAndDeleteSecurity($individu_to_groupe);
+            if (!$request->request->has('exec') || $request->request->get('exec') !== 'go') {
+                return new JsonResponse([
+                    "status" => 400,
+                    "message" => $this->get('translator')->trans('impossible de supprimer', [], 'FOSUserBundle')
+                ], Response::HTTP_BAD_REQUEST);
+            }
+            $individu = $individu_to_groupe->getIndividu();
+            $em = $this->getDoctrine()->getManager();
             $em->remove($individu_to_groupe);
             $em->flush();
-            return $this->json($json, 200);
+            return $this->routeRedirectView("api_user_get_individu-groups_user", ["user_id" => $individu->getId()], Response::HTTP_OK);
+        } catch (ConstraintViolationException $cve) {
+            return new JsonResponse(
+                [
+                    "status" => 400,
+                    "message" => $this->get('translator')->trans("impossible de supprimer, vérifiez vos données", [], 'FOSUserBundle')
+                ], Response::HTTP_FAILED_DEPENDENCY
+            );
+        } catch (AccessDeniedException $ads) {
+            return new JsonResponse(
+                [
+                    "status" => 403,
+                    "message" => $this->get('translator')->trans("Access denied", [], 'FOSUserBundle'),
+                ]
+                , Response::HTTP_FORBIDDEN
+            );
         }
-        $form = $this->createDeleteForm($individu_to_groupe);
-        $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
-            $em->remove($individu_to_groupe);
-            $em->flush();
-        }
-
-        return $this->redirectToRoute('apm_user_individu-to-groupe_index');
     }
 }

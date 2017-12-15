@@ -10,10 +10,14 @@ use APM\VenteBundle\Entity\Boutique;
 use APM\VenteBundle\Entity\Transaction;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Exception\ConstraintViolationException;
+use FOS\RestBundle\Controller\FOSRestController;
+use FOS\RestBundle\View\View;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Session;
 use FOS\RestBundle\Controller\Annotations\RouteResource;
 use FOS\RestBundle\Controller\Annotations\Get;
@@ -21,13 +25,14 @@ use FOS\RestBundle\Controller\Annotations\Post;
 use FOS\RestBundle\Controller\Annotations\Delete;
 use FOS\RestBundle\Controller\Annotations\Patch;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 
 /**
  * Livraison controller.
  * @RouteResource("livraison", pluralize=false)
  */
-class LivraisonController extends Controller
+class LivraisonController extends FOSRestController
 {
     private $code_filter;
     private $livreur_boutique;
@@ -41,8 +46,6 @@ class LivraisonController extends Controller
     private $datePrevueTo_filter;
 
     /**
-     * Liste les livraisons enregistrées par un utilisateur ou par une boutique
-     * les livraisons se font uniquement sur les opérations effectuées...
      * @param Request $request
      * @param Boutique $boutique
      * @return JsonResponse
@@ -52,37 +55,47 @@ class LivraisonController extends Controller
      */
     public function getAction(Request $request, Boutique $boutique = null)
     {
-        $this->listeAndShowSecurity($boutique);
-        if (null !== $boutique) {
-            $livraisons = $boutique->getLivraisons();
-        } else {
-            /** @var Utilisateur_avm $user */
-            $user = $this->getUser();
-            $livraisons = $user->getLivraisons();
-        }
-        $json = array();
-        $this->datePrevueFrom_filter = $request->query->has('datePrevueFrom_filter') ? $request->query->get('datePrevueFrom_filter') : "";
-        $this->datePrevueTo_filter = $request->query->has('datePrevueTo_filter') ? $request->query->get('datePrevueTo_filter') : "";
-        $this->dateEnregistrementFrom_filter = $request->query->has('dateEnregistrementFrom_filter') ? $request->query->get('dateEnregistrementFrom_filter') : "";
-        $this->dateEnregistrementTo_filter = $request->query->has('dateEnregistrementTo_filter') ? $request->query->get('dateEnregistrementTo_filter') : "";
-        $this->code_filter = $request->query->has('code_filter') ? $request->query->get('code_filter') : "";
-        $this->livreur_boutique = $request->query->has('livreur_boutique') ? $request->query->get('livreur_boutique') : "";
-        $this->description_filter = $request->query->has('description_filter') ? $request->query->get('description_filter') : "";
-        $this->etat_filter = $request->query->has('etat_filter') ? $request->query->get('etat_filter') : "";
-        $this->priorite_filter = $request->query->has('priorite_filter') ? $request->query->get('priorite_filter') : "";
-        $this->valide_filter = $request->query->has('valide_filter') ? $request->query->get('valide_filter') : "";
-        $iDisplayLength = $request->query->has('length') ? $request->query->get('length') : -1;
-        $iDisplayStart = $request->query->has('start') ? intval($request->query->get('start')) : 0;
-        $iTotalRecords = count($livraisons);
-        if ($iDisplayLength < 0) $iDisplayLength = $iTotalRecords;
-        $livraisons = $this->handleResults($livraisons, $iTotalRecords, $iDisplayStart, $iDisplayLength);
-        $iFilteredRecords = count($livraisons);
-        $data = $this->get('apm_core.data_serialized')->getFormalData($livraisons, array("owner_list"));
-        $json['totalRecords'] = $iTotalRecords;
-        $json['filteredRecords'] = $iFilteredRecords;
-        $json['items'] = $data;
+        try {
+            $this->listeAndShowSecurity($boutique);
+            if (null !== $boutique) {
+                $livraisons = $boutique->getLivraisons();
+            } else {
+                /** @var Utilisateur_avm $user */
+                $user = $this->getUser();
+                $livraisons = $user->getLivraisons();
+            }
+            $json = array();
+            $this->datePrevueFrom_filter = $request->query->has('datePrevueFrom_filter') ? $request->query->get('datePrevueFrom_filter') : "";
+            $this->datePrevueTo_filter = $request->query->has('datePrevueTo_filter') ? $request->query->get('datePrevueTo_filter') : "";
+            $this->dateEnregistrementFrom_filter = $request->query->has('dateEnregistrementFrom_filter') ? $request->query->get('dateEnregistrementFrom_filter') : "";
+            $this->dateEnregistrementTo_filter = $request->query->has('dateEnregistrementTo_filter') ? $request->query->get('dateEnregistrementTo_filter') : "";
+            $this->code_filter = $request->query->has('code_filter') ? $request->query->get('code_filter') : "";
+            $this->livreur_boutique = $request->query->has('livreur_boutique') ? $request->query->get('livreur_boutique') : "";
+            $this->description_filter = $request->query->has('description_filter') ? $request->query->get('description_filter') : "";
+            $this->etat_filter = $request->query->has('etat_filter') ? $request->query->get('etat_filter') : "";
+            $this->priorite_filter = $request->query->has('priorite_filter') ? $request->query->get('priorite_filter') : "";
+            $this->valide_filter = $request->query->has('valide_filter') ? $request->query->get('valide_filter') : "";
+            $iDisplayLength = $request->query->has('length') ? $request->query->get('length') : -1;
+            $iDisplayStart = $request->query->has('start') ? intval($request->query->get('start')) : 0;
+            $iTotalRecords = count($livraisons);
+            if ($iDisplayLength < 0) $iDisplayLength = $iTotalRecords;
+            $livraisons = $this->handleResults($livraisons, $iTotalRecords, $iDisplayStart, $iDisplayLength);
+            $iFilteredRecords = count($livraisons);
+            $data = $this->get('apm_core.data_serialized')->getFormalData($livraisons, array("owner_list"));
+            $json['totalRecords'] = $iTotalRecords;
+            $json['filteredRecords'] = $iFilteredRecords;
+            $json['items'] = $data;
 
-        return new JsonResponse($json, 200);
+            return new JsonResponse($json, 200);
+
+        } catch (AccessDeniedException $ads) {
+            return new JsonResponse([
+                    "status" => 403,
+                    "message" => $this->get('translator')->trans("Access denied", [], 'FOSUserBundle'),
+                ]
+                , Response::HTTP_FORBIDDEN
+            );
+        }
     }
 
     /**
@@ -214,7 +227,7 @@ class LivraisonController extends Controller
      * @param Request $request
      * @param Boutique $boutique
      * @param Transaction $transaction
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response| JsonResponse
+     * @return View | JsonResponse
      *
      * @Post("/new/livraison")
      * @Post("/new/livraison/boutique/{id}", name="_boutique")
@@ -223,15 +236,21 @@ class LivraisonController extends Controller
      */
     public function newAction(Request $request, Boutique $boutique = null, Transaction $transaction = null)
     {
-        $tr = [];
-        if (null !== $transaction) $tr = new ArrayCollection([$transaction]);
-        $this->createSecurity($boutique, $tr);
-        /** @var Livraison $livraison */
-        $livraison = TradeFactory::getTradeProvider("livraison");
-        $form = $this->createForm('APM\TransportBundle\Form\LivraisonType', $livraison);
-        if (null !== $transaction) $form->remove('operations');
-        $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
+        try {
+            $tr = [];
+            if (null !== $transaction) $tr = new ArrayCollection([$transaction]);
+            $this->createSecurity($boutique, $tr);
+            /** @var Livraison $livraison */
+            $livraison = TradeFactory::getTradeProvider("livraison");
+            $form = $this->createForm('APM\TransportBundle\Form\LivraisonType', $livraison);
+            if (null !== $transaction) $form->remove('operations');
+            $form->submit($request->request->all());
+            if (!$form->isValid()) {
+                return new JsonResponse([
+                    "status" => 400,
+                    "message" => $this->get('translator')->trans($form->getErrors(true, false), [], 'FOSUserBundle')
+                ], Response::HTTP_BAD_REQUEST);
+            }
             $livraison->setUtilisateur($this->getUser());
             $livraison->setBoutique($boutique);
             if (null !== $transaction) {
@@ -248,19 +267,22 @@ class LivraisonController extends Controller
             $em = $this->getDoctrine()->getManager();
             $em->persist($livraison);
             $em->flush();
-            if ($request->isXmlHttpRequest()) {
-                $json = array();
-                $json['item'] = array();
-                return $this->json(json_encode($json), 200);
-            }
 
-            return $this->redirectToRoute('apm_transport_livraison_show', array('id' => $livraison->getId()));
+            return $this->routeRedirectView("api_transport_show_livraison", ['id' => $livraison->getId()], Response::HTTP_CREATED);
+
+        } catch (ConstraintViolationException $cve) {
+            return new JsonResponse([
+                "status" => 400,
+                "message" => $this->get('translator')->trans("impossible d'enregistrer, vérifiez vos données", [], 'FOSUserBundle')
+            ], Response::HTTP_BAD_REQUEST);
+        } catch (AccessDeniedException $ads) {
+            return new JsonResponse([
+                    "status" => 403,
+                    "message" => $this->get('translator')->trans("Access denied", [], 'FOSUserBundle'),
+                ]
+                , Response::HTTP_FORBIDDEN
+            );
         }
-
-        return $this->render('APMTransportBundle:livraison:new.html.twig', array(
-            'livraison' => $livraison,
-            'form' => $form->createView(),
-        ));
     }
 
     /**
@@ -315,87 +337,50 @@ class LivraisonController extends Controller
     }
 
     /**
-     * Displays a form to edit an existing Livraison entity.
      * @param Request $request
      * @param Livraison $livraison
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response| JsonResponse
+     * @return View | JsonResponse
      *
      * @Get("/edit/livraison/{id}")
      */
     public function editAction(Request $request, Livraison $livraison)
     {
-        $this->editAndDeleteSecurity($livraison);
-        $editForm = $this->createForm('APM\TransportBundle\Form\LivraisonType', $livraison);
-        $editForm->handleRequest($request);
-        /** @var Session $session */
-        $session = $request->getSession();
-        if ($editForm->isSubmitted() && $editForm->isValid()
-            || $request->isXmlHttpRequest() && $request->isMethod('POST')
-        ) {
-            $em = $this->getDoctrine()->getManager();
+        try {
+            $this->editAndDeleteSecurity($livraison);
+            $form = $this->createForm('APM\TransportBundle\Form\LivraisonType', $livraison);
+            $form->submit($request->request->all(), false);
+            if (!$form->isValid()) {
+                return new JsonResponse([
+                    "status" => 400,
+                    "message" => $this->get('translator')->trans($form->getErrors(true, false), [], 'FOSUserBundle')
+                ], Response::HTTP_BAD_REQUEST);
+            }
+
             $transactions = $livraison->getOperations();
             /** @var Transaction $transaction */
             foreach ($transactions as $transaction) {
                 $transaction->setShipped(true);
                 $transaction->setLivraison($livraison);
             }
-            try {
-                if ($request->isXmlHttpRequest()) {
-                    $json = array();
-                    $json['item'] = array();
-                    $property = $request->query->get('name');
-                    $value = $request->query->get('value');
-                    switch ($property) {
-                        case 'dateLivraison':
-                            $livraison->setDateEtHeureLivraison($value);
-                            break;
-                        case 'description':
-                            $livraison->setDescription($value);
-                            break;
-                        case 'etat':
-                            $livraison->setEtatLivraison($value);
-                            break;
-                        case 'priorite':
-                            $livraison->setPriorite($value);
-                            break;
-                        case 'valide':
-                            $livraison->setValide($value);
-                            break;
-                        case 'transporteur':
-                            /** @var Profile_transporteur $transporteur */
-                            $transporteur = $em->getRepository('APMTransportBundle:profile_transporteur')->find($value);
-                            $livraison->setLivreur($transporteur);
-                            break;
-                        case 'transaction':
-                            /** @var Transaction $transaction */
-                            $transaction = $em->getRepository('APMVenteBundle:Transaction')->find($value);
-                            $transaction->setLivraison($livraison);
-                            $livraison->addOperation($transaction);
-                            break;
-                        default:
-                            $session->getFlashBag()->add('info', "<strong> Aucune mise à jour effectuée</strong>");
-                            return $this->json(json_encode(["item" => null]), 205);
-                    }
-                    $em->flush();
-                    $session->getFlashBag()->add('success', "Modification de la livraison : <strong>" . $property . "</strong> réf. livraison :" . $livraison->getCode() . "<br> Opération effectuée avec succès!");
-                    return $this->json(json_encode($json), 200);
-                }
-                $em->flush();
-                return $this->redirectToRoute('apm_transport_livraison_show', array('id' => $livraison->getId()));
-            } catch (ConstraintViolationException $cve) {
-                $session->getFlashBag()->add('danger', "<strong>Echec de l'enregistrement. </strong><br>L'enregistrement a échoué dû à une contrainte de données!");
-                return $this->json(json_encode(["item" => null]));
-            } catch (AccessDeniedException $ads) {
-                $session->getFlashBag()->add('danger', "<strong>Action interdite.</strong><br>Vous n'êtes pas autorisez à effectuer cette opération!");
-                return $this->json(json_encode(["item" => null]));
-            }
+            $em = $this->getDoctrine()->getManager();
+            $em->flush();
+            return $this->routeRedirectView("api_transport_show_livraison", ['id' => $livraison->getId()], Response::HTTP_OK);
+        } catch (ConstraintViolationException $cve) {
+            return new JsonResponse(
+                [
+                    "status" => 400,
+                    "message" => $this->get('translator')->trans("impossible d'enregistrer, vérifiez vos données", [], 'FOSUserBundle')
+                ], Response::HTTP_BAD_REQUEST
+            );
+        } catch (AccessDeniedException $ads) {
+            return new JsonResponse(
+                [
+                    "status" => 403,
+                    "message" => $this->get('translator')->trans("Access denied", [], 'FOSUserBundle'),
+                ]
+                , Response::HTTP_FORBIDDEN
+            );
         }
-        $deleteForm = $this->createDeleteForm($livraison);
-        return $this->render('APMTransportBundle:livraison:edit.html.twig', array(
-            'livraison' => $livraison,
-            'edit_form' => $editForm->createView(),
-            'delete_form' => $deleteForm->createView(),
-        ));
     }
 
     /**
@@ -421,48 +406,51 @@ class LivraisonController extends Controller
     }
 
     /**
-     * Creates a form to delete a Livraison entity.
-     *
-     * @param Livraison $livraison The Livraison entity
-     *
-     * @return \Symfony\Component\Form\Form The form
-     */
-    private function createDeleteForm(Livraison $livraison)
-    {
-        $this->editAndDeleteSecurity($livraison);
-        return $this->createFormBuilder()
-            ->setAction($this->generateUrl('apm_transport_livraison_delete', array('id' => $livraison->getId())))
-            ->setMethod('DELETE')
-            ->getForm();
-    }
-
-    /**
      * Deletes a Livraison entity.
      * @param Request $request
      * @param Livraison $livraison
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse | JsonResponse
+     * @return View | JsonResponse
      *
      * @Delete("/delete/livraison/{id}")
      */
     public function deleteAction(Request $request, Livraison $livraison)
     {
-        $this->editAndDeleteSecurity($livraison);
-        $em = $this->getDoctrine()->getManager();
-        if ($request->isXmlHttpRequest()) {
+        try {
+            $this->editAndDeleteSecurity($livraison);
+            if (!$request->request->has('exec') || $request->request->get('exec') !== 'go') {
+                return new JsonResponse([
+                    "status" => 400,
+                    "message" => $this->get('translator')->trans('impossible de supprimer', [], 'FOSUserBundle')
+                ], Response::HTTP_BAD_REQUEST);
+            }
+            if (null !== ($boutique = $livraison->getBoutique())) {
+                $route = "api_transport_get_livraisons_boutique";
+                $param = array("id" => $boutique->getId());
+            } else {
+                $route = "api_transport_get_livraisons";
+                $param = array();
+            }
+            $em = $this->getDoctrine()->getManager();
             $em->remove($livraison);
             $em->flush();
-            $json = array();
-            $json['item'] = array();
-            return $this->json(json_encode($json), 200);
-        }
-        $form = $this->createDeleteForm($livraison);
-        $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
-            $em->remove($livraison);
-            $em->flush();
+            return $this->routeRedirectView($route, $param, Response::HTTP_OK);
+        } catch (ConstraintViolationException $cve) {
+            return new JsonResponse(
+                [
+                    "status" => 400,
+                    "message" => $this->get('translator')->trans("impossible de supprimer, vérifiez vos données", [], 'FOSUserBundle')
+                ], Response::HTTP_FAILED_DEPENDENCY
+            );
+        } catch (AccessDeniedException $ads) {
+            return new JsonResponse(
+                [
+                    "status" => 403,
+                    "message" => $this->get('translator')->trans("Access denied", [], 'FOSUserBundle'),
+                ]
+                , Response::HTTP_FORBIDDEN
+            );
         }
 
-        return $this->redirectToRoute('apm_transport_livraison_index');
     }
 
 }

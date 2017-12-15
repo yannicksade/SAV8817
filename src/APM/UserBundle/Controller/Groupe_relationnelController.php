@@ -3,16 +3,16 @@
 namespace APM\UserBundle\Controller;
 
 use APM\UserBundle\Entity\Groupe_relationnel;
-use APM\UserBundle\Entity\Individu_to_groupe;
 use APM\UserBundle\Entity\Utilisateur_avm;
 use APM\UserBundle\Factory\TradeFactory;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-use Doctrine\Common\Persistence\ObjectManager;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Doctrine\DBAL\Exception\ConstraintViolationException;
+use FOS\RestBundle\Controller\FOSRestController;
+use FOS\RestBundle\View\View;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\HttpFoundation\Response;
 use FOS\RestBundle\Controller\Annotations\RouteResource;
 use FOS\RestBundle\Controller\Annotations\Get;
 use FOS\RestBundle\Controller\Annotations\Post;
@@ -20,13 +20,14 @@ use FOS\RestBundle\Controller\Annotations\Patch;
 use FOS\RestBundle\Controller\Annotations\Delete;
 use FOS\RestBundle\Controller\Annotations\Put;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 
 /**
  * Groupe_relationnel controller.
  * @RouteResource("groupeRelationnel", pluralize=false)
  */
-class Groupe_relationnelController extends Controller
+class Groupe_relationnelController extends FOSRestController
 {
     private $dateCreationFrom_filter;
     private $dateCreationTo_filter;
@@ -47,57 +48,67 @@ class Groupe_relationnelController extends Controller
      */
     public function getAction(Request $request)
     {
-        $this->listAndShowSecurity();
-        /** @var Utilisateur_avm $user */
-        $user = $this->getUser();
-        $q = $request->get('q');
-        $this->dateCreationFrom_filter = $request->request->has('dateCreationFrom_filter') ? $request->request->get('dateCreationFrom_filter') : "";
-        $this->dateCreationTo_filter = $request->request->has('dateCreationTo_filter') ? $request->request->get('dateCreationTo_filter') : "";
-        $this->code_filter = $request->request->has('code_filter') ? $request->request->get('code_filter') : "";
-        $this->description_filter = $request->request->has('description_filter') ? $request->request->get('description_filter') : "";
-        $this->designation_filter = $request->request->has('designation_filter') ? $request->request->get('designation_filter') : "";
-        $this->conversationalGroup_filter = $request->request->has('conversationalGroup_filter') ? $request->request->get('conversationalGroup_filter') : "";
-        $this->type_filter = $request->request->has('type_filter') ? $request->request->get('type_filter') : "";
-        $this->proprietaire_filter = $request->request->has('proprietaire_filter') ? $request->request->get('proprietaire_filter') : "";
-        $iDisplayLength = $request->request->has('length') ? $request->request->get('length') : -1;
-        $iDisplayStart = $request->request->has('start') ? intval($request->request->get('start')) : 0;
-        $json = array();
-        $json['items'] = array();
-        if ($q === "owner" || $q === "all") {
-            $groupes = $user->getGroupesProprietaire();
-            $iTotalRecords = count($groupes);
-            if ($iDisplayLength < 0) $iDisplayLength = $iTotalRecords;
-            $groupes = $this->handleResults($groupes, $iTotalRecords, $iDisplayStart, $iDisplayLength);
-            $iFilteredRecords = count($groupes);
-            $data = $this->get('apm_core.data_serialized')->getFormalData($groupes, array("owner_list"));
-            $json['totalRecordsOwner'] = $iTotalRecords;
-            $json['filteredRecordsOwner'] = $iFilteredRecords;
-            $json['items'] = $data;
-        }
-        if ($q === "guest" || $q === "all") {
-            //----- Ajout des groupes de conversation : groupes auxquels appartient l'utilisateur ---------------------
-            $individu_groupes = $user->getIndividuGroupes();
-            $groupesConversationnel = new ArrayCollection();;
-            if (null !== $individu_groupes) {
-                foreach ($individu_groupes as $individu_groupe) {
-                    /** @var Groupe_relationnel $groupe_relationnel */
-                    $groupe_relationnel = $individu_groupe->getGroupeRelationnel();
-                    if ($groupe_relationnel->isConversationalGroup() && $user !== $groupe_relationnel->getProprietaire()) {
-                        $groupesConversationnel->add($groupe_relationnel);
-                    };
-                }
-                $iTotalRecords = count($groupesConversationnel);
+        try {
+            $this->listAndShowSecurity();
+            /** @var Utilisateur_avm $user */
+            $user = $this->getUser();
+            $this->dateCreationFrom_filter = $request->request->has('dateCreationFrom_filter') ? $request->request->get('dateCreationFrom_filter') : "";
+            $this->dateCreationTo_filter = $request->request->has('dateCreationTo_filter') ? $request->request->get('dateCreationTo_filter') : "";
+            $this->code_filter = $request->request->has('code_filter') ? $request->request->get('code_filter') : "";
+            $this->description_filter = $request->request->has('description_filter') ? $request->request->get('description_filter') : "";
+            $this->designation_filter = $request->request->has('designation_filter') ? $request->request->get('designation_filter') : "";
+            $this->conversationalGroup_filter = $request->request->has('conversationalGroup_filter') ? $request->request->get('conversationalGroup_filter') : "";
+            $this->type_filter = $request->request->has('type_filter') ? $request->request->get('type_filter') : "";
+            $this->proprietaire_filter = $request->request->has('proprietaire_filter') ? $request->request->get('proprietaire_filter') : "";
+            $iDisplayLength = $request->request->has('length') ? $request->request->get('length') : -1;
+            $iDisplayStart = $request->request->has('start') ? intval($request->request->get('start')) : 0;
+            $json = array();
+            $json['items'] = array();
+            $q = $request->query->has('q') ? $request->query->get('q') : "all";
+            if ($q === "owner" || $q === "all") {
+                $groupes = $user->getGroupesProprietaire();
+                $iTotalRecords = count($groupes);
                 if ($iDisplayLength < 0) $iDisplayLength = $iTotalRecords;
-                $groupes = $this->handleResults($groupesConversationnel, $iTotalRecords, $iDisplayStart, $iDisplayLength);
+                $groupes = $this->handleResults($groupes, $iTotalRecords, $iDisplayStart, $iDisplayLength);
                 $iFilteredRecords = count($groupes);
                 $data = $this->get('apm_core.data_serialized')->getFormalData($groupes, array("owner_list"));
-                $json['totalRecordsGuest'] = $iTotalRecords;
-                $json['filteredRecordsGuest'] = $iFilteredRecords;
-                $json['items'] = $data;
+                $json['totalRecordsOwner'] = $iTotalRecords;
+                $json['filteredRecordsOwner'] = $iFilteredRecords;
+                $json['items']['owner'] = $data;
             }
-            //---------------------------------------------------------------------------------------------------------
+            if ($q === "guest" || $q === "all") {
+                //----- Ajout des groupes de conversation : groupes auxquels appartient l'utilisateur ---------------------
+                $individu_groupes = $user->getIndividuGroupes();
+                $groupesConversationnel = new ArrayCollection();;
+                if (null !== $individu_groupes) {
+                    foreach ($individu_groupes as $individu_groupe) {
+                        /** @var Groupe_relationnel $groupe_relationnel */
+                        $groupe_relationnel = $individu_groupe->getGroupeRelationnel();
+                        if ($groupe_relationnel->isConversationalGroup() && $user !== $groupe_relationnel->getProprietaire()) {
+                            $groupesConversationnel->add($groupe_relationnel);
+                        };
+                    }
+                    $iTotalRecords = count($groupesConversationnel);
+                    if ($iDisplayLength < 0) $iDisplayLength = $iTotalRecords;
+                    $groupes = $this->handleResults($groupesConversationnel, $iTotalRecords, $iDisplayStart, $iDisplayLength);
+                    $iFilteredRecords = count($groupes);
+                    $data = $this->get('apm_core.data_serialized')->getFormalData($groupes, array("owner_list"));
+                    $json['totalRecordsGuest'] = $iTotalRecords;
+                    $json['filteredRecordsGuest'] = $iFilteredRecords;
+                    $json['items']['guest'] = $data;
+                }
+                //---------------------------------------------------------------------------------------------------------
+            }
+            return new JsonResponse($json, 200);
+
+        } catch (AccessDeniedException $ads) {
+            return new JsonResponse([
+                    "status" => 403,
+                    "message" => $this->get('translator')->trans("Access denied", [], 'FOSUserBundle'),
+                ]
+                , Response::HTTP_FORBIDDEN
+            );
         }
-        return new JsonResponse($json, 200);
     }
 
     private function listAndShowSecurity()
@@ -204,61 +215,43 @@ class Groupe_relationnelController extends Controller
     /**
      * Creates a new Groupe_relationnel entity.
      * @param Request $request
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response | JsonResponse
+     * @return View | JsonResponse
      *
      * @Post("/new/grouperelationnel")
      */
     public function newAction(Request $request)
     {
-        $this->createSecurity();
-        /** @var Session $session */
-        $session = $request->getSession();
-        /** @var Groupe_relationnel $groupe_relationnel */
-        $groupe_relationnel = TradeFactory::getTradeProvider("groupe_relationnel");
-        $form = $this->createForm('APM\UserBundle\Form\Groupe_relationnelType');
-        $form->setData($groupe_relationnel);
-        $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
-            try {
-                $this->createSecurity();
-                $em = $this->getDoctrine()->getManager();
-                $groupe_relationnel->setProprietaire($this->getUser());
-                $em->persist($groupe_relationnel);
-                $em->flush();
-                if ($request->isXmlHttpRequest()) {
-                    $json = array();
-                    $json["item"] = array(//prevenir le client
-                        "action" => 0,
-                    );
-                    $session->getFlashBag()->add('success', "<strong> rabais d'offre créée. réf:" . $groupe_relationnel->getCode() . "</strong><br> Opération effectuée avec succès!");
-                    return $this->json(json_encode($json), 200);
-                }
-
-                if (null !== $groupe_relationnel->getImage()) {
-                    $this->get('apm_core.crop_image')->liipImageResolver($groupe_relationnel->getImage());
-                    return $this->redirectToRoute('apm_user_groupe-relationnel_show-image', array('id' => $groupe_relationnel->getId()));
-                } else {
-                    return $this->redirectToRoute('apm_user_groupe-relationnel_show', array('id' => $groupe_relationnel->getId()));
-                }
-                //---
-            } catch (ConstraintViolationException $cve) {
-                $session->getFlashBag()->add('danger', "<strong>Echec de l'enregistrement. </strong><br>L'enregistrement a échoué dû à une contrainte de données!");
-                return $this->json(json_encode(["item" => null]));
-            } catch (RuntimeException $rte) {
-                $session->getFlashBag()->add('danger', "<strong>Echec de l'opération.</strong><br>L'enregistrement a échoué. bien vouloir réessayer plutard, svp!");
-                return $this->json(json_encode(["item" => null]));
-            } catch (AccessDeniedException $ads) {
-                $session->getFlashBag()->add('danger', "<strong>Action interdite.</strong><br>Vous n'êtes pas autorisez à effectuer cette opération!");
-                return $this->json(json_encode(["item" => null]));
+        try {
+            $this->createSecurity();
+            /** @var Groupe_relationnel $groupe_relationnel */
+            $groupe_relationnel = TradeFactory::getTradeProvider("groupe_relationnel");
+            $form = $this->createForm('APM\UserBundle\Form\Groupe_relationnelType');
+            $form->setData($groupe_relationnel);
+            $form->submit($request->request->all());
+            if (!$form->isValid()) {
+                return new JsonResponse([
+                    "status" => 400,
+                    "message" => $this->get('translator')->trans($form->getErrors(true, false), [], 'FOSUserBundle')
+                ], Response::HTTP_BAD_REQUEST);
             }
+            $em = $this->getDoctrine()->getManager();
+            $groupe_relationnel->setProprietaire($this->getUser());
+            $em->persist($groupe_relationnel);
+            $em->flush();
+            return $this->routeRedirectView("api_user_show_grouperelationnel", ['id' => $groupe_relationnel->getId()], Response::HTTP_CREATED);
+        } catch (ConstraintViolationException $cve) {
+            return new JsonResponse([
+                "status" => 400,
+                "message" => $this->get('translator')->trans("impossible d'enregistrer, vérifiez vos données", [], 'FOSUserBundle')
+            ], Response::HTTP_BAD_REQUEST);
+        } catch (AccessDeniedException $ads) {
+            return new JsonResponse([
+                    "status" => 403,
+                    "message" => $this->get('translator')->trans("Access denied", [], 'FOSUserBundle'),
+                ]
+                , Response::HTTP_FORBIDDEN
+            );
         }
-        $session->set('previous_location', $request->getUri());
-        $data = array(
-            'form' => $form->createView(),
-            'url_image' => $this->get('apm_core.packages_maker')->getPackages()->getUrl('/', 'resolve_img'),
-            'groupe_relationnel' => $groupe_relationnel,
-        );
-        return $this->render('APMUserBundle:groupe_relationnel:new.html.twig', $data);
     }
 
 
@@ -327,68 +320,38 @@ class Groupe_relationnelController extends Controller
      * Displays a form to edit an existing Groupe_relationnel entity.
      * @param Request $request
      * @param Groupe_relationnel $groupe_relationnel
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @return View | JsonResponse
      *
      * @Put("/edit/grouperelationnel/{id}")
      */
     public function editAction(Request $request, Groupe_relationnel $groupe_relationnel)
     {
-        $this->editAndDeleteSecurity($groupe_relationnel);
-        if ($request->isXmlHttpRequest() && $request->getMethod() === "POST") {
-            $json = array();
-            $json['item'] = array();
-            /** @var Session $session */
-            $session = $request->getSession();
-            $em = $this->getDoctrine()->getManager();
-            $property = $request->request->get('name');
-            $value = $request->request->get('value');
-            switch ($property) {
-                case 'designation':
-                    $groupe_relationnel->setDesignation($value);
-                    break;
-                case 'description' :
-                    $groupe_relationnel->setDescription($value);
-                    break;
-                case 'conversationalGroup' :
-                    $groupe_relationnel->setConversationalGroup($value);
-                    break;
-                case 'type' :
-                    $groupe_relationnel->setType($value);
-                    break;
-                default:
-                    $session->getFlashBag()->add('info', "<strong> Aucune mis à jour effectuée</strong>");
-                    return $this->json(json_encode(["item" => null]), 205);
-            }
-            $em->flush();
-            $session->getFlashBag()->add('success', "Mis à jour propriété : <strong>" . $property . "</strong> réf. groupe_relationnel :" . $groupe_relationnel->getCode() . "<br> Opération effectuée avec succès!");
-            return $this->json(json_encode($json), 200);
-        }
-        $deleteForm = $this->createDeleteForm($groupe_relationnel);
-        $editForm = $this->createForm('APM\UserBundle\Form\Groupe_relationnelType', $groupe_relationnel);
-        $editForm->handleRequest($request);
-
-        if ($editForm->isSubmitted() && $editForm->isValid()) {
+        try {
             $this->editAndDeleteSecurity($groupe_relationnel);
-            $em = $this->getDoctrine()->getManager();
-            $em->persist($groupe_relationnel);
-            $em->flush();
-            //---
-            $dist = dirname(__DIR__, 4);
-            $file = $dist . '/web/' . $this->getParameter('images_url') . '/' . $groupe_relationnel->getImage();
-            if (file_exists($file)) {
-                return $this->redirectToRoute('apm_user_groupe-relationnel_show-image', array('id' => $groupe_relationnel->getId()));
-            } else {
-                return $this->redirectToRoute('apm_user_groupe-relationnel_show', array('id' => $groupe_relationnel->getId()));
+            $form = $this->createForm('APM\UserBundle\Form\Groupe_relationnelType', $groupe_relationnel);
+            $form->submit($request->request->all(), false);
+            if (!$form->isValid()) {
+                return new JsonResponse([
+                    "status" => 400,
+                    "message" => $this->get('translator')->trans($form->getErrors(true, false), [], 'FOSUserBundle')
+                ], Response::HTTP_BAD_REQUEST);
             }
-            //---
+            $em = $this->getDoctrine()->getManager();
+            $em->flush();
+            return $this->routeRedirectView("api_user_show_grouperelationnel", ['id' => $groupe_relationnel->getId()], Response::HTTP_OK);
+        } catch (ConstraintViolationException $cve) {
+            return new JsonResponse([
+                "status" => 400,
+                "message" => $this->get('translator')->trans("impossible d'enregistrer, vérifiez vos données", [], 'FOSUserBundle')
+            ], Response::HTTP_BAD_REQUEST);
+        } catch (AccessDeniedException $ads) {
+            return new JsonResponse([
+                    "status" => 403,
+                    "message" => $this->get('translator')->trans("Access denied", [], 'FOSUserBundle'),
+                ]
+                , Response::HTTP_FORBIDDEN
+            );
         }
-
-        return $this->render('APMUserBundle:groupe_relationnel:edit.html.twig', array(
-            'groupe_relationnel' => $groupe_relationnel,
-            'edit_form' => $editForm->createView(),
-            'delete_form' => $deleteForm->createView(),
-            'url_image' => $this->get('apm_core.packages_maker')->getPackages()->getUrl('/', 'resolve_img'),
-        ));
     }
 
     /**
@@ -412,50 +375,45 @@ class Groupe_relationnelController extends Controller
 
     }
 
-    /**
-     * Creates a form to delete a Groupe_relationnel entity.
-     *
-     * @param Groupe_relationnel $groupe_relationnel The Groupe_relationnel entity
-     *
-     * @return \Symfony\Component\Form\Form The form
-     */
-    private
-    function createDeleteForm(Groupe_relationnel $groupe_relationnel)
-    {
-        return $this->createFormBuilder()
-            ->setAction($this->generateUrl('apm_user_groupe-relationnel_delete', array('id' => $groupe_relationnel->getId())))
-            ->setMethod('DELETE')
-            ->getForm();
-    }
 
     /**
      * Deletes a Groupe_relationnel entity.
      * @param Request $request
      * @param Groupe_relationnel $groupe_relationnel
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse | JsonResponse
+     * @return View | JsonResponse
      *
      * @Delete("/delete/grouperelationnel/{id}")
      */
     public function deleteAction(Request $request, Groupe_relationnel $groupe_relationnel)
     {
-        $this->editAndDeleteSecurity($groupe_relationnel);
-        $em = $this->getDoctrine()->getManager();
-        if ($request->isXmlHttpRequest() && $request->getMethod() === "POST") {
-            $em->remove($groupe_relationnel);
-            $em->flush();
-            $json = array();
-            return $this->json($json, 200);
-        }
-        $form = $this->createDeleteForm($groupe_relationnel);
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
+        try {
             $this->editAndDeleteSecurity($groupe_relationnel);
+            if (!$request->request->has('exec') || $request->request->get('exec') !== 'go') {
+                return new JsonResponse([
+                    "status" => 400,
+                    "message" => $this->get('translator')->trans('impossible de supprimer', [], 'FOSUserBundle')
+                ], Response::HTTP_BAD_REQUEST);
+            }
+            $em = $this->getDoctrine()->getManager();
             $em->remove($groupe_relationnel);
             $em->flush();
+            return $this->routeRedirectView("api_user_get_grouperelationnels", [], Response::HTTP_OK);
+        } catch (ConstraintViolationException $cve) {
+            return new JsonResponse(
+                [
+                    "status" => 400,
+                    "message" => $this->get('translator')->trans("impossible de supprimer, vérifiez vos données", [], 'FOSUserBundle')
+                ], Response::HTTP_FAILED_DEPENDENCY
+            );
+        } catch (AccessDeniedException $ads) {
+            return new JsonResponse(
+                [
+                    "status" => 403,
+                    "message" => $this->get('translator')->trans("Access denied", [], 'FOSUserBundle'),
+                ]
+                , Response::HTTP_FORBIDDEN
+            );
         }
-
-        return $this->redirectToRoute('apm_user_groupe-relationnel_index');
     }
 
 }

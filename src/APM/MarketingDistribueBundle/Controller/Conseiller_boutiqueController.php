@@ -9,7 +9,9 @@ use APM\MarketingDistribueBundle\Factory\TradeFactory;
 use APM\UserBundle\Entity\Utilisateur_avm;
 use APM\VenteBundle\Entity\Boutique;
 use Doctrine\Common\Collections\Collection;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Doctrine\DBAL\Exception\ConstraintViolationException;
+use FOS\RestBundle\Controller\FOSRestController;
+use FOS\RestBundle\View\View;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
@@ -20,12 +22,13 @@ use FOS\RestBundle\Controller\Annotations\Delete;
 use FOS\RestBundle\Controller\Annotations\Put;
 use FOS\RestBundle\Controller\Annotations\Patch;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 /**
  * Conseiller_boutique controller.
  * @RouteResource("conseillerboutique")
  */
-class Conseiller_boutiqueController extends Controller
+class Conseiller_boutiqueController extends FOSRestController
 {
     private $gainValeur_filter;
     private $code_filter;
@@ -38,7 +41,7 @@ class Conseiller_boutiqueController extends Controller
      * operation du conseiller courant
      * @param Request $request
      * @param Boutique $boutique
-     * @return \Symfony\Component\HttpFoundation\Response | JsonResponse Lister les boutique du conseiller
+     * @return  JsonResponse
      *
      * Lister les boutique du conseiller
      * @Get("/cget/conseiller-boutiques", name="s")
@@ -46,34 +49,44 @@ class Conseiller_boutiqueController extends Controller
      */
     public function getAction(Request $request, Boutique $boutique = null)
     {
-        $this->listAndShowSecurity();
-        if (null === $boutique) {
-            /** @var Utilisateur_avm $user */
-            $user = $this->getUser();
-            $boutiques_conseillers = $user->getProfileConseiller()->getConseillerBoutiques();
-        } else {
-            $boutiques_conseillers = $boutique->getBoutiqueConseillers();
+        try {
+            $this->listAndShowSecurity();
+            if (null === $boutique) {
+                /** @var Utilisateur_avm $user */
+                $user = $this->getUser();
+                $boutiques_conseillers = $user->getProfileConseiller()->getConseillerBoutiques();
+            } else {
+                $boutiques_conseillers = $boutique->getBoutiqueConseillers();
+            }
+
+            $json = array();
+            $this->gainValeur_filter = $request->query->has('gainValeur_filter') ? $request->query->get('gainValeur_filter') : "";
+            $this->code_filter = $request->query->has('code_filter') ? $request->query->get('code_filter') : "";
+            $this->dateFrom_filter = $request->query->has('dateFrom_filter') ? $request->query->get('dateFrom_filter') : "";
+            $this->dateTo_filter = $request->query->has('dateTo_filter') ? $request->query->get('dateTo_filter') : "";
+            $this->conseiller_filter = $request->query->has('conseiller_filter') ? $request->query->get('conseiller_filter') : "";
+            $this->boutique_filter = $request->query->has('boutique_filter') ? $request->query->get('boutique_filter') : "";
+            $iDisplayLength = $request->query->has('length') ? $request->query->get('length') : -1;
+            $iDisplayStart = $request->query->has('start') ? intval($request->query->get('start')) : 0;
+            $iTotalRecords = count($boutiques_conseillers);
+            if ($iDisplayLength < 0) $iDisplayLength = $iTotalRecords;
+            $boutiques_conseillers = $this->handleResults($boutiques_conseillers, $iTotalRecords, $iDisplayStart, $iDisplayLength);
+            $iFilteredRecords = count($boutiques_conseillers);
+            $data = $this->get('apm_core.data_serialized')->getFormalData($boutiques_conseillers, array("owner_list"));
+            $json['totalRecords'] = $iTotalRecords;
+            $json['filteredRecords'] = $iFilteredRecords;
+            $json['items'] = $data;
+
+            return new JsonResponse($json, 200);
+
+        } catch (AccessDeniedException $ads) {
+            return new JsonResponse([
+                    "status" => 403,
+                    "message" => $this->get('translator')->trans("Access denied", [], 'FOSUserBundle'),
+                ]
+                , Response::HTTP_FORBIDDEN
+            );
         }
-
-        $json = array();
-        $this->gainValeur_filter = $request->query->has('gainValeur_filter') ? $request->query->get('gainValeur_filter') : "";
-        $this->code_filter = $request->query->has('code_filter') ? $request->query->get('code_filter') : "";
-        $this->dateFrom_filter = $request->query->has('dateFrom_filter') ? $request->query->get('dateFrom_filter') : "";
-        $this->dateTo_filter = $request->query->has('dateTo_filter') ? $request->query->get('dateTo_filter') : "";
-        $this->conseiller_filter = $request->query->has('conseiller_filter') ? $request->query->get('conseiller_filter') : "";
-        $this->boutique_filter = $request->query->has('boutique_filter') ? $request->query->get('boutique_filter') : "";
-        $iDisplayLength = $request->query->has('length') ? $request->query->get('length') : -1;
-        $iDisplayStart = $request->query->has('start') ? intval($request->query->get('start')) : 0;
-        $iTotalRecords = count($boutiques_conseillers);
-        if ($iDisplayLength < 0) $iDisplayLength = $iTotalRecords;
-        $boutiques_conseillers = $this->handleResults($boutiques_conseillers, $iTotalRecords, $iDisplayStart, $iDisplayLength);
-        $iFilteredRecords = count($boutiques_conseillers);
-        $data = $this->get('apm_core.data_serialized')->getFormalData($boutiques_conseillers, array("owner_list"));
-        $json['totalRecords'] = $iTotalRecords;
-        $json['filteredRecords'] = $iFilteredRecords;
-        $json['items'] = $data;
-        return new JsonResponse($json, 200);
-
     }
 
 
@@ -169,20 +182,26 @@ class Conseiller_boutiqueController extends Controller
      * Creates a new conseiller_boutique entity.
      * @param Request $request
      * @param Boutique $boutique
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response | JsonResponse
+     * @return View| JsonResponse
      *
      * @Post("/new/conseiller-boutique")
      * @Post("/new/conseiller-boutique/{id}", name="_boutique")
      */
     public function newAction(Request $request, Boutique $boutique = null)
     {
-        $this->createSecurity($boutique);
-        /** @var Conseiller_boutique $conseiller_boutique */
-        $conseiller_boutique = TradeFactory::getTradeProvider("conseiller_boutique");
-        $form = $this->createForm('APM\MarketingDistribueBundle\Form\Conseiller_boutiqueType', $conseiller_boutique);
-        if (null !== $boutique) $form->remove('boutique');
-        $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
+        try {
+            $this->createSecurity($boutique);
+            /** @var Conseiller_boutique $conseiller_boutique */
+            $conseiller_boutique = TradeFactory::getTradeProvider("conseiller_boutique");
+            $form = $this->createForm('APM\MarketingDistribueBundle\Form\Conseiller_boutiqueType', $conseiller_boutique);
+            if (null !== $boutique) $form->remove('boutique');
+            $form->submit($request->request->all());
+            if (!$form->isValid()) {
+                return new JsonResponse([
+                    "status" => 400,
+                    "message" => $this->get('translator')->trans($form->getErrors(true, false), [], 'FOSUserBundle')
+                ], Response::HTTP_BAD_REQUEST);
+            }
             /** @var Utilisateur_avm $user */
             $user = $this->getUser();
             $this->createSecurity($conseiller_boutique->getBoutique());
@@ -191,18 +210,22 @@ class Conseiller_boutiqueController extends Controller
             $em = $this->getDoctrine()->getManager();
             $em->persist($conseiller_boutique);
             $em->flush();
-            if ($request->isXmlHttpRequest()) {
-                $json = array();
-                $json['item'] = array();
-                return $this->json(json_encode($json), 200);
-            }
-            if (null !== $boutique) return $this->redirectToRoute('apm_marketing_conseiller_boutique_index');
-            return $this->redirectToRoute('apm_marketing_conseiller_boutique_show', array('id' => $conseiller_boutique->getId()));
+
+            return $this->routeRedirectView("api_marketing_show_conseillerboutique", ['id' => $conseiller_boutique->getId()], Response::HTTP_CREATED);
+
+        } catch (ConstraintViolationException $cve) {
+            return new JsonResponse([
+                "status" => 400,
+                "message" => $this->get('translator')->trans("impossible d'enregistrer, vérifiez vos données", [], 'FOSUserBundle')
+            ], Response::HTTP_BAD_REQUEST);
+        } catch (AccessDeniedException $ads) {
+            return new JsonResponse([
+                    "status" => 403,
+                    "message" => $this->get('translator')->trans("Access denied", [], 'FOSUserBundle'),
+                ]
+                , Response::HTTP_FORBIDDEN
+            );
         }
-        return $this->render('APMMarketingDistribueBundle:conseiller_boutique:new.html.twig', array(
-            'conseiller_boutique' => $conseiller_boutique,
-            'form' => $form->createView(),
-        ));
     }
 
     /**
@@ -245,66 +268,47 @@ class Conseiller_boutiqueController extends Controller
     }
 
     /**
-     * Displays a form to edit an existing conseiller_boutique entity.
      * @param Request $request
      * @param Conseiller_boutique $conseiller_boutique
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response | JsonResponse
+     * @return View | JsonResponse
      *
      * @Patch("/edit/conseiller-boutique/{id}")
      */
     public function editAction(Request $request, Conseiller_boutique $conseiller_boutique)
     {
-        $this->editAndDeleteSecurity($conseiller_boutique, $conseiller_boutique->getConseiller());
-
-        $deleteForm = $this->createDeleteForm($conseiller_boutique);
-        $editForm = $this->createForm('APM\MarketingDistribueBundle\Form\Conseiller_boutiqueType', $conseiller_boutique);
-        $editForm->handleRequest($request);
-        if ($editForm->isSubmitted() && $editForm->isValid()
-            || $request->isXmlHttpRequest() && $request->isMethod("POST")
-        ) {
-            try {
-                if ($request->isXmlHttpRequest()) {
-                    $json = array();
-                    $json['item'] = array();
-                    $property = $request->query->get('name');
-                    $value = $request->query->get('value');
-                    switch ($property) {
-                        case 'gainValeur':
-                            $conseiller_boutique->setGainValeur($value);
-                            break;
-                        case 'conseiller':
-                            /** @var Conseiller $conseiller */
-                            $conseiller = $em->getRepository('APMMarketingDistribueBundle:conseiller')->find($value);
-                            $conseiller_boutique->setConseiller($conseiller);
-                            break;
-                        case 'boutique':
-                            /** @var Boutique $boutique */
-                            $boutique = $em->getRepository('APMVenteBundle:Boutique')->find($value);
-                            $conseiller_boutique->setBoutique($boutique);
-                            break;
-                        default:
-                            $session->getFlashBag()->add('info', "<strong> Aucune mise à jour effectuée</strong>");
-                            return $this->json(json_encode(["item" => null]), 205);
-                    }
-                    $em->flush();
-                    $session->getFlashBag()->add('success', "Modification du conseiller boutique : <strong>" . $property . "</strong> <br> Opération effectuée avec succès!");
-                    return $this->json(json_encode($json), 200);
-                }
-                $em->flush();
-                return $this->redirectToRoute('apm_marketing_conseiller_boutique_show', array('id' => $conseiller_boutique->getId()));
-            } catch (ConstraintViolationException $cve) {
-                $session->getFlashBag()->add('danger', "<strong>Echec de l'enregistrement. </strong><br>L'enregistrement a échoué dû à une contrainte de données!");
-                return $this->json(json_encode(["item" => null]));
-            } catch (AccessDeniedException $ads) {
-                $session->getFlashBag()->add('danger', "<strong>Action interdite.</strong><br>Vous n'êtes pas autorisez à effectuer cette opération!");
-                return $this->json(json_encode(["item" => null]));
+        try {
+            $this->editAndDeleteSecurity($conseiller_boutique, $conseiller_boutique->getConseiller());
+            $form = $this->createForm('APM\MarketingDistribueBundle\Form\Conseiller_boutiqueType', $conseiller_boutique);
+            $form->submit($request->request->all(), false);
+            if (!$form->isValid()) {
+                return new JsonResponse(
+                    [
+                        "status" => 400,
+                        "message" => $this->get('translator')->trans($form->getErrors(true, false), [], 'FOSUserBundle')
+                    ], Response::HTTP_BAD_REQUEST
+                );
             }
+            $em = $this->getDoctrine()->getManager();
+            $em->flush();
+
+            return $this->routeRedirectView("api_marketing_show_conseillerboutique", ['id' => $conseiller_boutique->getId()], Response::HTTP_OK);
+
+        } catch (ConstraintViolationException $cve) {
+            return new JsonResponse(
+                [
+                    "status" => 400,
+                    "message" => $this->get('translator')->trans("impossible d'enregistrer, vérifiez vos données", [], 'FOSUserBundle')
+                ], Response::HTTP_BAD_REQUEST
+            );
+        } catch (AccessDeniedException $ads) {
+            return new JsonResponse(
+                [
+                    "status" => 403,
+                    "message" => $this->get('translator')->trans("Access denied", [], 'FOSUserBundle'),
+                ]
+                , Response::HTTP_FORBIDDEN
+            );
         }
-        return $this->render('APMMarketingDistribueBundle:conseiller_boutique:edit.html.twig', array(
-            'conseiller_boutique' => $conseiller_boutique,
-            'edit_form' => $editForm->createView(),
-            'delete_form' => $deleteForm->createView(),
-        ));
     }
 
     /**
@@ -334,47 +338,41 @@ class Conseiller_boutiqueController extends Controller
     }
 
     /**
-     * Creates a form to delete a conseiller_boutique entity.
-     *
-     * @param Conseiller_boutique $conseiller_boutique The conseiller_boutique entity
-     *
-     * @return \Symfony\Component\Form\Form The form
-     */
-    private function createDeleteForm(Conseiller_boutique $conseiller_boutique)
-    {
-        return $this->createFormBuilder()
-            ->setAction($this->generateUrl('apm_marketing_conseiller_boutique_delete', array('id' => $conseiller_boutique->getId())))
-            ->setMethod('DELETE')
-            ->getForm();
-    }
-
-    /**
-     * Deletes a conseiller_boutique entity.
      * @param Request $request
      * @param Conseiller_boutique $conseiller_boutique
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse | JsonResponse
+     * @return View | JsonResponse
      *
      * @Delete("/delete/conseiller-boutique/{id}")
      */
     public function deleteAction(Request $request, Conseiller_boutique $conseiller_boutique)
     {
-        $this->editAndDeleteSecurity($conseiller_boutique, $conseiller_boutique->getConseiller());
-        $em = $this->getDoctrine()->getManager();
-        if ($request->isXmlHttpRequest()) {
-            $em->remove($conseiller_boutique);
-            $em->flush();
-            $json = array();
-            $json['item'] = array();
-            return $this->json(json_encode($json), 200);
-        }
-        $form = $this->createDeleteForm($conseiller_boutique);
-        $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
+        try {
             $this->editAndDeleteSecurity($conseiller_boutique, $conseiller_boutique->getConseiller());
+            if (!$request->request->has('exec') || $request->request->get('exec') !== 'go') {
+                return new JsonResponse([
+                    "status" => 400,
+                    "message" => $this->get('translator')->trans('impossible de supprimer', [], 'FOSUserBundle')
+                ], Response::HTTP_BAD_REQUEST);
+            }
+            $em = $this->getDoctrine()->getManager();
             $em->remove($conseiller_boutique);
             $em->flush();
+            return $this->routeRedirectView("api_marketing_get_conseillerboutiques", [], Response::HTTP_OK);
+        } catch (ConstraintViolationException $cve) {
+            return new JsonResponse(
+                [
+                    "status" => 400,
+                    "message" => $this->get('translator')->trans("impossible de supprimer, vérifiez vos données", [], 'FOSUserBundle')
+                ], Response::HTTP_FAILED_DEPENDENCY
+            );
+        } catch (AccessDeniedException $ads) {
+            return new JsonResponse(
+                [
+                    "status" => 403,
+                    "message" => $this->get('translator')->trans("Access denied", [], 'FOSUserBundle'),
+                ]
+                , Response::HTTP_FORBIDDEN
+            );
         }
-
-        return $this->redirectToRoute('apm_marketing_conseiller_boutique_index');
     }
 }

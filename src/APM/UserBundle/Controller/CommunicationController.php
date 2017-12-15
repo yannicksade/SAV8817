@@ -6,10 +6,12 @@ use APM\UserBundle\Entity\Communication;
 use APM\UserBundle\Entity\Utilisateur_avm;
 use APM\UserBundle\Factory\TradeFactory;
 use Doctrine\Common\Collections\Collection;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Doctrine\DBAL\Exception\ConstraintViolationException;
+use FOS\RestBundle\Controller\FOSRestController;
+use FOS\RestBundle\View\View;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\HttpFoundation\Response;
 use FOS\RestBundle\Controller\Annotations\RouteResource;
 use FOS\RestBundle\Controller\Annotations\Get;
 use FOS\RestBundle\Controller\Annotations\Post;
@@ -17,12 +19,13 @@ use FOS\RestBundle\Controller\Annotations\Patch;
 use FOS\RestBundle\Controller\Annotations\Delete;
 use FOS\RestBundle\Controller\Annotations\Put;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 /**
  * Communication controller.
  * @RouteResource("communication", pluralize=false)
  */
-class CommunicationController extends Controller
+class CommunicationController extends FOSRestController
 {
     private $code_filter;
     private $contenu_filter;
@@ -41,59 +44,67 @@ class CommunicationController extends Controller
     /**
      * Lister les communication reçues et envoyées par un utilisateur
      * @param Request $request
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
+     * @return JsonResponse
      *
      * @Get("/cget/communications", name="s")
      */
     public function getAction(Request $request)
     {
-        $this->listAndShowSecurity();
-        /** @var Utilisateur_avm $user */
-        $user = $this->getUser();
-        $q = $request->get('q');
-        $this->dateDeVigueurFrom_filter = $request->query->has('dateDeVigueurFrom_filter') ? $request->query->get('dateDeVigueurFrom_filter') : "";
-        $this->dateDeVigueurTo_filter = $request->query->has('dateDeVigueurTo_filter') ? $request->query->get('dateDeVigueurTo_filter') : "";
-        $this->code_filter = $request->query->has('code_filter') ? $request->query->get('code_filter') : "";
-        $this->contenu_filter = $request->query->has('contenu_filter') ? $request->query->get('contenu_filter') : "";
-        $this->etat_filter = $request->query->has('etat_filter') ? $request->query->get('etat_filter') : "";
-        $this->reference_filter = $request->query->has('reference_filter') ? $request->query->get('reference_filter') : "";
-        $this->dateFinFrom_filter = $request->query->has('dateFinFrom_filter') ? $request->query->get('dateFinFrom_filter') : "";
-        $this->dateFinTo_filter = $request->query->has('dateFinTo_filter') ? $request->query->get('dateFinTo_filter') : "";
-        $this->date_filter = $request->query->has('date_filter') ? $request->query->get('date_filter') : "";
-        $this->type_filter = $request->query->has('type_filter') ? $request->query->get('type_filter') : "";
-        $this->valide_filter = $request->query->has('valide_filter') ? $request->query->get('valide_filter') : "";
-        $this->emetteur_filter = $request->query->has('emetteur_filter') ? $request->query->get('emetteur_filter') : "";
-        $this->recepteur_filter = $request->query->has('recepteur_filter') ? $request->query->get('recepteur_filter') : "";
-        $iDisplayLength = $request->query->has('length') ? $request->query->get('length') : -1;
-        $iDisplayStart = $request->query->has('start') ? intval($request->query->get('start')) : 0;
+        try {
+            $this->listAndShowSecurity();
+            /** @var Utilisateur_avm $user */
+            $user = $this->getUser();
+            $this->dateDeVigueurFrom_filter = $request->query->has('dateDeVigueurFrom_filter') ? $request->query->get('dateDeVigueurFrom_filter') : "";
+            $this->dateDeVigueurTo_filter = $request->query->has('dateDeVigueurTo_filter') ? $request->query->get('dateDeVigueurTo_filter') : "";
+            $this->code_filter = $request->query->has('code_filter') ? $request->query->get('code_filter') : "";
+            $this->contenu_filter = $request->query->has('contenu_filter') ? $request->query->get('contenu_filter') : "";
+            $this->etat_filter = $request->query->has('etat_filter') ? $request->query->get('etat_filter') : "";
+            $this->reference_filter = $request->query->has('reference_filter') ? $request->query->get('reference_filter') : "";
+            $this->dateFinFrom_filter = $request->query->has('dateFinFrom_filter') ? $request->query->get('dateFinFrom_filter') : "";
+            $this->dateFinTo_filter = $request->query->has('dateFinTo_filter') ? $request->query->get('dateFinTo_filter') : "";
+            $this->date_filter = $request->query->has('date_filter') ? $request->query->get('date_filter') : "";
+            $this->type_filter = $request->query->has('type_filter') ? $request->query->get('type_filter') : "";
+            $this->valide_filter = $request->query->has('valide_filter') ? $request->query->get('valide_filter') : "";
+            $this->emetteur_filter = $request->query->has('emetteur_filter') ? $request->query->get('emetteur_filter') : "";
+            $this->recepteur_filter = $request->query->has('recepteur_filter') ? $request->query->get('recepteur_filter') : "";
+            $iDisplayLength = $request->query->has('length') ? $request->query->get('length') : -1;
+            $iDisplayStart = $request->query->has('start') ? intval($request->query->get('start')) : 0;
+            $json = array();
+            $json['items'] = array();
+            $q = $request->query->has('q') ? $request->query->get('q') : "all";
+            if ($q === "sender" || $q == "all") {
+                $communicationsSent = $user->getEmetteurCommunications();
+                $iTotalRecords = count($communicationsSent);
+                if ($iDisplayLength < 0) $iDisplayLength = $iTotalRecords;
+                $communicationsSent = $this->handleResults($communicationsSent, $iTotalRecords, $iDisplayStart, $iDisplayLength);
+                $iFilteredRecords = count($communicationsSent);
+                $data = $this->get('apm_core.data_serialized')->getFormalData($communicationsSent, array("owner_list"));
+                $json['totalRecordsSent'] = $iTotalRecords;
+                $json['filteredRecordsSent'] = $iFilteredRecords;
+                $json['items']['sender'] = $data;
+            }
 
-        $json = array();
-        $json['items'] = array();
-        if ($q === "sent" || $q === "all") {
-            $communicationsSent = $user->getEmetteurCommunications();
-            $iTotalRecords = count($communicationsSent);
-            if ($iDisplayLength < 0) $iDisplayLength = $iTotalRecords;
-            $communicationsSent = $this->handleResults($communicationsSent, $iTotalRecords, $iDisplayStart, $iDisplayLength);
-            $iFilteredRecords = count($communicationsSent);
-            $data = $this->get('apm_core.data_serialized')->getFormalData($communicationsSent, array("owner_list"));
-            $json['totalRecordsSent'] = $iTotalRecords;
-            $json['filteredRecordsSent'] = $iFilteredRecords;
-            $json['items'] = $data;
+            if ($q === "receiver" || $q === "all") {
+                $communicationsReceived = $user->getRecepteurCommunications();
+                $iTotalRecords = count($communicationsReceived);
+                if ($iDisplayLength < 0) $iDisplayLength = $iTotalRecords;
+                $communicationsReceived = $this->handleResults($communicationsReceived, $iTotalRecords, $iDisplayStart, $iDisplayLength);
+                $iFilteredRecords = count($communicationsReceived);
+                $data = $this->get('apm_core.data_serialized')->getFormalData($communicationsReceived, array("owner_list"));
+                $json['totalRecordsReceived'] = $iTotalRecords;
+                $json['filteredRecordsReceived'] = $iFilteredRecords;
+                $json['items']['receiver'] = $data;
+            }
+            return new JsonResponse($json, 200);
+
+        } catch (AccessDeniedException $ads) {
+            return new JsonResponse([
+                    "status" => 403,
+                    "message" => $this->get('translator')->trans("Access denied", [], 'FOSUserBundle'),
+                ]
+                , Response::HTTP_FORBIDDEN
+            );
         }
-
-        if ($q === "received" || $q === "all") {
-            $communicationsReceived = $user->getRecepteurCommunications();
-            $iTotalRecords = count($communicationsReceived);
-            if ($iDisplayLength < 0) $iDisplayLength = $iTotalRecords;
-            $communicationsReceived = $this->handleResults($communicationsReceived, $iTotalRecords, $iDisplayStart, $iDisplayLength);
-            $iFilteredRecords = count($communicationsReceived);
-            $data = $this->get('apm_core.data_serialized')->getFormalData($communicationsReceived, array("owner_list"));
-            $json['totalRecordsReceived'] = $iTotalRecords;
-            $json['filteredRecordsReceived'] = $iFilteredRecords;
-            $json['items'] = $data;
-        }
-
-        return new JsonResponse($json, 200);
     }
 
     private function listAndShowSecurity()
@@ -212,53 +223,43 @@ class CommunicationController extends Controller
     }
 
     /**
-     * L'Emetteur Crée et soumet un model de communication
      * @param Request $request
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response | JsonResponse
+     * @return View | JsonResponse
      *
      * @Post("/new/communication")
      */
     public function newAction(Request $request)
     {
-        $this->createSecurity();
-        /** @var Session $session */
-        $session = $request->getSession();
-        /** @var Communication $communication */
-        $communication = TradeFactory::getTradeProvider("communication");
-        $form = $this->createForm('APM\UserBundle\Form\CommunicationType', $communication);
-        $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
-            try {
-                $this->createSecurity();
-                $communication->setEmetteur($this->getUser());
-                $em = $this->getDoctrine()->getManager();
-                $em->persist($communication);
-                $em->flush();
-                if ($request->isXmlHttpRequest()) {
-                    $json = array();
-                    $json["item"] = array(//prevenir le client
-                        "action" => 0,
-                    );
-                    $session->getFlashBag()->add('success', "<strong> rabais d'offre créée. réf:" . $communication->getCode() . "</strong><br> Opération effectuée avec succès!");
-                    return $this->json(json_encode($json), 200);
-                }
-                return $this->redirectToRoute('apm_user_communication_show', array('id' => $communication->getId()));
-            } catch (ConstraintViolationException $cve) {
-                $session->getFlashBag()->add('danger', "<strong>Echec de l'enregistrement. </strong><br>L'enregistrement a échoué dû à une contrainte de données!");
-                return $this->json(json_encode(["item" => null]));
-            } catch (RuntimeException $rte) {
-                $session->getFlashBag()->add('danger', "<strong>Echec de l'opération.</strong><br>L'enregistrement a échoué. bien vouloir réessayer plutard, svp!");
-                return $this->json(json_encode(["item" => null]));
-            } catch (AccessDeniedException $ads) {
-                $session->getFlashBag()->add('danger', "<strong>Action interdite.</strong><br>Vous n'êtes pas autorisez à effectuer cette opération!");
-                return $this->json(json_encode(["item" => null]));
+        try {
+            $this->createSecurity();
+            /** @var Communication $communication */
+            $communication = TradeFactory::getTradeProvider("communication");
+            $form = $this->createForm('APM\UserBundle\Form\CommunicationType', $communication);
+            $form->submit($request->request->all());
+            if (!$form->isValid()) {
+                return new JsonResponse([
+                    "status" => 400,
+                    "message" => $this->get('translator')->trans($form->getErrors(true, false), [], 'FOSUserBundle')
+                ], Response::HTTP_BAD_REQUEST);
             }
+            $communication->setEmetteur($this->getUser());
+            $em = $this->getDoctrine()->getManager();
+            $em->persist($communication);
+            $em->flush();
+            return $this->routeRedirectView("api_user_show_communication", ['id' => $communication->getId()], Response::HTTP_CREATED);
+        } catch (ConstraintViolationException $cve) {
+            return new JsonResponse([
+                "status" => 400,
+                "message" => $this->get('translator')->trans("impossible d'enregistrer, vérifiez vos données", [], 'FOSUserBundle')
+            ], Response::HTTP_BAD_REQUEST);
+        } catch (AccessDeniedException $ads) {
+            return new JsonResponse([
+                    "status" => 403,
+                    "message" => $this->get('translator')->trans("Access denied", [], 'FOSUserBundle'),
+                ]
+                , Response::HTTP_FORBIDDEN
+            );
         }
-        $session->set('previous_location', $request->getUri());
-        return $this->render('APMUserBundle:communication:new.html.twig', array(
-            'communication' => $communication,
-            'form' => $form->createView(),
-        ));
     }
 
     private function createSecurity()
@@ -275,7 +276,6 @@ class CommunicationController extends Controller
     }
 
     /**
-     * Finds and displays a Communication entity.
      * @param Communication $communication
      * @return JsonResponse
      *
@@ -289,65 +289,40 @@ class CommunicationController extends Controller
     }
 
     /**
-     * Displays a form to edit an existing Communication entity.
      * @param Request $request
      * @param Communication $communication
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @return View | JsonResponse
      *
      * @Put("/edit/communication/{id}")
      */
     public function editAction(Request $request, Communication $communication)
     {
-        $this->editAndDeleteSecurity($communication);
-        if ($request->isXmlHttpRequest() && $request->getMethod() === "POST") {
-            $json = array();
-            $json['item'] = array();
-            /** @var Session $session */
-            $session = $request->getSession();
-            $em = $this->getDoctrine()->getManager();
-            $property = $request->query->get('name');
-            $value = $request->query->get('value');
-            switch ($property) {
-                case 'dateDeVigueur':
-                    $communication->setDatedevigueur($value);
-                    break;
-                case 'dateFin' :
-                    $communication->setDateFin($value);
-                    break;
-                case 'reference' :
-                    $communication->setReference($value);
-                    break;
-                case 'etat' :
-                    $communication->setEtat($value);
-                    break;
-                case 'type' :
-                    $communication->setType($value);
-                    break;
-                default:
-                    $session->getFlashBag()->add('info', "<strong> Aucune mis à jour effectuée</strong>");
-                    return $this->json(json_encode(["item" => null]), 205);
-            }
-            $em->flush();
-            $session->getFlashBag()->add('success', "Mis à jour propriété : <strong>" . $property . "</strong> réf. communication :" . $communication->getCode() . "<br> Opération effectuée avec succès!");
-            return $this->json(json_encode($json), 200);
-        }
-        $deleteForm = $this->createDeleteForm($communication);
-        $editForm = $this->createForm('APM\UserBundle\Form\CommunicationType', $communication);
-        $editForm->handleRequest($request);
-        if ($editForm->isSubmitted() && $editForm->isValid()) {
+        try {
             $this->editAndDeleteSecurity($communication);
+            $form = $this->createForm('APM\UserBundle\Form\CommunicationType', $communication);
+            $form->submit($request->request->all(), false);
+            if (!$form->isValid()) {
+                return new JsonResponse([
+                    "status" => 400,
+                    "message" => $this->get('translator')->trans($form->getErrors(true, false), [], 'FOSUserBundle')
+                ], Response::HTTP_BAD_REQUEST);
+            }
             $em = $this->getDoctrine()->getManager();
-            $em->persist($communication);
             $em->flush();
-
-            return $this->redirectToRoute('apm_user_communication_show', array('id' => $communication->getId()));
+            return $this->routeRedirectView("api_user_show_communication", ['id' => $communication->getId()], Response::HTTP_OK);
+        } catch (ConstraintViolationException $cve) {
+            return new JsonResponse([
+                "status" => 400,
+                "message" => $this->get('translator')->trans("impossible d'enregistrer, vérifiez vos données", [], 'FOSUserBundle')
+            ], Response::HTTP_BAD_REQUEST);
+        } catch (AccessDeniedException $ads) {
+            return new JsonResponse([
+                    "status" => 403,
+                    "message" => $this->get('translator')->trans("Access denied", [], 'FOSUserBundle'),
+                ]
+                , Response::HTTP_FORBIDDEN
+            );
         }
-
-        return $this->render('APMUserBundle:communication:edit.html.twig', array(
-            'communication' => $communication,
-            'edit_form' => $editForm->createView(),
-            'delete_form' => $deleteForm->createView(),
-        ));
     }
 
     /**
@@ -358,10 +333,6 @@ class CommunicationController extends Controller
         //---------------------------------security-----------------------------------------------
         // Unable to access the controller unless you have a USERAVM role
         $this->denyAccessUnlessGranted('ROLE_USERAVM', null, 'Unable to access this page!');
-
-        /* ensure that the user is logged in
-        *  and that the one is the owner
-        */
         $user = $this->getUser();
         if ((!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY')) || ($communication->getEmetteur() !== $user)) {
             throw $this->createAccessDeniedException();
@@ -371,47 +342,43 @@ class CommunicationController extends Controller
     }
 
     /**
-     * Creates a form to delete a Communication entity.
-     *
-     * @param Communication $communication The Communication entity
-     *
-     * @return \Symfony\Component\Form\Form The form
-     */
-    private function createDeleteForm(Communication $communication)
-    {
-        return $this->createFormBuilder()
-            ->setAction($this->generateUrl('apm_user_communication_delete', array('id' => $communication->getId())))
-            ->setMethod('DELETE')
-            ->getForm();
-    }
-
-    /**
      * Deletes a Communication entity.
      * @param Request $request
      * @param Communication $communication
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse | JsonResponse
+     * @return View | JsonResponse
      *
      * @Delete("/delete/communication/{id}")
      */
     public function deleteAction(Request $request, Communication $communication)
     {
-        $this->editAndDeleteSecurity($communication);
-        $em = $this->getDoctrine()->getManager();
-        if ($request->isXmlHttpRequest() && $request->getMethod() === "POST") {
-            $em->remove($communication);
-            $em->flush();
-            $json = array();
-            return $this->json($json, 200);
-        }
-        $form = $this->createDeleteForm($communication);
-        $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
+        try {
             $this->editAndDeleteSecurity($communication);
+            if (!$request->request->has('exec') || $request->request->get('exec') !== 'go') {
+                return new JsonResponse([
+                    "status" => 400,
+                    "message" => $this->get('translator')->trans('impossible de supprimer', [], 'FOSUserBundle')
+                ], Response::HTTP_BAD_REQUEST);
+            }
+            $em = $this->getDoctrine()->getManager();
             $em->remove($communication);
             $em->flush();
+            return $this->routeRedirectView("api_user_get_communications", [], Response::HTTP_OK);
+        } catch (ConstraintViolationException $cve) {
+            return new JsonResponse(
+                [
+                    "status" => 400,
+                    "message" => $this->get('translator')->trans("impossible de supprimer, vérifiez vos données", [], 'FOSUserBundle')
+                ], Response::HTTP_FAILED_DEPENDENCY
+            );
+        } catch (AccessDeniedException $ads) {
+            return new JsonResponse(
+                [
+                    "status" => 403,
+                    "message" => $this->get('translator')->trans("Access denied", [], 'FOSUserBundle'),
+                ]
+                , Response::HTTP_FORBIDDEN
+            );
         }
-
-        return $this->redirectToRoute('apm_user_communication_index');
     }
 
 }

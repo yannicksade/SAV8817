@@ -7,10 +7,12 @@ use APM\AchatBundle\Factory\TradeFactory;
 use APM\UserBundle\Entity\Utilisateur_avm;
 use APM\VenteBundle\Entity\Offre;
 use Doctrine\Common\Collections\Collection;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Doctrine\DBAL\Exception\ConstraintViolationException;
+use FOS\RestBundle\Controller\FOSRestController;
+use FOS\RestBundle\View\View;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\HttpFoundation\Response;
 use FOS\RestBundle\Controller\Annotations\RouteResource;
 use FOS\RestBundle\Controller\Annotations\Get;
 use FOS\RestBundle\Controller\Annotations\Post;
@@ -18,12 +20,13 @@ use FOS\RestBundle\Controller\Annotations\Delete;
 use FOS\RestBundle\Controller\Annotations\Put;
 use FOS\RestBundle\Controller\Annotations\Patch;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 /**
  * Specification_achat controller.
  * @RouteResource("specification", pluralize=false)
  */
-class Specification_achatController extends Controller
+class Specification_achatController extends FOSRestController
 {
     private $demandeRabais_filter;
     private $livraison_filter;
@@ -41,46 +44,55 @@ class Specification_achatController extends Controller
      * Liste les Specification faites par le client sur les offres
      * Liste les spécifications sur une offre
      * @param Offre $offre
-     * @return \Symfony\Component\HttpFoundation\Response| JsonResponse
+     * @return  JsonResponse
      *
      * @Get("/cget/specifications", name="s")
      * @Get("/cget/specifications/offre/{id}", name="s_offre")
      */
     public function getAction(Offre $offre = null)
     {
-        $this->listAndShowSecurity($offre);
-        if (null !== $offre) {
-            $specification_achats = $offre->getSpecifications();
-        } else {
-            /** @var Utilisateur_avm $user */
-            $user = $this->getUser();
-            $specification_achats = $user->getSpecifications();
+        try {
+            $this->listAndShowSecurity($offre);
+            if (null !== $offre) {
+                $specification_achats = $offre->getSpecifications();
+            } else {
+                /** @var Utilisateur_avm $user */
+                $user = $this->getUser();
+                $specification_achats = $user->getSpecifications();
+            }
+
+            $this->demandeRabais_filter = $request->query->has('demandeRabais_filter') ? $request->query->get('demandeRabais_filter') : "";
+            $this->code_filter = $request->query->has('code_filter') ? $request->query->get('code_filter') : "";
+            $this->livraison_filter = $request->query->has('livraison_filter') ? $request->query->get('livraison_filter') : "";
+            $this->dateLivraisonFrom_filter = $request->query->has('dateLivraisonFrom_filter') ? $request->query->get('dateLivraisonFrom_filter') : "";
+            $this->dateLivraisonTo_filter = $request->query->has('dateLivraisonTo_filter') ? $request->query->get('dateLivraisonTo_filter') : "";
+            $this->dateFrom_filter = $request->query->has('dateFrom_filter') ? $request->query->get('dateFrom_filter') : "";
+            $this->dateTo_filter = $request->query->has('dateTo_filter') ? $request->query->get('dateTo_filter') : "";
+            $this->avis_filter = $request->query->has('avis_filter') ? $request->query->get('avis_filter') : "";
+            $this->echantillon_filter = $request->query->has('echantillon_filter') ? $request->query->get('echantillon_filter') : "";
+            $this->offre_filter = $request->query->has('offre_filter') ? $request->query->get('offre_filter') : "";
+            $this->utilisateur_filter = $request->query->has('utilisateur_filter') ? $request->query->get('utilisateur_filter') : "";
+
+            $iDisplayLength = $request->query->has('length') ? $request->query->get('length') : -1;
+            $iDisplayStart = $request->query->has('start') ? intval($request->query->get('start')) : 0;
+            $json = array();
+            $iTotalRecords = count($specification_achats);
+            if ($iDisplayLength < 0) $iDisplayLength = $iTotalRecords;
+            $specification_achats = $this->handleResults($specification_achats, $iTotalRecords, $iDisplayStart, $iDisplayLength);
+            $iFilteredRecords = count($specification_achats);
+            $data = $this->get('apm_core.data_serialized')->getFormalData($specification_achats, array("owner_list"));
+            $json['totalRecords'] = $iTotalRecords;
+            $json['filteredRecords'] = $iFilteredRecords;
+            $json['items'] = $data;
+            return new JsonResponse($json, 200);
+        } catch (AccessDeniedException $ads) {
+            return new JsonResponse([
+                    "status" => 403,
+                    "message" => $this->get('translator')->trans("Access denied", [], 'FOSUserBundle'),
+                ]
+                , Response::HTTP_FORBIDDEN
+            );
         }
-
-        $this->demandeRabais_filter = $request->query->has('demandeRabais_filter') ? $request->query->get('demandeRabais_filter') : "";
-        $this->code_filter = $request->query->has('code_filter') ? $request->query->get('code_filter') : "";
-        $this->livraison_filter = $request->query->has('livraison_filter') ? $request->query->get('livraison_filter') : "";
-        $this->dateLivraisonFrom_filter = $request->query->has('dateLivraisonFrom_filter') ? $request->query->get('dateLivraisonFrom_filter') : "";
-        $this->dateLivraisonTo_filter = $request->query->has('dateLivraisonTo_filter') ? $request->query->get('dateLivraisonTo_filter') : "";
-        $this->dateFrom_filter = $request->query->has('dateFrom_filter') ? $request->query->get('dateFrom_filter') : "";
-        $this->dateTo_filter = $request->query->has('dateTo_filter') ? $request->query->get('dateTo_filter') : "";
-        $this->avis_filter = $request->query->has('avis_filter') ? $request->query->get('avis_filter') : "";
-        $this->echantillon_filter = $request->query->has('echantillon_filter') ? $request->query->get('echantillon_filter') : "";
-        $this->offre_filter = $request->query->has('offre_filter') ? $request->query->get('offre_filter') : "";
-        $this->utilisateur_filter = $request->query->has('utilisateur_filter') ? $request->query->get('utilisateur_filter') : "";
-
-        $iDisplayLength = $request->query->has('length') ? $request->query->get('length') : -1;
-        $iDisplayStart = $request->query->has('start') ? intval($request->query->get('start')) : 0;
-        $json = array();
-        $iTotalRecords = count($specification_achats);
-        if ($iDisplayLength < 0) $iDisplayLength = $iTotalRecords;
-        $specification_achats = $this->handleResults($specification_achats, $iTotalRecords, $iDisplayStart, $iDisplayLength);
-        $iFilteredRecords = count($specification_achats);
-        $data = $this->get('apm_core.data_serialized')->getFormalData($specification_achats, array("owner_list"));
-        $json['totalRecords'] = $iTotalRecords;
-        $json['filteredRecords'] = $iFilteredRecords;
-        $json['items'] = $data;
-        return new JsonResponse($json, 200);
     }
 
     /**
@@ -225,37 +237,44 @@ class Specification_achatController extends Controller
     }
 
     /**
-     * @param Request $request
      * @param Offre $offre
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response| JsonResponse
+     * @return View | JsonResponse
      *
      * @Post("/new/specification/offre/{id}")
      */
-    public function newAction(Request $request, Offre $offre)
+    public function newAction(Offre $offre)
     {
-        $this->createSecurity();
-        /** @var Specification_achat $specification_achat */
-        $specification_achat = TradeFactory::getTradeProvider("specification_achat");
-        $form = $this->createForm('APM\AchatBundle\Form\Specification_achatType', $specification_achat);
-        $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
+        try {
+            $this->createSecurity();
+            /** @var Specification_achat $specification_achat */
+            $specification_achat = TradeFactory::getTradeProvider("specification_achat");
+            $form = $this->createForm('APM\AchatBundle\Form\Specification_achatType', $specification_achat);
+            if (!$form->isValid()) {
+                return new JsonResponse([
+                    "status" => 400,
+                    "message" => $this->get('translator')->trans($form->getErrors(true, false), [], 'FOSUserBundle')
+                ], Response::HTTP_BAD_REQUEST);
+            }
             $specification_achat->setUtilisateur($this->getUser());
             $specification_achat->setOffre($offre);
             $em = $this->getDoctrine()->getManager();
             $em->persist($specification_achat);
             $em->flush();
-            if ($request->isXmlHttpRequest()) {
-                $json = array();
-                $json['item'] = array();
-                return $this->json(json_encode($json), 200);
-            }
-            return $this->redirectToRoute('apm_achat_specification_achat_show', array('id' => $specification_achat->getId()));
-        }
+            return $this->routeRedirectView("api_achat_show_specification", ['id' => $specification_achat->getId()], Response::HTTP_CREATED);
 
-        return $this->render('APMAchatBundle:specification_achat:new.html.twig', array(
-            'specification_achat' => $specification_achat,
-            'form' => $form->createView(),
-        ));
+        } catch (ConstraintViolationException $cve) {
+            return new JsonResponse([
+                "status" => 400,
+                "message" => $this->get('translator')->trans("impossible d'enregistrer, vérifiez vos données", [], 'FOSUserBundle')
+            ], Response::HTTP_BAD_REQUEST);
+        } catch (AccessDeniedException $ads) {
+            return new JsonResponse([
+                    "status" => 403,
+                    "message" => $this->get('translator')->trans("Access denied", [], 'FOSUserBundle'),
+                ]
+                , Response::HTTP_FORBIDDEN
+            );
+        }
     }
 
     private function createSecurity()
@@ -288,61 +307,46 @@ class Specification_achatController extends Controller
     }
 
     /**
-     * Displays a form to edit an existing Specification_achat entity.
      * @param Request $request
      * @param Specification_achat $specification_achat
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @return JsonResponse | View
      *
      * @Put("/edit/specification/{id}")
      */
     public function editAction(Request $request, Specification_achat $specification_achat)
     {
-        $this->editAndDeleteSecurity($specification_achat);
-        $deleteForm = $this->createDeleteForm($specification_achat);
-        $editForm = $this->createForm('APM\AchatBundle\Form\Specification_achatType', $specification_achat);
-        $editForm->handleRequest($request);
-        if ($editForm->isSubmitted() && $editForm->isValid()
-            || $request->isXmlHttpRequest() && $request->isMethod('POST')
-        ) {
-            $em = $this->getDoctrine()->getManager();
-            if ($request->isXmlHttpRequest()) {
-                $json = array();
-                $json['item'] = array();
-                $property = $request->query->get('name');
-                $value = $request->query->get('value');
-                switch ($property) {
-                    case 'demandeRabais':
-                        $specification_achat->setDemandeRabais($value);
-                        break;
-                    case 'livraison':
-                        $specification_achat->setLivraison($value);
-                        break;
-                    case 'avis':
-                        $specification_achat->setAvis($value);
-                        break;
-                    case 'dateLivraison' :
-                        $specification_achat->setDateLivraisonSouhaite($value);
-                        break;
-                    case 'echantillon' :
-                        $specification_achat->setEchantillon($value);
-                        break;
-                    default:
-                        $session->getFlashBag()->add('info', "<strong> Aucune mis à jour effectuée</strong>");
-                        return $this->json(json_encode(["item" => null]), 205);
-                }
-                $em->flush();
-                $session->getFlashBag()->add('success', "Mise à jour propriété : <strong>" . $property . "</strong> réf. Spécification achat :" . $specification_achat->getCode() . "<br> Opération effectuée avec succès!");
-                return $this->json(json_encode($json), 200);
+        try {
+            $this->editAndDeleteSecurity($specification_achat);
+            $form = $this->createForm('APM\AchatBundle\Form\Specification_achatType', $specification_achat);
+            $form->submit($request->request->all(), false);
+            if (!$form->isValid()) {
+                return new JsonResponse(
+                    [
+                        "status" => 400,
+                        "message" => $this->get('translator')->trans($form->getErrors(true, false), [], 'FOSUserBundle')
+                    ], Response::HTTP_BAD_REQUEST
+                );
             }
+            $em = $this->getDoctrine()->getManager();
             $em->flush();
-            $session->getFlashBag()->add('success', "Mise à jour propriété : <strong>" . $property . "</strong> réf. Spécification achat :" . $specification_achat->getCode() . "<br> Opération effectuée avec succès!");
-            return $this->redirectToRoute('apm_achat_specification_achat_show', array('id' => $specification_achat->getId()));
+            return $this->routeRedirectView("api_achat_show_specification ", ["id" => $specification_achat->getId()], Response::HTTP_OK);
+        } catch (ConstraintViolationException $cve) {
+            return new JsonResponse(
+                [
+                    "status" => 400,
+                    "message" => $this->get('translator')->trans("impossible d'enregistrer, vérifiez vos données", [], 'FOSUserBundle')
+                ], Response::HTTP_BAD_REQUEST
+            );
+        } catch (AccessDeniedException $ads) {
+            return new JsonResponse(
+                [
+                    "status" => 403,
+                    "message" => $this->get('translator')->trans("Access denied", [], 'FOSUserBundle'),
+                ]
+                , Response::HTTP_FORBIDDEN
+            );
         }
-        return $this->render('APMAchatBundle:specification_achat:edit.html.twig', array(
-            'specification_achat' => $specification_achat,
-            'edit_form' => $editForm->createView(),
-            'delete_form' => $deleteForm->createView(),
-        ));
+
     }
 
     /**
@@ -364,56 +368,43 @@ class Specification_achatController extends Controller
     }
 
     /**
-     * Creates a form to delete a Specification_achat entity.
-     *
-     * @param Specification_achat $specification_achat The Specification_achat entity
-     *
-     * @return \Symfony\Component\Form\Form The form
-     */
-    private function createDeleteForm(Specification_achat $specification_achat)
-    {
-        return $this->createFormBuilder()
-            ->setAction($this->generateUrl('apm_achat_specification_achat_delete', array('id' => $specification_achat->getId())))
-            ->setMethod('DELETE')
-            ->getForm();
-    }
-
-    /**
      * Deletes a Specification_achat entity.
      * @param Request $request
      * @param Specification_achat $specification_achat
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse | JsonResponse
+     * @return View | JsonResponse
      * @Delete("/delete/specification/{id}")
      */
     public function deleteAction(Request $request, Specification_achat $specification_achat)
     {
-        $this->editAndDeleteSecurity($specification_achat);
-        /** @var Session $session */
-        $session = $request->getSession();
-        $em = $this->getDoctrine()->getManager();
         try {
-            if ($request->isXmlHttpRequest()) {
-                $em->remove($specification_achat);
-                $em->flush();
-                $json = array();
-                $json['item'];
-                $session->getFlashBag()->add('success', "Suppression de la spécification : " . "<strong>" . $specification_achat->getCode() . "</strong><br>Opération effectuée avec succès!");
-                return $this->json(json_encode($json), 200);
+            $this->editAndDeleteSecurity($specification_achat);
+            if (!$request->request->has('exec') || $request->request->get('exec') !== 'go') {
+                return new JsonResponse([
+                    "status" => 400,
+                    "message" => $this->get('translator')->trans('impossible de supprimer', [], 'FOSUserBundle')
+                ], Response::HTTP_BAD_REQUEST);
             }
-            $form = $this->createDeleteForm($specification_achat);
-            $form->handleRequest($request);
-            if ($form->isSubmitted() && $form->isValid()) {
-                $em->remove($specification_achat);
-                $em->flush();
-            }
-            $session->getFlashBag()->add('success', "Suppression de la spécification: " . "<strong>" . $specification_achat->getCode() . "</strong><br>Opération effectuée avec succès!");
-            return $this->redirectToRoute('apm_achat_specification_achat_index');
+            $em = $this->getDoctrine()->getManager();
+            $em->remove($specification_achat);
+            $em->flush();
+
+            return $this->routeRedirectView("api_achat_get_specifications", [], Response::HTTP_OK);
+
         } catch (ConstraintViolationException $cve) {
-            $session->getFlashBag()->add('danger', "Echec de la suppression de: " . "<strong>" . $specification_achat->getCode() . "</strong><br>L'opération de suppression du groupe d'offre a échoué!");
-            return $this->redirectToRoute('apm_achat_groupe_index');
+            return new JsonResponse(
+                [
+                    "status" => 400,
+                    "message" => $this->get('translator')->trans("impossible de supprimer, vérifiez vos données", [], 'FOSUserBundle')
+                ], Response::HTTP_FAILED_DEPENDENCY
+            );
         } catch (AccessDeniedException $ads) {
-            $session->getFlashBag()->add('danger', "<strong>Action interdite.</strong><br>Vous n'êtes pas autorisez à effectuer cette opération!");
-            return $this->json(json_encode(["item" => null]));
+            return new JsonResponse(
+                [
+                    "status" => 403,
+                    "message" => $this->get('translator')->trans("Access denied", [], 'FOSUserBundle'),
+                ]
+                , Response::HTTP_FORBIDDEN
+            );
         }
 
     }

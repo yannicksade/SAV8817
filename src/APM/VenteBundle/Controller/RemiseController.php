@@ -9,11 +9,13 @@ use APM\VenteBundle\Entity\Remise;
 use APM\VenteBundle\Factory\TradeFactory;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Doctrine\DBAL\Exception\ConstraintViolationException;
+use FOS\RestBundle\Controller\FOSRestController;
+use FOS\RestBundle\View\View;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
-use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\HttpFoundation\Response;
 use FOS\RestBundle\Controller\Annotations\RouteResource;
 use FOS\RestBundle\Controller\Annotations\Get;
 use FOS\RestBundle\Controller\Annotations\Post;
@@ -21,12 +23,13 @@ use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use FOS\RestBundle\Controller\Annotations\Put;
 use FOS\RestBundle\Controller\Annotations\Patch;
 use FOS\RestBundle\Controller\Annotations\Delete;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 /**
  * Remise controller.
  * @RouteResource("remise", pluralize=false)
  */
-class RemiseController extends Controller
+class RemiseController extends FOSRestController
 {
     private $dateExpiration_filter;
     private $code_filter;
@@ -53,56 +56,62 @@ class RemiseController extends Controller
      */
     public function getAction(Request $request, Boutique $boutique = null, Offre $offre = null)
     {
-        /** @var Session $session */
-        $session = $request->getSession();
-        if (null !== $offre) {//liste les remises sur l'offre
-            $this->listAndShowSecurity($offre);
-            $offres [] = $offre;
+        try {
+            if (null !== $offre) {//liste les remises sur l'offre
+                $this->listAndShowSecurity($offre);
+                $offres [] = $offre;
 
-        } elseif (null !== $boutique) {
-            $this->listAndShowSecurity(null, $boutique);
-            $offres = $boutique->getOffres();
-        } else {//liste les remises d'un utilisateur
-            $this->listAndShowSecurity();
-            /** @var Utilisateur_avm $user */
-            $user = $this->getUser();
-            $offres = $user->getOffres();
-        }
-        $remises = new ArrayCollection();
-        if (null !== $offres) {
-            /** @var Offre $o */
-            foreach ($offres as $o) {
-                foreach ($o->getRemises() as $r) {
-                    $remises->add($r);
+            } elseif (null !== $boutique) {
+                $this->listAndShowSecurity(null, $boutique);
+                $offres = $boutique->getOffres();
+            } else {//liste les remises d'un utilisateur
+                $this->listAndShowSecurity();
+                /** @var Utilisateur_avm $user */
+                $user = $this->getUser();
+                $offres = $user->getOffres();
+            }
+            $remises = new ArrayCollection();
+            if (null !== $offres) {
+                /** @var Offre $o */
+                foreach ($offres as $o) {
+                    foreach ($o->getRemises() as $r) {
+                        $remises->add($r);
+                    }
                 }
             }
+
+            $this->dateExpiration_filter = $request->query->has('dateExpiration_filter') ? $request->query->get('dateExpiration_filter') : "";
+            $this->code_filter = $request->query->has('code_filter') ? $request->query->get('code_filter') : "";
+            $this->offre_filter = $request->query->has('offre_filter') ? $request->query->get('offre_filter') : "";
+            $this->etat_filter = $request->query->has('etat_filter') ? $request->query->get('etat_filter') : "";
+            $this->valeurMin_filter = $request->query->has('valeurMin_filter') ? $request->query->get('valeurMin_filter') : "";
+            $this->valeurMax_filter = $request->query->has('valeurMax_filter') ? $request->query->get('valeurMax_filter') : "";
+            $this->nombreUtilisation_filter = $request->query->has('nombreUtilisation_filter') ? $request->query->get('nombreUtilisation_filter') : "";
+            $this->quantiteMin_filter = $request->query->has('quantiteMin_filter') ? $request->query->get('quantiteMin_filter') : "";
+            $this->permanence_filter = $request->query->has('permanence_filter') ? $request->query->get('permanence_filter') : "";
+            $this->restreint_filter = $request->query->has('restreint_filter') ? $request->query->get('restreint_filter') : "";
+            $iDisplayLength = $request->query->has('length') ? $request->query->get('length') : -1;
+            $iDisplayStart = $request->query->has('start') ? intval($request->query->get('start')) : 0;
+            $json = array();
+            $iTotalRecords = count($remises);
+            if ($iDisplayLength < 0) $iDisplayLength = $iTotalRecords;
+            $remises = $this->handleResults($remises, $iTotalRecords, $iDisplayStart, $iDisplayLength);
+            //filtre
+            $iFilteredRecords = count($remises);
+            $data = $this->get('apm_core.data_serialized')->getFormalData($remises, array("owner_list"));
+            $json['totalRecords'] = $iTotalRecords;
+            $json['filteredRecords'] = $iFilteredRecords;
+            $json['items'] = $data;
+            return new JsonResponse($json, 200);
+        } catch (AccessDeniedException $ads) {
+            return new JsonResponse(
+                [
+                    "status" => 403,
+                    "message" => $this->get('translator')->trans("Access denied", [], 'FOSUserBundle'),
+                ]
+                , Response::HTTP_FORBIDDEN
+            );
         }
-
-        $this->dateExpiration_filter = $request->query->has('dateExpiration_filter') ? $request->query->get('dateExpiration_filter') : "";
-        $this->code_filter = $request->query->has('code_filter') ? $request->query->get('code_filter') : "";
-        $this->offre_filter = $request->query->has('offre_filter') ? $request->query->get('offre_filter') : "";
-        $this->etat_filter = $request->query->has('etat_filter') ? $request->query->get('etat_filter') : "";
-        $this->valeurMin_filter = $request->query->has('valeurMin_filter') ? $request->query->get('valeurMin_filter') : "";
-        $this->valeurMax_filter = $request->query->has('valeurMax_filter') ? $request->query->get('valeurMax_filter') : "";
-        $this->nombreUtilisation_filter = $request->query->has('nombreUtilisation_filter') ? $request->query->get('nombreUtilisation_filter') : "";
-        $this->quantiteMin_filter = $request->query->has('quantiteMin_filter') ? $request->query->get('quantiteMin_filter') : "";
-        $this->permanence_filter = $request->query->has('permanence_filter') ? $request->query->get('permanence_filter') : "";
-        $this->restreint_filter = $request->query->has('restreint_filter') ? $request->query->get('restreint_filter') : "";
-        $iDisplayLength = $request->query->has('length') ? $request->query->get('length') : -1;
-        $iDisplayStart = $request->query->has('start') ? intval($request->query->get('start')) : 0;
-        $json = array();
-        $json['items'] = array();
-        $iTotalRecords = count($remises);
-        if ($iDisplayLength < 0) $iDisplayLength = $iTotalRecords;
-        $remises = $this->handleResults($remises, $iTotalRecords, $iDisplayStart, $iDisplayLength);
-        //filtre
-        $iFilteredRecords = count($remises);
-        $data = $this->get('apm_core.data_serialized')->getFormalData($remises, array("owner_list"));
-        $json['totalRecords'] = $iTotalRecords;
-        $json['filteredRecords'] = $iFilteredRecords;
-        $json['items'] = $data;
-
-        return new JsonResponse($json, 200);
     }
 
     /**
@@ -216,50 +225,42 @@ class RemiseController extends Controller
     /**
      * @param Request $request
      * @param Offre $offre
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response| JsonResponse
+     * @return View | JsonResponse
      *
      * @Post("/new/remise/offre/{id}", name="_offre")
      */
     public function newAction(Request $request, Offre $offre)
     {
-        $this->createSecurity($offre);
-        /** @var Session $session */
-        $session = $request->getSession();
-        /** @var Remise $remise */
-        $remise = TradeFactory::getTradeProvider('remise');
-        $form = $this->createForm('APM\VenteBundle\Form\RemiseType', $remise);
-        $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
-            try {
-                $remise->setOffre($offre);
-                $em = $this->getDoctrine()->getManager();
-                $em->persist($remise);
-                $em->flush();
-                if ($request->isXmlHttpRequest()) {
-                    $json = array();
-                    $json["item"] = array(//prevenir le client
-                        "action" => 0,
-                    );
-                    $session->getFlashBag()->add('success', "<strong> remise créée. réf:" . $remise->getCode() . "</strong><br> Opération effectuée avec succès!");
-                    return $this->json(json_encode($json), 200);
-                }
-                return $this->redirectToRoute('apm_vente_remise_show', array('id' => $remise->getId()));
-            } catch (ConstraintViolationException $cve) {
-                $session->getFlashBag()->add('danger', "<strong>Echec de l'enregistrement. </strong><br>L'enregistrement a échoué dû à une contrainte de données!");
-                return $this->json(json_encode(["item" => null]));
-            } catch (RuntimeException $rte) {
-                $session->getFlashBag()->add('danger', "<strong>Echec de l'opération.</strong><br>L'enregistrement a échoué. bien vouloir réessayer plutard, svp!");
-                return $this->json(json_encode(["item" => null]));
-            } catch (AccessDeniedException $ads) {
-                $session->getFlashBag()->add('danger', "<strong>Action interdite.</strong><br>Vous n'êtes pas autorisez à effectuer cette opération!");
-                return $this->json(json_encode(["item" => null]));
+        try {
+            $this->createSecurity($offre);
+            /** @var Remise $remise */
+            $remise = TradeFactory::getTradeProvider('remise');
+            $form = $this->createForm('APM\VenteBundle\Form\RemiseType', $remise);
+            $form->submit($request->request->all());
+            if (!$form->isValid()) {
+                return new JsonResponse([
+                    "status" => 400,
+                    "message" => $this->get('translator')->trans($form->getErrors(true, false), [], 'FOSUserBundle')
+                ], Response::HTTP_BAD_REQUEST);
             }
+            $remise->setOffre($offre);
+            $em = $this->getDoctrine()->getManager();
+            $em->persist($remise);
+            $em->flush();
+            return $this->routeRedirectView("api_vente_show_remise", ['id' => $remise->getId()], Response::HTTP_CREATED);
+        } catch (ConstraintViolationException $cve) {
+            return new JsonResponse([
+                "status" => 400,
+                "message" => $this->get('translator')->trans("impossible d'enregistrer, vérifiez vos données", [], 'FOSUserBundle')
+            ], Response::HTTP_BAD_REQUEST);
+        } catch (AccessDeniedException $ads) {
+            return new JsonResponse([
+                    "status" => 403,
+                    "message" => $this->get('translator')->trans("Access denied", [], 'FOSUserBundle'),
+                ]
+                , Response::HTTP_FORBIDDEN
+            );
         }
-        $session->set('previous_location', $request->getUri());
-        return $this->render('APMVenteBundle:remise:new.html.twig', array(
-            'form' => $form->createView(),
-            'remise' => $remise
-        ));
     }
 
     /**
@@ -300,71 +301,38 @@ class RemiseController extends Controller
      * Displays a form to edit an existing Remise entity.
      * @param Request $request
      * @param Remise $remise
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @return View | JsonResponse
      *
      * @Put("/edit/remise/{id}")
      */
     public function editAction(Request $request, Remise $remise)
     {
-        $this->editAndDeleteSecurity($remise);
-        if ($request->isXmlHttpRequest() && $request->getMethod() === "POST") {
-            $json = array();
-            $json['item'] = array();
-            /** @var Session $session */
-            $session = $request->getSession();
-            $em = $this->getDoctrine()->getManager();
-            $property = $request->request->get('name');
-            $value = $request->request->get('value');
-            switch ($property) {
-                case 'permanence':
-                    $remise->setPermanence($value);
-                    break;
-                case 'dateExpiration':
-                    $remise->setDateExpiration($value);
-                    break;
-                case 'valeur':
-                    $remise->setValeur($value);
-                    break;
-                case 'restreint' :
-                    $remise->setRestreint($value);
-                    break;
-                case 'quantiteMin' :
-                    $remise->setQuantiteMin($value);
-                    break;
-                case 'nombreUtilisation' :
-                    $remise->setNombreUtilisation($value);
-                    break;
-                case 'offre':
-                    /** @var Offre $offre */
-                    $offre = $em->getRepository('APMVenteBundle:Offre')->find($value);
-                    $remise->setOffre($offre);
-                    break;
-                default:
-                    $session->getFlashBag()->add('info', "<strong> Aucune mis à jour effectuée</strong>");
-                    return $this->json(json_encode(["item" => null]), 205);
-            }
-            $em->flush();
-            $session->getFlashBag()->add('success', "Mis à jour propriété : <strong>" . $property . "</strong> réf. transaction :" . $remise->getCode() . "<br> Opération effectuée avec succès!");
-            return $this->json(json_encode($json), 200);
-        }
-
-        $deleteForm = $this->createDeleteForm($remise);
-        $editForm = $this->createForm('APM\VenteBundle\Form\RemiseType', $remise);
-        $editForm->handleRequest($request);
-        if ($editForm->isSubmitted() && $editForm->isValid()) {
+        try {
             $this->editAndDeleteSecurity($remise);
+            $form = $this->createForm('APM\VenteBundle\Form\RemiseType', $remise);
+            $form->submit($request->request->all(), false);
+            if (!$form->isValid()) {
+                return new JsonResponse([
+                    "status" => 400,
+                    "message" => $this->get('translator')->trans($form->getErrors(true, false), [], 'FOSUserBundle')
+                ], Response::HTTP_BAD_REQUEST);
+            }
             $em = $this->getDoctrine()->getManager();
-            $em->persist($remise);
             $em->flush();
-
-            return $this->redirectToRoute('apm_vente_remise_show', array('id' => $remise->getId()));
+            return $this->routeRedirectView("api_vente_show_remise", ['id' => $remise->getId()], Response::HTTP_OK);
+        } catch (ConstraintViolationException $cve) {
+            return new JsonResponse([
+                "status" => 400,
+                "message" => $this->get('translator')->trans("impossible d'enregistrer, vérifiez vos données", [], 'FOSUserBundle')
+            ], Response::HTTP_BAD_REQUEST);
+        } catch (AccessDeniedException $ads) {
+            return new JsonResponse([
+                    "status" => 403,
+                    "message" => $this->get('translator')->trans("Access denied", [], 'FOSUserBundle'),
+                ]
+                , Response::HTTP_FORBIDDEN
+            );
         }
-
-        return $this->render('APMVenteBundle:remise:edit.html.twig', array(
-            'remise' => $remise,
-            'edit_form' => $editForm->createView(),
-            'delete_form' => $deleteForm->createView(),
-        ));
     }
 
     /**
@@ -388,45 +356,41 @@ class RemiseController extends Controller
     }
 
     /**
-     * Creates a form to delete a Remise entity.
-     *
-     * @param Remise $remise The Remise entity
-     *
-     * @return \Symfony\Component\Form\Form The form
-     */
-    private function createDeleteForm(Remise $remise)
-    {
-        return $this->createFormBuilder()
-            ->setAction($this->generateUrl('apm_vente_remise_delete', array('id' => $remise->getId())))
-            ->setMethod('DELETE')
-            ->getForm();
-    }
-
-    /**
-     * Deletes a Remise entity.
      * @param Request $request
      * @param Remise $remise
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse | JsonResponse
+     * @return View | JsonResponse
      *
      * @Delete("/delete/remise/{id}")
      */
     public function deleteAction(Request $request, Remise $remise)
     {
-        $this->editAndDeleteSecurity($remise);
-        $em = $this->getDoctrine()->getManager();
-        if ($request->isXmlHttpRequest() && $request->getMethod() === "POST") {
-            $em->remove($remise);
-            $em->flush();
-            $json = array();
-            return $this->json($json, 200);
-        }
-        $form = $this->createDeleteForm($remise);
-        $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
+        try {
             $this->editAndDeleteSecurity($remise);
+            if (!$request->request->has('exec') || $request->request->get('exec') !== 'go') {
+                return new JsonResponse([
+                    "status" => 400,
+                    "message" => $this->get('translator')->trans('impossible de supprimer', [], 'FOSUserBundle')
+                ], Response::HTTP_BAD_REQUEST);
+            }
+            $offre = $remise->getOffre();
+            $em = $this->getDoctrine()->getManager();
             $em->remove($remise);
             $em->flush();
+            return $this->routeRedirectView("api_vente_get_remises_offre", [$offre->getId()], Response::HTTP_OK);
+        } catch (ConstraintViolationException $cve) {
+            return new JsonResponse(
+                [
+                    "status" => 400,
+                    "message" => $this->get('translator')->trans("impossible de supprimer, vérifiez vos données", [], 'FOSUserBundle')
+                ], Response::HTTP_FAILED_DEPENDENCY);
+        } catch (AccessDeniedException $ads) {
+            return new JsonResponse(
+                [
+                    "status" => 403,
+                    "message" => $this->get('translator')->trans("Access denied", [], 'FOSUserBundle'),
+                ]
+                , Response::HTTP_FORBIDDEN
+            );
         }
-        return $this->redirectToRoute('apm_vente_remise_index', ['id' => $remise->getOffre()->getId()]);
     }
 }

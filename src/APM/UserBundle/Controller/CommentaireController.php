@@ -6,9 +6,12 @@ use APM\UserBundle\Entity\Commentaire;
 use APM\UserBundle\Factory\TradeFactory;
 use APM\VenteBundle\Entity\Offre;
 use Doctrine\Common\Collections\Collection;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Doctrine\DBAL\Exception\ConstraintViolationException;
+use FOS\RestBundle\Controller\FOSRestController;
+use FOS\RestBundle\View\View;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Session;
 use FOS\RestBundle\Controller\Annotations\RouteResource;
 use FOS\RestBundle\Controller\Annotations\Get;
@@ -17,15 +20,15 @@ use FOS\RestBundle\Controller\Annotations\Patch;
 use FOS\RestBundle\Controller\Annotations\Delete;
 use FOS\RestBundle\Controller\Annotations\Put;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 /**
  * Commentaire controller.
- * Tout utilisateur peut éditer, modifier ou supprimer des commentaires sur n'importe qu'elle offre; mais seul le proprietaire
  * de l'offre peut les publier
  *
  * @RouteResource("commentaire", pluralize=false)
  */
-class CommentaireController extends Controller
+class CommentaireController extends FOSRestController
 {
     private $contenu_filter;
     private $dateLimiteFrom_filter;
@@ -37,10 +40,6 @@ class CommentaireController extends Controller
 
 
     /**
-     * Liste les commentaires faits sur une offre
-     * un commentaire sur une offre pourrait être publié ou non
-     * Tant q'un commentaire n'est pas publié, il n'est accessible qu'à celui qui l'a posté et au propriétaire(et gerant) de l'offre
-     *
      * @param Request $request
      * @param Offre $offre
      * @return JsonResponse
@@ -49,49 +48,60 @@ class CommentaireController extends Controller
      */
     public function getAction(Request $request, Offre $offre)
     {
-        $this->listAndShowSecurity();
-        $vendeur = $offre->getVendeur();
-        $boutique = $offre->getBoutique();
-        $user = $this->getUser();
-        $gerant = null;
-        $proprietaire = null;
-        $commentaires = null;
-        if (null !== $boutique) {
-            $gerant = $boutique->getGerant();
-            $proprietaire = $boutique->getProprietaire();
-        }
-        $comments = $offre->getCommentaires();
-        $commentaires = $comments;
-        if ($user !== $vendeur && $user !== $gerant && $user !== $proprietaire) {
+        try {
+            $this->listAndShowSecurity();
+            $vendeur = $offre->getVendeur();
+            $boutique = $offre->getBoutique();
+            $user = $this->getUser();
+            $gerant = null;
+            $proprietaire = null;
             $commentaires = null;
-            /** @var Commentaire $commentaire */
-            foreach ($comments as $commentaire) { //presenter uniquement les commentaires publiés au publique
-                if ($commentaire->isPubliable() || $commentaire->getUtilisateur() === $user) {
-                    $commentaires [] = $commentaire;
+            if (null !== $boutique) {
+                $gerant = $boutique->getGerant();
+                $proprietaire = $boutique->getProprietaire();
+            }
+            $comments = $offre->getCommentaires();
+            $commentaires = $comments;
+            if ($user !== $vendeur && $user !== $gerant && $user !== $proprietaire) {
+                $commentaires = null;
+                /** @var Commentaire $commentaire */
+                foreach ($comments as $commentaire) { //presenter uniquement les commentaires publiés au publique
+                    if ($commentaire->isPubliable() || $commentaire->getUtilisateur() === $user) {
+                        $commentaires [] = $commentaire;
+                    }
                 }
             }
+
+            $this->contenu_filter = $request->query->has('contenu_filter') ? $request->query->get('contenu_filter') : "";
+            $this->dateLimiteFrom_filter = $request->query->has('dateLimiteFrom_filter') ? $request->query->get('dateLimiteFrom_filter') : "";
+            $this->dateLimiteTo_filter = $request->query->has('dateLimiteTo_filter') ? $request->query->get('dateLimiteTo_filter') : "";
+            $this->publiable_filter = $request->query->has('publiable_filter') ? $request->query->get('publiable_filter') : "";
+            $this->utilisateur_filter = $request->query->has('utilisateur_filter') ? $request->query->get('utilisateur_filter') : "";
+            $iDisplayLength = $request->query->has('length') ? $request->query->get('length') : -1;
+            $iDisplayStart = $request->query->has('start') ? intval($request->query->get('start')) : 0;
+            $json = array();
+
+            $iTotalRecords = count($commentaires);
+            if ($iDisplayLength < 0) $iDisplayLength = $iTotalRecords;
+            $commentaires = $this->handleResults($commentaires, $iTotalRecords, $iDisplayStart, $iDisplayLength);
+            //filtre
+            $iFilteredRecords = count($commentaires);
+            $data = $this->get('apm_core.data_serialized')->getFormalData($commentaires, array("owner_list"));
+            $json['totalRecords'] = $iTotalRecords;
+            $json['filteredRecords'] = $iFilteredRecords;
+            $json['items'] = $data;
+
+            return new JsonResponse($json, 200);
+
+        } catch (AccessDeniedException $ads) {
+            return new JsonResponse(
+                [
+                    "status" => 403,
+                    "message" => $this->get('translator')->trans("Access denied", [], 'FOSUserBundle'),
+                ]
+                , Response::HTTP_FORBIDDEN
+            );
         }
-
-        $this->contenu_filter = $request->query->has('contenu_filter') ? $request->query->get('contenu_filter') : "";
-        $this->dateLimiteFrom_filter = $request->query->has('dateLimiteFrom_filter') ? $request->query->get('dateLimiteFrom_filter') : "";
-        $this->dateLimiteTo_filter = $request->query->has('dateLimiteTo_filter') ? $request->query->get('dateLimiteTo_filter') : "";
-        $this->publiable_filter = $request->query->has('publiable_filter') ? $request->query->get('publiable_filter') : "";
-        $this->utilisateur_filter = $request->query->has('utilisateur_filter') ? $request->query->get('utilisateur_filter') : "";
-        $iDisplayLength = $request->query->has('length') ? $request->query->get('length') : -1;
-        $iDisplayStart = $request->query->has('start') ? intval($request->query->get('start')) : 0;
-        $json = array();
-
-        $iTotalRecords = count($commentaires);
-        if ($iDisplayLength < 0) $iDisplayLength = $iTotalRecords;
-        $commentaires = $this->handleResults($commentaires, $iTotalRecords, $iDisplayStart, $iDisplayLength);
-        //filtre
-        $iFilteredRecords = count($commentaires);
-        $data = $this->get('apm_core.data_serialized')->getFormalData($commentaires, array("owner_list"));
-        $json['totalRecords'] = $iTotalRecords;
-        $json['filteredRecords'] = $iFilteredRecords;
-        $json['items'] = $data;
-
-        return new JsonResponse($json, 200);
     }
 
     /**
@@ -181,53 +191,46 @@ class CommentaireController extends Controller
      * Creates a new Commentaire entity.
      * @param Request $request
      * @param Offre $offre
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response | JsonResponse
+     * @return View | JsonResponse
      *
      * @Post("/new/communication/offre/{id}", name="_offre")
      */
     public function newAction(Request $request, Offre $offre)
     {
-        $this->createSecurity($offre);
-        /** @var Session $session */
-        $session = $request->getSession();
-        /** @var Commentaire $commentaire */
-        $commentaire = TradeFactory::getTradeProvider("commentaire");
-        $form = $this->createForm('APM\UserBundle\Form\CommentaireType', $commentaire);
-        $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
-            try {
-                $this->createSecurity($offre);
-                $commentaire->setUtilisateur($this->getUser());
-                $commentaire->setOffre($offre);
-                $em = $this->getDoctrine()->getManager();
-                $em->persist($commentaire);
-                $em->flush();
-                if ($request->isXmlHttpRequest()) {
-                    $json = array();
-                    $json["item"] = array(//prevenir le client
-                        "action" => 0,
-                    );
-                    $session->getFlashBag()->add('success', "<strong> rabais d'offre créée. réf:" . substr($commentaire->getContenu(), 5) . "</strong><br> Opération effectuée avec succès!");
-                    return $this->json(json_encode($json), 200);
-                }
-                return $this->redirectToRoute('apm_user_commentaire_show', array('id' => $commentaire->getId()));
-            } catch (ConstraintViolationException $cve) {
-                $session->getFlashBag()->add('danger', "<strong>Echec de l'enregistrement. </strong><br>L'enregistrement a échoué dû à une contrainte de données!");
-                return $this->json(json_encode(["item" => null]));
-            } catch (RuntimeException $rte) {
-                $session->getFlashBag()->add('danger', "<strong>Echec de l'opération.</strong><br>L'enregistrement a échoué. bien vouloir réessayer plutard, svp!");
-                return $this->json(json_encode(["item" => null]));
-            } catch (AccessDeniedException $ads) {
-                $session->getFlashBag()->add('danger', "<strong>Action interdite.</strong><br>Vous n'êtes pas autorisez à effectuer cette opération!");
-                return $this->json(json_encode(["item" => null]));
+        try {
+            $this->createSecurity($offre);
+            /** @var Session $session */
+            $session = $request->getSession();
+            /** @var Commentaire $commentaire */
+            $commentaire = TradeFactory::getTradeProvider("commentaire");
+            $form = $this->createForm('APM\UserBundle\Form\CommentaireType', $commentaire);
+            $form->submit($request->request->all());
+            if (!$form->isValid()) {
+                return new JsonResponse([
+                    "status" => 400,
+                    "message" => $this->get('translator')->trans($form->getErrors(true, false), [], 'FOSUserBundle')
+                ], Response::HTTP_BAD_REQUEST);
             }
+            $this->createSecurity($offre);
+            $commentaire->setUtilisateur($this->getUser());
+            $commentaire->setOffre($offre);
+            $em = $this->getDoctrine()->getManager();
+            $em->persist($commentaire);
+            $em->flush();
+            return $this->routeRedirectView("api_user_show_commentaire", ['id' => $commentaire->getId()], Response::HTTP_CREATED);
+        } catch (ConstraintViolationException $cve) {
+            return new JsonResponse([
+                "status" => 400,
+                "message" => $this->get('translator')->trans("impossible d'enregistrer, vérifiez vos données", [], 'FOSUserBundle')
+            ], Response::HTTP_BAD_REQUEST);
+        } catch (AccessDeniedException $ads) {
+            return new JsonResponse([
+                    "status" => 403,
+                    "message" => $this->get('translator')->trans("Access denied", [], 'FOSUserBundle'),
+                ]
+                , Response::HTTP_FORBIDDEN
+            );
         }
-        $session->set('previous_location', $request->getUri());
-        return $this->render('APMUserBundle:commentaire:new.html.twig', array(
-            'commentaire' => $commentaire,
-            'offre' => $offre,
-            'form' => $form->createView(),
-        ));
     }
 
     /**
@@ -263,54 +266,38 @@ class CommentaireController extends Controller
      * Displays a form to edit an existing Commentaire entity.
      * @param Request $request
      * @param Commentaire $commentaire
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @return View | JsonResponse
      *
      * @Put("/edit/commentaire/{id}")
      */
     public function editAction(Request $request, Commentaire $commentaire)
     {
-        $this->editAndDeleteSecurity($commentaire);
-        if ($request->isXmlHttpRequest() && $request->getMethod() === "POST") {
-            $json = array();
-            $json['item'] = array();
-            /** @var Session $session */
-            $session = $request->getSession();
-            $em = $this->getDoctrine()->getManager();
-            $property = $request->query->get('name');
-            $value = $request->query->get('value');
-            switch ($property) {
-                case 'publiable':
-                    $commentaire->setPubliable($value);
-                    break;
-                case 'evaluation' :
-                    $commentaire->setEvaluation($value);
-                    break;
-                default:
-                    $session->getFlashBag()->add('info', "<strong> Aucune mis à jour effectuée</strong>");
-                    return $this->json(json_encode(["item" => null]), 205);
-            }
-            $em->flush();
-            $session->getFlashBag()->add('success', "Mis à jour propriété : <strong>" . $property . "</strong> réf. commentaire :" . substr($commentaire->getContenu(), 5) . "<br> Opération effectuée avec succès!");
-            return $this->json(json_encode($json), 200);
-        }
-        $deleteForm = $this->createDeleteForm($commentaire);
-        $editForm = $this->createForm('APM\UserBundle\Form\CommentaireType', $commentaire);
-        $editForm->handleRequest($request);
-
-        if ($editForm->isSubmitted() && $editForm->isValid()) {
+        try {
             $this->editAndDeleteSecurity($commentaire);
+            $form = $this->createForm('APM\UserBundle\Form\CommentaireType', $commentaire);
+            $form->submit($request->request->all(), false);
+            if (!$form->isValid()) {
+                return new JsonResponse([
+                    "status" => 400,
+                    "message" => $this->get('translator')->trans($form->getErrors(true, false), [], 'FOSUserBundle')
+                ], Response::HTTP_BAD_REQUEST);
+            }
             $em = $this->getDoctrine()->getManager();
-            $em->persist($commentaire);
             $em->flush();
-
-            return $this->redirectToRoute('apm_user_commentaire_show', array('id' => $commentaire->getId()));
+            return $this->routeRedirectView("api_user_show_commentaire", ['id' => $commentaire->getId()], Response::HTTP_OK);
+        } catch (ConstraintViolationException $cve) {
+            return new JsonResponse([
+                "status" => 400,
+                "message" => $this->get('translator')->trans("impossible d'enregistrer, vérifiez vos données", [], 'FOSUserBundle')
+            ], Response::HTTP_BAD_REQUEST);
+        } catch (AccessDeniedException $ads) {
+            return new JsonResponse([
+                    "status" => 403,
+                    "message" => $this->get('translator')->trans("Access denied", [], 'FOSUserBundle'),
+                ]
+                , Response::HTTP_FORBIDDEN
+            );
         }
-
-        return $this->render('APMUserBundle:commentaire:edit.html.twig', array(
-            'commentaire' => $commentaire,
-            'edit_form' => $editForm->createView(),
-            'delete_form' => $deleteForm->createView(),
-        ));
     }
 
     /**
@@ -320,9 +307,6 @@ class CommentaireController extends Controller
     {
         //---------------------------------security-----------------------------------------------
         $this->denyAccessUnlessGranted('ROLE_USERAVM', null, 'Unable to access this page!');
-        /* ensure that the user is logged in
-        *  and that the one is the author
-        */
         $user = $this->getUser();
         if ((!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY')) || ($commentaire->getUtilisateur() !== $user)) {
             throw $this->createAccessDeniedException();
@@ -331,48 +315,44 @@ class CommentaireController extends Controller
 
     }
 
-    /**
-     * Creates a form to delete a Commentaire entity.
-     *
-     * @param Commentaire $commentaire The Commentaire entity
-     *
-     * @return \Symfony\Component\Form\Form The form
-     */
-    private function createDeleteForm(Commentaire $commentaire)
-    {
-        return $this->createFormBuilder()
-            ->setAction($this->generateUrl('apm_user_commentaire_delete', array('id' => $commentaire->getId())))
-            ->setMethod('DELETE')
-            ->getForm();
-    }
-
-    // pour soumettre un commentaire il faut que l'offre soit publique
 
     /**
      * Deletes a Commentaire entity.
      * @param Request $request
      * @param Commentaire $commentaire
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse | JsonResponse
+     * @return View | JsonResponse
      *
      * @Delete("/delete/commentaire/{id}")
      */
     public function deleteAction(Request $request, Commentaire $commentaire)
     {
-        $this->editAndDeleteSecurity($commentaire);
-        $em = $this->getDoctrine()->getManager();
-        if ($request->isXmlHttpRequest() && $request->getMethod() === "POST") {
-            $em->remove($commentaire);
-            $em->flush();
-            $json = array();
-            return $this->json($json, 200);
-        }
-        $form = $this->createDeleteForm($commentaire);
-        $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
+        try {
             $this->editAndDeleteSecurity($commentaire);
+            if (!$request->request->has('exec') || $request->request->get('exec') !== 'go') {
+                return new JsonResponse([
+                    "status" => 400,
+                    "message" => $this->get('translator')->trans('impossible de supprimer', [], 'FOSUserBundle')
+                ], Response::HTTP_BAD_REQUEST);
+            }
+            $em = $this->getDoctrine()->getManager();
             $em->remove($commentaire);
             $em->flush();
+            return $this->routeRedirectView("api_user_get_commentaires", [], Response::HTTP_OK);
+        } catch (ConstraintViolationException $cve) {
+            return new JsonResponse(
+                [
+                    "status" => 400,
+                    "message" => $this->get('translator')->trans("impossible de supprimer, vérifiez vos données", [], 'FOSUserBundle')
+                ], Response::HTTP_FAILED_DEPENDENCY);
+        } catch (AccessDeniedException $ads) {
+            return new JsonResponse(
+                [
+                    "status" => 403,
+                    "message" => $this->get('translator')->trans("Access denied", [], 'FOSUserBundle'),
+                ]
+                , Response::HTTP_FORBIDDEN
+            );
         }
-        return $this->redirectToRoute('apm_user_commentaire_index');
+
     }
 }
