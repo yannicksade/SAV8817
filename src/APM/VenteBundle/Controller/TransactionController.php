@@ -345,9 +345,7 @@ class TransactionController extends FOSRestController
      * headers={
      *      { "name"="Authorization",  "required"=true, "description"="Authorization token"}
      * },
-     *  requirements={
-     *      {"name"="id", "required"=true, "requirement"="\d+", "dataType"="integer", "description"= "transaction Id"}
-     *  },
+     *
      * input={
      *    "class"="APM\VenteBundle\Entity\Transaction",
      *     "parsers" = {
@@ -362,7 +360,7 @@ class TransactionController extends FOSRestController
      * @return View | JsonResponse
      *
      * @Post("/new/transaction")
-     * @Post("/new/transaction/boutique/{id}", name="_boutique")
+     * @Post("/new/transaction/boutique/{id}", name="_boutique", requirements={"id"="boutique_id"})
      */
     public function newAction(Request $request, Boutique $boutique = null)
     {
@@ -565,7 +563,7 @@ class TransactionController extends FOSRestController
      *      { "name"="Authorization", "required"="true", "description"="Authorization token"},
      * },
      * requirements = {
-     *      {"name"="id", "dataType"="integer", "required"=true, "requirement"="\d+", "description"="transaction Id"}
+     *      {"name"="id", "dataType"="integer", "requirement"="\d+", "description"="transaction Id"}
      * },
      * parameters = {
      *      {"name"="exec", "required"=true, "dataType"="string", "requirement"="\D+", "description"="needed to check the origin of the request", "format"="exec=go"}

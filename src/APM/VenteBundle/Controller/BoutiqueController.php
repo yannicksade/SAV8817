@@ -106,8 +106,8 @@ class BoutiqueController extends FOSRestController implements ClassResourceInter
             $selectedGroup = array("owner_list");
             $json = array();
             $json['items'] = array();
-            $p = $request->query->has('p') ? $request->query->get('p') : "all";
-            if ($p === "owner" || $p === "all") {
+            $q = $request->query->has('q') ? $request->query->get('q') : "all";
+            if ($q === "owner" || $q === "all") {
                 $boutiques = $user->getBoutiquesProprietaire();
                 $iTotalRecords = count($boutiques);
                 if ($iDisplayLength < 0) $iDisplayLength = $iTotalRecords;
@@ -118,7 +118,7 @@ class BoutiqueController extends FOSRestController implements ClassResourceInter
                 $json['totalRecordsOwner'] = $iTotalRecords;
                 $json['filteredRecordsOwner'] = $iFilteredRecords;
             }
-            if ($p === "shopkeeper" || $p === "all") {
+            if ($q === "shopkeeper" || $q === "all") {
                 $boutiquesGerant = $user->getBoutiquesGerant();
                 $iTotalRecords = count($boutiquesGerant);
                 if ($iDisplayLength < 0) $iDisplayLength = $iTotalRecords;
@@ -513,7 +513,7 @@ class BoutiqueController extends FOSRestController implements ClassResourceInter
      *      { "name"="Authorization", "required"="true", "description"="Authorization token"},
      * },
      * requirements = {
-     *      {"name"="id", "dataType"="integer", "required"=true, "requirement"="\d+", "description"="boutique Id"}
+     *      {"name"="id", "dataType"="integer", "requirement"="\d+", "description"="boutique Id"}
      * },
      * parameters = {
      *      {"name"="exec", "required"=true, "dataType"="string", "requirement"="\D+", "description"="needed to check the origin of the request", "format"="exec=go"}

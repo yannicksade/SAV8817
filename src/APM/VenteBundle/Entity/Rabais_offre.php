@@ -22,6 +22,50 @@ use JMS\Serializer\Annotation\Groups;
 class Rabais_offre extends TradeFactory
 {
     /**
+     * @var integer
+     * @Assert\NotNull
+     * @Expose
+     * @Groups({"owner_rabais_details", "others_rabais_details"})
+     * @ORM\Column(name="etat", type="integer", nullable=false)
+     */
+    private $etat;
+
+    /**
+     * @var \DateTime|null
+     * @Expose
+     * @Groups({"owner_rabais_details", "others_rabais_details"})
+     * @Assert\DateTime
+     * @ORM\Column(name="dateExpiration", type="datetime", nullable=true)
+     */
+    private $dateExpiration;
+
+    /**
+     * @var boolean
+     * @Expose
+     * @Groups({"owner_rabais_details"})
+     * @Assert\Choice({0,1})
+     * @ORM\Column(name="Restricted", type="boolean", nullable=true)
+     */
+    private $restreint;
+
+    /**
+     * @var boolean
+     * @Expose
+     * @Groups({"owner_rabais_details", "others_rabais_details"})
+     * @Assert\Choice({0,1})
+     * @ORM\Column(name="permanence", type="boolean", nullable=true)
+     */
+    private $permanence;
+
+
+    /**
+     * @var string
+     * @Groups({"owner_rabais_details", "others_rabais_details"})
+     * @ORM\Column(name="valeur", type="decimal", nullable=true)
+     */
+    private $valeur;
+
+    /**
      * @var string
      * @Expose
      * @Groups({"owner_list", "owner_rabais_details", "others_rabais_details"})
@@ -41,11 +85,11 @@ class Rabais_offre extends TradeFactory
     /**
      * @var integer
      * @Expose
-     * @Groups({"owner_rabais_details","others_rabais_details"})
-     * @Assert\Range(min=1,max=10) avec <null> le nombre d'occurrence est indefini
-     * @ORM\Column(name="nombreDefois", type="smallint", nullable=true)
+     * @Groups({"owner_rabais_details", "others_rabais_details"})
+     * @Assert\Range(min=0, max=30) avec <null> le nombre d'occurrence est indefini
+     * @ORM\Column(name="nombreUtilisation", type="smallint", nullable=true)
      */
-    private $nombreDefois;
+    private $nombreUtilisation;
 
     /**
      * @var string
@@ -99,7 +143,7 @@ class Rabais_offre extends TradeFactory
      * @Groups({"owner_rabais_details", "others_rabais_details"})
      * @ORM\ManyToOne(targetEntity="APM\UserBundle\Entity\Utilisateur_avm", inversedBy="rabaisRecus")
      * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="beneficiaire_id", referencedColumnName="id", nullable=false)
+     *   @ORM\JoinColumn(name="beneficiaire_id", referencedColumnName="id")
      * })
      */
     private $beneficiaireRabais;
@@ -420,6 +464,150 @@ class Rabais_offre extends TradeFactory
     public function setDescription($description)
     {
         $this->description = $description;
+
+        return $this;
+    }
+
+    /**
+     * Get etat
+     *
+     * @return integer
+     */
+    public function getEtat()
+    {
+        return $this->etat;
+    }
+
+    /**
+     * Set etat
+     *
+     * @param integer $etat
+     *
+     * @return Rabais_offre
+     */
+    public function setEtat($etat)
+    {
+        $this->etat = $etat;
+
+        return $this;
+    }
+
+    /**
+     * Get dateExpiration
+     *
+     * @return \DateTime
+     */
+    public function getDateExpiration()
+    {
+        return $this->dateExpiration;
+    }
+
+    /**
+     * Set dateExpiration
+     *
+     * @param \DateTime $dateExpiration
+     *
+     * @return Rabais_offre
+     */
+    public function setDateExpiration($dateExpiration)
+    {
+        $this->dateExpiration = $dateExpiration;
+
+        return $this;
+    }
+
+    /**
+     * Get restreint
+     *
+     * @return boolean
+     */
+    public function getRestreint()
+    {
+        return $this->restreint;
+    }
+
+    /**
+     * Set restreint
+     *
+     * @param boolean $restreint
+     *
+     * @return Rabais_offre
+     */
+    public function setRestreint($restreint)
+    {
+        $this->restreint = $restreint;
+
+        return $this;
+    }
+
+    /**
+     * Get nombreUtilisation
+     *
+     * @return integer
+     */
+    public function getNombreUtilisation()
+    {
+        return $this->nombreUtilisation;
+    }
+
+    /**
+     * Set nombreUtilisation
+     *
+     * @param integer $nombreUtilisation
+     *
+     * @return Rabais_offre
+     */
+    public function setNombreUtilisation($nombreUtilisation)
+    {
+        $this->nombreUtilisation = $nombreUtilisation;
+
+        return $this;
+    }
+
+    /**
+     * Get permanence
+     *
+     * @return boolean
+     */
+    public function getPermanence()
+    {
+        return $this->permanence;
+    }
+
+    /**
+     * Set permanence
+     *
+     * @param boolean $permanence
+     *
+     * @return Rabais_offre
+     */
+    public function setPermanence($permanence)
+    {
+        $this->permanence = $permanence;
+
+        return $this;
+    }
+
+    /**
+     * Get valeur
+     *
+     * @return string
+     */
+    public function getValeur()
+    {
+        return $this->valeur;
+    }
+
+    /**
+     * Set valeur
+     *
+     * @param string $valeur
+     *
+     * @return Rabais_offre
+     */
+    public function setValeur($valeur)
+    {
+        $this->valeur = $valeur;
 
         return $this;
     }

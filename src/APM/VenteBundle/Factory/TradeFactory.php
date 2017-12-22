@@ -65,30 +65,22 @@ abstract class TradeFactory
                         }
                         return $rabais;
                     } else
-                        if ($var === "remise") {
-                            $remise = null;
-                            while ($i < $n && $remise == null) {
-                                $remise = new Remise(CodeGenerator::getGenerator($length));
+                        if ($var === "transaction") {
+                            $transaction = null;
+                            while ($i < $n && $transaction == null) {
+                                $transaction = new Transaction(CodeGenerator::getGenerator($length));
                                 $i++;
                             }
-                            return $remise;
+                            return $transaction;
                         } else
-                                if ($var === "transaction") {
-                                    $transaction = null;
-                                    while ($i < $n && $transaction == null) {
-                                        $transaction = new Transaction(CodeGenerator::getGenerator($length));
-                                        $i++;
-                                    }
-                                    return $transaction;
-                                } else
-                                    if ($var === "transaction_produit") {
-                                        $tr_produit = null;
-                                        while ($i < $n && $tr_produit == null) {
-                                            $tr_produit = new Transaction_produit();
-                                            $i++;
-                                        }
-                                        return $tr_produit;
-                                    }
+                            if ($var === "transaction_produit") {
+                                $tr_produit = null;
+                                while ($i < $n && $tr_produit == null) {
+                                    $tr_produit = new Transaction_produit();
+                                    $i++;
+                                }
+                                return $tr_produit;
+                            }
         return null;
     }
 

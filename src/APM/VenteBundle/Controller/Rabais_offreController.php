@@ -40,6 +40,14 @@ class Rabais_offreController extends FOSRestController
     private $prixUpdateMin_filter;
     private $dateLimiteTo_filter;
     private $dateLimiteFrom_filter;
+    private $etat_filter;
+    private $nombreUtilisation_filter;
+    private $quantiteMax_filter;
+    private $quantiteMin_filter;
+    private $permanence_filter;
+    private $restreint_filter;
+    private $valeurMax_filter;
+    private $valeurMin_filter;
 
 
     /**
@@ -55,13 +63,23 @@ class Rabais_offreController extends FOSRestController
      *      {"name"="dateLimiteTo_filter", "dataType"="dateTime", "pattern"="19-12-2017|DESC"},
      *      {"name"="description_filter", "dataType"="string"},
      *      {"name"="code_filter", "dataType"="string"},
-     *      {"name"="nombreDefois_filter", "dataType"="integer"},
-     *      {"name"="prixUpdateMin_filter", "dataType"="integer"},
-     *      {"name"="prixUpdateMax_filter", "dataType"="integer"},
-     *      {"name"="quantite_filter", "dataType"="integer"},
+     *
+     *      {"name"="prixUpdateMin_filter", "dataType"="sting"},
+     *      {"name"="prixUpdateMax_filter", "dataType"="string"},
      *      {"name"="vendeur_filter", "dataType"="string"},
      *      {"name"="offre_filter", "dataType"="string"},
      *      {"name"="groupe_filter", "dataType"="string"},
+     *
+     *      {"name"="etat_filter", "dataType"="integer"},
+     *      {"name"="quantiteMin_filter", "dataType"="integer"},
+     *      {"name"="quantiteMax_filter", "dataType"="integer"},
+     *     {"name"="valeurMin_filter", "dataType"="string"},
+     *      {"name"="valeurMax_filter", "dataType"="string"},
+     *      {"name"="nombreUtilisation_filter", "dataType"="integer"},
+     *
+     *      {"name"="permanence_filter", "dataType"="boolean"},
+     *      {"name"="restreint_filter", "dataType"="boolean"},
+     *
      *      {"name"="length_filter", "dataType"="integer", "requirement"="\d+"},
      *      {"name"="start_filter", "dataType"="integer", "requirement"="\d+"},
      *  },
@@ -73,7 +91,7 @@ class Rabais_offreController extends FOSRestController
      *     "groups"={"owner_list"}
      * },
      *  parameters= {
-     *      {"name"="q", "required"="false", "dataType"="string", "requirement"="\D+", "description"="query request == product | received | anonymous ==", "format"= "?q=product"}
+     *      {"name"="q", "required"="false", "dataType"="string", "requirement"="\D+", "description"="query request == on_product | received | made ==", "format"= "?q=on_product"}
      *  },
      * statusCodes={
      *     "output" = "A single or a collection of rabais",
@@ -89,7 +107,7 @@ class Rabais_offreController extends FOSRestController
      * @return JsonResponse
      *
      * @Get("/cget/rabaisoffres/utilisateur")
-     * @Get("/cget/rabaisoffres/offre/{id}", name="_offre")
+     * @Get("/cget/rabaisoffres/offre/{id}", name="_offre", requirements={"id"="offre_id"})
      */
     public function getAction(Request $request, Offre $offre = null)
     {
@@ -104,17 +122,28 @@ class Rabais_offreController extends FOSRestController
             $this->nombreDefois_filter = $request->query->has('nombreDefois_filter') ? $request->query->get('nombreDefois_filter') : "";
             $this->prixUpdateMin_filter = $request->query->has('prixUpdateMin_filter') ? $request->query->get('prixUpdateMin_filter') : "";
             $this->prixUpdateMax_filter = $request->query->has('prixUpdateMax_filter') ? $request->query->get('prixUpdateMax_filter') : "";
-            $this->quantite_filter = $request->query->has('quantite_filter') ? $request->query->get('quantite_filter') : "";
+
             $this->vendeur_filter = $request->query->has('vendeur_filter') ? $request->query->get('vendeur_filter') : "";
             $this->offre_filter = $request->query->has('offre_filter') ? $request->query->get('offre_filter') : "";
             $this->groupe_filter = $request->query->has('groupe_filter') ? $request->query->get('groupe_filter') : "";
+
+
+            $this->etat_filter = $request->query->has('etat_filter') ? $request->query->get('etat_filter') : "";
+            $this->valeurMin_filter = $request->query->has('valeurMin_filter') ? $request->query->get('valeurMin_filter') : "";
+            $this->valeurMax_filter = $request->query->has('valeurMax_filter') ? $request->query->get('valeurMax_filter') : "";
+            $this->nombreUtilisation_filter = $request->query->has('nombreUtilisation_filter') ? $request->query->get('nombreUtilisation_filter') : "";
+            $this->quantiteMin_filter = $request->query->has('quantiteMin_filter') ? $request->query->get('quantiteMin_filter') : "";
+            $this->quantiteMax_filter = $request->query->has('quantiteMax_filter') ? $request->query->get('quantiteMax_filter') : "";
+            $this->permanence_filter = $request->query->has('permanence_filter') ? $request->query->get('permanence_filter') : "";
+            $this->restreint_filter = $request->query->has('restreint_filter') ? $request->query->get('restreint_filter') : "";
+
             $iDisplayLength = $request->query->has('length') ? $request->query->get('length') : -1;
             $iDisplayStart = $request->query->has('start') ? intval($request->query->get('start')) : 0;
             $json = array();
             $rabais_offres = null;
             $q = $request->query->has('q') ? $request->query->get('q') : 'all';
             $json['items'] = array();
-            if ($q === "product" || $q === "all") {
+            if ($q === "on_product" || $q === "all") {
                 if (null !== $offre) $rabais_offres = $offre->getRabais();
                 if (null !== $rabais_offres) {
                     $iTotalRecords = count($rabais_offres);
@@ -128,7 +157,7 @@ class Rabais_offreController extends FOSRestController
                 }
             }
 
-            if ($q === "anonymous" || $q === "all") {
+            if ($q === "received" || $q === "all") {
                 $rabais_recus = $user->getRabaisRecus();
                 if (null !== $rabais_recus) {
                     $iTotalRecords = count($rabais_recus);
@@ -142,7 +171,7 @@ class Rabais_offreController extends FOSRestController
                 }
             }
 
-            if ($q === "received" || $q === "all") {
+            if ($q === "made" || $q === "all") {
                 $rabais_accordes = $user->getRabaisAccordes();
                 if (null !== $rabais_accordes) {
                     $iTotalRecords = count($rabais_accordes);
@@ -216,12 +245,7 @@ class Rabais_offreController extends FOSRestController
                 return $e->getCode() === $this->code_filter;
             });
         }
-        if ($this->quantite_filter != null) {
-            $rabais = $rabais->filter(function ($e) {//filtrage select
-                /** @var Rabais_offre $e */
-                return $e->getQuantiteMin() <= $this->quantite_filter;
-            });
-        }
+
         if ($this->groupe_filter != null) {
             $rabais = $rabais->filter(function ($e) {//filtrage select
                 /** @var Rabais_offre $e */
@@ -231,13 +255,13 @@ class Rabais_offreController extends FOSRestController
         if ($this->prixUpdateMin_filter != null) {
             $rabais = $rabais->filter(function ($e) {//filtrage select
                 /** @var Rabais_offre $e */
-                return intval($e->getPrixUpdate()) >= intval($this->prixUpdateMin_filter);
+                return floatval($e->getPrixUpdate()) >= floatval($this->prixUpdateMin_filter);
             });
         }
         if ($this->prixUpdateMax_filter != null) {
             $rabais = $rabais->filter(function ($e) {//filtrage select
                 /** @var Rabais_offre $e */
-                return intval($e->getPrixUpdate()) <= intval($this->prixUpdateMax_filter);
+                return floatval($e->getPrixUpdate()) <= floatval($this->prixUpdateMax_filter);
             });
         }
         if ($this->dateLimiteFrom_filter != null) {
@@ -282,7 +306,30 @@ class Rabais_offreController extends FOSRestController
                 return preg_match('/' . $pattern . '/i', $subject) === 1 ? true : false;
             });
         }
-
+        if ($this->quantiteMin_filter != null) {
+            $rabais = $rabais->filter(function ($e) {//filtrage select
+                /** @var Rabais_offre $e */
+                return $e->getQuantiteMin() >= intval($this->quantiteMin_filter);
+            });
+        }
+        if ($this->quantiteMax_filter != null) {
+            $rabais = $rabais->filter(function ($e) {//filtrage select
+                /** @var Rabais_offre $e */
+                return $e->getQuantiteMin() <= intval($this->quantiteMax_filter);
+            });
+        }
+        if ($this->valeurMin_filter != null) {
+            $rabais = $rabais->filter(function ($e) {//filtrage select
+                /** @var Rabais_offre $e */
+                return $e->getValeur() >= intval($this->valeurMin_filter);
+            });
+        }
+        if ($this->valeurMax_filter != null) {
+            $rabais = $rabais->filter(function ($e) {//filtrage select
+                /** @var Rabais_offre $e */
+                return floatval($e->getValeur()) <= floatval($this->valeurMax_filter);
+            });
+        }
         $rabais = ($rabais !== null) ? $rabais->toArray() : [];
         //assortment: descending of date -- du plus recent au plus ancient
         usort(
@@ -317,7 +364,7 @@ class Rabais_offreController extends FOSRestController
      *      { "name"="Authorization",  "required"=true, "description"="Authorization token"}
      * },
      *  requirements={
-     *      {"name"="id", "required"=true, "requirement"="\d+", "dataType"="integer", "description"= "rabais_offre Id"}
+     *      {"name"="id", "requirement"="\d+", "dataType"="integer", "description"= "rabais_offre Id"}
      *  },
      * input={
      *     "class"="APM\VenteBundle\Entity\Rabais_offre",

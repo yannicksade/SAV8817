@@ -67,6 +67,9 @@ class CategorieController extends FOSRestController
      *    },
      *     "groups"={"owner_list"}
      * },
+     * requirements={
+     *       {"name"="id", "dataType"="integer", "requirement"="\d+", "description"="boutique Id"}
+     *  },
      *
      * statusCodes={
      *     "output" = "A single or a collection of categorie",
@@ -247,7 +250,7 @@ class CategorieController extends FOSRestController
      *         404="Returned when the entity is not found",
      * },
      *  requirements={
-     *      {"name"="id", "required"=true, "dataType"="integer", "requirement"="\d+", "description"="boutique Id"}
+     *      {"name"="id", "dataType"="integer", "requirement"="\d+", "description"="boutique Id"}
      *  },
      * headers={
      *      { "name"="Authorization",  "required"=true, "description"="Authorization token"}

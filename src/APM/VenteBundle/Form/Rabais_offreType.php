@@ -29,7 +29,6 @@ class Rabais_offreType extends AbstractType
 
         $builder
             ->add('dateLimite', DateTimeType::class)
-            ->add('nombreDefois', NumberType::class, ['required' => false])
             ->add('prixUpdate', MoneyType::class, [
                 'grouping' => true,
                 'required' => true,
@@ -53,6 +52,13 @@ class Rabais_offreType extends AbstractType
                 },
 
             ])
+            ->add('description')
+            ->add('restreint', CheckboxType::class, ['required' => false])
+            ->add('permanence', CheckboxType::class, ['required' => false])
+            ->add('nombreUtilisation', NumberType::class, ['required' => false])
+            ->add('valeur', MoneyType::class, [
+                'grouping' => true,
+                'required' => false])
             ->add('description');
     }
 

@@ -18,11 +18,6 @@ apm_vente_rabais_offre:
     resource: APM\VenteBundle\Controller\Rabais_offreController
     name_prefix: api_vente_
 
-apm_vente_remise:
-    type: rest
-    resource: APM\VenteBundle\Controller\RemiseController
-    name_prefix: api_vente_
-
 apm_vente_transaction_produit:
     type: rest
     resource: APM\VenteBundle\Controller\Transaction_produitController
@@ -32,5 +27,3 @@ apm_vente_transaction:
     type: rest
     resource: APM\VenteBundle\Controller\TransactionController
     name_prefix: api_vente_
-
-    #resource="@FOSUserBundle/Resources/config/routing/security.xml"

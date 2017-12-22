@@ -332,10 +332,7 @@ class Offre extends TradeFactory
      * @ORM\OneToMany(targetEntity="APM\UserBundle\Entity\Commentaire", mappedBy="offre")
      */
     private $commentaires;
-    /**
-     * @ORM\OneToMany(targetEntity="APM\VenteBundle\Entity\Remise", mappedBy="offre")
-     */
-    private $remises;
+
     /**
      * @var Specification_achat
      * @ORM\OneToMany(targetEntity="APM\AchatBundle\Entity\Specification_achat" , mappedBy="offre", cascade={"remove"})
@@ -365,7 +362,6 @@ class Offre extends TradeFactory
     {
         $this->service_apres_ventes = new ArrayCollection();
         $this->commentaires = new ArrayCollection();
-        $this->remises = new ArrayCollection();
         $this->code = "OF" . $var;
         $this->specifications = new ArrayCollection();
         $this->communications = new ArrayCollection();
@@ -899,40 +895,6 @@ class Offre extends TradeFactory
     public function getCommentaires()
     {
         return $this->commentaires;
-    }
-
-    /**
-     * Add remise
-     *
-     * @param Remise $remise
-     *
-     * @return Offre
-     */
-    public function addRemise(Remise $remise)
-    {
-        $this->remises[] = $remise;
-
-        return $this;
-    }
-
-    /**
-     * Remove remise
-     *
-     * @param Remise $remise
-     */
-    public function removeRemise(Remise $remise)
-    {
-        $this->remises->removeElement($remise);
-    }
-
-    /**
-     * Get remises
-     *
-     * @return Collection
-     */
-    public function getRemises()
-    {
-        return $this->remises;
     }
 
     /**
