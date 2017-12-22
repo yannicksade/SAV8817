@@ -42,17 +42,59 @@ class TransactionController extends FOSRestController
     private $boutique_filter;
     private $transactionProduit_filter;
     private $produit_filter;
+    private $dateFrom_filter;
+    private $dateTo_filter;
 
-    /** @ParamConverter("livraison", options={"mapping": {"livraison_id":"id"}})
-     * Liste les transactions d'un individu; effectuées et recues
+    /**
+     * @ApiDoc(
+     * resource=true,
+     * description="Retrieve list of transactions.",
+     * headers={
+     *      { "name"="Authorization", "required"=true, "description"="Authorization token"},
+     * },
+     * filters={
+     *      {"name"="dateFrom_filter", "dataType"="dateTime", "pattern"="19-12-2017|ASC"},
+     *      {"name"="dateTo_filter", "dataType"="dateTime", "pattern"="19-12-2017|DESC"},
+     *      {"name"="code_filter", "dataType"="string"},
+     *      {"name"="etat_filter", "dataType"="integer"},
+     *      {"name"="shipped_filter", "dataType"="boolean"},
+     *      {"name"="nature_filter", "dataType"="string"},
+     *      {"name"="boutiqueBeneficiaire_filter", "dataType"="string"},
+     *      {"name"="nature_filter", "dataType"="string"},
+     *      {"name"="boutique_filter", "dataType"="string"},
+     *      {"name"="produit_filter", "dataType"="string"},
+     *      {"name"="transactionProduit_filter", "dataType"="string"},
+     *      {"name"="length_filter", "dataType"="integer", "requirement"="\d+"},
+     *      {"name"="start_filter", "dataType"="integer", "requirement"="\d+"},
+     *  },
+     * requirements={
+     *   {"name"="q", "dataType"="string", "requirement"="\D+", "description"=" ==sent | received | done or receiver == e.g ?q=sent"}
+     * },
+     * output={
+     *   "class"="APM\VenteBundle\Entity\Transaction",
+     *   "parsers" = {
+     *      "Nelmio\ApiDocBundle\Parser\JmsMetadataParser"
+     *    },
+     *     "groups"={"owner_list"}
+     * },
+     *
+     * statusCodes={
+     *     "output" = "A single or a collection of transactions",
+     *     200="Returned when successful",
+     *     403="Returned when the user is not authorized to perform the action",
+     *     404="Returned when the specified resource is not found",
+     * },
+     *     views={"default", "vente"}
+     * )
+     * @ParamConverter("livraison", options={"mapping": {"livraison_id":"id"}})
      * @param Request $request
      * @param Boutique $boutique
      * @param Livraison $livraison
-     * @return \Symfony\Component\HttpFoundation\Response | JsonResponse
+     * @return JsonResponse
      *
      * @Get("/cget/transactions", name="s")
-     * @Get("/cget/transactions/boutique/{id}", name="s_boutique")
-     * @Get("/cget/transactions/livraison/{livraison_id}", name="s_livraison")
+     * @Get("/cget/transactions/boutique/{id}", name="s_boutique", requirements={"id"="boutique_id"})
+     * @Get("/cget/transactions/livraison/{livraison_id}", name="s_livraison", requirements={"livraison_id"="\d+"})
      */
     public function getAction(Request $request, Boutique $boutique = null, Livraison $livraison = null)
     {
@@ -60,23 +102,23 @@ class TransactionController extends FOSRestController
             $this->listAndShowSecurity($boutique);
             /** @var Utilisateur_avm $user */
             $user = $this->getUser();
-            $q = $request->get('q');
             $this->beneficiaire_filter = $request->query->has('beneficiaire_filter') ? $request->query->get('beneficiaire_filter') : "";
             $this->code_filter = $request->query->has('code_filter') ? $request->query->get('code_filter') : "";
             $this->nature_filter = $request->query->has('nature_filter') ? $request->query->get('nature_filter') : "";
             $this->etat_filter = $request->query->has('etat_filter') ? $request->query->get('etat_filter') : "";
             $this->montant_filter = $request->query->has('montant_filter') ? $request->query->get('montant_filter') : "";
-
             $this->shipped_filter = $request->query->has('shipped_filter') ? $request->query->get('shipped_filter') : "";
             $this->boutiqueBeneficiaire_filter = $request->query->has('boutiqueBeneficiaire_filter') ? $request->query->get('boutiqueBeneficiaire_filter') : "";
             $this->boutique_filter = $request->query->has('boutique_filter') ? $request->query->get('boutique_filter') : "";
             $this->transactionProduit_filter = $request->query->has('transactionProduit_filter') ? $request->query->get('transactionProduit_filter') : "";
             $this->produit_filter = $request->query->has('produit_filter') ? $request->query->get('produit_filter') : "";
-
+            $this->dateFrom_filter = $request->query->has('dateFrom_filter') ? $request->query->get('dateFrom_filter') : "";
+            $this->dateTo_filter = $request->query->has('dateTo_filter') ? $request->query->get('dateTo_filter') : "";
             $iDisplayLength = $request->query->has('length') ? $request->query->get('length') : -1;
             $iDisplayStart = $request->query->has('start') ? intval($request->query->get('start')) : 0;
             $json = array();
             $json['items'] = array();
+            $q = $request->query->has('q') ? $request->query->get('q') : "all";
             if ($q === "sent" || $q === "all") {
                 $transactionsEffectues = (null !== $boutique) ? $boutique->getTransactions() : $user->getTransactionsEffectues();
                 $iTotalRecords = count($transactionsEffectues);
@@ -220,6 +262,22 @@ class TransactionController extends FOSRestController
                 return strncasecmp($str1, $str2, $len) === 0 ? true : false;
             });
         }
+        if ($this->dateFrom_filter != null) {
+            $transactions = $transactions->filter(function ($e) {//start date
+                /** @var Transaction $e */
+                $dt1 = (new \DateTime($e->getDate()->format('d-m-Y')))->getTimestamp();
+                $dt2 = (new \DateTime($this->dateFrom_filter))->getTimestamp();
+                return $dt1 - $dt2 >= 0 ? true : false; //start from the given date 'dateFrom_filter'
+            });
+        }
+        if ($this->dateTo_filter != null) {
+            $transactions = $transactions->filter(function ($e) {//end date
+                /** @var Transaction $e */
+                $dt = (new \DateTime($e->getDate()->format('d-m-Y')))->getTimestamp();
+                $dt2 = (new \DateTime($this->dateTo_filter))->getTimestamp();
+                return $dt - $dt2 <= 0 ? true : false;// end from at the given date 'dateTo_filter'
+            });
+        }
         if ($this->produit_filter != null) {
             $transactions = $transactions->filter(function ($e) {//search for occurences in the text
                 /** @var Transaction $e */
@@ -274,7 +332,31 @@ class TransactionController extends FOSRestController
     }
 
     /**
-     * Creates a new Transaction entity.
+     * @ApiDoc(
+     * resource=true,
+     * resourceDescription="Operations on Transaction.",
+     * description="Create an object of type Transaction.",
+     * statusCodes={
+     *         201="Returned when successful",
+     *         400="Returned when the data are not valid or an unknown error occurred",
+     *         403="Returned when the user is not authorized to carry on the action",
+     *         404="Returned when the entity is not found",
+     * },
+     * headers={
+     *      { "name"="Authorization",  "required"=true, "description"="Authorization token"}
+     * },
+     *  requirements={
+     *      {"name"="id", "required"=true, "requirement"="\d+", "dataType"="integer", "description"= "transaction Id"}
+     *  },
+     * input={
+     *    "class"="APM\VenteBundle\Entity\Transaction",
+     *     "parsers" = {
+     *          "Nelmio\ApiDocBundle\Parser\ValidationParser"
+     *      },
+     *    "name" = "Transaction",
+     * },
+     *      views = {"default", "vente" }
+     * )
      * @param Request $request
      * @param Boutique $boutique
      * @return View | JsonResponse
@@ -342,14 +424,36 @@ class TransactionController extends FOSRestController
     }
 
     /**
-     * Finds and displays a Transaction entity.
-     * @param Request $request
+     * @ApiDoc(
+     * resource=true,
+     * description="Retrieve the details of an objet of type Transaction.",
+     * headers={
+     *      { "name"="Authorization", "required"=true, "description"="Authorization token"},
+     * },
+     * requirements = {
+     *      {"name"="id", "dataType"="integer", "requirement"="\d+", "description"="transaction id"}
+     * },
+     * output={
+     *   "class"="APM\VenteBundle\Entity\Transaction",
+     *   "parsers" = {
+     *      "Nelmio\ApiDocBundle\Parser\JmsMetadataParser"
+     *    },
+     *     "groups"={"owner_transaction_details", "owner_list"}
+     * },
+     * statusCodes={
+     *     "output" = "A single Object",
+     *     200="Returned when successful",
+     *     403="Returned when the user is not authorized to perform the action",
+     *     404="Returned when the specified resource is not found",
+     * },
+     *     views={"default", "vente"}
+     * )
      * @param Transaction $transaction
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return JsonResponse
      *
      * @Get("/show/transaction/{id}")
      */
-    public function showAction(Request $request, Transaction $transaction)
+    public function showAction(Transaction $transaction)
     {
         $this->listAndShowSecurity($transaction->getBoutique(), $transaction);
         $data = $this->get('apm_core.data_serialized')->getFormalData($transaction, ["owner_transaction_details", "owner_list"]);
@@ -357,7 +461,32 @@ class TransactionController extends FOSRestController
     }
 
     /**
-     * Displays a form to edit an existing Transaction entity.
+     * @ApiDoc(
+     * resource=true,
+     * resourceDescription="Operations on Transaction",
+     * description="Update an object of type Transaction.",
+     * statusCodes={
+     *         200="Returned when successful",
+     *         400="Returned when the data are not valid or an unknown error occurred",
+     *         403="Returned when the user is not authorized to carry on the action",
+     *         404="Returned when the entity is not found",
+     * },
+     * headers={
+     *      { "name"="Authorization", "required"="true", "description"="Authorization token"}
+     * },
+     * requirements = {
+     *      {"name"="id", "dataType"="integer", "requirement"="\d+", "description"="transaction Id"}
+     * },
+     * input={
+     *    "class"="APM\VenteBundle\Entity\Transaction",
+     *     "parsers" = {
+     *          "Nelmio\ApiDocBundle\Parser\ValidationParser"
+     *      },
+     *    "name" = "Transaction",
+     * },
+     *
+     * views = {"default", "vente" }
+     * )
      * @param Request $request
      * @param Transaction $transaction
      * @return View | JsonResponse
@@ -429,7 +558,26 @@ class TransactionController extends FOSRestController
 
 
     /**
-     * Deletes a Transaction entity.
+     * @ApiDoc(
+     * resource=true,
+     * description="Delete objet of type Transaction.",
+     * headers={
+     *      { "name"="Authorization", "required"="true", "description"="Authorization token"},
+     * },
+     * requirements = {
+     *      {"name"="id", "dataType"="integer", "required"=true, "requirement"="\d+", "description"="transaction Id"}
+     * },
+     * parameters = {
+     *      {"name"="exec", "required"=true, "dataType"="string", "requirement"="\D+", "description"="needed to check the origin of the request", "format"="exec=go"}
+     * },
+     * statusCodes={
+     *     200="Returned when successful",
+     *     400="Returned when the data are not valid or an unknown error occurred",
+     *     403="Returned when the user is not authorized to perform the action",
+     *     404="Returned when the specified resource is not found",
+     * },
+     *     views={"default", "vente"}
+     * )
      * @param Request $request
      * @param Transaction $transaction
      * @return View | JsonResponse

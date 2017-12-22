@@ -46,12 +46,48 @@ class LivraisonController extends FOSRestController
     private $datePrevueTo_filter;
 
     /**
+     * @ApiDoc(
+     * resource=true,
+     * description="Retrieve list of type Livraison.",
+     * headers={
+     *      { "name"="Authorization", "required"="true", "description"="Authorization token"},
+     * },
+     * filters={
+     *      {"name"="code_filter", "dataType"="string"},
+     *      {"name"="datePrevueFrom_filter", "dataType"="dateTime", "pattern"="19-12-2017|ASC"},
+     *      {"name"="datePrevueTo_filter", "dataType"="dateTime", "pattern"="19-12-2017|DESC"},
+     *      {"name"="dateEnregistrementFrom_filter", "dataType"="dateTime", "pattern"="19-12-2017|ASC"},
+     *      {"name"="dateEnregistrementTo_filter", "dataType"="dateTime", "pattern"="19-12-2017|DESC"},
+     *      {"name"="description_filter", "dataType"="string"},
+     *      {"name"="etat_filter", "dataType"="integer"},
+     *      {"name"="livreur_boutique", "dataType"="string"},
+     *      {"name"="priorite_filter", "dataType"="integer"},
+     *      {"name"="valide_filter", "dataType"="boolean"},
+     *      {"name"="length_filter", "dataType"="integer", "requirement"="\d+"},
+     *      {"name"="start_filter", "dataType"="integer", "requirement"="\d+"},
+     *  },
+     *
+     * output={
+     *   "class"="APM\TransportBundle\Entity\Livraison",
+     *   "parsers" = {
+     *      "Nelmio\ApiDocBundle\Parser\JmsMetadataParser"
+     *    },
+     *     "groups"={"owner_list"}
+     * },
+     * statusCodes={
+     *     "output" = "A single or a collection of Livraison",
+     *     200="Returned when successful",
+     *     403="Returned when the user is not authorized to perform the action",
+     *     404="Returned when the specified resource is not found",
+     * },
+     *     views={"default", "transport"}
+     * )
      * @param Request $request
      * @param Boutique $boutique
      * @return JsonResponse
      *
      * @Get("/cget/livraisons", name="s")
-     * @Get("/cget/livraisons/boutique/{id}", name="s_boutique")
+     * @Get("/cget/livraisons/boutique/{id}", name="s_boutique", requirements={"id"="boutique_id"})
      */
     public function getAction(Request $request, Boutique $boutique = null)
     {
@@ -222,6 +258,28 @@ class LivraisonController extends FOSRestController
     }
 
     /**
+     * @ApiDoc(
+     * resource=true,
+     * resourceDescription="Operations on Livraison.",
+     * description="Create an object of type livraison.",
+     * statusCodes={
+     *         201="Returned when successful",
+     *         400="Returned when the data are not valid or an unknown error occurred",
+     *         403="Returned when the user is not authorized to carry on the action",
+     *         404="Returned when the entity is not found",
+     * },
+     * headers={
+     *      { "name"="Authorization",  "required"=true, "description"="Authorization token"}
+     * },
+     * input={
+     *    "class"="APM\TransportBundle\Entity\Livraison",
+     *     "parsers" = {
+     *          "Nelmio\ApiDocBundle\Parser\ValidationParser"
+     *      },
+     *    "name" = "Livraison",
+     * },
+     * views = {"default", "transport" }
+     * )
      * @ParamConverter("transaction", options={"mapping":{"transaction_id":"id"}})
      * Creates a new Livraison entity.
      * @param Request $request
@@ -230,9 +288,9 @@ class LivraisonController extends FOSRestController
      * @return View | JsonResponse
      *
      * @Post("/new/livraison")
-     * @Post("/new/livraison/boutique/{id}", name="_boutique")
-     * @Post("/new/livraison/transaction/{transaction_id}", name="_transaction")
-     * @Post("/new/livraison/boutique/{id}/transaction/{transaction_id}", name="_boutique_transaction")
+     * @Post("/new/livraison/boutique/{id}", name="_boutique", requirements={"id"="boutique_id"})
+     * @Post("/new/livraison/transaction/{transaction_id}", name="_transaction", requirements={"transaction_id"="\d+"})
+     * @Post("/new/livraison/boutique/{id}/transaction/{transaction_id}", name="_boutique_transaction", requirements={"id"="boutique_id", "transaction_id"="\d+"})
      */
     public function newAction(Request $request, Boutique $boutique = null, Transaction $transaction = null)
     {
@@ -317,13 +375,37 @@ class LivraisonController extends FOSRestController
     }
 
     /**
+     * @ApiDoc(
+     * resource=true,
+     * description="Retrieve the details of an objet of type livraison.",
+     * headers={
+     *      { "name"="Authorization", "required"="true", "description"="Authorization token"},
+     * },
+     * requirements = {
+     *      {"name"="id", "dataType"="integer", "requirement"="\d+", "description"="livraison id"}
+     * },
+     * output={
+     *   "class"="APM\TransportBundle\Entity\Livraison",
+     *   "parsers" = {
+     *      "Nelmio\ApiDocBundle\Parser\JmsMetadataParser"
+     *    },
+     *     "groups"={"owner_livraison_details", "owner_list"}
+     * },
+     * statusCodes={
+     *     "output" = "A single Object",
+     *     200="Returned when successful",
+     *     403="Returned when the user is not authorized to perform the action",
+     *     404="Returned when the specified resource is not found",
+     * },
+     *     views={"default", "transport"}
+     * )
      * @ParamConverter("transaction", options={"mapping":{"transaction_id":"id"}})
      * voir un livraison
      * @param Livraison $livraison
      * @param Transaction $transaction
      * @return JsonResponse
-     *
-     * @Get("/show/livraison{id}")
+     * @Get("/show/livraison/{id}")
+     * @Get("/show/livraison/{id}/transaction/{transaction_id}", name="_transaction", requirements={"transaction_id"="\d+"})
      */
     public function showAction(Livraison $livraison, Transaction $transaction = null)
     {
@@ -337,6 +419,32 @@ class LivraisonController extends FOSRestController
     }
 
     /**
+     * @ApiDoc(
+     * resource=true,
+     * resourceDescription="Operations on Livraison",
+     * description="Update an object of type Livraison.",
+     * statusCodes={
+     *         200="Returned when successful",
+     *         400="Returned when the data are not valid or an unknown error occurred",
+     *         403="Returned when the user is not authorized to carry on the action",
+     *         404="Returned when the entity is not found",
+     * },
+     * headers={
+     *      { "name"="Authorization", "required"="true", "description"="Authorization token"}
+     * },
+     * requirements = {
+     *      {"name"="id", "dataType"="integer", "requirement"="\d+", "description"="livraison Id"}
+     * },
+     * input={
+     *    "class"="APM\TransportBundle\Entity\Livraison",
+     *     "parsers" = {
+     *          "Nelmio\ApiDocBundle\Parser\ValidationParser"
+     *      },
+     *    "name" = "Transport",
+     * },
+     *
+     * views = {"default", "transport" }
+     * )
      * @param Request $request
      * @param Livraison $livraison
      * @return View | JsonResponse
@@ -406,7 +514,26 @@ class LivraisonController extends FOSRestController
     }
 
     /**
-     * Deletes a Livraison entity.
+     * @ApiDoc(
+     * resource=true,
+     * description="Delete objet of type livraison.",
+     * headers={
+     *      { "name"="Authorization", "required"="true", "description"="Authorization token"},
+     * },
+     * requirements = {
+     *      {"name"="id", "dataType"="integer", "required"=true, "requirement"="\d+", "description"="livraison Id"}
+     * },
+     * parameters = {
+     *      {"name"="exec", "required"=true, "dataType"="string", "requirement"="\D+", "description"="needed to check the origin of the request", "format"="exec=go"}
+     * },
+     * statusCodes={
+     *     200="Returned when successful",
+     *     400="Returned when the data are not valid or an unknown error occurred",
+     *     403="Returned when the user is not authorized to perform the action",
+     *     404="Returned when the specified resource is not found",
+     * },
+     *     views={"default", "transport"}
+     * )
      * @param Request $request
      * @param Livraison $livraison
      * @return View | JsonResponse

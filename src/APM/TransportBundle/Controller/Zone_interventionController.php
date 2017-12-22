@@ -37,6 +37,40 @@ class Zone_interventionController extends FOSRestController
     private $transporteur_filter;
 
     /**
+     * @ApiDoc(
+     * resource=true,
+     * description="Retrieve list of type Zone_intervention",
+     * headers={
+     *      {"name"="Authorization", "required"=true, "description"="Authorization token"},
+     * },
+     * filters={
+     *      {"name"="designation_filter", "dataType"="string"},
+     *      {"name"="code_filter", "dataType"="string"},
+     *      {"name"="description_filter", "dataType"="integer"},
+     *      {"name"="adresse_filter", "dataType"="integer"},
+     *      {"name"="pays_filter", "dataType"="integer"},
+     *      {"name"="transporteur_filter", "dataType"="integer"},
+     *      {"name"="length_filter", "dataType"="integer", "requirement"="\d+"},
+     *      {"name"="start_filter", "dataType"="integer", "requirement"="\d+"},
+     *  },
+     * output={
+     *   "class"="APM\TransportBundle\Entity\Zone_intervention",
+     *   "parsers" = {
+     *      "Nelmio\ApiDocBundle\Parser\JmsMetadataParser"
+     *    },
+     *     "groups"={"owner_list"}
+     * },
+     *     requirements={
+     *          {"name"="id", "required"=true, "dataType"="integer", "requirements"="\d+", "description"="Zone_intervention Id"}
+     *     },
+     * statusCodes={
+     *     "output" = "A single or a collection of Zone_intervention",
+     *     200="Returned when successful",
+     *     403="Returned when the user is not authorized to perform the action",
+     *     404="Returned when the specified resource is not found",
+     * },
+     *     views={"default", "transport"}
+     * )
      * @param Request $request
      * @return JsonResponse
      *
@@ -172,9 +206,31 @@ class Zone_interventionController extends FOSRestController
     }
 
     /**
+     * @ApiDoc(
+     * resource=true,
+     * resourceDescription="Operations on Zone intervention.",
+     * description="Create an object of type Zone_intervention.",
+     * statusCodes={
+     *         201="Returned when successful",
+     *         400="Returned when the data are not valid or an unknown error occurred",
+     *         403="Returned when the user is not authorized to carry on the action",
+     *         404="Returned when the entity is not found",
+     * },
+     * headers={
+     *      { "name"="Authorization",  "required"=true, "description"="Authorization token"}
+     * },
+     * input={
+     *    "class"="APM\TransportBundle\Entity\Zone_intervention",
+     *     "parsers" = {
+     *          "Nelmio\ApiDocBundle\Parser\ValidationParser"
+     *      },
+     *    "name" = "zone_intervention",
+     * },
+     *      views = {"default", "transport" }
+     * )
      * @param Request $request
      * @return View | JsonResponse
-     * @Post("/new/zoneintervention/{id}")
+     * @Post("/new/zoneintervention")
      */
     public function newAction(Request $request)
     {
@@ -242,7 +298,30 @@ class Zone_interventionController extends FOSRestController
     }
 
     /**
-     * Finds and displays a Zone_intervention entity.
+     * @ApiDoc(
+     * resource=true,
+     * description="Retrieve the details of an objet of type zone_intervention.",
+     * headers={
+     *      { "name"="Authorization", "required"="true", "description"="Authorization token"},
+     * },
+     * requirements = {
+     *      {"name"="id", "dataType"="integer", "requirement"="\d+", "description"="Zone_intervention id"}
+     * },
+     * output={
+     *   "class"="APM\TransportBundle\Entity\Zone_intervention",
+     *   "parsers" = {
+     *      "Nelmio\ApiDocBundle\Parser\JmsMetadataParser"
+     *    },
+     *     "groups"={"owner_zone_details", "owner_list"}
+     * },
+     * statusCodes={
+     *     "output" = "A single object",
+     *     200="Returned when successful",
+     *     403="Returned when the user is not authorized to perform the action",
+     *     404="Returned when the specified resource is not found",
+     * },
+     *     views={"default", "transport"}
+     * )
      * @param Zone_intervention $zone_intervention
      * @return JsonResponse
      *
@@ -256,7 +335,32 @@ class Zone_interventionController extends FOSRestController
     }
 
     /**
-     * Displays a form to edit an existing Zone_intervention entity.
+     * @ApiDoc(
+     * resource=true,
+     * resourceDescription="Operations on Zone_intervention",
+     * description="Update an object of type Zone_intervention.",
+     * statusCodes={
+     *         200="Returned when successful",
+     *         400="Returned when the data are not valid or an unknown error occurred",
+     *         403="Returned when the user is not authorized to carry on the action",
+     *         404="Returned when the entity is not found",
+     * },
+     * headers={
+     *      { "name"="Authorization", "required"="true", "description"="Authorization token"}
+     * },
+     * requirements = {
+     *      {"name"="id", "dataType"="integer", "requirement"="\d+", "description"="Zone_intervention Id"}
+     * },
+     * input={
+     *    "class"="APM\TransportBundle\Entity\Zone_intervention",
+     *     "parsers" = {
+     *          "Nelmio\ApiDocBundle\Parser\ValidationParser"
+     *      },
+     *    "name" = "zone_intervention",
+     * },
+     *
+     * views = {"default", "transport" }
+     * )
      * @param Request $request
      * @param Zone_intervention $zone_intervention
      * @return View | JsonResponse
@@ -329,7 +433,26 @@ class Zone_interventionController extends FOSRestController
 
 
     /**
-     * Deletes a Zone_intervention entity.
+     * @ApiDoc(
+     * resource=true,
+     * description="Delete objet of type Zone_intervention",
+     * headers={
+     *      { "name"="Authorization", "required"="true", "description"="Authorization token"},
+     * },
+     * requirements = {
+     *      {"name"="id", "dataType"="integer", "required"=true, "requirement"="\d+", "description"="zone_intervention Id"}
+     * },
+     * parameters = {
+     *      {"name"="exec", "required"=true, "dataType"="string", "requirement"="\D+", "description"="needed to check the origin of the request", "format"="exec=go"}
+     * },
+     * statusCodes={
+     *         200="Returned when successful",
+     *         400="Returned when the data are not valid or an unknown error occurred",
+     *         403="Returned when the user is not authorized to carry on the action",
+     *         404="Returned when the entity is not found",
+     * },
+     *     views={"default", "transport"}
+     * )
      * @param Request $request
      * @param Zone_intervention $zone_intervention
      * @return View | JsonResponse

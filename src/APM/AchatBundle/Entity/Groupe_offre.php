@@ -35,19 +35,21 @@ class Groupe_offre extends TradeFactory
     private $code;
 
     /**
+     * Date d'execution des opérations
      * @var \DateTime
+     * @Type("DateTime<'d-m-Y H:i'>")
      * @Expose
      * @Groups({"owner_groupeO_details"})
-     * @Assert\DateTime
+     * @Assert\DateTime()
      * @ORM\Column(name="dateDeVigueur", type="datetime", nullable=true)
      */
     private $dateDeVigueur;
 
     /**
      * @var \DateTime
+     * @Type("DateTime<'d-m-Y H:i'>")
      * @Expose
      * @Groups({"owner_groupeO_details"})
-     * @Assert\DateTime
      * @ORM\Column(name="dateCreation", type="datetime", nullable=true)
      */
     private $dateCreation;
@@ -55,6 +57,7 @@ class Groupe_offre extends TradeFactory
 
     /**
      * @var integer
+     * @Type("integer")
      * @Expose
      * @Groups({"owner_groupeO_details"})
      * @ORM\Column(name="propriete", type="integer", nullable=true)

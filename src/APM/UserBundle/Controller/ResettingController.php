@@ -22,16 +22,30 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use FOS\RestBundle\Controller\Annotations\Post;
 use FOS\RestBundle\Controller\Annotations\Get;
 use FOS\RestBundle\Controller\Annotations\RouteResource;
-
+use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 /**
  * Controller managing the resetting of the password.
  *
- * @author Thibault Duplessis <thibault.duplessis@gmail.com>
- * @author Christophe Coevoet <stof@notk.org>
+ * @author yannick sade <yannicksade@gmail.com>
  */
 class ResettingController extends FOSRestController
 {
     /**
+     * @ApiDoc(
+     * resource=true,
+     * description="Reset user password ",
+     * parameters = {
+     *     {"name"="username", "dataType"="string", "required"=true, "format"="yannick | ysade@avm.com", "description"="username or email"}
+     * },
+     *  statusCodes={
+     *     "output" = "Ends by returning the user reset form",
+     *     200="Returned when successful",
+     *     400="Returned when the data are not valid or an unknown error occurs",
+     *     403="Returned when the user is not authorized to perform the action",
+     *     404="Returned when the specified resource is not found",
+     *  },
+     *     views={"default","profile"}
+     * ),
      * @Post("/user/request")
      * @param Request $request
      * @return FormInterface|JsonResponse|Response
@@ -42,7 +56,20 @@ class ResettingController extends FOSRestController
     }
 
     /**
-     * Reset user password
+     * @ApiDoc(
+     * resource=true,
+     * description="Confirm resetting of user password from e-mail",
+     *  statusCodes={
+     *     200="Returned when successful",
+     *     400="Returned when the data are not valid or an unknown error occurs",
+     *     403="Returned when the user is not authorized to perform the action",
+     *     404="Returned when the specified resource is not found",
+     *  },
+     * requirements = {
+     *   {"name"="token", "dataType"="string", "requirement"="\D+", "required"=true, "description"="token ..."}
+     * },
+     *     views={"default","profile"}
+     * ),
      * @Post("/user/confirm")
      * @param Request $request
      * @return FormInterface|JsonResponse|Response
@@ -56,6 +83,24 @@ class ResettingController extends FOSRestController
     //----------------------------------- staff ------------------------------------------------
 
     /**
+     * @ApiDoc(
+     * resource=true,
+     * description="Reset staff password",
+     * parameters = {
+     *     {"name"="username", "dataType"="string", "required"=true, "format"="yannick | ysade@avm.com", "description"="username or email"}
+     * },
+     * requirements = {
+     *     {"name"="token", "dataType"="string", "required"=true, "description"="token"}
+     * },
+     *  statusCodes={
+     *     "output" = "Ends by returning the staff reset form",
+     *     200="Returned when successful",
+     *     400="Returned when the data are not valid or an unknown error occurs",
+     *     403="Returned when the user is not authorized to perform the action",
+     *     404="Returned when the specified resource is not found",
+     *  },
+     *     views={"default","profile"}
+     * ),
      * @Post("/staff/request")
      * @param Request $request
      * @return FormInterface|JsonResponse|Response
@@ -66,7 +111,20 @@ class ResettingController extends FOSRestController
     }
 
     /**
-     * Reset user password
+     * @ApiDoc(
+     * resource=true,
+     * description="Confirm resetting of staff password from e-mail",
+     *  statusCodes={
+     *     200="Returned when successful",
+     *     400="Returned when the data are not valid or an unknown error occurs",
+     *     403="Returned when the user is not authorized to perform the action",
+     *     404="Returned when the specified resource is not found",
+     *  },
+     * requirements = {
+     *   {"name"="token", "dataType"="string", "requirement"="\D+", "required"=true, "description"="token ..."}
+     * },
+     *     views={"default","profile"}
+     * ),
      * @Post("/staff/confirm")
      * @param Request $request
      * @return FormInterface|JsonResponse|Response

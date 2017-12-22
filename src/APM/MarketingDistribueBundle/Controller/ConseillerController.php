@@ -38,10 +38,43 @@ class ConseillerController extends FOSRestController
     private $isConseillerA2;
 
     /**
-     * Liste tous les conseillers
+     * @ApiDoc(
+     * resource=true,
+     * description="Retrieve list of Conseillers.",
+     * headers={
+     *      { "name"="Authorization", "required"="true", "description"="Authorization token"},
+     * },
+     * filters={
+     *      {"name"="code_filter", "dataType"="string"},
+     *      {"name"="dateFrom_filter", "dataType"="dateTime", "pattern"="19-12-2017|ASC"},
+     *      {"name"="dateTo_filter", "dataType"="dateTime", "pattern"="19-12-2017|DESC"},
+     *      {"name"="dateCreationReseauFrom_filter", "dataType"="dateTime", "pattern"="19-12-2017|ASC"},
+     *      {"name"="dateCreationReseauTo_filter", "dataType"="dateTime", "pattern"="19-12-2017|DESC"},
+     *      {"name"="matricule_filter", "dataType"="string"},
+     *      {"name"="description_filter", "dataType"="string"},
+     *      {"name"="valeurQuota_filter", "dataType"="integer"},
+     *      {"name"="length_filter", "dataType"="integer", "requirement"="\d+"},
+     *      {"name"="start_filter", "dataType"="integer", "requirement"="\d+"},
+     *  },
+     *
+     * output={
+     *   "class"="APM\MarketingBundle\Entity\Conseiller",
+     *   "parsers" = {
+     *      "Nelmio\ApiDocBundle\Parser\JmsMetadataParser"
+     *    },
+     *     "groups"={"owner_list"}
+     * },
+     * statusCodes={
+     *     "output" = "A single or a collection of Conseiller",
+     *     200="Returned when successful",
+     *     403="Returned when the user is not authorized to perform the action",
+     *     404="Returned when the specified resource is not found",
+     * },
+     *     views={"default", "marketing"}
+     * )
      * @return JsonResponse
      *
-     * @Get("/cget/conseiller")
+     * @Get("/cget/conseillers", name="s")
      */
     public function getAction()
     {
@@ -186,11 +219,32 @@ class ConseillerController extends FOSRestController
     }
 
     /**
-     * Creates a new Conseiller entity.
+     * @ApiDoc(
+     * resource=true,
+     * resourceDescription="Operations on Conseiller",
+     * description="Create an object of type Conseiller",
+     * statusCodes={
+     *         201="Returned when successful",
+     *         400="Returned when the data are not valid or an unknown error occurred",
+     *         403="Returned when the user is not authorized to carry on the action",
+     *         404="Returned when the entity is not found",
+     * },
+     * headers={
+     *      { "name"="Authorization", "required"=true, "description"="Authorization token"}
+     * },
+     * input={
+     *    "class"="APM\MarketingDistribueBundle\Entity\Conseiller",
+     *     "parsers" = {
+     *          "Nelmio\ApiDocBundle\Parser\ValidationParser"
+     *      },
+     *    "name" = "Conseiller",
+     * },
+     *  views = {"default", "marketing" }
+     * )
      * @param Request $request
      * @return View | JsonResponse
      *
-     * @Post("/new")
+     * @Post("/new/conseiller")
      */
     public function newAction(Request $request)
     {
@@ -243,11 +297,34 @@ class ConseillerController extends FOSRestController
     }
 
     /**
-     * Finds and displays a Conseiller entity.
+     * @ApiDoc(
+     * resource=true,
+     * description="Retrieve the details of an objet of type Conseiller",
+     * headers={
+     *      { "name"="Authorization", "required"="true", "description"="Authorization token"},
+     * },
+     * requirements = {
+     *      {"name"="id", "dataType"="integer", "requirement"="\d+", "description"="conseiller_id"}
+     * },
+     * output={
+     *   "class"="APM\MarketingDistribueBundle\Entity\Conseiller",
+     *   "parsers" = {
+     *      "Nelmio\ApiDocBundle\Parser\JmsMetadataParser"
+     *    },
+     *     "groups"={"owner_conseiller_details", "owner_list"}
+     * },
+     * statusCodes={
+     *     "output" = "A single Object",
+     *     200="Returned when successful",
+     *     403="Returned when the user is not authorized to perform the action",
+     *     404="Returned when the specified resource is not found",
+     * },
+     *     views={"default", "marketing"}
+     * )
      * @param Conseiller $conseiller
      * @return JsonResponse
      *
-     * @Get("/show/{id}")
+     * @Get("/show/conseiller/{id}")
      */
     public function showAction(Conseiller $conseiller)
     {
@@ -257,11 +334,36 @@ class ConseillerController extends FOSRestController
     }
 
     /**
+     * @ApiDoc(
+     * resource=true,
+     * resourceDescription="Operations on conseiller",
+     * description="Update an object of type Conseiller.",
+     * statusCodes={
+     *         200="Returned when successful",
+     *         400="Returned when the data are not valid or an unknown error occurred",
+     *         403="Returned when the user is not authorized to carry on the action",
+     *         404="Returned when the entity is not found",
+     * },
+     * headers={
+     *      { "name"="Authorization", "required"=true, "description"="Authorization token"}
+     * },
+     * requirements = {
+     *      {"name"="id", "dataType"="integer", "requirement"="\d+", "description"="conseiller Id"}
+     * },
+     * input={
+     *    "class"="APM\MarketingDistribueBundle\Entity\Conseiller",
+     *     "parsers" = {
+     *          "Nelmio\ApiDocBundle\Parser\ValidationParser"
+     *      },
+     *    "name" = "Conseiller",
+     * },
+     *     views={"default","marketing"}
+     * )
      * @param Request $request
      * @param Conseiller $conseiller
      * @return View | JsonResponse
      *
-     * @Get("/edit/conseiller/{id}")
+     * @Post("/edit/conseiller/{id}")
      */
     public function editAction(Request $request, Conseiller $conseiller)
     {
@@ -319,11 +421,30 @@ class ConseillerController extends FOSRestController
 
 
     /**
+     * @ApiDoc(
+     * resource=true,
+     * description="Delete objet of type Conseiller",
+     * headers={
+     *      { "name"="Authorization", "required"="true", "description"="Authorization token"},
+     * },
+     * requirements = {
+     *      {"name"="id", "dataType"="integer", "required"=true, "requirement"="\d+", "description"="conseiller Id"}
+     * },
+     * parameters = {
+     *      {"name"="exec", "required"=true, "dataType"="string", "requirement"="\D+", "description"="needed to check the origin of the request", "format"="exec=go"}
+     * },
+     * statusCodes={
+     *     200="Returned when successful",
+     *     403="Returned when the user is not authorized to perform the action",
+     *     404="Returned when the specified resource is not found",
+     * },
+     *     views={"default", "marketing"}
+     * )
      * @param Request $request
      * @param Conseiller $conseiller
      * @return View | JsonResponse
      *
-     * @Delete("/delete/profile-conseiller/{id}")
+     * @Delete("/delete/conseiller/{id}")
      */
     public function deleteAction(Request $request, Conseiller $conseiller)
     {

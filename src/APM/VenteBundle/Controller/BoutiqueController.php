@@ -36,16 +36,53 @@ class BoutiqueController extends FOSRestController implements ClassResourceInter
     private $etat_filter;
     private $nationalite_filter;
     private $description_filter;
+    private $dateCreationFrom_filter;
+    private $dateCreationTo_filter;
     #private $dateTo_filter;
     #private $dateFrom_filter;
 
     /**
+     * @ApiDoc(
+     * resource=true,
+     * description="Retrieve list of boutiques.",
+     * headers={
+     *      { "name"="Authorization", "required"="true", "description"="Authorization token"},
+     * },
+     * filters={
+     *      {"name"="nationalite_filter", "dataType"="string"},
+     *      {"name"="dateCreationFrom_filter", "dataType"="dateTime", "pattern"="19-12-2017|ASC"},
+     *      {"name"="dateCreationTo_filter", "dataType"="dateTime", "pattern"="19-12-2017|DESC"},
+     *      {"name"="description_filter", "dataType"="string"},
+     *      {"name"="code_filter", "dataType"="string"},
+     *      {"name"="etat_filter", "dataType"="integer"},
+     *      {"name"="designation_filter", "dataType"="string"},
+     *      {"name"="length_filter", "dataType"="integer", "requirement"="\d+"},
+     *      {"name"="start_filter", "dataType"="integer", "requirement"="\d+"},
+     *  },
+     * output={
+     *   "class"="APM\VenteBundle\Entity\Boutique",
+     *   "parsers" = {
+     *      "Nelmio\ApiDocBundle\Parser\JmsMetadataParser"
+     *    },
+     *     "groups"={"owner_list"}
+     * },
+     *  parameters= {
+     *      {"name"="q", "required"=false, "dataType"="string", "requirement"="\D+", "description"="query request==owner or shopkeeper==", "format"= "?q=owner"}
+     *  },
+     * statusCodes={
+     *     "output" = "A single or a collection of boutiques",
+     *     200="Returned when successful",
+     *     403="Returned when the user is not authorized to perform the action",
+     *     404="Returned when the specified resource is not found",
+     * },
+     *     views={"default", "vente"}
+     * )
      * @param Request $request
      * @param Utilisateur_avm|null $user
      * @return JsonResponse
      *
      * @Get("/cget/boutiques", name="s")
-     * @Get("/cget/boutiques/user/{id}", name="s_user")
+     * @Get("/cget/boutiques/user/{id}", name="s_user", requirements={"id"="user_id"})
      */
     public function getAction(Request $request, Utilisateur_avm $user = null)
     {
@@ -57,8 +94,9 @@ class BoutiqueController extends FOSRestController implements ClassResourceInter
             } else {
                 $this->adminSecurity();
             }
-            //filtre
             /** @var Boutique $boutique */
+            $this->dateCreationFrom_filter = $request->query->has('dateCreationFrom_filter') ? $request->query->get('dateCreationFrom_filter') : "";
+            $this->dateCreationTo_filter = $request->query->has('dateCreationTo_filter') ? $request->query->get('dateCreationTo_filter') : "";
             $this->nationalite_filter = $request->query->has('nationalite_filter') ? $request->query->get('nationalite_filter') : "";
             $this->code_filter = $request->query->has('code_filter') ? $request->query->get('code_filter') : "";
             $this->designation_filter = $request->query->has('designation_filter') ? $request->query->get('designation_filter') : "";
@@ -172,6 +210,23 @@ class BoutiqueController extends FOSRestController implements ClassResourceInter
             });
         }
 
+        if ($this->dateCreationFrom_filter != null) {
+            $boutiques = $boutiques->filter(function ($e) {//start date
+                /** @var Boutique $e */
+                $dt1 = (new \DateTime($e->getDateCreation()->format('d-m-Y H:i')))->getTimestamp();
+                $dt2 = (new \DateTime($this->dateCreationFrom_filter))->getTimestamp();
+                return $dt1 - $dt2 >= 0 ? true : false; //start from the given date 'dateFrom_filter'
+            });
+        }
+        if ($this->dateCreationTo_filter != null) {
+            $boutiques = $boutiques->filter(function ($e) {//end date
+                /** @var Boutique $e */
+                $dt = (new \DateTime($e->getDateCreation()->format('d-m-Y H:i')))->getTimestamp();
+                $dt2 = (new \DateTime($this->dateCreationTo_filter))->getTimestamp();
+                return $dt - $dt2 <= 0 ? true : false;// end from at the given date 'dateTo_filter'
+            });
+        }
+
         $boutiques = ($boutiques !== null) ? $boutiques->toArray() : [];
         //assortment: descending of date -- du plus recent au plus ancient
         usort(
@@ -192,7 +247,28 @@ class BoutiqueController extends FOSRestController implements ClassResourceInter
     }
 
     /**
-     * Creates a new Boutique entity.
+     * @ApiDoc(
+     * resource=true,
+     * resourceDescription="Operations on Boutique.",
+     * description="Create an object of type Boutique.",
+     * statusCodes={
+     *         201="Returned when successful",
+     *         400="Returned when the data are not valid or an unknown error occurred",
+     *         403="Returned when the user is not authorized to carry on the action",
+     *         404="Returned when the entity is not found",
+     * },
+     * headers={
+     *      { "name"="Authorization",  "required"=true, "description"="Authorization token"}
+     * },
+     * input={
+     *    "class"="APM\VenteBundle\Entity\Boutique",
+     *     "parsers" = {
+     *          "Nelmio\ApiDocBundle\Parser\ValidationParser"
+     *      },
+     *    "name" = "Boutique",
+     * },
+     * views = {"default", "vente" }
+     * )
      * @param Request $request
      * @Post("/new/boutique")
      * @return View|JsonResponse
@@ -290,9 +366,32 @@ class BoutiqueController extends FOSRestController implements ClassResourceInter
     }
 
     /**
-     * Finds and displays a Boutique entity.
+     * @ApiDoc(
+     * resource=true,
+     * description="Retrieve the details of an objet of type Boutique.",
+     * headers={
+     *      { "name"="Authorization", "required"=true, "description"="Authorization token"},
+     * },
+     * requirements = {
+     *      {"name"="id", "dataType"="integer", "requirement"="\d+", "description"="boutique id"}
+     * },
+     * output={
+     *   "class"="APM\VenteBundle\Entity\Boutique",
+     *   "parsers" = {
+     *      "Nelmio\ApiDocBundle\Parser\JmsMetadataParser"
+     *    },
+     *     "groups"={"owner_boutique_details", "owner_list"}
+     * },
+     * statusCodes={
+     *     "output" = "A single Object",
+     *     200="Returned when successful",
+     *     403="Returned when the user is not authorized to perform the action",
+     *     404="Returned when the specified resource is not found",
+     * },
+     *     views={"default", "vente"}
+     * )
      * @param Boutique $boutique
-     * @return \Symfony\Component\HttpFoundation\Response | JsonResponse
+     * @return JsonResponse
      *
      * @Get("/show/boutique/{id}")
      */
@@ -305,6 +404,32 @@ class BoutiqueController extends FOSRestController implements ClassResourceInter
     }
 
     /**
+     * @ApiDoc(
+     * resource=true,
+     * resourceDescription="Operations on Boutique",
+     * description="Update an object of type Boutique.",
+     * statusCodes={
+     *         200="Returned when successful",
+     *         400="Returned when the data are not valid or an unknown error occurred",
+     *         403="Returned when the user is not authorized to carry on the action",
+     *         404="Returned when the entity is not found",
+     * },
+     * headers={
+     *      { "name"="Authorization", "required"="true", "description"="Authorization token"}
+     * },
+     * requirements = {
+     *      {"name"="id", "dataType"="integer", "requirement"="\d+", "description"="boutique Id"}
+     * },
+     * input={
+     *    "class"="APM\VenteBundle\Entity\Boutique",
+     *     "parsers" = {
+     *          "Nelmio\ApiDocBundle\Parser\ValidationParser"
+     *      },
+     *    "name" = "Boutique",
+     * },
+     *
+     * views = {"default", "vente" }
+     * )
      * @param Request $request
      * @param Boutique $boutique
      * @return View | JsonResponse
@@ -345,9 +470,6 @@ class BoutiqueController extends FOSRestController implements ClassResourceInter
         }
     }
 
-    /*changer le personnel ayant le droit sur les produits de la
-     * changer les droits sur les offres
-    */
 
     /**
      * @param Boutique $boutique
@@ -384,7 +506,26 @@ class BoutiqueController extends FOSRestController implements ClassResourceInter
 
 
     /**
-     * Deletes a Boutique entity.
+     * @ApiDoc(
+     * resource=true,
+     * description="Delete objet of type Boutique.",
+     * headers={
+     *      { "name"="Authorization", "required"="true", "description"="Authorization token"},
+     * },
+     * requirements = {
+     *      {"name"="id", "dataType"="integer", "required"=true, "requirement"="\d+", "description"="boutique Id"}
+     * },
+     * parameters = {
+     *      {"name"="exec", "required"=true, "dataType"="string", "requirement"="\D+", "description"="needed to check the origin of the request", "format"="exec=go"}
+     * },
+     * statusCodes={
+     *     200="Returned when successful",
+     *     400="Returned when the data are not valid or an unknown error occurred",
+     *     403="Returned when the user is not authorized to perform the action",
+     *     404="Returned when the specified resource is not found",
+     * },
+     *     views={"default", "vente"}
+     * )
      * @param Request $request
      * @param Boutique $boutique
      * @return JsonResponse| View

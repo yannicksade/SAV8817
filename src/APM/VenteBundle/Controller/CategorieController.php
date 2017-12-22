@@ -41,7 +41,41 @@ class CategorieController extends FOSRestController
 
 
     /**
-     * Liste les catégories par Boutique
+     * @ApiDoc(
+     * resource=true,
+     * description="Retrieve list of categorie.",
+     * headers={
+     *      { "name"="Authorization", "required"="true", "description"="Authorization token"},
+     * },
+     * filters={
+     *      {"name"="designation_filter", "dataType"="string"},
+     *      {"name"="description_filter", "dataType"="string"},
+     *      {"name"="code_filter", "dataType"="string"},
+     *      {"name"="livrable_filter", "dataType"="string"},
+     *      {"name"="publiable_filter", "dataType"="boolean"},
+     *      {"name"="etat_filter", "dataType"="integer"},
+     *      {"name"="categorieCourante_filter", "dataType"="string"},
+     *      {"name"="date_from_filter", "dataType"="dateTime", "pattern"="19-12-2017|ASC"},
+     *      {"name"="date_to_filter", "dataType"="dateTime", "pattern"="19-12-2017|DESC"},
+     *      {"name"="length_filter", "dataType"="integer", "requirement"="\d+"},
+     *      {"name"="start_filter", "dataType"="integer", "requirement"="\d+"},
+     *  },
+     * output={
+     *   "class"="APM\VenteBundle\Entity\Categorie",
+     *   "parsers" = {
+     *      "Nelmio\ApiDocBundle\Parser\JmsMetadataParser"
+     *    },
+     *     "groups"={"owner_list"}
+     * },
+     *
+     * statusCodes={
+     *     "output" = "A single or a collection of categorie",
+     *     200="Returned when successful",
+     *     403="Returned when the user is not authorized to perform the action",
+     *     404="Returned when the specified resource is not found",
+     * },
+     *     views={"default", "vente"}
+     * )
      * @param Request $request
      * @param Boutique $boutique
      * @return JsonResponse
@@ -202,15 +236,37 @@ class CategorieController extends FOSRestController
     }
 
     /**
-     * Creates les catégories sont créées uniquement dans les boutiques
+     ** @ApiDoc(
+     * resource=true,
+     * resourceDescription="Operations on Categorie.",
+     * description="Create an object of type Categorie.",
+     * statusCodes={
+     *         201="Returned when successful",
+     *         400="Returned when the data are not valid or an unknown error occurred",
+     *         403="Returned when the user is not authorized to carry on the action",
+     *         404="Returned when the entity is not found",
+     * },
+     *  requirements={
+     *      {"name"="id", "required"=true, "dataType"="integer", "requirement"="\d+", "description"="boutique Id"}
+     *  },
+     * headers={
+     *      { "name"="Authorization",  "required"=true, "description"="Authorization token"}
+     * },
+     * input={
+     *    "class"="APM\VenteBundle\Entity\Categorie",
+     *     "parsers" = {
+     *          "Nelmio\ApiDocBundle\Parser\ValidationParser"
+     *      },
+     *    "name" = "Categorie",
+     * },
+     * views = {"default", "vente" }
+     * )
      * @param Request $request
      * @param Boutique $boutique
-     * @Post("/new/categorie")
      * @Post("/new/categorie/boutique/{id}", name="_boutique")
-     *
      * @return JsonResponse | View
      */
-    public function newAction(Request $request, Boutique $boutique = null)
+    public function newAction(Request $request, Boutique $boutique)
     {
         try {
             $this->createSecurity($boutique);
@@ -282,7 +338,30 @@ class CategorieController extends FOSRestController
     }
 
     /**
-     * Finds and displays a Categorie entity.
+     * @ApiDoc(
+     * resource=true,
+     * description="Retrieve the details of an objet of type Categorie.",
+     * headers={
+     *      { "name"="Authorization", "required"=true, "description"="Authorization token"},
+     * },
+     * requirements = {
+     *      {"name"="id", "dataType"="integer", "requirement"="\d+", "description"="categorie id"}
+     * },
+     * output={
+     *   "class"="APM\VenteBundle\Entity\Categorie",
+     *   "parsers" = {
+     *      "Nelmio\ApiDocBundle\Parser\JmsMetadataParser"
+     *    },
+     *     "groups"={"owner_categorie_details", "owner_list"}
+     * },
+     * statusCodes={
+     *     "output" = "A single Object",
+     *     200="Returned when successful",
+     *     403="Returned when the user is not authorized to perform the action",
+     *     404="Returned when the specified resource is not found",
+     * },
+     *     views={"default", "vente"}
+     * )
      * @param Categorie $categorie
      * @return JsonResponse
      *
@@ -296,7 +375,32 @@ class CategorieController extends FOSRestController
     }
 
     /**
-     * Displays a form to edit an existing Categorie entity.
+     * @ApiDoc(
+     * resource=true,
+     * resourceDescription="Operations on Categorie",
+     * description="Update an object of type Categorie.",
+     * statusCodes={
+     *         200="Returned when successful",
+     *         400="Returned when the data are not valid or an unknown error occurred",
+     *         403="Returned when the user is not authorized to carry on the action",
+     *         404="Returned when the entity is not found",
+     * },
+     * headers={
+     *      { "name"="Authorization", "required"="true", "description"="Authorization token"}
+     * },
+     * requirements = {
+     *      {"name"="id", "dataType"="integer", "requirement"="\d+", "description"="categorie Id"}
+     * },
+     * input={
+     *    "class"="APM\VenteBundle\Entity\Categorie",
+     *     "parsers" = {
+     *          "Nelmio\ApiDocBundle\Parser\ValidationParser"
+     *      },
+     *    "name" = "Categorie",
+     * },
+     *
+     * views = {"default", "vente" }
+     * )
      * @param Request $request
      * @param Categorie $categorie
      * @return View |JsonResponse
@@ -356,7 +460,26 @@ class CategorieController extends FOSRestController
     }
 
     /**
-     * Deletes a Categorie entity.
+     * @ApiDoc(
+     * resource=true,
+     * description="Delete objet of type Categorie.",
+     * headers={
+     *      { "name"="Authorization", "required"="true", "description"="Authorization token"},
+     * },
+     * requirements = {
+     *      {"name"="id", "dataType"="integer", "required"=true, "requirement"="\d+", "description"="categorie Id"}
+     * },
+     * parameters = {
+     *      {"name"="exec", "required"=true, "dataType"="string", "requirement"="\D+", "description"="needed to check the origin of the request", "format"="exec=go"}
+     * },
+     * statusCodes={
+     *     200="Returned when successful",
+     *     400="Returned when the data are not valid or an unknown error occurred",
+     *     403="Returned when the user is not authorized to perform the action",
+     *     404="Returned when the specified resource is not found",
+     * },
+     *     views={"default", "vente"}
+     * )
      * @param Request $request
      * @param Categorie $categorie
      * @return View | JsonResponse

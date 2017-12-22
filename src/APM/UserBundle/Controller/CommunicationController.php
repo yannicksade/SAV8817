@@ -42,7 +42,48 @@ class CommunicationController extends FOSRestController
     private $dateFinTo_filter;
 
     /**
-     * Lister les communication reçues et envoyées par un utilisateur
+     * @ApiDoc(
+     * resource=true,
+     * description="Retrieve list of communications sent and received.",
+     * headers={
+     *      { "name"="Authorization", "required"="true", "description"="Authorization token"},
+     * },
+     * filters={
+     *      {"name"="code_filter", "dataType"="string"},
+     *      {"name"="contenu_filter", "dataType"="string"},
+     *      {"name"="dateDeVigueurFrom_filter", "dataType"="dateTime", "pattern"="19-12-2017|ASC"},
+     *      {"name"="dateDeVigueurTo_filter", "dataType"="dateTime", "pattern"="19-12-2017|DESC"},
+     *      {"name"="dateFinFrom_filter", "dataType"="dateTime", "pattern"="19-12-2017|ASC"},
+     *      {"name"="dateFinTo_filter", "dataType"="dateTime", "pattern"="19-12-2017|DESC"},
+     *      {"name"="date_filter", "dataType"="dateTime", "pattern"="19-12-2017"},
+     *      {"name"="etat_filter", "dataType"="integer"},
+     *      {"name"="type_filter", "dataType"="integer"},
+     *      {"name"="description_filter", "dataType"="string"},
+     *      {"name"="reference_filter", "dataType"="string"},
+     *      {"name"="valide_filter", "dataType"="boolean"},
+     *      {"name"="emetteur_filter", "dataType"="string"},
+     *      {"name"="recepteur_filter", "dataType"="string"},
+     *      {"name"="length_filter", "dataType"="integer", "requirement"="\d+"},
+     *      {"name"="start_filter", "dataType"="integer", "requirement"="\d+"},
+     *  },
+     * requirements={
+     *   {"name"="q", "required"=false, "dataType"="string", "requirement"="\D+", "description"="query request ==sender or receiver== e.g ?q=sender"}
+     * },
+     * output={
+     *   "class"="APM\UserBundle\Entity\Communication",
+     *   "parsers" = {
+     *      "Nelmio\ApiDocBundle\Parser\JmsMetadataParser"
+     *    },
+     *     "groups"={"owner_list"}
+     * },
+     * statusCodes={
+     *     "output" = "A single or a collection of communications",
+     *     200="Returned when successful",
+     *     403="Returned when the user is not authorized to perform the action",
+     *     404="Returned when the specified resource is not found",
+     * },
+     *     views={"default", "user"}
+     * )
      * @param Request $request
      * @return JsonResponse
      *
@@ -223,6 +264,28 @@ class CommunicationController extends FOSRestController
     }
 
     /**
+     * @ApiDoc(
+     * resource=true,
+     * resourceDescription="Operations on Communication.",
+     * description="Create an object of type Communication.",
+     * statusCodes={
+     *         201="Returned when successful",
+     *         400="Returned when the data are not valid or an unknown error occurred",
+     *         403="Returned when the user is not authorized to carry on the action",
+     *         404="Returned when the entity is not found",
+     * },
+     * headers={
+     *      { "name"="Authorization",  "required"=true, "description"="Authorization token"}
+     * },
+     * input={
+     *    "class"="APM\UserBundle\Entity\Communication",
+     *     "parsers" = {
+     *          "Nelmio\ApiDocBundle\Parser\ValidationParser"
+     *      },
+     *    "name" = "Communication",
+     * },
+     * views = {"default", "user" }
+     * )
      * @param Request $request
      * @return View | JsonResponse
      *
@@ -276,6 +339,30 @@ class CommunicationController extends FOSRestController
     }
 
     /**
+     * @ApiDoc(
+     * resource=true,
+     * description="Retrieve the details of an objet of type Communication.",
+     * headers={
+     *      { "name"="Authorization", "required"="true", "description"="Authorization token"},
+     * },
+     * requirements = {
+     *      {"name"="id", "dataType"="integer", "requirement"="\d+", "description"="communication id"}
+     * },
+     * output={
+     *   "class"="APM\UserBundle\Entity\Communication",
+     *   "parsers" = {
+     *      "Nelmio\ApiDocBundle\Parser\JmsMetadataParser"
+     *    },
+     *     "groups"={"owner_communication_details", "owner_list"}
+     * },
+     * statusCodes={
+     *     "output" = "A single Object",
+     *     200="Returned when successful",
+     *     403="Returned when the user is not authorized to perform the action",
+     *     404="Returned when the specified resource is not found",
+     * },
+     *     views={"default", "user"}
+     * )
      * @param Communication $communication
      * @return JsonResponse
      *
@@ -289,6 +376,32 @@ class CommunicationController extends FOSRestController
     }
 
     /**
+     * @ApiDoc(
+     * resource=true,
+     * resourceDescription="Operations on Communication",
+     * description="Update an object of type Communication.",
+     * statusCodes={
+     *         200="Returned when successful",
+     *         400="Returned when the data are not valid or an unknown error occurred",
+     *         403="Returned when the user is not authorized to carry on the action",
+     *         404="Returned when the entity is not found",
+     * },
+     * headers={
+     *      { "name"="Authorization", "required"="true", "description"="Authorization token"}
+     * },
+     * requirements = {
+     *      {"name"="id", "dataType"="integer", "requirement"="\d+", "description"="communication Id"}
+     * },
+     * input={
+     *    "class"="APM\UserBundle\Entity\Communication",
+     *     "parsers" = {
+     *          "Nelmio\ApiDocBundle\Parser\ValidationParser"
+     *      },
+     *    "name" = "Communication",
+     * },
+     *
+     * views = {"default", "user" }
+     * )
      * @param Request $request
      * @param Communication $communication
      * @return View | JsonResponse
@@ -342,7 +455,26 @@ class CommunicationController extends FOSRestController
     }
 
     /**
-     * Deletes a Communication entity.
+     * @ApiDoc(
+     * resource=true,
+     * description="Delete objet of type Communication.",
+     * headers={
+     *      { "name"="Authorization", "required"="true", "description"="Authorization token"},
+     * },
+     * requirements = {
+     *      {"name"="id", "dataType"="integer", "required"=true, "requirement"="\d+", "description"="communication Id"}
+     * },
+     * parameters = {
+     *      {"name"="exec", "required"=true, "dataType"="string", "requirement"="\D+", "description"="needed to check the origin of the request", "format"="exec=go"}
+     * },
+     * statusCodes={
+     *     200="Returned when successful",
+     *     400="Returned when the data are not valid or an unknown error occurred",
+     *     403="Returned when the user is not authorized to perform the action",
+     *     404="Returned when the specified resource is not found",
+     * },
+     *     views={"default", "user"}
+     * )
      * @param Request $request
      * @param Communication $communication
      * @return View | JsonResponse

@@ -45,13 +45,49 @@ class CommissionnementController extends FOSRestController
     private $quantiteFrom_filter;
 
     /**
-     * Liste les commissionnements d'un conseiller ou d'une boutique pour jouir il faut avoir definir son profile conseiller
+     * @ApiDoc(
+     * resource=true,
+     * description="Retrieve list of Commissionnements.",
+     * headers={
+     *      { "name"="Authorization", "required"="true", "description"="Authorization token"},
+     * },
+     * filters={
+     *      {"name"="libelle_filter", "dataType"="string"},
+     *      {"name"="code_filter", "dataType"="string"},
+     *      {"name"="description_filter", "dataType"="string"},
+     *      {"name"="dateFrom_filter", "dataType"="dateTime", "pattern"="19-12-2017|ASC"},
+     *      {"name"="dateTo_filter", "dataType"="dateTime", "pattern"="19-12-2017|DESC"},
+     *      {"name"="conseiller_filter", "dataType"="string"},
+     *      {"name"="commission_filter", "dataType"="string"},
+     *      {"name"="creditDepenseFrom_filter", "dataType"="integer"},
+     *      {"name"="creditDepenseTo_filter", "dataType"="integer"},
+     *      {"name"="quantiteTo_filter", "dataType"="string"},
+     *      {"name"="quantiteFrom_filter", "dataType"="string"},
+     *      {"name"="length_filter", "dataType"="integer", "requirement"="\d+"},
+     *      {"name"="start_filter", "dataType"="integer", "requirement"="\d+"},
+     *  },
+     *
+     * output={
+     *   "class"="APM\MarketingBundle\Entity\Commissionnement",
+     *   "parsers" = {
+     *      "Nelmio\ApiDocBundle\Parser\JmsMetadataParser"
+     *    },
+     *     "groups"={"owner_list"}
+     * },
+     * statusCodes={
+     *     "output" = "A single or a collection of Commissionnement",
+     *     200="Returned when successful",
+     *     403="Returned when the user is not authorized to perform the action",
+     *     404="Returned when the specified resource is not found",
+     * },
+     *     views={"default", "marketing"}
+     * )
      * @param Request $request
      * @param Boutique $boutique
-     * @return \Symfony\Component\HttpFoundation\Response | JsonResponse
+     * @return JsonResponse
      *
      * @Get("/cget/commissionnements", name="s")
-     * @Get("/cget/commissionnements/boutique/{id}", name="s_boutique")
+     * @Get("/cget/commissionnements/boutique/{id}", name="s_boutique", requirements={"id"="boutique_id"})
      *
      */
     public function getAction(Request $request, Boutique $boutique = null)
@@ -259,11 +295,34 @@ class CommissionnementController extends FOSRestController
     }
 
     /**
+     * @ApiDoc(
+     * resource=true,
+     * resourceDescription="Operations on Commissionnement.",
+     * description="Create an object of type Commissionnement.",
+     * statusCodes={
+     *         201="Returned when successful",
+     *         400="Returned when the data are not valid or an unknown error occurred",
+     *         403="Returned when the user is not authorized to carry on the action",
+     *         404="Returned when the entity is not found",
+     * },
+     * headers={
+     *      { "name"="Authorization", "required"=true, "description"="Authorization token"}
+     * },
+     * requirements={
+     *      {"name"="id", "requirement"="\d+", "dataType"="integer", "description"="boutique_id"}
+     * },
+     * input={
+     *   "class"="APM\MarketingBundle\Entity\Conseiller",
+     *   "parsers" = {
+     *      "Nelmio\ApiDocBundle\Parser\JmsMetadataParser"
+     *    },
+     *     "groups"={"create_net"}
+     * },
+     *  views = {"default", "marketing" }
+     * )
      * @param Request $request
      * @param Boutique $boutique
      * @return View | JsonResponse
-     *
-     *
      * @Post("/new/commissionnement/boutique/{id}")
      */
     public
@@ -329,7 +388,30 @@ class CommissionnementController extends FOSRestController
     }
 
     /**
-     * Finds and displays a Commissionnement entity.
+     * @ApiDoc(
+     * resource=true,
+     * description="Retrieve the details of an objet of type Commissionnement",
+     * headers={
+     *      { "name"="Authorization", "required"="true", "description"="Authorization token"},
+     * },
+     * requirements = {
+     *      {"name"="id", "dataType"="integer", "requirement"="\d+", "description"="commissionnement_id"}
+     * },
+     * output={
+     *   "class"="APM\MarketingDistribueBundle\Entity\Commissionnement",
+     *   "parsers" = {
+     *      "Nelmio\ApiDocBundle\Parser\JmsMetadataParser"
+     *    },
+     *     "groups"={"owner_commissionnement_details", "owner_list"}
+     * },
+     * statusCodes={
+     *     "output" = "A single Object",
+     *     200="Returned when successful",
+     *     403="Returned when the user is not authorized to perform the action",
+     *     404="Returned when the specified resource is not found",
+     * },
+     *     views={"default", "marketing"}
+     * )
      * @param Commissionnement $commissionnement
      * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
      *
@@ -344,12 +426,36 @@ class CommissionnementController extends FOSRestController
     }
 
     /**
-     * Displays a form to edit an existing Commissionnement entity.
+     * @ApiDoc(
+     * resource=true,
+     * resourceDescription="Operations on commissionnement",
+     * description="Update an object of type commissionnement.",
+     * statusCodes={
+     *         200="Returned when successful",
+     *         400="Returned when the data are not valid or an unknown error occurred",
+     *         403="Returned when the user is not authorized to carry on the action",
+     *         404="Returned when the entity is not found",
+     * },
+     * headers={
+     *      { "name"="Authorization", "required"=true, "description"="Authorization token"}
+     * },
+     * requirements = {
+     *      {"name"="id", "dataType"="integer", "requirement"="\d+", "description"="commissionnement Id"}
+     * },
+     * input={
+     *    "class"="APM\MarketingDistribueBundle\Entity\Commissionnement",
+     *     "parsers" = {
+     *          "Nelmio\ApiDocBundle\Parser\ValidationParser"
+     *      },
+     *    "name" = "Commissionnement",
+     * },
+     *     views={"default","marketing"}
+     * )
      * @param Request $request
      * @param Commissionnement $commissionnement
      * @return View | JsonResponse
      *
-     * @Patch("/edit/commissionnement/{id}")
+     * @Put("/edit/commissionnement/{id}")
      */
     public
     function editAction(Request $request, Commissionnement $commissionnement)
@@ -401,7 +507,25 @@ class CommissionnementController extends FOSRestController
     }
 
     /**
-     * Supprimer à partir d'un formulaire
+     * @ApiDoc(
+     * resource=true,
+     * description="Delete objet of type Commissionnement.",
+     * headers={
+     *      { "name"="Authorization", "required"="true", "description"="Authorization token"},
+     * },
+     * requirements = {
+     *      {"name"="id", "dataType"="integer", "required"=true, "requirement"="\d+", "description"="commissionnement Id"}
+     * },
+     * parameters = {
+     *      {"name"="exec", "required"=true, "dataType"="string", "requirement"="\D+", "description"="needed to check the origin of the request", "format"="exec=go"}
+     * },
+     * statusCodes={
+     *     200="Returned when successful",
+     *     403="Returned when the user is not authorized to perform the action",
+     *     404="Returned when the specified resource is not found",
+     * },
+     *     views={"default", "marketing"}
+     * )
      * @param Request $request
      * @param Commissionnement $commissionnement
      * @return View | JsonResponse

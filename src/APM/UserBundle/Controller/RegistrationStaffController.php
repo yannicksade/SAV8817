@@ -20,7 +20,7 @@ use FOS\RestBundle\Controller\Annotations\Get;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use FOS\RestBundle\Controller\Annotations\RouteResource;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
-
+use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 /**
  * Class RegistrationUtilisateurAVMController
  * @package APM\UserBundle\Controller
@@ -30,7 +30,25 @@ class RegistrationStaffController extends FOSRestController
 {
 
     /**
-     * @Post("/register")
+     * @ApiDoc(
+     * resource=true,
+     * description="Create a staff account",
+     *  input={
+     *   "class"="APM\UserBundle\Entity\Admin",
+     *   "parsers" = {
+     *      "Nelmio\ApiDocBundle\Parser\ValidationParser"
+     *    }
+     *     },
+     *  statusCodes={
+     *     "output" = "Ends by sending a confirmation e-mail to the staff's address",
+     *     200="Returned when successful",
+     *     400="Returned when the data are not valid or an unknown error occurred",
+     *     403="Returned when the user is not authorized to perform the action",
+     *     404="Returned when the specified resource is not found",
+     * },
+     *     views={"default","profile"}
+     * ),
+     * @Post("/register-staff")
      * @param Request $request
      * @return JsonResponse|Response
      */
@@ -61,6 +79,19 @@ class RegistrationStaffController extends FOSRestController
     }
 
     /**
+     * @ApiDoc(
+     * resource=true,
+     * description="Activates your account by email",
+     * requirements = {
+     *   {"name"="token", "dataType"="string", "requirement"="\D+", "required"=true, "description"="token ..."}
+     * },
+     *  statusCodes={
+     *     "output" = "HTML confirmation template",
+     *     200="Returned when successful",
+     *     400="Returned when the data are not valid or an unknown error occurs",
+     *     404="Returned when the specified resource is not found with the provided token",
+     *  }
+     * ),
      * @param Request $request
      * @return JsonResponse|Response
      * @Get("/confirmation-password")

@@ -26,7 +26,7 @@ use Symfony\Component\Security\Core\Security;
 use FOS\RestBundle\Controller\Annotations\Get;
 use FOS\RestBundle\Controller\Annotations\Post;
 use FOS\RestBundle\Controller\Annotations\Lock;
-use Symfony\Component\Security\Core\Exception\LockedException;
+use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
 use JMS\Serializer\SerializationContext;
 use JMS\Serializer\SerializerBuilder;
@@ -111,6 +111,22 @@ class SecurityController extends FOSRestController
     }*/
 
     /**
+     * @ApiDoc(
+     * resource=true,
+     * description="login",
+     *  statusCodes={
+     *     "output"="token",
+     *     200="Returned when successful",
+     *     400="Returned when the data are not valid or an unknown error occurs",
+     *     401="Returned when unauthorized, may be the token has expired or the username/password or the token is invalid",
+     *     404="Returned when the specified resource is not found",
+     *  },
+     * parameters = {
+     *   {"name"="username", "dataType"="string", "requirement"="\D+", "required"=true, "description"="username or email"},
+     *   {"name"="password", "dataType"="string", "requirement"="\D+", "required"=true, "description"="password"}
+     * },
+     *     views={"default","profile"}
+     * ),
      * @Post("/login", name="login", options={"method_prefix"= false})
      */
     public function checkAction()

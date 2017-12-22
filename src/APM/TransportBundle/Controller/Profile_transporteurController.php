@@ -35,6 +35,35 @@ class Profile_transporteurController extends FOSRestController
     private $isLivreur_boutique_filter;
 
     /**
+     * @ApiDoc(
+     * resource=true,
+     * description="Retrieve list of transporteurs.",
+     * headers={
+     *      { "name"="Authorization", "required"="true", "description"="Authorization token"}
+     * },
+     * filters={
+     *      {"name"="code_filter", "dataType"="string"},
+     *      {"name"="livreur_boutique", "dataType"="string"},
+     *      {"name"="matricule_filter", "dataType"="string"},
+     *      {"name"="length_filter", "dataType"="integer", "requirement"="\d+"},
+     *      {"name"="start_filter", "dataType"="integer", "requirement"="\d+"},
+     *  },
+     *
+     * output={
+     *   "class"="APM\TransportBundle\Entity\Profile_transporteur",
+     *   "parsers" = {
+     *      "Nelmio\ApiDocBundle\Parser\JmsMetadataParser"
+     *    },
+     *     "groups"={"owner_list"}
+     * },
+     * statusCodes={
+     *     "output" = "A single or a collection of transporteurs",
+     *     200="Returned when successful",
+     *     403="Returned when the user is not authorized to perform the action",
+     *     404="Returned when the specified resource is not found",
+     * },
+     *     views={"default", "transport"}
+     * )
      * @param Request $request
      * @return JsonResponse
      *
@@ -137,7 +166,28 @@ class Profile_transporteurController extends FOSRestController
     }
 
     /**
-     * Creates a new Profile_transporteur entity.
+     * @ApiDoc(
+     * resource=true,
+     * resourceDescription="Operations on transporteur.",
+     * description="Create an object of type transporteur.",
+     * statusCodes={
+     *         201="Returned when successful",
+     *         400="Returned when the data are not valid or an unknown error occurred",
+     *         403="Returned when the user is not authorized to carry on the action",
+     *         404="Returned when the entity is not found",
+     * },
+     * headers={
+     *      { "name"="Authorization",  "required"=true, "description"="Authorization token"}
+     * },
+     * input={
+     *    "class"="APM\TransportBundle\Entity\Profile_transporteur",
+     *     "parsers" = {
+     *          "Nelmio\ApiDocBundle\Parser\ValidationParser"
+     *      },
+     *    "name" = "Transporteur",
+     * },
+     * views = {"default", "transport" }
+     * )
      * @param Request $request
      * @return View | JsonResponse
      *
@@ -197,7 +247,30 @@ class Profile_transporteurController extends FOSRestController
     }
 
     /**
-     * Finds and displays a Profile_transporteur entity.
+     * @ApiDoc(
+     * resource=true,
+     * description="Retrieve the details of an objet of type Transporteur.",
+     * headers={
+     *      { "name"="Authorization", "required"="true", "description"="Authorization token"},
+     * },
+     * requirements = {
+     *      {"name"="id", "dataType"="integer", "requirement"="\d+", "description"="transporteur id"}
+     * },
+     * output={
+     *   "class"="APM\TransportBundle\Entity\Profile_transporteur",
+     *   "parsers" = {
+     *      "Nelmio\ApiDocBundle\Parser\JmsMetadataParser"
+     *    },
+     *     "groups"={"owner_transporteur_details", "owner_list"}
+     * },
+     * statusCodes={
+     *     "output" = "A single Object",
+     *     200="Returned when successful",
+     *     403="Returned when the user is not authorized to perform the action",
+     *     404="Returned when the specified resource is not found",
+     * },
+     *     views={"default", "transport"}
+     * )
      * @param Profile_transporteur $profile_transporteur
      * @return JsonResponse
      *
@@ -211,6 +284,32 @@ class Profile_transporteurController extends FOSRestController
     }
 
     /**
+     * @ApiDoc(
+     * resource=true,
+     * resourceDescription="Operations on transporteur",
+     * description="Update an object of type Transporteur.",
+     * statusCodes={
+     *         200="Returned when successful",
+     *         400="Returned when the data are not valid or an unknown error occurred",
+     *         403="Returned when the user is not authorized to carry on the action",
+     *         404="Returned when the entity is not found",
+     * },
+     * headers={
+     *      { "name"="Authorization", "required"="true", "description"="Authorization token"}
+     * },
+     * requirements = {
+     *      {"name"="id", "dataType"="integer", "requirement"="\d+", "description"="transporteur Id"}
+     * },
+     * input={
+     *    "class"="APM\TransportBundle\Entity\Profile_transporteur",
+     *     "parsers" = {
+     *          "Nelmio\ApiDocBundle\Parser\ValidationParser"
+     *      },
+     *    "name" = "Transport",
+     * },
+     *
+     * views = {"default", "transport" }
+     * )
      * @param Request $request
      * @param Profile_transporteur $profile_transporteur
      * @return View | JsonResponse
@@ -269,7 +368,26 @@ class Profile_transporteurController extends FOSRestController
     }
 
     /**
-     * Deletes a Profile_transporteur entity.
+     * @ApiDoc(
+     * resource=true,
+     * description="Delete objet of type Transporteur.",
+     * headers={
+     *      { "name"="Authorization", "required"="true", "description"="Authorization token"},
+     * },
+     * requirements = {
+     *      {"name"="id", "dataType"="integer", "required"=true, "requirement"="\d+", "description"="transporteur Id"}
+     * },
+     * parameters = {
+     *      {"name"="exec", "required"=true, "dataType"="string", "requirement"="\D+", "description"="needed to check the origin of the request", "format"="exec=go"}
+     * },
+     * statusCodes={
+     *     200="Returned when successful",
+     *     400="Returned when the data are not valid or an unknown error occurred",
+     *     403="Returned when the user is not authorized to perform the action",
+     *     404="Returned when the specified resource is not found",
+     * },
+     *     views={"default", "transport"}
+     * )
      * @param Request $request
      * @param Profile_transporteur $profile_transporteur
      * @return View | JsonResponse

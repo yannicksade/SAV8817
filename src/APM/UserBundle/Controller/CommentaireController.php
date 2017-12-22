@@ -40,6 +40,40 @@ class CommentaireController extends FOSRestController
 
 
     /**
+     * @ApiDoc(
+     * resource=true,
+     * description="Retrieve list of comments.",
+     * headers={
+     *      { "name"="Authorization", "required"="true", "description"="Authorization token"},
+     * },
+     * filters={
+     *      {"name"="contenu_filter", "dataType"="string"},
+     *      {"name"="dateLimiteFrom_filter", "dataType"="dateTime", "pattern"="19-12-2017|ASC"},
+     *      {"name"="dateLimiteTo_filter", "dataType"="dateTime", "pattern"="19-12-2017|DESC"},
+     *      {"name"="description_filter", "dataType"="string"},
+     *      {"name"="publiable_filter", "dataType"="boolean"},
+     *      {"name"="utilisateur_filter", "dataType"="string"},
+     *      {"name"="length_filter", "dataType"="integer", "requirement"="\d+"},
+     *      {"name"="start_filter", "dataType"="integer", "requirement"="\d+"},
+     *  },
+     *  requirements = {
+     *      {"name"="id", "required"=true, "requirement"="\d+", "dataType"="integer", "description"="offre_id"}
+     *  },
+     * output={
+     *   "class"="APM\UserBundle\Entity\Commentaire",
+     *   "parsers" = {
+     *      "Nelmio\ApiDocBundle\Parser\JmsMetadataParser"
+     *    },
+     *     "groups"={"owner_list"}
+     * },
+     * statusCodes={
+     *     "output" = "A single or a collection of comments",
+     *     200="Returned when successful",
+     *     403="Returned when the user is not authorized to perform the action",
+     *     404="Returned when the specified resource is not found",
+     * },
+     *     views={"default", "user"}
+     * )
      * @param Request $request
      * @param Offre $offre
      * @return JsonResponse
@@ -188,7 +222,28 @@ class CommentaireController extends FOSRestController
     }
 
     /**
-     * Creates a new Commentaire entity.
+     * @ApiDoc(
+     * resource=true,
+     * resourceDescription="Operations on Commentaire.",
+     * description="Create an object of type Commentaire.",
+     * statusCodes={
+     *         201="Returned when successful",
+     *         400="Returned when the data are not valid or an unknown error occurred",
+     *         403="Returned when the user is not authorized to carry on the action",
+     *         404="Returned when the entity is not found",
+     * },
+     * headers={
+     *      { "name"="Authorization",  "required"=true, "description"="Authorization token"}
+     * },
+     * input={
+     *    "class"="APM\UserBundle\Entity\Commentaire",
+     *     "parsers" = {
+     *          "Nelmio\ApiDocBundle\Parser\ValidationParser"
+     *      },
+     *    "name" = "Commentaire",
+     * },
+     * views = {"default", "user" }
+     * )
      * @param Request $request
      * @param Offre $offre
      * @return View | JsonResponse
@@ -248,14 +303,36 @@ class CommentaireController extends FOSRestController
     }
 
     /**
-     * Finds and displays a Commentaire entity.
-     * @param Request $request
+     * @ApiDoc(
+     * resource=true,
+     * description="Retrieve the details of an objet of type Commentaire.",
+     * headers={
+     *      { "name"="Authorization", "required"="true", "description"="Authorization token"},
+     * },
+     * requirements = {
+     *      {"name"="id", "dataType"="integer", "requirement"="\d+", "description"="commentaire id"}
+     * },
+     * output={
+     *   "class"="APM\UserBundle\Entity\Commentaire",
+     *   "parsers" = {
+     *      "Nelmio\ApiDocBundle\Parser\JmsMetadataParser"
+     *    },
+     *     "groups"={"owner_commentaire_details", "owner_list"}
+     * },
+     * statusCodes={
+     *     "output" = "A single Object",
+     *     200="Returned when successful",
+     *     403="Returned when the user is not authorized to perform the action",
+     *     404="Returned when the specified resource is not found",
+     * },
+     *     views={"default", "user"}
+     * )
      * @param Commentaire $commentaire
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return JsonResponse
      *
      * @Get("/show/commentaire/{id}")
      */
-    public function showAction(Request $request, Commentaire $commentaire)
+    public function showAction(Commentaire $commentaire)
     {
         $this->listAndShowSecurity();
         $data = $this->get('apm_core.data_serialized')->getFormalData($commentaire, ["owner_commentaire_details", "owner_list"]);
@@ -263,7 +340,32 @@ class CommentaireController extends FOSRestController
     }
 
     /**
-     * Displays a form to edit an existing Commentaire entity.
+     * @ApiDoc(
+     * resource=true,
+     * resourceDescription="Operations on Commentaire",
+     * description="Update an object of type Commentaire.",
+     * statusCodes={
+     *         200="Returned when successful",
+     *         400="Returned when the data are not valid or an unknown error occurred",
+     *         403="Returned when the user is not authorized to carry on the action",
+     *         404="Returned when the entity is not found",
+     * },
+     * headers={
+     *      { "name"="Authorization", "required"="true", "description"="Authorization token"}
+     * },
+     * requirements = {
+     *      {"name"="id", "dataType"="integer", "requirement"="\d+", "description"="commentaire Id"}
+     * },
+     * input={
+     *    "class"="APM\UserBundle\Entity\Commentaire",
+     *     "parsers" = {
+     *          "Nelmio\ApiDocBundle\Parser\ValidationParser"
+     *      },
+     *    "name" = "User",
+     * },
+     *
+     * views = {"default", "user" }
+     * )
      * @param Request $request
      * @param Commentaire $commentaire
      * @return View | JsonResponse
@@ -317,7 +419,26 @@ class CommentaireController extends FOSRestController
 
 
     /**
-     * Deletes a Commentaire entity.
+     * @ApiDoc(
+     * resource=true,
+     * description="Delete objet of type Commentaire.",
+     * headers={
+     *      { "name"="Authorization", "required"="true", "description"="Authorization token"},
+     * },
+     * requirements = {
+     *      {"name"="id", "dataType"="integer", "required"=true, "requirement"="\d+", "description"="commentaire Id"}
+     * },
+     * parameters = {
+     *      {"name"="exec", "required"=true, "dataType"="string", "requirement"="\D+", "description"="needed to check the origin of the request", "format"="exec=go"}
+     * },
+     * statusCodes={
+     *     200="Returned when successful",
+     *     400="Returned when the data are not valid or an unknown error occurred",
+     *     403="Returned when the user is not authorized to perform the action",
+     *     404="Returned when the specified resource is not found",
+     * },
+     *     views={"default", "user"}
+     * )
      * @param Request $request
      * @param Commentaire $commentaire
      * @return View | JsonResponse

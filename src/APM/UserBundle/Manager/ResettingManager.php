@@ -189,7 +189,6 @@ class ResettingManager implements ContainerAwareInterface
             "route" => $path
         );
 
-
         $view->setTemplate("@FOSUser/Resetting/reset.html.twig")
             ->setTemplateData($data);
 
@@ -256,6 +255,5 @@ class ResettingManager implements ContainerAwareInterface
             ];
         }
     }
-
 
 }

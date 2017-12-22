@@ -38,14 +38,45 @@ class Conseiller_boutiqueController extends FOSRestController
     private $boutique_filter;
 
     /**
-     * operation du conseiller courant
+     * @ApiDoc(
+     * resource=true,
+     * description="Retrieve list of Conseiller_boutique.",
+     * headers={
+     *      { "name"="Authorization", "required"="true", "description"="Authorization token"},
+     * },
+     * filters={
+     *      {"name"="code_filter", "dataType"="string"},
+     *      {"name"="dateFrom_filter", "dataType"="dateTime", "pattern"="19-12-2017|ASC"},
+     *      {"name"="dateTo_filter", "dataType"="dateTime", "pattern"="19-12-2017|DESC"},
+     *      {"name"="conseiller_filter", "dataType"="string"},
+     *      {"name"="boutique_filter", "dataType"="string"},
+     *      {"name"="gainValeur_filter", "dataType"="integer"},
+     *      {"name"="length_filter", "dataType"="integer", "requirement"="\d+"},
+     *      {"name"="start_filter", "dataType"="integer", "requirement"="\d+"},
+     *  },
+     *
+     * output={
+     *   "class"="APM\MarketingBundle\Entity\Conseiller_boutique",
+     *   "parsers" = {
+     *      "Nelmio\ApiDocBundle\Parser\JmsMetadataParser"
+     *    },
+     *     "groups"={"owner_list"}
+     * },
+     * statusCodes={
+     *     "output" = "A single or a collection of Conseiller_boutique",
+     *     200="Returned when successful",
+     *     403="Returned when the user is not authorized to perform the action",
+     *     404="Returned when the specified resource is not found",
+     * },
+     *     views={"default", "marketing"}
+     * )
      * @param Request $request
      * @param Boutique $boutique
      * @return  JsonResponse
      *
      * Lister les boutique du conseiller
      * @Get("/cget/conseiller-boutiques", name="s")
-     * @Get("/cget/conseillers-boutique/{id}", name="s_boutique")
+     * @Get("/cget/conseillers-boutique/boutique/{id}", name="s_boutique", requirements={"id"="boutique_id"})
      */
     public function getAction(Request $request, Boutique $boutique = null)
     {
@@ -179,13 +210,34 @@ class Conseiller_boutiqueController extends FOSRestController
     }
 
     /**
-     * Creates a new conseiller_boutique entity.
+     * @ApiDoc(
+     * resource=true,
+     * resourceDescription="Operations on Conseiller_boutique.",
+     * description="Create an object of type Conseiller_boutique.",
+     * statusCodes={
+     *         201="Returned when successful",
+     *         400="Returned when the data are not valid or an unknown error occurred",
+     *         403="Returned when the user is not authorized to carry on the action",
+     *         404="Returned when the entity is not found",
+     * },
+     * headers={
+     *      { "name"="Authorization", "required"=true, "description"="Authorization token"}
+     * },
+     * input={
+     *    "class"="APM\MarketingDistribueBundle\Entity\Conseiller_boutique",
+     *     "parsers" = {
+     *          "Nelmio\ApiDocBundle\Parser\ValidationParser"
+     *      },
+     *    "name" = "Conseiller_boutique",
+     * },
+     *  views = {"default", "marketing" }
+     * )
      * @param Request $request
      * @param Boutique $boutique
      * @return View| JsonResponse
      *
      * @Post("/new/conseiller-boutique")
-     * @Post("/new/conseiller-boutique/{id}", name="_boutique")
+     * @Post("/new/conseiller-boutique/boutique/{id}", name="_boutique", requirements={"id"="boutique_id"})
      */
     public function newAction(Request $request, Boutique $boutique = null)
     {
@@ -254,7 +306,30 @@ class Conseiller_boutiqueController extends FOSRestController
     }
 
     /**
-     * Finds and displays a conseiller_boutique entity.
+     * @ApiDoc(
+     * resource=true,
+     * description="Retrieve the details of an objet of type Conseiller_boutique",
+     * headers={
+     *      { "name"="Authorization", "required"="true", "description"="Authorization token"},
+     * },
+     * requirements = {
+     *      {"name"="id", "dataType"="integer", "requirement"="\d+", "description"="conseiller_boutique_id"}
+     * },
+     * output={
+     *   "class"="APM\MarketingDistribueBundle\Entity\Conseiller_boutique",
+     *   "parsers" = {
+     *      "Nelmio\ApiDocBundle\Parser\JmsMetadataParser"
+     *    },
+     *     "groups"={"owner_conseillerB_details", "owner_list"}
+     * },
+     * statusCodes={
+     *     "output" = "A single Object",
+     *     200="Returned when successful",
+     *     403="Returned when the user is not authorized to perform the action",
+     *     404="Returned when the specified resource is not found",
+     * },
+     *     views={"default", "marketing"}
+     * )
      * @param Conseiller_boutique $conseiller_boutique
      * @return JsonResponse
      *
@@ -268,11 +343,36 @@ class Conseiller_boutiqueController extends FOSRestController
     }
 
     /**
+     * @ApiDoc(
+     * resource=true,
+     * resourceDescription="Operations on conseiller_boutique",
+     * description="Update an object of type Conseiller_boutique.",
+     * statusCodes={
+     *         200="Returned when successful",
+     *         400="Returned when the data are not valid or an unknown error occurred",
+     *         403="Returned when the user is not authorized to carry on the action",
+     *         404="Returned when the entity is not found",
+     * },
+     * headers={
+     *      { "name"="Authorization", "required"=true, "description"="Authorization token"}
+     * },
+     * requirements = {
+     *      {"name"="id", "dataType"="integer", "requirement"="\d+", "description"="conseiller_boutique Id"}
+     * },
+     * input={
+     *    "class"="APM\MarketingDistribueBundle\Entity\Conseiller_boutique",
+     *     "parsers" = {
+     *          "Nelmio\ApiDocBundle\Parser\ValidationParser"
+     *      },
+     *    "name" = "Conseiller_boutique",
+     * },
+     *     views={"default","marketing"}
+     * )
      * @param Request $request
      * @param Conseiller_boutique $conseiller_boutique
      * @return View | JsonResponse
      *
-     * @Patch("/edit/conseiller-boutique/{id}")
+     * @Put("/edit/conseiller-boutique/{id}")
      */
     public function editAction(Request $request, Conseiller_boutique $conseiller_boutique)
     {
@@ -338,6 +438,25 @@ class Conseiller_boutiqueController extends FOSRestController
     }
 
     /**
+     * @ApiDoc(
+     * resource=true,
+     * description="Delete objet of type Conseiller_boutique.",
+     * headers={
+     *      { "name"="Authorization", "required"="true", "description"="Authorization token"},
+     * },
+     * requirements = {
+     *      {"name"="id", "dataType"="integer", "required"=true, "requirement"="\d+", "description"="conseiller boutique Id"}
+     * },
+     * parameters = {
+     *      {"name"="exec", "required"=true, "dataType"="string", "requirement"="\D+", "description"="needed to check the origin of the request", "format"="exec=go"}
+     * },
+     * statusCodes={
+     *     200="Returned when successful",
+     *     403="Returned when the user is not authorized to perform the action",
+     *     404="Returned when the specified resource is not found",
+     * },
+     *     views={"default", "marketing"}
+     * )
      * @param Request $request
      * @param Conseiller_boutique $conseiller_boutique
      * @return View | JsonResponse

@@ -29,11 +29,35 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
-
+use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 class ProfileController extends FOSRestController
 {
     /**
      * Show the user.
+     * @ApiDoc(
+     * resource=true,
+     * description="Retrieve user profile.",
+     * headers={
+     *      { "name"="Authorization", "required"="true", "description"="Authorization token"},
+     * },
+     * requirements= {
+     *      {"name"="id", "dataType"="integer", "required"=true, "requirement"="\d+", "description" = "user id"}
+     * },
+     * output={
+     *   "class"="APM\UserBundle\Entity\Utilisateur",
+     *   "parsers" = {
+     *      "Nelmio\ApiDocBundle\Parser\JmsMetadataParser"
+     *    },
+     *     "groups"={"owner_user_details", "owner_list"}
+     * },
+     * statusCodes={
+     *     "output" = "Return user profile",
+     *     200="Returned when successful",
+     *     403="Returned when the user is not authorized to perform the action",
+     *     404="Returned when the specified resource is not found",
+     * },
+     *     views={"default", "profile"}
+     * )
      * @param Utilisateur $user
      * @return JsonResponse
      * @Get("/show/profile/{id}")
@@ -45,6 +69,36 @@ class ProfileController extends FOSRestController
     }
 
     /**
+     * @ApiDoc(
+     * resource=true,
+     * description="Update user profile.",
+     * headers={
+     *      { "name"="Authorization", "required"="true", "description"="Authorization token"},
+     * },
+     * requirements= {
+     *      {"name"="id", "dataType"="integer", "required"=true, "requirement"="\d+", "description" = "user id"}
+     * },
+     * input={
+     *    "class"="APM\UserBundle\Entity\Admin",
+     *   "parsers" = {
+     *      "Nelmio\ApiDocBundle\Parser\ValidationParser"
+     *    }
+     * },
+     * output={
+     *   "class"="APM\UserBundle\Entity\Admin",
+     *   "parsers" = {
+     *      "Nelmio\ApiDocBundle\Parser\JmsMetadataParser"
+     *    },
+     *     "groups"={"owner_staff_details", "owner_list"}
+     * },
+     * statusCodes={
+     *     "output" = "Return user profile",
+     *     200="Returned when successful",
+     *     403="Returned when the user is not authorized to perform the action",
+     *     404="Returned when the specified resource is not found",
+     * },
+     *     views={"default", "profile"}
+     * )
      * @param Request $request
      * @param Utilisateur_avm $user
      * @return View|JsonResponse|Response
@@ -84,6 +138,36 @@ class ProfileController extends FOSRestController
     }
 
     /**
+     * @ApiDoc(
+     * resource=true,
+     * description="Update staff profile.",
+     * headers={
+     *      { "name"="Authorization", "required"="true", "description"="Authorization token"},
+     * },
+     * requirements= {
+     *      {"name"="id", "dataType"="integer", "required"=true, "requirement"="\d+", "description" = "user id"}
+     * },
+     * input={
+     *    "class"="APM\UserBundle\Entity\Utilisateur_avm",
+     *   "parsers" = {
+     *      "Nelmio\ApiDocBundle\Parser\ValidationParser"
+     *    }
+     * },
+     * output={
+     *   "class"="APM\UserBundle\Entity\Utilisateur_avm",
+     *   "parsers" = {
+     *      "Nelmio\ApiDocBundle\Parser\JmsMetadataParser"
+     *    },
+     *     "groups"={"owner_user_details", "owner_list"}
+     * },
+     * statusCodes={
+     *     "output" = "Return user profile",
+     *     200="Returned when successful",
+     *     403="Returned when the user is not authorized to perform the action",
+     *     404="Returned when the specified resource is not found",
+     * },
+     *     views={"default", "profile"}
+     * )
      * @param Request $request
      * @param Admin $user
      * @return View|JsonResponse
@@ -123,7 +207,27 @@ class ProfileController extends FOSRestController
     }
 
     /**
-     * Change user password
+     * @ApiDoc(
+     * resource=true,
+     * description="Change user password.",
+     * headers={
+     *      { "name"="Authorization", "required"="true", "description"="Authorization token"},
+     * },
+     * requirements= {
+     *      {"name"="id", "dataType"="integer", "required"=true, "requirement"="\d+", "description" = "user id"}
+     * },
+     * parameters={
+     *    {"name"="current_password", "required"=true, "dataType"="string", "requirement"="\D+", "your current password"},
+     *    {"name"="plainPassword[first]", "required"=true, "dataType"="string", "requirement"="\D+", "your new password"},
+     *    {"name"="plainPassword[second]", "required"=true, "dataType"="string", "requirement"="\D+", "confirmation password"}
+     * },
+     * statusCodes={
+     *     200="Returned when successful",
+     *     403="Returned when the user is not authorized to perform the action",
+     *     404="Returned when the specified resource is not found",
+     * },
+     *     views={"default", "profile"}
+     * )
      *
      * @Post("/change-password/user/{id}")
      * @param Request $request
@@ -150,7 +254,27 @@ class ProfileController extends FOSRestController
     }
 
     /**
-     * Change staff password
+     * @ApiDoc(
+     * resource=true,
+     * description="Change staff password .",
+     * headers={
+     *      { "name"="Authorization", "required"="true", "description"="Authorization token"},
+     * },
+     * requirements= {
+     *      {"name"="id", "dataType"="integer", "required"=true, "requirement"="\d+", "description" = "staff id"}
+     * },
+     * parameters={
+     *    {"name"="current_password", "required"=true, "dataType"="string", "requirement"="\D+", "your current password"},
+     *    {"name"="plainPassword[first]", "required"=true, "dataType"="string", "requirement"="\D+", "your new password"},
+     *    {"name"="plainPassword[second]", "required"=true, "dataType"="string", "requirement"="\D+", "confirmation password"}
+     * },
+     * statusCodes={
+     *     200="Returned when successful",
+     *     403="Returned when the user is not authorized to perform the action",
+     *     404="Returned when the specified resource is not found",
+     * },
+     *     views={"default", "profile"}
+     * )
      *
      * @Post("/change-password/staff/{id}")
      * @param Request $request

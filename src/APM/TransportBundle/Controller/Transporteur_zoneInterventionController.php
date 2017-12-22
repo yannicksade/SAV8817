@@ -39,13 +39,41 @@ class Transporteur_zoneInterventionController extends FOSRestController
     private $zoneIntervention_filter;
 
     /**
+     * @ApiDoc(
+     * resource=true,
+     * description="Retrieve list of Transporteur_zoneIntervention.",
+     * headers={
+     *      { "name"="Authorization", "required"="true", "description"="Authorization token"},
+     * },
+     * filters={
+     *      {"name"="transporteur_filter", "dataType"="string"},
+     *      {"name"="zoneIntervention_filter", "dataType"="string"},
+     *      {"name"="length_filter", "dataType"="integer", "requirement"="\d+"},
+     *      {"name"="start_filter", "dataType"="integer", "requirement"="\d+"},
+     *  },
+     *
+     * output={
+     *   "class"="APM\TransportBundle\Entity\Transporteur_zoneintervention",
+     *   "parsers" = {
+     *      "Nelmio\ApiDocBundle\Parser\JmsMetadataParser"
+     *    },
+     *     "groups"={"owner_list"}
+     * },
+     * statusCodes={
+     *     "output" = "A single or a collection of Transporteur_zoneIntervention",
+     *     200="Returned when successful",
+     *     403="Returned when the user is not authorized to perform the action",
+     *     404="Returned when the specified resource is not found",
+     * },
+     *     views={"default", "transport"}
+     * )
      * @ParamConverter("zone_intervention", options={"mapping": {"zone_id":"id"}})
      * @param Request $request
      * @param Profile_transporteur $transporteur
      * @param Zone_intervention $zone_intervention
      * @return JsonResponse
      *
-     * @Get("/cget/transporteurs/zone/{zone_id}", name="s_zone")
+     * @Get("/cget/transporteurs/zone/{zone_id}", name="s_zone", requirements={"id"="transporteur", "zoneIntervention_id"="\d+"})
      * @Get("/cget/zones/transporteur/{id}", name="s_transporteur")
      */
     public function getAction(Request $request, Profile_transporteur $transporteur = null, Zone_intervention $zone_intervention = null)
@@ -140,10 +168,32 @@ class Transporteur_zoneInterventionController extends FOSRestController
         return $transporteurs_zones;
     }
 
-
-    //insérer un transporteur dans une zone d'intervention; transporteur; boutique
-
     /**
+     * @ApiDoc(
+     * resource=true,
+     * resourceDescription="Operations on transporteur zoneIntervention.",
+     * description="Create an object of type Transporteur_zoneIntervention.",
+     * statusCodes={
+     *         201="Returned when successful",
+     *         400="Returned when the data are not valid or an unknown error occurred",
+     *         403="Returned when the user is not authorized to carry on the action",
+     *         404="Returned when the entity is not found",
+     * },
+     * headers={
+     *      { "name"="Authorization",  "required"=true, "description"="Authorization token"}
+     * },
+     * requirements={
+     *      {"name"="id", "required"=true, "requirement"="\d+", "dataType"="integer", "description"="transporteur Id"},
+     *      {"name"="zone_id", "required"=true, "requirement"="\d+", "dataType"="integer", "description"="ZoneIntervention Id"}
+     * },
+     * input={
+     *    "class"="APM\TransportBundle\Entity\Transporteur_zoneintervention",
+     *     "parsers" = {
+     *          "Nelmio\ApiDocBundle\Parser\ValidationParser"
+     *      }
+     * },
+     *      views = {"default", "transport" }
+     * )
      * @param Request $request
      * @param Profile_transporteur $transporteur
      * @param Zone_intervention|null $zone_intervention
@@ -218,6 +268,31 @@ class Transporteur_zoneInterventionController extends FOSRestController
     }
 
     /**
+     * @ApiDoc(
+     * resource=true,
+     * description="Retrieve the details of an objet of type Transporteur_zoneIntervention.",
+     * headers={
+     *      { "name"="Authorization", "required"="true", "description"="Authorization token"},
+     * },
+     * requirements = {
+     *      {"name"="id", "dataType"="integer", "requirement"="\d+", "description"="Transporteur_zoneIntervention_Id"}
+     * },
+     * output={
+     *   "class"="APM\TransportBundle\Entity\Transporteur_zoneintervention",
+     *   "parsers" = {
+     *      "Nelmio\ApiDocBundle\Parser\JmsMetadataParser"
+     *    },
+     *     "groups"={"owner_transporteurZ_details", "owner_list"}
+     * },
+     * statusCodes={
+     *     "output" = "A single Object",
+     *     200="Returned when successful",
+     *     403="Returned when the user is not authorized to perform the action",
+     *     404="Returned when the specified resource is not found",
+     * },
+     *     views={"default", "transport"}
+     * )
+     *
      * @param Transporteur_zoneintervention $transporteur_zoneintervention
      * @return JsonResponse
      *
@@ -258,6 +333,30 @@ class Transporteur_zoneInterventionController extends FOSRestController
     }
 
     /**
+     * @ApiDoc(
+     * resource=true,
+     * resourceDescription="Operations on Transporteur_zoneintervention",
+     * description="Update an object of type Transporteur_zoneintervention.",
+     * statusCodes={
+     *         200="Returned when successful",
+     *         400="Returned when the data are not valid or an unknown error occurred",
+     *         403="Returned when the user is not authorized to carry on the action",
+     *         404="Returned when the entity is not found",
+     * },
+     * headers={
+     *      { "name"="Authorization", "required"="true", "description"="Authorization token"}
+     * },
+     * requirements = {
+     *      {"name"="id", "dataType"="integer", "requirement"="\d+", "description"="transporteur_zoneintervention Id"}
+     * },
+     * input={
+     *    "class"="APM\TransportBundle\Entity\Transporteur_zoneintervention",
+     *     "parsers" = {
+     *          "Nelmio\ApiDocBundle\Parser\ValidationParser"
+     *      },
+     * },
+     * views = {"default", "transport" }
+     * )
      * @param Request $request
      * @param Transporteur_zoneintervention $transporteur_zoneintervention
      * @return JsonResponse| View
@@ -300,6 +399,26 @@ class Transporteur_zoneInterventionController extends FOSRestController
     }
 
     /**
+     * @ApiDoc(
+     * resource=true,
+     * description="Delete objet of type Transporteur_zoneintervention.",
+     * headers={
+     *      { "name"="Authorization", "required"="true", "description"="Authorization token"},
+     * },
+     * requirements = {
+     *      {"name"="id", "dataType"="integer", "required"=true, "requirement"="\d+", "description"="transporteur_zoneintervention Id"}
+     * },
+     * parameters = {
+     *      {"name"="exec", "required"=true, "dataType"="string", "requirement"="\D+", "description"="needed to check the origin of the request", "format"="exec=go"}
+     * },
+     * statusCodes={
+     *     200="Returned when successful",
+     *     400="Returned when the data are not valid or an unknown error occurred",
+     *     403="Returned when the user is not authorized to perform the action",
+     *     404="Returned when the specified resource is not found",
+     * },
+     *     views={"default", "transport"}
+     * )
      * @param Request $request
      * @param Transporteur_zoneintervention $transporteur_zoneintervention
      * @return View | JsonResponse

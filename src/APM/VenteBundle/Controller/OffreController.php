@@ -67,12 +67,44 @@ class OffreController extends FOSRestController implements ClassResourceInterfac
      * @return JsonResponse
      *
      * @Get("/cget/offres", name="s")
-     * @Get("/cget/offres/boutique/{id}", name="s_boutique")
-     * @Get("/cget/offres/boutique/{id}/categorie/{categorie_id}", name="s_categorie")
-     * @Get("/cget/offres/user/{user_id}", name="s_ByAdmin")
-     * @Get("/cget/offres/groupe/{groupe_id}", name="s_groupeOffre")
-     * @Get("/cget/offres/transaction/{transaction_id}", name="s_transaction")
-     * @Get("/cget/offres/boutique/{id}/transaction/{transaction_id}", name="s_transaction_boutique")
+     * @Get("/cget/offres/boutique/{id}", name="s_boutique", requirements={"id"="boutique_id"})
+     * @Get("/cget/offres/boutique/{id}/categorie/{categorie_id}", name="s_categorie", requirements={"id"="boutique_id", "categorie_id"="\d+"})
+     * @Get("/cget/offres/user/{user_id}", name="s_ByAdmin", requirements={"user_id"="\d+"})
+     * @Get("/cget/offres/groupe/{groupe_id}", name="s_groupeOffre", requirements={"groupe_id"="\d+"})
+     * @Get("/cget/offres/transaction/{transaction_id}", name="s_transaction", requirements={"transaction_id"="\d+"})
+     * @Get("/cget/offres/boutique/{id}/transaction/{transaction_id}", name="s_transaction_boutique", requirements={"id"="boutique_id", "transaction_id"="\d+"})
+     *
+     * @ApiDoc(
+     * resource=true,
+     * description="Retrieve list of offres.",
+     * headers={
+     *      { "name"="Authorization", "required"="true", "description"="Authorization token"},
+     * },
+     * filters={
+     *      {"name"="code_filter", "dataType"="string"},
+     *      {"name"="designation_filter", "dataType"="integer"},
+     *      {"name"="date_from_filter",  "dataType"="dateTime", "pattern"="19-12-2017|ASC"},
+     *      {"name"="date_to_filter", "dataType"="dateTime", "pattern"="19-12-2017|DESC"},
+     *      {"name"="etat_filter", "dataType"="integer", "pattern"="1,2,3,4,5,6,7,8|SELECT"},
+     *      {"name"="length_filter", "dataType"="integer"},
+     *      {"name"="start_filter", "dataType"="integer"},
+     * },
+     * output={
+     *   "class"="APM\VenteBundle\Entity\Offre",
+     *   "parsers" = {
+     *      "Nelmio\ApiDocBundle\Parser\JmsMetadataParser"
+     *    },
+     *     "groups"={"owner_list"}
+     * },
+     *
+     * statusCodes={
+     *     "output" = "A single or a collection of offre",
+     *     200="Returned when successful",
+     *     403="Returned when the user is not authorized to carry on this operation",
+     *     404="Returned when a specified object is not found",
+     * },
+     *     views={"default","vente"}
+     * )
      */
     public function getAction(Request $request, Boutique $boutique = null, Categorie $categorie = null, Utilisateur_avm $user = null, Groupe_offre $groupe_offre = null, Transaction $transaction = null)
     {
@@ -291,6 +323,28 @@ class OffreController extends FOSRestController implements ClassResourceInterfac
     }
 
     /**
+     * @ApiDoc(
+     * resource=true,
+     * resourceDescription="Operations on offre.",
+     * description="Create an object of type Offre.",
+     * statusCodes={
+     *         201="Returned when successful",
+     *         400="Returned when the data are not valid or an unknown error occurred",
+     *         403="Returned when the user is not authorized to carry on the action",
+     *         404="Returned when the entity is not found",
+     * },
+     * headers={
+     *      { "name"="Authorization",  "required"=true, "description"="Authorization token"}
+     * },
+     * input={
+     *    "class"="APM\VenteBundle\Entity\Offre",
+     *     "parsers" = {
+     *          "Nelmio\ApiDocBundle\Parser\ValidationParser"
+     *      },
+     *    "name" = "Offre",
+     * },
+     * views = {"default", "vente" }
+     * )
      * @param Request $request
      * @return View|JsonResponse
      * @Post("/new/offre")
@@ -398,7 +452,30 @@ class OffreController extends FOSRestController implements ClassResourceInterfac
     }
 
     /**
-     * Tout utilisateur AVM peut voir une offre
+     * @ApiDoc(
+     * resource=true,
+     * description="Retrieve the details of an objet of type Offre.",
+     * headers={
+     *      { "name"="Authorization", "required"="true", "description"="Authorization token"},
+     * },
+     * requirements = {
+     *      {"name"="id", "dataType"="integer", "requirement"="\d+", "description"="offre id"}
+     * },
+     * output={
+     *   "class"="APM\VenteBundle\Entity\Offre",
+     *   "parsers" = {
+     *      "Nelmio\ApiDocBundle\Parser\JmsMetadataParser"
+     *    },
+     *     "groups"={"owner_offre_details", "owner_list"}
+     * },
+     * statusCodes={
+     *     "output" = "A single Object",
+     *     200="Returned when successful",
+     *     403="Returned when the user is not authorized to perform the action",
+     *     404="Returned when the specified resource is not found",
+     * },
+     *     views={"default", "vente"}
+     * )
      * @param Offre $offre
      * @return JsonResponse
      *
@@ -415,7 +492,32 @@ class OffreController extends FOSRestController implements ClassResourceInterfac
 //------------------------ End INDEX ACTION --------------------------------------------
 
     /**
-     * Displays a form to edit an existing Offre entity.
+     * @ApiDoc(
+     * resource=true,
+     * resourceDescription="Operations on Offre",
+     * description="Update an object of type Offre.",
+     * statusCodes={
+     *         200="Returned when successful",
+     *         400="Returned when the data are not valid or an unknown error occurred",
+     *         403="Returned when the user is not authorized to carry on the action",
+     *         404="Returned when the entity is not found",
+     * },
+     * headers={
+     *      { "name"="Authorization", "required"="true", "description"="Authorization token"}
+     * },
+     * requirements = {
+     *      {"name"="id", "dataType"="integer", "requirement"="\d+", "description"="offre Id"}
+     * },
+     * input={
+     *    "class"="APM\VenteBundle\Entity\Offre",
+     *     "parsers" = {
+     *          "Nelmio\ApiDocBundle\Parser\ValidationParser"
+     *      },
+     *    "name" = "Offre",
+     * },
+     *
+     * views = {"default", "vente" }
+     * )
      * @param Request $request
      * @param Offre $offre
      * @return View | JsonResponse
@@ -481,7 +583,26 @@ class OffreController extends FOSRestController implements ClassResourceInterfac
 
 
     /**
-     * Deletes an Offre entity.
+     * @ApiDoc(
+     * resource=true,
+     * description="Delete objet of type offre.",
+     * headers={
+     *      { "name"="Authorization", "required"="true", "description"="Authorization token"},
+     * },
+     * requirements = {
+     *      {"name"="id", "dataType"="integer", "required"=true, "requirement"="\d+", "description"="offre Id"}
+     * },
+     * parameters = {
+     *      {"name"="exec", "required"=true, "dataType"="string", "requirement"="\D+", "description"="needed to check the origin of the request", "format"="exec=go"}
+     * },
+     * statusCodes={
+     *     200="Returned when successful",
+     *     400="Returned when the data are not valid or an unknown error occurred",
+     *     403="Returned when the user is not authorized to perform the action",
+     *     404="Returned when the specified resource is not found",
+     * },
+     *     views={"default", "vente"}
+     * )
      * @param Request $request
      * @param Offre $offre
      * @return View|JsonResponse

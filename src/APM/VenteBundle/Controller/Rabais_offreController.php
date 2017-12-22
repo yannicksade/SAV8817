@@ -43,11 +43,50 @@ class Rabais_offreController extends FOSRestController
 
 
     /**
-     * Le vendeur crée des rabais pour un utilisateur donné
-     * Liste les rabais créé par le vendeur
+     * @ApiDoc(
+     * resource=true,
+     * description="Retrieve list of rabais offre.",
+     * headers={
+     *      { "name"="Authorization", "required"="true", "description"="Authorization token"},
+     * },
+     * filters={
+     *      {"name"="beneficiaire_filter", "dataType"="string"},
+     *      {"name"="dateLimiteFrom_filter", "dataType"="dateTime", "pattern"="19-12-2017|ASC"},
+     *      {"name"="dateLimiteTo_filter", "dataType"="dateTime", "pattern"="19-12-2017|DESC"},
+     *      {"name"="description_filter", "dataType"="string"},
+     *      {"name"="code_filter", "dataType"="string"},
+     *      {"name"="nombreDefois_filter", "dataType"="integer"},
+     *      {"name"="prixUpdateMin_filter", "dataType"="integer"},
+     *      {"name"="prixUpdateMax_filter", "dataType"="integer"},
+     *      {"name"="quantite_filter", "dataType"="integer"},
+     *      {"name"="vendeur_filter", "dataType"="string"},
+     *      {"name"="offre_filter", "dataType"="string"},
+     *      {"name"="groupe_filter", "dataType"="string"},
+     *      {"name"="length_filter", "dataType"="integer", "requirement"="\d+"},
+     *      {"name"="start_filter", "dataType"="integer", "requirement"="\d+"},
+     *  },
+     * output={
+     *   "class"="APM\VenteBundle\Entity\Boutique",
+     *   "parsers" = {
+     *      "Nelmio\ApiDocBundle\Parser\JmsMetadataParser"
+     *    },
+     *     "groups"={"owner_list"}
+     * },
+     *  parameters= {
+     *      {"name"="q", "required"="false", "dataType"="string", "requirement"="\D+", "description"="query request == product | received | anonymous ==", "format"= "?q=product"}
+     *  },
+     * statusCodes={
+     *     "output" = "A single or a collection of rabais",
+     *     200="Returned when successful",
+     *     403="Returned when the user is not authorized to perform the action",
+     *     404="Returned when the specified resource is not found",
+     * },
+     *     views={"default", "vente"}
+     * )
+     *
      * @param Request $request
      * @param Offre $offre
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return JsonResponse
      *
      * @Get("/cget/rabaisoffres/utilisateur")
      * @Get("/cget/rabaisoffres/offre/{id}", name="_offre")
@@ -58,7 +97,6 @@ class Rabais_offreController extends FOSRestController
             $this->listAndShowSecurity($offre);
             /** @var Utilisateur_avm $user */
             $user = $this->getUser();
-            $q = $request->get('q');
             $this->beneficiaire_filter = $request->query->has('beneficiaire_filter') ? $request->query->get('beneficiaire_filter') : "";
             $this->code_filter = $request->query->has('code_filter') ? $request->query->get('code_filter') : "";
             $this->dateLimiteFrom_filter = $request->query->has('dateLimiteFrom_filter') ? $request->query->get('dateLimiteFrom_filter') : "";
@@ -74,8 +112,9 @@ class Rabais_offreController extends FOSRestController
             $iDisplayStart = $request->query->has('start') ? intval($request->query->get('start')) : 0;
             $json = array();
             $rabais_offres = null;
+            $q = $request->query->has('q') ? $request->query->get('q') : 'all';
             $json['items'] = array();
-            if ($q === "fromProduct" || $q === "all") {
+            if ($q === "product" || $q === "all") {
                 if (null !== $offre) $rabais_offres = $offre->getRabais();
                 if (null !== $rabais_offres) {
                     $iTotalRecords = count($rabais_offres);
@@ -89,7 +128,7 @@ class Rabais_offreController extends FOSRestController
                 }
             }
 
-            if ($q === "sent" || $q === "all") {
+            if ($q === "anonymous" || $q === "all") {
                 $rabais_recus = $user->getRabaisRecus();
                 if (null !== $rabais_recus) {
                     $iTotalRecords = count($rabais_recus);
@@ -186,19 +225,19 @@ class Rabais_offreController extends FOSRestController
         if ($this->groupe_filter != null) {
             $rabais = $rabais->filter(function ($e) {//filtrage select
                 /** @var Rabais_offre $e */
-                return $e->getGroupe()->getCode() === intval($this->groupe_filter);
+                return $e->getGroupe()->getCode() === $this->groupe_filter;
             });
         }
         if ($this->prixUpdateMin_filter != null) {
             $rabais = $rabais->filter(function ($e) {//filtrage select
                 /** @var Rabais_offre $e */
-                return $e->getPrixUpdate() >= intval($this->prixUpdateMin_filter);
+                return intval($e->getPrixUpdate()) >= intval($this->prixUpdateMin_filter);
             });
         }
         if ($this->prixUpdateMax_filter != null) {
             $rabais = $rabais->filter(function ($e) {//filtrage select
                 /** @var Rabais_offre $e */
-                return $e->getPrixUpdate() <= intval($this->prixUpdateMax_filter);
+                return intval($e->getPrixUpdate()) <= intval($this->prixUpdateMax_filter);
             });
         }
         if ($this->dateLimiteFrom_filter != null) {
@@ -264,7 +303,31 @@ class Rabais_offreController extends FOSRestController
     }
 
     /**
-     * Creates a new Rabais_offre entity.
+     * @ApiDoc(
+     * resource=true,
+     * resourceDescription="Operations on Rabais_offre.",
+     * description="Create an object of type Rabais_offre.",
+     * statusCodes={
+     *         201="Returned when successful",
+     *         400="Returned when the data are not valid or an unknown error occurred",
+     *         403="Returned when the user is not authorized to carry on the action",
+     *         404="Returned when the entity is not found",
+     * },
+     * headers={
+     *      { "name"="Authorization",  "required"=true, "description"="Authorization token"}
+     * },
+     *  requirements={
+     *      {"name"="id", "required"=true, "requirement"="\d+", "dataType"="integer", "description"= "rabais_offre Id"}
+     *  },
+     * input={
+     *     "class"="APM\VenteBundle\Entity\Rabais_offre",
+     *     "parsers" = {
+     *          "Nelmio\ApiDocBundle\Parser\ValidationParser"
+     *      },
+     *    "name" = "Rabais_offre",
+     * },
+     *     views = {"default", "vente" }
+     * )
      * @param Request $request
      * @param Offre $offre
      * @Post("/new/rabaisoffre/{id}")
@@ -340,7 +403,30 @@ class Rabais_offreController extends FOSRestController
     }
 
     /**
-     * Finds and displays a Rabais_offre entity.
+     * @ApiDoc(
+     * resource=true,
+     * description="Retrieve the details of an objet of type Rabais_offre.",
+     * headers={
+     *      { "name"="Authorization", "required"="true", "description"="Authorization token"},
+     * },
+     * requirements = {
+     *      {"name"="id", "dataType"="integer", "requirement"="\d+", "description"="rabais_offre id"}
+     * },
+     * output={
+     *   "class"="APM\VenteBundle\Entity\Rabais_offre",
+     *   "parsers" = {
+     *      "Nelmio\ApiDocBundle\Parser\JmsMetadataParser"
+     *    },
+     *     "groups"={"owner_rabais_details", "owner_list"}
+     * },
+     * statusCodes={
+     *     "output" = "A single Object",
+     *     200="Returned when successful",
+     *     403="Returned when the user is not authorized to perform the action",
+     *     404="Returned when the specified resource is not found",
+     * },
+     *     views={"default", "vente"}
+     * )
      * @param Rabais_offre $rabais_offre
      * @return JsonResponse
      *
@@ -354,7 +440,32 @@ class Rabais_offreController extends FOSRestController
     }
 
     /**
-     * Displays a form to edit an existing Rabais_offre entity.
+     * @ApiDoc(
+     * resource=true,
+     * resourceDescription="Operations on Rabais_offre",
+     * description="Update an object of type Rabais_offre.",
+     * statusCodes={
+     *         200="Returned when successful",
+     *         400="Returned when the data are not valid or an unknown error occurred",
+     *         403="Returned when the user is not authorized to carry on the action",
+     *         404="Returned when the entity is not found",
+     * },
+     * headers={
+     *      { "name"="Authorization", "required"="true", "description"="Authorization token"}
+     * },
+     * requirements = {
+     *      {"name"="id", "dataType"="integer", "requirement"="\d+", "description"="Rabais_offre Id"}
+     * },
+     * input={
+     *    "class"="APM\VenteBundle\Entity\Rabais_offre",
+     *     "parsers" = {
+     *          "Nelmio\ApiDocBundle\Parser\ValidationParser"
+     *      },
+     *    "name" = "Rabais_offre",
+     * },
+     *
+     * views = {"default", "vente" }
+     * )
      * @param Request $request
      * @param Rabais_offre $rabais_offre
      * @return View|JsonResponse
@@ -397,14 +508,11 @@ class Rabais_offreController extends FOSRestController
     private function editAndDeleteSecurity($rabais)
     {
         //---------------------------------security-----------------------------------------------
-        // Unable to access the controller unless you have a USERAVM role
         $this->denyAccessUnlessGranted('ROLE_USERAVM', null, 'Unable to access this page!');
         if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY')) {
             throw $this->createAccessDeniedException();
         }
 
-        /// N'autorise que le vendeur, le gerant ou le proprietaire à pouvoir modifier ou supprimer des rabais sur l'offre
-        // à condition qu'ils ne soyent pas ledit bénéficiaire
         $boutique = $rabais->getOffre()->getBoutique();
         $user = $this->getUser();
         $gerant = null;
@@ -423,7 +531,26 @@ class Rabais_offreController extends FOSRestController
 
 
     /**
-     * Deletes a Rabais_offre entity.
+     * @ApiDoc(
+     * resource=true,
+     * description="Delete objet of type Rabais_offre.",
+     * headers={
+     *      { "name"="Authorization", "required"="true", "description"="Authorization token"},
+     * },
+     * requirements = {
+     *      {"name"="id", "dataType"="integer", "required"=true, "requirement"="\d+", "description"="rabais_offre Id"}
+     * },
+     * parameters = {
+     *      {"name"="exec", "required"=true, "dataType"="string", "requirement"="\D+", "description"="needed to check the origin of the request", "format"="exec=go"}
+     * },
+     * statusCodes={
+     *     200="Returned when successful",
+     *     400="Returned when the data are not valid or an unknown error occurred",
+     *     403="Returned when the user is not authorized to perform the action",
+     *     404="Returned when the specified resource is not found",
+     * },
+     *     views={"default", "vente"}
+     * )
      * @param Request $request
      * @param Rabais_offre $rabais_offre
      * @return View | JsonResponse

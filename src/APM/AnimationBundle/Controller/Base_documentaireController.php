@@ -36,7 +36,37 @@ class Base_documentaireController extends FOSRestController
     private $proprietaire_filter;
 
     /**
-     *Liste les documents de l'utilisateur
+     * @ApiDoc(
+     * resource=true,
+     * description="Retrieve list of documents.",
+     * headers={
+     *      { "name"="Authorization", "required"="true", "description"="Authorization token"},
+     * },
+     * filters={
+     *      {"name"="objet_filter", "dataType"="string"},
+     *      {"name"="code_filter", "dataType"="string"},
+     *      {"name"="dateFrom_filter", "dataType"="dateTime", "pattern"="19-12-2017|ASC"},
+     *      {"name"="dateTo_filter", "dataType"="dateTime", "pattern"="19-12-2017|DESC"},
+     *      {"name"="updatedAt_filter", "dataType"="dateTime", "pattern"="19-12-2017"},
+     *      {"name"="proprietaire_filter", "dataType"="string", "pattern"="yannick|USERNAME"},
+     *      {"name"="length_filter", "dataType"="integer", "requirement"="\d+"},
+     *      {"name"="start_filter", "dataType"="integer", "requirement"="\d+"},
+     *  },
+     * output={
+     *   "class"="APM\AnimationBundle\Entity\Base_documentaire",
+     *   "parsers" = {
+     *      "Nelmio\ApiDocBundle\Parser\JmsMetadataParser"
+     *    },
+     *     "groups"={"owner_list"}
+     * },
+     * statusCodes={
+     *     "output" = "A single or a collection of document",
+     *     200="Returned when successful",
+     *     403="Returned when the user is not authorized to perform the action",
+     *     404="Returned when the specified resource is not found",
+     * },
+     *     views={"default", "animation"}
+     * )
      * @param Request $request
      * @return JsonResponse
      *
@@ -182,7 +212,30 @@ class Base_documentaireController extends FOSRestController
     }
 
     /**
-     * Creates a new Base_documentaire entity.
+     * @ApiDoc(
+     * resource=true,
+     * resourceDescription="Operations on Base_documentaire.",
+     * description="Create an object of type Base_documentaire.",
+     * statusCodes={
+     *         201="Returned when successful",
+     *         400="Returned when the data are not valid or an unknown error occurred",
+     *         403="Returned when the user is not authorized to carry on the action",
+     * },
+     * headers={
+     *      { "name"="Authorization", "required"=true, "description"="Authorization token"}
+     * },
+     * requirements={
+     *      {"name"="id", "requirement"="\d+", "dataType"="integer", "description"="offre_id"}
+     * },
+     * input={
+     *    "class"="APM\AchatBundle\Entity\Base_documentaire",
+     *     "parsers" = {
+     *          "Nelmio\ApiDocBundle\Parser\ValidationParser"
+     *      },
+     *    "name" = "Base_documentaire",
+     * },
+     *  views = {"default", "animation" }
+     * )
      * @param Request $request
      * @return View| JsonResponse
      *
@@ -237,7 +290,30 @@ class Base_documentaireController extends FOSRestController
     }
 
     /**
-     * Finds and displays a Base_documentaire entity.
+     * @ApiDoc(
+     * resource=true,
+     * description="Retrieve the details of an objet of type Base_documentaire.",
+     * headers={
+     *      { "name"="Authorization", "required"="true", "description"="Authorization token"},
+     * },
+     * requirements = {
+     *      {"name"="id", "dataType"="integer", "requirement"="\d+", "description"="document_id"}
+     * },
+     * output={
+     *   "class"="APM\AchatBundle\Entity\Base_documentaire",
+     *   "parsers" = {
+     *      "Nelmio\ApiDocBundle\Parser\JmsMetadataParser"
+     *    },
+     *     "groups"={"owner_document_details", "owner_list"}
+     * },
+     * statusCodes={
+     *     "output" = "A single Object",
+     *     200="Returned when successful",
+     *     403="Returned when the user is not authorized to perform the action",
+     *     404="Returned when the specified resource is not found",
+     * },
+     *     views={"default", "animation"}
+     * )
      * @param Base_documentaire $document
      * @return \Symfony\Component\HttpFoundation\Response | JsonResponse
      *
@@ -251,7 +327,31 @@ class Base_documentaireController extends FOSRestController
     }
 
     /**
-     * Displays a form to edit an existing Base_documentaire entity.
+     * @ApiDoc(
+     * resource=true,
+     * resourceDescription="Operations on Base_documentaire",
+     * description="Update an object of type base_documentaire.",
+     * statusCodes={
+     *         200="Returned when successful",
+     *         400="Returned when the data are not valid or an unknown error occurred",
+     *         403="Returned when the user is not authorized to carry on the action",
+     *         404="Returned when the entity is not found",
+     * },
+     * headers={
+     *      { "name"="Authorization", "required"=true, "description"="Authorization token"}
+     * },
+     * requirements = {
+     *      {"name"="id", "dataType"="integer", "requirement"="\d+", "description"="document Id"}
+     * },
+     * input={
+     *    "class"="APM\AchatBundle\Entity\Base_documentaire",
+     *     "parsers" = {
+     *          "Nelmio\ApiDocBundle\Parser\ValidationParser"
+     *      },
+     *    "name" = "Specification_achat",
+     * },
+     *     views={"default","animation"}
+     *)
      * @param Request $request
      * @param Base_documentaire $document
      * @return View | JsonResponse
@@ -316,6 +416,25 @@ class Base_documentaireController extends FOSRestController
     }
 
     /**
+     * @ApiDoc(
+     * resource=true,
+     * description="Delete objet of type Base_documentaire.",
+     * headers={
+     *      { "name"="Authorization", "required"="true", "description"="Authorization token"},
+     * },
+     * requirements = {
+     *      {"name"="id", "dataType"="integer", "required"=true, "requirement"="\d+", "description"="document Id"}
+     * },
+     * parameters = {
+     *      {"name"="exec", "required"=true, "dataType"="string", "requirement"="\D+", "description"="needed to check the origin of the request", "format"="exec=go"}
+     * },
+     * statusCodes={
+     *     200="Returned when successful",
+     *     403="Returned when the user is not authorized to perform the action",
+     *     404="Returned when the specified resource is not found",
+     * },
+     *     views={"default", "animation"}
+     * )
      * @param Request $request
      * @param Base_documentaire $document
      * @return View | JsonResponse

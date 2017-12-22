@@ -27,12 +27,33 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
  */
 class Reseau_conseillersController extends FOSRestController
 {
-    /** Liste les binômes du réseau du conseiller (2 par 2) pour dessiner l'arbre
+    /**
+     * @ApiDoc(
+     * resource=true,
+     * description="Retrieve the network of a conseiller.",
+     * headers={
+     *      { "name"="Authorization", "required"="true", "description"="Authorization token"},
+     * },
+     * output={
+     *   "class"="APM\MarketingBundle\Entity\Conseiller",
+     *   "parsers" = {
+     *      "Nelmio\ApiDocBundle\Parser\JmsMetadataParser"
+     *    },
+     *     "groups"={"net", "owner_list"}
+     * },
+     * statusCodes={
+     *     "output" = "A network ",
+     *     200="Returned when successful",
+     *     403="Returned when the user is not authorized to perform the action",
+     *     404="Returned when the specified resource is not found",
+     * },
+     *     views={"default", "marketing"}
+     * )
      * @param Conseiller|null $conseiller
      * @return JsonResponse
      *
      * @Get("/")
-     * @Put("/conseiller/{id}", name="_conseiller")
+     * @Put("/conseiller/{id}", name="_conseiller", requirements={"id"="conseiller_id"})
      */
     public function getAction(Conseiller $conseiller = null)
     {
@@ -82,7 +103,31 @@ class Reseau_conseillersController extends FOSRestController
     }
 
     /**
-     * Ajoute ou modifie le conseiller de droite ou de gauche
+     * @ApiDoc(
+     * resource=true,
+     * resourceDescription="Operations on conseiller",
+     * description="Add/remove/modify conseiller left and right  of the current conseiller.",
+     * statusCodes={
+     *         200="Returned when successful",
+     *         400="Returned when the data are not valid or an unknown error occurred",
+     *         403="Returned when the user is not authorized to carry on the action",
+     *         404="Returned when the entity is not found",
+     * },
+     * headers={
+     *      { "name"="Authorization", "required"=true, "description"="Authorization token"}
+     * },
+     * requirements = {
+     *      {"name"="id", "dataType"="integer", "requirement"="\d+", "description"="conseiller Id"}
+     * },
+     *
+     * input={
+     *   "class"="APM\MarketingBundle\Entity\Conseiller",
+     *   "parsers" = {
+     *      "Nelmio\ApiDocBundle\Parser\JmsMetadataParser"
+     *    },
+     *     "groups"={"net", "owner_list"}
+     * },
+     * )
      * @param Request $request
      * @param Conseiller $conseiller maître du reseau courant
      * @return View | JsonResponse
@@ -268,6 +313,31 @@ class Reseau_conseillersController extends FOSRestController
     }
 
     /**
+     * @ApiDoc(
+     * resource=true,
+     * resourceDescription="Operations on conseiller",
+     * description="Promote a conseiller.",
+     * statusCodes={
+     *         200="Returned when successful",
+     *         400="Returned when the data are not valid or an unknown error occurred",
+     *         403="Returned when the user is not authorized to carry on the action",
+     *         404="Returned when the entity is not found",
+     * },
+     * headers={
+     *      { "name"="Authorization", "required"=true, "description"="Authorization token"}
+     * },
+     * requirements = {
+     *      {"name"="id", "dataType"="integer", "requirement"="\d+", "description"="$advisorFictif Id"}
+     * },
+     *
+     * input={
+     *   "class"="APM\MarketingBundle\Entity\Conseiller",
+     *   "parsers" = {
+     *      "Nelmio\ApiDocBundle\Parser\JmsMetadataParser"
+     *    },
+     *     "groups"={"net", "owner_list"}
+     * },
+     * )
      * @param Request $request
      * @param Conseiller $advisorFictif
      * @return View | JsonResponse
@@ -369,8 +439,25 @@ class Reseau_conseillersController extends FOSRestController
     }
 
     /**
-     * Activer son profile de manager de réseau conseiller
-     * @param Request $request
+     * @ApiDoc(
+     * resource=true,
+     * resourceDescription="Operations on Reseau conseiller.",
+     * description="Create an object of type Conseiller.",
+     * statusCodes={
+     *         201="Returned when successful",
+     *         400="Returned when the data are not valid or an unknown error occurred",
+     *         403="Returned when the user is not authorized to carry on the action",
+     *         404="Returned when the entity is not found",
+     * },
+     * headers={
+     *      { "name"="Authorization", "required"=true, "description"="Authorization token"}
+     * },
+     *
+     * parameters = {
+     *      {"name"="nombreInstanceReseau", "required"=true, "dataType"="integer", "requirement"="\d+", "description"="0 or 1 for network creation"}
+     * },
+     *  views = {"default", "marketing" }
+     * )
      * @return View  | JsonResponse
      *
      * @Post("/new")

@@ -15,6 +15,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 class Groupe_offreType extends AbstractType
 {
     /**
+     * {@inheritdoc}
+     *
      * @param FormBuilderInterface $builder
      * @param array $options
      */
@@ -22,7 +24,8 @@ class Groupe_offreType extends AbstractType
     {
         $builder
             ->add('code')
-            ->add('dateDeVigueur', TextType::class, [
+            ->add('dateDeVigueur', TextType::class, array(
+                'description' => 'this is a note',
                 'required' => false,
                 /*'html5' => false,
                 'widget' => 'single_text',*/
@@ -30,7 +33,7 @@ class Groupe_offreType extends AbstractType
                 //'attr'=>['class' =>'bs-datetime'],
                 //'label'=>'date alerte',
                 //'label_attr' =>['class' =>'control-label']
-            ])
+            ))
 
             ->add('description', TextareaType::class, ['required' => false])
             ->add('propriete', ChoiceType::class, [

@@ -37,13 +37,43 @@ class Individu_to_groupeController extends FOSRestController
     private $utilisateur_filter;
 
     /**
+     * @ApiDoc(
+     * resource=true,
+     * description="Retrieve list of individu_groupes.",
+     * headers={
+     *      { "name"="Authorization", "required"="true", "description"="Authorization token"},
+     * },
+     * filters={
+     *      {"name"="utilisateur_filter", "dataType"="string"},
+     *      {"name"="dateCreationFrom_filter", "dataType"="dateTime", "pattern"="19-12-2017|ASC"},
+     *      {"name"="dateCreationTo_filter", "dataType"="dateTime", "pattern"="19-12-2017|DESC"},
+     *      {"name"="description_filter", "dataType"="string"},
+     *      {"name"="propriete_filter", "dataType"="integer"},
+     *      {"name"="length_filter", "dataType"="integer", "requirement"="\d+"},
+     *      {"name"="start_filter", "dataType"="integer", "requirement"="\d+"},
+     *  },
+     * output={
+     *   "class"="APM\UserBundle\Entity\Individu_to_groupe",
+     *   "parsers" = {
+     *      "Nelmio\ApiDocBundle\Parser\JmsMetadataParser"
+     *    },
+     *     "groups"={"owner_list"}
+     * },
+     * statusCodes={
+     *     "output" = "A single or a collection of Individu_to_groupe",
+     *     200="Returned when successful",
+     *     403="Returned when the user is not authorized to perform the action",
+     *     404="Returned when the specified resource is not found",
+     * },
+     *     views={"default", "user"}
+     * )
      * @ParamConverter("utilisateur_avm", options={"mapping": {"user_id":"id"}})
      * @param Request $request
      * @param Groupe_relationnel $groupe_relationnel
      * @param Utilisateur_avm $utilisateur_avm
      * @return JsonResponse
-     * @Get("/cget/individus/group/{id}", name="s_group")
-     * @Get("/cget/groups/user/{user_id}", name="s_user")
+     * @Get("/cget/individus/group/{id}", name="s_group", requirements={"id"="groupe_relationnel_id"})
+     * @Get("/cget/groups/user/{user_id}", name="s_user", requirements={"user_id"="\d+"})
      */
     public function getAction(Request $request, Groupe_relationnel $groupe_relationnel = null, Utilisateur_avm $utilisateur_avm = null)
     {
@@ -183,7 +213,28 @@ class Individu_to_groupeController extends FOSRestController
     }
 
     /**
-     *  Affecter l'utilisateur à un groupe
+     * @ApiDoc(
+     * resource=true,
+     * resourceDescription="Operations on Individu_to_groupe.",
+     * description="Create an object of type Individu_to_groupe.",
+     * statusCodes={
+     *         201="Returned when successful",
+     *         400="Returned when the data are not valid or an unknown error occurred",
+     *         403="Returned when the user is not authorized to carry on the action",
+     *         404="Returned when the entity is not found",
+     * },
+     * headers={
+     *      { "name"="Authorization",  "required"=true, "description"="Authorization token"}
+     * },
+     * input={
+     *    "class"="APM\UserBundle\Entity\Individu_to_groupe",
+     *     "parsers" = {
+     *          "Nelmio\ApiDocBundle\Parser\ValidationParser"
+     *      },
+     *    "name" = "Individu_to_groupe",
+     * },
+     *      views = {"default", "user" }
+     * )
      * @param Request $request
      * @param Groupe_relationnel $groupe_relationnel
      * @return View | JsonResponse
@@ -256,7 +307,30 @@ class Individu_to_groupeController extends FOSRestController
     }
 
     /**
-     * Finds and displays a Individu_to_groupe entity.
+     * @ApiDoc(
+     * resource=true,
+     * description="Retrieve the details of an objet of type Individu_to_groupe.",
+     * headers={
+     *      { "name"="Authorization", "required"="true", "description"="Authorization token"},
+     * },
+     * requirements = {
+     *      {"name"="id", "dataType"="integer", "requirement"="\d+", "description"="individu_to_groupe id"}
+     * },
+     * output={
+     *   "class"="APM\UserBundle\Entity\Individu_to_groupe",
+     *   "parsers" = {
+     *      "Nelmio\ApiDocBundle\Parser\JmsMetadataParser"
+     *    },
+     *     "groups"={"owner_individuToG", "owner_list"}
+     * },
+     * statusCodes={
+     *     "output" = "A single Object",
+     *     200="Returned when successful",
+     *     403="Returned when the user is not authorized to perform the action",
+     *     404="Returned when the specified resource is not found",
+     * },
+     *     views={"default", "user"}
+     * )
      * @param Individu_to_groupe $individu_to_groupe
      * @return JsonResponse
      *
@@ -270,6 +344,32 @@ class Individu_to_groupeController extends FOSRestController
     }
 
     /**
+     * @ApiDoc(
+     * resource=true,
+     * resourceDescription="Operations on Individu_to_groupe",
+     * description="Update an object of type Individu_to_groupe.",
+     * statusCodes={
+     *         200="Returned when successful",
+     *         400="Returned when the data are not valid or an unknown error occurred",
+     *         403="Returned when the user is not authorized to carry on the action",
+     *         404="Returned when the entity is not found",
+     * },
+     * headers={
+     *      { "name"="Authorization", "required"="true", "description"="Authorization token"}
+     * },
+     * requirements = {
+     *      {"name"="id", "dataType"="integer", "requirement"="\d+", "description"="Individu_to_groupe Id"}
+     * },
+     * input={
+     *    "class"="APM\UserBundle\Entity\Individu_to_groupe",
+     *     "parsers" = {
+     *          "Nelmio\ApiDocBundle\Parser\ValidationParser"
+     *      },
+     *    "name" = "Individu_to_groupe",
+     * },
+     *
+     * views = {"default", "user" }
+     * )
      * @param Request $request
      * @param Individu_to_groupe $individu_to_groupe
      * @return View | JsonResponse
@@ -327,6 +427,26 @@ class Individu_to_groupeController extends FOSRestController
 
 
     /**
+     * @ApiDoc(
+     * resource=true,
+     * description="Delete objet of type Individu_to_groupe.",
+     * headers={
+     *      { "name"="Authorization", "required"="true", "description"="Authorization token"},
+     * },
+     * requirements = {
+     *      {"name"="id", "dataType"="integer", "required"=true, "requirement"="\d+", "description"="Individu_to_groupe Id"}
+     * },
+     * parameters = {
+     *      {"name"="exec", "required"=true, "dataType"="string", "requirement"="\D+", "description"="needed to check the origin of the request", "format"="exec=go"}
+     * },
+     * statusCodes={
+     *     200="Returned when successful",
+     *     400="Returned when the data are not valid or an unknown error occurred",
+     *     403="Returned when the user is not authorized to perform the action",
+     *     404="Returned when the specified resource is not found",
+     * },
+     *     views={"default", "user"}
+     * )
      * @param Request $request
      * @param Individu_to_groupe $individu_to_groupe
      * @return View | JsonResponse
@@ -353,7 +473,7 @@ class Individu_to_groupeController extends FOSRestController
                 [
                     "status" => 400,
                     "message" => $this->get('translator')->trans("impossible de supprimer, vérifiez vos données", [], 'FOSUserBundle')
-                ], Response::HTTP_FAILED_DEPENDENCY
+                ], Response::HTTP_BAD_REQUEST
             );
         } catch (AccessDeniedException $ads) {
             return new JsonResponse(

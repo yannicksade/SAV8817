@@ -129,7 +129,7 @@ class RegistrationManager implements ContainerAwareInterface
         if (null === $user) {
             return new JsonResponse(
                 sprintf('The user with "confirmation token" does not exist for value "%s"', $token),
-                JsonResponse::HTTP_BAD_REQUEST);
+                JsonResponse::HTTP_NOT_FOUND);
         }
         /** @var $dispatcher EventDispatcherInterface */
         $dispatcher = $this->container->get('event_dispatcher');

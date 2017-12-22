@@ -16,17 +16,14 @@ NelmioApiDocBundle:
     resource: "@NelmioApiDocBundle/Resources/config/routing.yml"
     prefix: "/api/doc"
 
+nelmio_api_swagger:
+    resource: "@NelmioApiDocBundle/Resources/config/swagger_routing.yml"
+    prefix: /api/docs/swagger
+
 fos_user_registration_check_email:
     path:     /check-email-mask
     #defaults: { _controller: "APMUserBundle:Registration:checkEmailAction" }
     #methods:  GET
-
-#fos_comment_api:
- #   type: rest
-  #  resource: "@FOSCommentBundle/Resources/config/routing.yml"
-   # prefix: /api
-    #defaults: { _format: html }
-
 #------------------------------- user account ----------------------------------------------------
 apm_security_login:
     type:  rest

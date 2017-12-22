@@ -26,7 +26,7 @@ abstract class Utilisateur extends BaseUser
 {
     /**
      * @Expose
-     * @Groups({"owner_list", "others_list", "owner_user_details", "others_user_details"})
+     * @Groups({"owner_list", "others_list", "owner_user_details", "others_user_details", "reset"})
      */
     protected $username;
     /**

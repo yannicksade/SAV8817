@@ -44,17 +44,52 @@ class Service_apres_venteController extends FOSRestController
     private $client_filter;
 
     /**
-     * Liste tous les SAV enregistrés entant que client, les SAV receptionnés en tant que boutique ou les SAV d'une offre
+     * @ApiDoc(
+     * resource=true,
+     * description="Retrieve list of service-apres-vente.",
+     * headers={
+     *      { "name"="Authorization", "required"="true", "description"="Authorization token"},
+     * },
+     * filters={
+     *      {"name"="offre_filter", "dataType"="string"},
+     *      {"name"="code_filter", "dataType"="string"},
+     *      {"name"="designation_filter", "dataType"="string"},
+     *      {"name"="date_from_filter", "dataType"="dateTime", "pattern"="19-12-2017|ASC"},
+     *      {"name"="date_to_filter", "dataType"="dateTime", "pattern"="19-12-2017|DESC"},
+     *      {"name"="etat_filter", "dataType"="integer", "pattern"="1,2,3,4,5,6,7,8|SELECT"},
+     *      {"name"="desc_filter", "dataType"="string", "description"="description"},
+     *      {"name"="boutique_filter", "dataType"="string"},
+     *      {"name"="affiliation_filter", "dataType"="string"},
+     *      {"name"="commentaire_filter", "dataType"="string"},
+     *      {"name"="client_filter", "dataType"="string", "pattern"="yannick|USERNAME"},
+     *      {"name"="length_filter", "dataType"="integer", "requirement"="\d+"},
+     *      {"name"="start_filter", "dataType"="integer", "requirement"="\d+"},
+     *  },
+     *
+     * output={
+     *   "class"="APM\AchatBundle\Entity\Service_apres_vente",
+     *   "parsers" = {
+     *      "Nelmio\ApiDocBundle\Parser\JmsMetadataParser"
+     *    },
+     *     "groups"={"owner_list"}
+     * },
+     * statusCodes={
+     *     "output" = "A single or a collection of Service_apres_vente",
+     *     200="Returned when successful",
+     *     403="Returned when the user is not authorized to perform the action",
+     *     404="Returned when the specified resource is not found",
+     * },
+     *     views={"default", "achat"}
+     * )
      * @ParamConverter("offre", options={"mapping": {"offre_id":"id"}})
-     * liste les SAV du clients
      * @param Request $request
      * @param Boutique $boutique
      * @param Offre $offre
      * @return JsonResponse Liste tous les SAV d'un client
      *
      * @Get("/cget/services", name="s")
-     * @Get("/cget/services/boutique/{id}", name="s_boutique")
-     * @Get("/cget/services/offre/{offre_id}", name="s_offre")
+     * @Get("/cget/services/boutique/{id}", name="s_boutique", requirements={"id"="boutique_id"})
+     * @Get("/cget/services/offre/{offre_id}", name="s_offre", requirements={"offre_id"="\d+"})
      */
     public function getAction(Request $request, Boutique $boutique = null, Offre $offre = null)
     {
@@ -181,6 +216,9 @@ class Service_apres_venteController extends FOSRestController
 
     /**
      * @param Collection $services
+     * @param $iTotalRecords
+     * @param $iDisplayStart
+     * @param $iDisplayLength
      * @return array
      */
     private function handleResults($services, $iTotalRecords, $iDisplayStart, $iDisplayLength)
@@ -282,12 +320,35 @@ class Service_apres_venteController extends FOSRestController
     }
 
     /**
+     * @ApiDoc(
+     * resource=true,
+     * resourceDescription="Operations on SAV.",
+     * description="Create an object of type Service_apres_vente.",
+     * statusCodes={
+     *         201="Returned when successful",
+     *         400="Returned when the data are not valid or an unknown error occurred",
+     *         403="Returned when the user is not authorized to carry on the action",
+     *         404="Returned when the entity is not found",
+     * },
+     * headers={
+     *      { "name"="Authorization", "required"=true, "description"="Authorization token"}
+     * },
+     * input={
+     *    "class"="APM\AchatBundle\Entity\Service_apres_vente",
+     *     "parsers" = {
+     *          "Nelmio\ApiDocBundle\Parser\ValidationParser"
+     *      },
+     *    "name" = "Service_apres_vente",
+     * },
+     *  views = {"default", "achat" }
+     * )
+     *
      * @param Request $request
      * @param Offre $offre
      * @return View | JsonResponse
      *
      * @Post("/new/sav")
-     * @Post("/new/sav/offre/{id}", name="_offre")
+     * @Post("/new/sav/offre/{id}", name="_offre", requirements={"id"="offre_id"},)
      */
     public
     function newAction(Request $request, Offre $offre = null)
@@ -361,7 +422,30 @@ class Service_apres_venteController extends FOSRestController
     }
 
     /**
-     * Finds and displays a Service_apres_vente entity.
+     * @ApiDoc(
+     * resource=true,
+     * description="Retrieve the details of an objet of type Service_apres_vente.",
+     * headers={
+     *      { "name"="Authorization", "required"="true", "description"="Authorization token"},
+     * },
+     * requirements = {
+     *      {"name"="id", "dataType"="integer", "requirement"="\d+", "description"="service_apres_vente_id"}
+     * },
+     * output={
+     *   "class"="APM\AchatBundle\Entity\Service_apres_vente",
+     *   "parsers" = {
+     *      "Nelmio\ApiDocBundle\Parser\JmsMetadataParser"
+     *    },
+     *     "groups"={"owner_sav_details", "owner_list"}
+     * },
+     * statusCodes={
+     *     "output" = "A single Object",
+     *     200="Returned when successful",
+     *     403="Returned when the user is not authorized to perform the action",
+     *     404="Returned when the specified resource is not found",
+     * },
+     *     views={"default", "achat"}
+     * )
      * @param Service_apres_vente $service_apres_vente
      * @return JsonResponse Afficher ls détails d'une SAV
      *
@@ -375,7 +459,32 @@ class Service_apres_venteController extends FOSRestController
     }
 
     /**
-     * Displays a form to edit an existing Service_apres_vente entity.
+     * @ApiDoc(
+     * resource=true,
+     * resourceDescription="Operations on service_apres_vente.",
+     * description="Update an object of type service_apres_vente.",
+     * statusCodes={
+     *         200="Returned when successful",
+     *         400="Returned when the data are not valid or an unknown error occurred",
+     *         403="Returned when the user is not authorized to carry on the action",
+     *         404="Returned when the entity is not found",
+     * },
+     * headers={
+     *      { "name"="Authorization", "required"=true, "description"="Authorization token"}
+     * },
+     * requirements = {
+     *      {"name"="id", "dataType"="integer", "requirement"="\d+", "description"="service_apres_vente Id"}
+     * },
+     * input={
+     *    "class"="APM\AchatBundle\Entity\Service_apres_vente",
+     *     "parsers" = {
+     *          "Nelmio\ApiDocBundle\Parser\ValidationParser"
+     *      },
+     *    "name" = "Service_apres_vente",
+     * },
+     *
+     * views = {"default", "achat" }
+     * )
      * @param Request $request
      * @param Service_apres_vente $service_apres_vente
      * @return View |JsonResponse
@@ -445,7 +554,25 @@ class Service_apres_venteController extends FOSRestController
 //------------------------ End INDEX ACTION --------------------------------------------
 
     /**
-     * Deletes a Service_apres_vente entity.
+     * @ApiDoc(
+     * resource=true,
+     * description="Delete objet of type service_apres_vente.",
+     * headers={
+     *      { "name"="Authorization", "required"="true", "description"="Authorization token"},
+     * },
+     * requirements = {
+     *      {"name"="id", "dataType"="integer", "required"=true, "requirement"="\d+", "description"="service_apres_vente Id"}
+     * },
+     * parameters = {
+     *      {"name"="exec", "required"=true, "dataType"="string", "requirement"="\D+", "description"="needed to check the origin of the request", "format"="exec=go"}
+     * },
+     * statusCodes={
+     *     200="Returned when successful",
+     *     403="Returned when the user is not authorized to perform the action",
+     *     404="Returned when the specified resource is not found",
+     * },
+     *     views={"default", "achat"}
+     * )
      * @param Request $request
      * @param Service_apres_vente $service_apres_vente
      * @return View | JsonResponse

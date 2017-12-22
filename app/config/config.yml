@@ -14,7 +14,7 @@ parameters:
     fos_user.resetting.token_ttl: 86400
 
     #nelmio api docs
-    api_name: we-trade
+    api_name: weasy trade
     api_description: The World Electronic Trade for every one
     cors_allow_origin: ^http://localhost:[0-9]+
 
@@ -89,7 +89,7 @@ swiftmailer:
     transport: %mailer_transport%
     username:  %mailer_user%
     password:  %mailer_password%
-    #host:      %mailer_host%
+    host:      %mailer_host%
     #spool:     { type: memory }
 
 # Fos user
@@ -212,23 +212,30 @@ nelmio_cors:
     #forced_allow_origin_value: ~
     paths:
         ^/: ~
-       # ^/apm/: ~
 
 
 # Nelmio API Doc
 nelmio_api_doc:
+     name: Weasy Trade
+     motd:
+          template:             'NelmioApiDocBundle::Components/motd.html.twig'
+     cache:
+         enabled: true
      sandbox:
+        enabled:  true
         authentication:
+          name: access_token
           delivery: http
-          type:     basic # or bearer
-#    sandbox:
-#        accept_type:          application/json
-#        body_format:
-#            formats:           [json]
-#            default_format:    json # One of form; json
-#        request_format:
-#            formats:
-#                json:           application/json
+          type:     bearer # or basic
+          custom_endpoint: true
+        #endpoint: http://sandbox.example.com/
+        accept_type:          application/json
+        body_format:
+            formats:           [form, json]
+            default_format:    form
+        request_format:
+            formats:
+                json:           application/json
 
 # FOS REST Bundle
 fos_rest:

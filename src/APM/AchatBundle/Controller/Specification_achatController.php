@@ -41,13 +41,48 @@ class Specification_achatController extends FOSRestController
     private $dateTo_filter;
 
     /**
-     * Liste les Specification faites par le client sur les offres
-     * Liste les spécifications sur une offre
+     * @ApiDoc(
+     * resource=true,
+     * description="Retrieve list of specification.",
+     * headers={
+     *      { "name"="Authorization", "required"="true", "description"="Authorization token"},
+     * },
+     * filters={
+     *      {"name"="offre_filter", "dataType"="string"},
+     *      {"name"="code_filter", "dataType"="string"},
+     *      {"name"="dateFrom_filter", "dataType"="dateTime", "pattern"="19-12-2017|ASC"},
+     *      {"name"="dateTo_filter", "dataType"="dateTime", "pattern"="19-12-2017|DESC"},
+     *      {"name"="dateLivraisonFrom_filter", "dataType"="dateTime", "pattern"="19-12-2017|ASC"},
+     *      {"name"="dateLivraisonTo_filter", "dataType"="dateTime", "pattern"="19-12-2017|DESC"},
+     *      {"name"="livraison_filter", "dataType"="boolean"},
+     *      {"name"="avis_filter", "dataType"="string"},
+     *      {"name"="demandeRabais_filter", "dataType"="boolean"},
+     *      {"name"="echantillon_filter", "dataType"="boolean"},
+     *      {"name"="utilisateur_filter", "dataType"="string", "pattern"="yannick|USERNAME"},
+     *      {"name"="length_filter", "dataType"="integer", "requirement"="\d+"},
+     *      {"name"="start_filter", "dataType"="integer", "requirement"="\d+"},
+     *  },
+     *
+     * output={
+     *   "class"="APM\AchatBundle\Entity\Specification_achat",
+     *   "parsers" = {
+     *      "Nelmio\ApiDocBundle\Parser\JmsMetadataParser"
+     *    },
+     *     "groups"={"owner_list"}
+     * },
+     * statusCodes={
+     *     "output" = "A single or a collection of Specification",
+     *     200="Returned when successful",
+     *     403="Returned when the user is not authorized to perform the action",
+     *     404="Returned when the specified resource is not found",
+     * },
+     *     views={"default", "achat"}
+     * )
      * @param Offre $offre
      * @return  JsonResponse
      *
      * @Get("/cget/specifications", name="s")
-     * @Get("/cget/specifications/offre/{id}", name="s_offre")
+     * @Get("/cget/specifications/offre/{id}", name="s_offre", requirements={"id"="offre_id"})
      */
     public function getAction(Offre $offre = null)
     {
@@ -237,6 +272,31 @@ class Specification_achatController extends FOSRestController
     }
 
     /**
+     * @ApiDoc(
+     * resource=true,
+     * resourceDescription="Operations on Specification achat.",
+     * description="Create an object of type Specification_achat.",
+     * statusCodes={
+     *         201="Returned when successful",
+     *         400="Returned when the data are not valid or an unknown error occurred",
+     *         403="Returned when the user is not authorized to carry on the action",
+     *         404="Returned when the entity is not found",
+     * },
+     * headers={
+     *      { "name"="Authorization", "required"=true, "description"="Authorization token"}
+     * },
+     * requirements={
+    {"name"="id", "requirement"="\d+", "dataType"="integer", "description"="offre_id"}
+     * },
+     * input={
+     *    "class"="APM\AchatBundle\Entity\Specification_achat",
+     *     "parsers" = {
+     *          "Nelmio\ApiDocBundle\Parser\ValidationParser"
+     *      },
+     *    "name" = "Specification_achat",
+     * },
+     *  views = {"default", "achat" }
+     * )
      * @param Offre $offre
      * @return View | JsonResponse
      *
@@ -291,9 +351,30 @@ class Specification_achatController extends FOSRestController
     }
 
     /**
-     * Voir une specification faite
-     *
-     * Finds and displays a Specification_achat entity.
+     * @ApiDoc(
+     * resource=true,
+     * description="Retrieve the details of an objet of type Specification_achat.",
+     * headers={
+     *      { "name"="Authorization", "required"="true", "description"="Authorization token"},
+     * },
+     * requirements = {
+     *      {"name"="id", "dataType"="integer", "requirement"="\d+", "description"="specification_id"}
+     * },
+     * output={
+     *   "class"="APM\AchatBundle\Entity\Specification_achat",
+     *   "parsers" = {
+     *      "Nelmio\ApiDocBundle\Parser\JmsMetadataParser"
+     *    },
+     *     "groups"={"owner_spA_details", "owner_list"}
+     * },
+     * statusCodes={
+     *     "output" = "A single Object",
+     *     200="Returned when successful",
+     *     403="Returned when the user is not authorized to perform the action",
+     *     404="Returned when the specified resource is not found",
+     * },
+     *     views={"default", "achat"}
+     * )
      * @param Specification_achat $specification
      * @return \Symfony\Component\HttpFoundation\Response| JsonResponse
      *
@@ -307,6 +388,31 @@ class Specification_achatController extends FOSRestController
     }
 
     /**
+     * @ApiDoc(
+     * resource=true,
+     * resourceDescription="Operations on specification achat",
+     * description="Update an object of type specification_achat.",
+     * statusCodes={
+     *         200="Returned when successful",
+     *         400="Returned when the data are not valid or an unknown error occurred",
+     *         403="Returned when the user is not authorized to carry on the action",
+     *         404="Returned when the entity is not found",
+     * },
+     * headers={
+     *      { "name"="Authorization", "required"=true, "description"="Authorization token"}
+     * },
+     * requirements = {
+     *      {"name"="id", "dataType"="integer", "requirement"="\d+", "description"="specification Id"}
+     * },
+     * input={
+     *    "class"="APM\AchatBundle\Entity\Specification_achat",
+     *     "parsers" = {
+     *          "Nelmio\ApiDocBundle\Parser\ValidationParser"
+     *      },
+     *    "name" = "Specification_achat",
+     * },
+     *     views={"default","achat"}
+     *)
      * @param Request $request
      * @param Specification_achat $specification_achat
      * @return JsonResponse | View
@@ -368,7 +474,25 @@ class Specification_achatController extends FOSRestController
     }
 
     /**
-     * Deletes a Specification_achat entity.
+     * @ApiDoc(
+     * resource=true,
+     * description="Delete objet of type Specification_achat.",
+     * headers={
+     *      { "name"="Authorization", "required"="true", "description"="Authorization token"},
+     * },
+     * requirements = {
+     *      {"name"="id", "dataType"="integer", "required"=true, "requirement"="\d+", "description"="specification Id"}
+     * },
+     * parameters = {
+     *      {"name"="exec", "required"=true, "dataType"="string", "requirement"="\D+", "description"="needed to check the origin of the request", "format"="exec=go"}
+     * },
+     * statusCodes={
+     *     200="Returned when successful",
+     *     403="Returned when the user is not authorized to perform the action",
+     *     404="Returned when the specified resource is not found",
+     * },
+     *     views={"default", "achat"}
+     * )
      * @param Request $request
      * @param Specification_achat $specification_achat
      * @return View | JsonResponse

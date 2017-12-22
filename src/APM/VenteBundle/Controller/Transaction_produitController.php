@@ -39,10 +39,43 @@ class Transaction_produitController extends FOSRestController
     private $dateInsertionFrom_filter;
 
     /**
+     * @ApiDoc(
+     * resource=true,
+     * description="Retrieve list of transaction_produits.",
+     * headers={
+     *      { "name"="Authorization", "required"="true", "description"="Authorization token"},
+     * },
+     * filters={
+     *      {"name"="dateInsertionFrom_filter", "dataType"="dateTime", "pattern"="19-12-2017|ASC"},
+     *      {"name"="dateInsertionTo_filter", "dataType"="dateTime", "pattern"="19-12-2017|DESC"},
+     *      {"name"="codeTransaction_filter", "dataType"="string"},
+     *      {"name"="quantiteFrom_filter", "dataType"="integer"},
+     *      {"name"="quantiteTo_filter", "dataType"="integer"},
+     *      {"name"="designation_filter", "dataType"="string"},
+     *      {"name"="reference_filter", "dataType"="string"},
+     *      {"name"="length_filter", "dataType"="integer", "requirement"="\d+"},
+     *      {"name"="start_filter", "dataType"="integer", "requirement"="\d+"},
+     *  },
+     * output={
+     *   "class"="APM\VenteBundle\Entity\Transaction_produit",
+     *   "parsers" = {
+     *      "Nelmio\ApiDocBundle\Parser\JmsMetadataParser"
+     *    },
+     *     "groups"={"owner_list"}
+     * },
+     *
+     * statusCodes={
+     *     "output" = "A single or a collection of transaction_produits",
+     *     200="Returned when successful",
+     *     403="Returned when the user is not authorized to perform the action",
+     *     404="Returned when the specified resource is not found",
+     * },
+     *     views={"default", "vente"}
+     * )
      * @param Request $request
      * @param Transaction $transaction
      * @return JsonResponse
-     * Get("/cget/transaction-produits/transaction/{id}", name="s")
+     * @Get("/cget/transaction-produits/transaction/{id}", name="s")
      */
     public function getAction(Request $request, Transaction $transaction)
     {
@@ -197,12 +230,37 @@ class Transaction_produitController extends FOSRestController
     }
 
     /**
+     * @ApiDoc(
+     * resource=true,
+     * resourceDescription="Operations on Transaction_produit.",
+     * description="Create an object of type Transaction_produit.",
+     * statusCodes={
+     *         201="Returned when successful",
+     *         400="Returned when the data are not valid or an unknown error occurred",
+     *         403="Returned when the user is not authorized to carry on the action",
+     *         404="Returned when the entity is not found",
+     * },
+     * headers={
+     *      { "name"="Authorization",  "required"=true, "description"="Authorization token"}
+     * },
+     *  requirements={
+     *      {"name"="id", "required"=true, "requirement"="\d+", "dataType"="integer", "description"= "transaction_produit Id"}
+     *  },
+     * input={
+     *    "class"="APM\VenteBundle\Entity\Transaction_produit",
+     *     "parsers" = {
+     *          "Nelmio\ApiDocBundle\Parser\ValidationParser"
+     *      },
+     *    "name" = "Transaction_produit",
+     * },
+     *      views = {"default", "vente" }
+     * )
      * @param Request $request
      * @param Transaction $transaction
      * @return View | JsonResponse
      *
      * @Post("/new/transaction-produit")
-     * @Post("/new/transaction-produit/transaction/{id}", name="_transaction")
+     * @Post("/new/transaction-produit/transaction/{id}", name="_transaction", requirements={"id"="transaction_id"})
      */
     public function newAction(Request $request, Transaction $transaction = null)
     {
@@ -283,8 +341,32 @@ class Transaction_produitController extends FOSRestController
     }
 
     /**
+     * @ApiDoc(
+     * resource=true,
+     * description="Retrieve the details of an objet of type Transaction_produit.",
+     * headers={
+     *      { "name"="Authorization", "required"="true", "description"="Authorization token"},
+     * },
+     * requirements = {
+     *      {"name"="id", "dataType"="integer", "requirement"="\d+", "description"="transaction_produit id"}
+     * },
+     * output={
+     *   "class"="APM\VenteBundle\Entity\Transaction_produit",
+     *   "parsers" = {
+     *      "Nelmio\ApiDocBundle\Parser\JmsMetadataParser"
+     *    },
+     *     "groups"={"owner_transactionP_details", "owner_list"}
+     * },
+     * statusCodes={
+     *     "output" = "A single Object",
+     *     200="Returned when successful",
+     *     403="Returned when the user is not authorized to perform the action",
+     *     404="Returned when the specified resource is not found",
+     * },
+     *     views={"default", "vente"}
+     * )
      * @param Transaction_produit $transaction_produit
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return JsonResponse
      *
      * @Get("/show/transaction-produit/{id}")
      */
@@ -297,6 +379,32 @@ class Transaction_produitController extends FOSRestController
     }
 
     /**
+     * @ApiDoc(
+     * resource=true,
+     * resourceDescription="Operations on Transaction_produit",
+     * description="Update an object of type Transaction_produit.",
+     * statusCodes={
+     *         200="Returned when successful",
+     *         400="Returned when the data are not valid or an unknown error occurred",
+     *         403="Returned when the user is not authorized to carry on the action",
+     *         404="Returned when the entity is not found",
+     * },
+     * headers={
+     *      { "name"="Authorization", "required"="true", "description"="Authorization token"}
+     * },
+     * requirements = {
+     *      {"name"="id", "dataType"="integer", "requirement"="\d+", "description"="transaction_produit Id"}
+     * },
+     * input={
+     *    "class"="APM\VenteBundle\Entity\Transaction_produit",
+     *     "parsers" = {
+     *          "Nelmio\ApiDocBundle\Parser\ValidationParser"
+     *      },
+     *    "name" = "Transaction_produit",
+     * },
+     *
+     * views = {"default", "vente" }
+     * )
      * @param Request $request
      * @param Transaction_produit $transaction_produit
      * @return View | JsonResponse
@@ -350,7 +458,26 @@ class Transaction_produitController extends FOSRestController
 
 
     /**
-     * Deletes a Transaction_produit entity.
+     * @ApiDoc(
+     * resource=true,
+     * description="Delete objet of type Transaction_produit.",
+     * headers={
+     *      { "name"="Authorization", "required"="true", "description"="Authorization token"},
+     * },
+     * requirements = {
+     *      {"name"="id", "dataType"="integer", "required"=true, "requirement"="\d+", "description"="transaction_produit Id"}
+     * },
+     * parameters = {
+     *      {"name"="exec", "required"=true, "dataType"="string", "requirement"="\D+", "description"="needed to check the origin of the request", "format"="exec=go"}
+     * },
+     * statusCodes={
+     *     200="Returned when successful",
+     *     400="Returned when the data are not valid or an unknown error occurred",
+     *     403="Returned when the user is not authorized to perform the action",
+     *     404="Returned when the specified resource is not found",
+     * },
+     *     views={"default", "vente"}
+     * )
      * @param Request $request
      * @param Transaction_produit $transaction_produit
      * @return View| JsonResponse

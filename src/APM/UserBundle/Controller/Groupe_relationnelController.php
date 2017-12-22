@@ -40,7 +40,42 @@ class Groupe_relationnelController extends FOSRestController
     private $boutique_filter;
 
     /**
-     * Liste tous les groupes relationnels crées par l'utilisateur
+     * @ApiDoc(
+     * resource=true,
+     * description="Retrieve list of groupe_relationnels.",
+     * headers={
+     *      { "name"="Authorization", "required"="true", "description"="Authorization token"},
+     * },
+     * filters={
+     *      {"name"="code_filter", "dataType"="string"},
+     *      {"name"="designation_filter", "dataType"="string"},
+     *      {"name"="dateCreationFrom_filter", "dataType"="dateTime", "pattern"="19-12-2017|ASC"},
+     *      {"name"="dateCreationTo_filter", "dataType"="dateTime", "pattern"="19-12-2017|DESC"},
+     *      {"name"="conversationalGroup_filter", "dataType"="boolean"},
+     *      {"name"="type_filter", "dataType"="integer"},
+     *      {"name"="description_filter", "dataType"="string"},
+     *      {"name"="proprietaire_filter", "dataType"="string"},
+     *      {"name"="length_filter", "dataType"="integer", "requirement"="\d+"},
+     *      {"name"="start_filter", "dataType"="integer", "requirement"="\d+"},
+     *  },
+     * requirements={
+     *   {"name"="q", "required"=false, "dataType"="string", "requirement"="\D+", "description"="query request ==owner or guest== e.g ?q=owner"}
+     * },
+     * output={
+     *   "class"="APM\UserBundle\Entity\Groupe_relationnel",
+     *   "parsers" = {
+     *      "Nelmio\ApiDocBundle\Parser\JmsMetadataParser"
+     *    },
+     *     "groups"={"owner_list"}
+     * },
+     * statusCodes={
+     *     "output" = "A single or a collection of Groupe_relationnel",
+     *     200="Returned when successful",
+     *     403="Returned when the user is not authorized to perform the action",
+     *     404="Returned when the specified resource is not found",
+     * },
+     *     views={"default", "user"}
+     * )
      * @param Request $request
      * @return JsonResponse
      *
@@ -213,7 +248,28 @@ class Groupe_relationnelController extends FOSRestController
     }
 
     /**
-     * Creates a new Groupe_relationnel entity.
+     * @ApiDoc(
+     * resource=true,
+     * resourceDescription="Operations on Groupe_relationnel.",
+     * description="Create an object of type Groupe_relationnel.",
+     * statusCodes={
+     *         201="Returned when successful",
+     *         400="Returned when the data are not valid or an unknown error occurred",
+     *         403="Returned when the user is not authorized to carry on the action",
+     *         404="Returned when the entity is not found",
+     * },
+     * headers={
+     *      { "name"="Authorization",  "required"=true, "description"="Authorization token"}
+     * },
+     * input={
+     *    "class"="APM\UserBundle\Entity\Groupe_relationnel",
+     *     "parsers" = {
+     *          "Nelmio\ApiDocBundle\Parser\ValidationParser"
+     *      },
+     *    "name" = "Groupe_relationnel",
+     * },
+     * views = {"default", "user" }
+     * )
      * @param Request $request
      * @return View | JsonResponse
      *
@@ -303,9 +359,32 @@ class Groupe_relationnelController extends FOSRestController
     }
 
     /**
-     * Finds and displays a Groupe_relationnel entity.
+     * @ApiDoc(
+     * resource=true,
+     * description="Retrieve the details of an objet of type Groupe_relationnel.",
+     * headers={
+     *      { "name"="Authorization", "required"="true", "description"="Authorization token"},
+     * },
+     * requirements = {
+     *      {"name"="id", "dataType"="integer", "requirement"="\d+", "description"="groupe_relationnel id"}
+     * },
+     * output={
+     *   "class"="APM\UserBundle\Entity\Groupe_relationnel",
+     *   "parsers" = {
+     *      "Nelmio\ApiDocBundle\Parser\JmsMetadataParser"
+     *    },
+     *     "groups"={"owner_groupeR_details", "owner_list"}
+     * },
+     * statusCodes={
+     *     "output" = "A single Object",
+     *     200="Returned when successful",
+     *     403="Returned when the user is not authorized to perform the action",
+     *     404="Returned when the specified resource is not found",
+     * },
+     *     views={"default", "user"}
+     * )
      * @param Groupe_relationnel $groupe_relationnel
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return JsonResponse
      *
      * @Get("/show/grouperelationnel/{id}")
      */
@@ -317,7 +396,32 @@ class Groupe_relationnelController extends FOSRestController
     }
 
     /**
-     * Displays a form to edit an existing Groupe_relationnel entity.
+     * @ApiDoc(
+     * resource=true,
+     * resourceDescription="Operations on Groupe_relationnel",
+     * description="Update an object of type Groupe_relationnel.",
+     * statusCodes={
+     *         200="Returned when successful",
+     *         400="Returned when the data are not valid or an unknown error occurred",
+     *         403="Returned when the user is not authorized to carry on the action",
+     *         404="Returned when the entity is not found",
+     * },
+     * headers={
+     *      { "name"="Authorization", "required"="true", "description"="Authorization token"}
+     * },
+     * requirements = {
+     *      {"name"="id", "dataType"="integer", "requirement"="\d+", "description"="groupe_relationnel Id"}
+     * },
+     * input={
+     *    "class"="APM\UserBundle\Entity\Groupe_relationnel",
+     *     "parsers" = {
+     *          "Nelmio\ApiDocBundle\Parser\ValidationParser"
+     *      },
+     *    "name" = "Groupe_relationnel",
+     * },
+     *
+     * views = {"default", "user" }
+     * )
      * @param Request $request
      * @param Groupe_relationnel $groupe_relationnel
      * @return View | JsonResponse
@@ -377,7 +481,26 @@ class Groupe_relationnelController extends FOSRestController
 
 
     /**
-     * Deletes a Groupe_relationnel entity.
+     * @ApiDoc(
+     * resource=true,
+     * description="Delete objet of type Groupe_relationnel.",
+     * headers={
+     *      { "name"="Authorization", "required"="true", "description"="Authorization token"},
+     * },
+     * requirements = {
+     *      {"name"="id", "dataType"="integer", "required"=true, "requirement"="\d+", "description"="Groupe_relationnel Id"}
+     * },
+     * parameters = {
+     *      {"name"="exec", "required"=true, "dataType"="string", "requirement"="\D+", "description"="needed to check the origin of the request", "format"="exec=go"}
+     * },
+     * statusCodes={
+     *     200="Returned when successful",
+     *     400="Returned when the data are not valid or an unknown error occurred",
+     *     403="Returned when the user is not authorized to perform the action",
+     *     404="Returned when the specified resource is not found",
+     * },
+     *     views={"default", "user"}
+     * )
      * @param Request $request
      * @param Groupe_relationnel $groupe_relationnel
      * @return View | JsonResponse

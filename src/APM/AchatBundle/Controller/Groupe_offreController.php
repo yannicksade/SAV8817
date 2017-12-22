@@ -41,8 +41,44 @@ class Groupe_offreController extends FOSRestController
 
 
     /**
+     * @ApiDoc(
+     * resource=true,
+     * description="Retrieve list of groupe offre.",
+     * headers={
+     *      { "name"="Authorization", "required"="true", "description"="Authorization token"},
+     * },
+     * filters={
+     *      {"name"="propriete_filter", "dataType"="integer", "pattern"="1,2,3|SELECT"},
+     *      {"name"="code_filter", "dataType"="string"},
+     *      {"name"="designation_filter", "dataType"="string"},
+     *      {"name"="dateFrom_filter", "dataType"="dateTime", "pattern"="19-12-2017|ASC"},
+     *      {"name"="dateTo_filter", "dataType"="dateTime", "pattern"="19-12-2017|DESC"},
+     *      {"name"="dateVigueurFrom_filter", "dataType"="dateTime", "pattern"="19-12-2017|ASC"},
+     *      {"name"="dateVigueurTo_filter", "dataType"="dateTime", "pattern"="19-12-2017|DESC"},
+     *      {"name"="description_filter", "dataType"="string"},
+     *      {"name"="recurrent_filter", "dataType"="boolean"},
+     *      {"name"="createur_filter", "dataType"="string", "pattern"="yannick|USERNAME"},
+     *      {"name"="length_filter", "dataType"="integer", "requirement"="\d+"},
+     *      {"name"="start_filter", "dataType"="integer", "requirement"="\d+"},
+     *  },
+     *
+     * output={
+     *   "class"="APM\AchatBundle\Entity\Groupe_offre",
+     *   "parsers" = {
+     *      "Nelmio\ApiDocBundle\Parser\JmsMetadataParser"
+     *    },
+     *     "groups"={"owner_list"}
+     * },
+     * statusCodes={
+     *     "output" = "A single or a collection of Groupe_offre",
+     *     200="Returned when successful",
+     *     403="Returned when the user is not authorized to perform the action",
+     *     404="Returned when the specified resource is not found",
+     * },
+     *     views={"default", "achat"}
+     * )
      * @param Request $request
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response | JsonResponse
+     * @return JsonResponse
      *
      * @Get("/cget/collectionoffres", name="s")
      */
@@ -211,9 +247,31 @@ class Groupe_offreController extends FOSRestController
     }
 
     /**
+     * @ApiDoc(
+     * resource=true,
+     * resourceDescription="Operations on groupeOffre.",
+     * description="Create an object of type groupe offre.",
+     * statusCodes={
+     *         201="Returned when successful",
+     *         400="Returned when the data are not valid or an unknown error occurred",
+     *         403="Returned when the user is not authorized to carry on the action",
+     *         404="Returned when the entity is not found",
+     * },
+     * headers={
+     *      { "name"="Authorization",  "required"=true, "description"="Authorization token"}
+     * },
+     * input={
+     *    "class"="APM\AchatBundle\Entity\Groupe_offre",
+     *     "parsers" = {
+     *          "Nelmio\ApiDocBundle\Parser\ValidationParser"
+     *      },
+     *    "name" = "GroupeOffre",
+     * },
+     * views = {"default", "achat" }
+     * )
      * @param Request $request
      * @return JsonResponse|View
-     *
+
      * @Post("/new/collectionoffre")
      */
     public function newAction(Request $request)
@@ -267,10 +325,36 @@ class Groupe_offreController extends FOSRestController
     }
 
     /**
+     * @ApiDoc(
+     * resource=true,
+     * resourceDescription="Operations on groupeOffre.",
+     * description="Update an object of type groupe offre.",
+     * statusCodes={
+     *         200="Returned when successful",
+     *         400="Returned when the data are not valid or an unknown error occurred",
+     *         403="Returned when the user is not authorized to carry on the action",
+     *         404="Returned when the entity is not found",
+     * },
+     * headers={
+     *      { "name"="Authorization", "required"="true", "description"="Authorization token"}
+     * },
+     * requirements = {
+     *      {"name"="id", "dataType"="integer", "requirement"="\d+", "description"="groupe offre Id"}
+     * },
+     * input={
+     *    "class"="APM\AchatBundle\Entity\Groupe_offre",
+     *     "parsers" = {
+     *          "Nelmio\ApiDocBundle\Parser\ValidationParser"
+     *      },
+     *    "name" = "GroupeOffre",
+     * },
+     *
+     * views = {"default", "achat" }
+     * )
      * @param Request $request
      * @param Groupe_offre $groupe_offre
      * @return JsonResponse | View
-     * @Patch("/edit/collectionoffre/{id}")
+     * @Put("/edit/collectionoffre/{id}")
      */
     public function editAction(Request $request, Groupe_offre $groupe_offre)
     {
@@ -331,6 +415,30 @@ class Groupe_offreController extends FOSRestController
     }
 
     /**
+     * @ApiDoc(
+     * resource=true,
+     * description="Retrieve the details of an objet of type groupe offre.",
+     * headers={
+     *      { "name"="Authorization", "required"="true", "description"="Authorization token"},
+     * },
+     * requirements = {
+     *      {"name"="id", "dataType"="integer", "requirement"="\d+", "description"="groupe offre Id"}
+     * },
+     * output={
+     *   "class"="APM\AchatBundle\Entity\Groupe_offre",
+     *   "parsers" = {
+     *      "Nelmio\ApiDocBundle\Parser\JmsMetadataParser"
+     *    },
+     *     "groups"={"owner_groupeO_details", "owner_list"}
+     * },
+     * statusCodes={
+     *     "output" = "A single Object",
+     *     200="Returned when successful",
+     *     403="Returned when the user is not authorized to perform the action",
+     *     404="Returned when the specified resource is not found",
+     * },
+     *     views={"default", "achat"}
+     * )
      * @param Groupe_offre $groupe_offre
      * @return JsonResponse
      * @Get("/show/collectionoffre/{id}")
@@ -343,6 +451,25 @@ class Groupe_offreController extends FOSRestController
     }
 
     /**
+     * @ApiDoc(
+     * resource=true,
+     * description="Delete objet of type groupe offre.",
+     * headers={
+     *      { "name"="Authorization", "required"="true", "description"="Authorization token"},
+     * },
+     * requirements = {
+     *      {"name"="id", "dataType"="integer", "required"=true, "requirement"="\d+", "description"="groupe offre Id"}
+     * },
+     * parameters = {
+     *      {"name"="exec", "required"=true, "dataType"="string", "requirement"="\D+", "description"="needed to check the origin of the request", "format"="exec=go"}
+     * },
+     * statusCodes={
+     *     200="Returned when successful",
+     *     403="Returned when the user is not authorized to perform the action",
+     *     404="Returned when the specified resource is not found",
+     * },
+     *     views={"default", "achat"}
+     * )
      * @param Request $request
      * @param Groupe_offre $groupe_offre
      * @return JsonResponse| View
