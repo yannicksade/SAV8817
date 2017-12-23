@@ -561,7 +561,7 @@ class Service_apres_venteController extends FOSRestController
      *      { "name"="Authorization", "required"="true", "description"="Authorization token"},
      * },
      * requirements = {
-     *      {"name"="id", "dataType"="integer", "required"=true, "requirement"="\d+", "description"="service_apres_vente Id"}
+     *      {"name"="id", "dataType"="integer", "requirement"="\d+", "description"="service_apres_vente Id"}
      * },
      * parameters = {
      *      {"name"="exec", "required"=true, "dataType"="string", "requirement"="\D+", "description"="needed to check the origin of the request", "format"="exec=go"}

@@ -68,7 +68,7 @@ class Specification_achatController extends FOSRestController
      *   "parsers" = {
      *      "Nelmio\ApiDocBundle\Parser\JmsMetadataParser"
      *    },
-     *     "groups"={"owner_list"}
+     *    "groups"={"owner_list"}
      * },
      * statusCodes={
      *     "output" = "A single or a collection of Specification",
@@ -286,7 +286,7 @@ class Specification_achatController extends FOSRestController
      *      { "name"="Authorization", "required"=true, "description"="Authorization token"}
      * },
      * requirements={
-    {"name"="id", "requirement"="\d+", "dataType"="integer", "description"="offre_id"}
+     *      {"name"="id", "requirement"="\d+", "dataType"="integer", "description"="offre_id"}
      * },
      * input={
      *    "class"="APM\AchatBundle\Entity\Specification_achat",
@@ -376,7 +376,7 @@ class Specification_achatController extends FOSRestController
      *     views={"default", "achat"}
      * )
      * @param Specification_achat $specification
-     * @return \Symfony\Component\HttpFoundation\Response| JsonResponse
+     * @return JsonResponse
      *
      * @Get("/show/specification/{id}")
      */
@@ -406,13 +406,13 @@ class Specification_achatController extends FOSRestController
      * },
      * input={
      *    "class"="APM\AchatBundle\Entity\Specification_achat",
-     *     "parsers" = {
+     *    "parsers" = {
      *          "Nelmio\ApiDocBundle\Parser\ValidationParser"
-     *      },
+     *     },
      *    "name" = "Specification_achat",
      * },
      *     views={"default","achat"}
-     *)
+     * )
      * @param Request $request
      * @param Specification_achat $specification_achat
      * @return JsonResponse | View
@@ -481,7 +481,7 @@ class Specification_achatController extends FOSRestController
      *      { "name"="Authorization", "required"="true", "description"="Authorization token"},
      * },
      * requirements = {
-     *      {"name"="id", "dataType"="integer", "required"=true, "requirement"="\d+", "description"="specification Id"}
+     *      {"name"="id", "dataType"="integer", "requirement"="\d+", "description"="specification Id"}
      * },
      * parameters = {
      *      {"name"="exec", "required"=true, "dataType"="string", "requirement"="\D+", "description"="needed to check the origin of the request", "format"="exec=go"}

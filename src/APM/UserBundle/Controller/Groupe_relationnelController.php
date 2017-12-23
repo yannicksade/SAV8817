@@ -59,7 +59,7 @@ class Groupe_relationnelController extends FOSRestController
      *      {"name"="start_filter", "dataType"="integer", "requirement"="\d+"},
      *  },
      * requirements={
-     *   {"name"="q", "required"=false, "dataType"="string", "requirement"="\D+", "description"="query request ==owner or guest== e.g ?q=owner"}
+     *   {"name"="q", "dataType"="string", "requirement"="\D+", "description"="query request: owner, guest", "format"="?q=owner | null"}
      * },
      * output={
      *   "class"="APM\UserBundle\Entity\Groupe_relationnel",

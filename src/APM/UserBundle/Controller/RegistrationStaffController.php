@@ -38,7 +38,7 @@ class RegistrationStaffController extends FOSRestController
      *   "parsers" = {
      *      "Nelmio\ApiDocBundle\Parser\ValidationParser"
      *    }
-     *     },
+     *  },
      *  statusCodes={
      *     "output" = "Ends by sending a confirmation e-mail to the staff's address",
      *     200="Returned when successful",

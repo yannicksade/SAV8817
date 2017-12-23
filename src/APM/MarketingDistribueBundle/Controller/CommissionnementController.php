@@ -413,7 +413,7 @@ class CommissionnementController extends FOSRestController
      *     views={"default", "marketing"}
      * )
      * @param Commissionnement $commissionnement
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
+     * @return JsonResponse
      *
      * @Get("/show/commissionnement/{id}")
      */

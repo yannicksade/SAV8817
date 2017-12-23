@@ -315,7 +315,7 @@ class Base_documentaireController extends FOSRestController
      *     views={"default", "animation"}
      * )
      * @param Base_documentaire $document
-     * @return \Symfony\Component\HttpFoundation\Response | JsonResponse
+     * @return  JsonResponse
      *
      * @Get("/show/document/{id}")
      */
@@ -344,11 +344,11 @@ class Base_documentaireController extends FOSRestController
      *      {"name"="id", "dataType"="integer", "requirement"="\d+", "description"="document Id"}
      * },
      * input={
-     *    "class"="APM\AchatBundle\Entity\Base_documentaire",
+     *     "class"="APM\AchatBundle\Entity\Base_documentaire",
      *     "parsers" = {
      *          "Nelmio\ApiDocBundle\Parser\ValidationParser"
      *      },
-     *    "name" = "Specification_achat",
+     *    "name" = "Document",
      * },
      *     views={"default","animation"}
      *)
@@ -423,7 +423,7 @@ class Base_documentaireController extends FOSRestController
      *      { "name"="Authorization", "required"="true", "description"="Authorization token"},
      * },
      * requirements = {
-     *      {"name"="id", "dataType"="integer", "required"=true, "requirement"="\d+", "description"="document Id"}
+     *      {"name"="id", "dataType"="integer", "requirement"="\d+", "description"="document Id"}
      * },
      * parameters = {
      *      {"name"="exec", "required"=true, "dataType"="string", "requirement"="\D+", "description"="needed to check the origin of the request", "format"="exec=go"}

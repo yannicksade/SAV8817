@@ -66,7 +66,7 @@ class ResettingController extends FOSRestController
      *     404="Returned when the specified resource is not found",
      *  },
      * requirements = {
-     *   {"name"="token", "dataType"="string", "requirement"="\D+", "required"=true, "description"="token ..."}
+     *   {"name"="token", "dataType"="string", "requirement"="\D+", "description"="token ..."}
      * },
      *     views={"default","profile"}
      * ),
@@ -90,7 +90,7 @@ class ResettingController extends FOSRestController
      *     {"name"="username", "dataType"="string", "required"=true, "format"="yannick | ysade@avm.com", "description"="username or email"}
      * },
      * requirements = {
-     *     {"name"="token", "dataType"="string", "required"=true, "description"="token"}
+     *     {"name"="token", "dataType"="string", "requirement"="\D+", "description"="token"}
      * },
      *  statusCodes={
      *     "output" = "Ends by returning the staff reset form",
@@ -121,7 +121,7 @@ class ResettingController extends FOSRestController
      *     404="Returned when the specified resource is not found",
      *  },
      * requirements = {
-     *   {"name"="token", "dataType"="string", "requirement"="\D+", "required"=true, "description"="token ..."}
+     *   {"name"="token", "dataType"="string", "requirement"="\D+", "description"="token ..."}
      * },
      *     views={"default","profile"}
      * ),

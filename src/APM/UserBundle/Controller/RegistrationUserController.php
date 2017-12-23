@@ -31,13 +31,13 @@ class RegistrationUserController extends FOSRestController
      * @ApiDoc(
      * resource=true,
      * description="Create a user account",
-     *  input={
+     * input={
      *   "class"="APM\UserBundle\Entity\Utilisateur_avm",
      *   "parsers" = {
      *      "Nelmio\ApiDocBundle\Parser\ValidationParser"
      *    }
      *     },
-     *  statusCodes={
+     * statusCodes={
      *     "output" = "Ends by sending a confirmation e-mail to your address",
      *     200="Returned when successful",
      *     403="Returned when the user is not authorized to perform the action",
@@ -61,7 +61,7 @@ class RegistrationUserController extends FOSRestController
      * resource=true,
      * description="Activates your account by email",
      * requirements = {
-     *   {"name"="token", "dataType"="string", "requirement"="\D+", "required"=true, "description"="token ..."}
+     *   {"name"="token", "dataType"="string", "requirement"="\D+", "description"="token ..."}
      * },
      *  statusCodes={
      *     "output" = "HTML confirmation template",

@@ -73,8 +73,8 @@ class Transporteur_zoneInterventionController extends FOSRestController
      * @param Zone_intervention $zone_intervention
      * @return JsonResponse
      *
-     * @Get("/cget/transporteurs/zone/{zone_id}", name="s_zone", requirements={"id"="transporteur", "zoneIntervention_id"="\d+"})
-     * @Get("/cget/zones/transporteur/{id}", name="s_transporteur")
+     * @Get("/cget/transporteurs/zone/{zone_id}", name="s_zone", requirements={"zoneIntervention_id"="\d+"})
+     * @Get("/cget/zones/transporteur/{id}", name="s_transporteur", requirements={"id"="transporteur_id"})
      */
     public function getAction(Request $request, Profile_transporteur $transporteur = null, Zone_intervention $zone_intervention = null)
     {
@@ -406,7 +406,7 @@ class Transporteur_zoneInterventionController extends FOSRestController
      *      { "name"="Authorization", "required"="true", "description"="Authorization token"},
      * },
      * requirements = {
-     *      {"name"="id", "dataType"="integer", "required"=true, "requirement"="\d+", "description"="transporteur_zoneintervention Id"}
+     *      {"name"="id", "dataType"="integer", "requirement"="\d+", "description"="transporteur_zoneintervention Id"}
      * },
      * parameters = {
      *      {"name"="exec", "required"=true, "dataType"="string", "requirement"="\D+", "description"="needed to check the origin of the request", "format"="exec=go"}

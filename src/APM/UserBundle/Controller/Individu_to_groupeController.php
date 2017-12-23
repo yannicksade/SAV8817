@@ -226,6 +226,10 @@ class Individu_to_groupeController extends FOSRestController
      * headers={
      *      { "name"="Authorization",  "required"=true, "description"="Authorization token"}
      * },
+     * requirements = {
+     *      {"name"="id", "dataType"="integer", "requirement"="\d+", "description"="groupe_relationnel Id"}
+     * },
+     *
      * input={
      *    "class"="APM\UserBundle\Entity\Individu_to_groupe",
      *     "parsers" = {
@@ -434,7 +438,7 @@ class Individu_to_groupeController extends FOSRestController
      *      { "name"="Authorization", "required"="true", "description"="Authorization token"},
      * },
      * requirements = {
-     *      {"name"="id", "dataType"="integer", "required"=true, "requirement"="\d+", "description"="Individu_to_groupe Id"}
+     *      {"name"="id", "dataType"="integer", "requirement"="\d+", "description"="Individu_to_groupe Id"}
      * },
      * parameters = {
      *      {"name"="exec", "required"=true, "dataType"="string", "requirement"="\D+", "description"="needed to check the origin of the request", "format"="exec=go"}

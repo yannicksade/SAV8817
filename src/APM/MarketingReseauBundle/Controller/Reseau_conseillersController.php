@@ -52,8 +52,8 @@ class Reseau_conseillersController extends FOSRestController
      * @param Conseiller|null $conseiller
      * @return JsonResponse
      *
-     * @Get("/")
-     * @Put("/conseiller/{id}", name="_conseiller", requirements={"id"="conseiller_id"})
+     * @Get("/get")
+     * @Put("/get/conseiller/{id}", name="_conseiller", requirements={"id"="conseiller_id"})
      */
     public function getAction(Conseiller $conseiller = null)
     {
@@ -127,6 +127,7 @@ class Reseau_conseillersController extends FOSRestController
      *    },
      *     "groups"={"net", "owner_list"}
      * },
+     *      views={"default", "marketing"}
      * )
      * @param Request $request
      * @param Conseiller $conseiller maître du reseau courant
@@ -337,6 +338,7 @@ class Reseau_conseillersController extends FOSRestController
      *    },
      *     "groups"={"net", "owner_list"}
      * },
+     *      views={"default", "marketing"}
      * )
      * @param Request $request
      * @param Conseiller $advisorFictif

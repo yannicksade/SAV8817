@@ -45,7 +45,7 @@ class Groupe_offreController extends FOSRestController
      * resource=true,
      * description="Retrieve list of groupe offre.",
      * headers={
-     *      { "name"="Authorization", "required"="true", "description"="Authorization token"},
+     *    { "name"="Authorization", "required"="true", "description"="Authorization token"},
      * },
      * filters={
      *      {"name"="propriete_filter", "dataType"="integer", "pattern"="1,2,3|SELECT"},
@@ -458,7 +458,7 @@ class Groupe_offreController extends FOSRestController
      *      { "name"="Authorization", "required"="true", "description"="Authorization token"},
      * },
      * requirements = {
-     *      {"name"="id", "dataType"="integer", "required"=true, "requirement"="\d+", "description"="groupe offre Id"}
+     *      {"name"="id", "dataType"="integer", "requirement"="\d+", "description"="groupe offre Id"}
      * },
      * parameters = {
      *      {"name"="exec", "required"=true, "dataType"="string", "requirement"="\D+", "description"="needed to check the origin of the request", "format"="exec=go"}

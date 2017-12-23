@@ -48,14 +48,15 @@ class Livreur_boutiqueController extends FOSRestController
      *  },
      *
      * output={
-     *   "class"="APM\TransportBundle\Entity\Livreur_boutique",
-     *   "parsers" = {
+     * "class"="APM\TransportBundle\Entity\Livreur_boutique",
+     * "parsers" = {
      *      "Nelmio\ApiDocBundle\Parser\JmsMetadataParser"
      *    },
      *     "groups"={"owner_list"}
      * },
      *     requirements={
-     *          {"name"="id", "required"=true, "dataType"="integer", "requirements"="\d+", "description"="boutique Id"}
+     *          {"name"="id", "dataType"="integer", "requirements"="\d+", "description"="boutique Id"},
+     *          {"name"="q", "dataType"="string", "requirement"="\D+", "description"="query request: owner, guest ", "format"= "?q=owner | null"}
      *     },
      * statusCodes={
      *     "output" = "A single or a collection of Livreurs of a boutique",
@@ -76,12 +77,12 @@ class Livreur_boutiqueController extends FOSRestController
             $this->listeAndShowSecurity();
             $json = array();
             $json['items'] = array();
-            $q = $request->query->get('q');
             $this->reference_filter = $request->query->has('reference_filter') ? $request->query->get('reference_filter') : "";
             $this->transporteur_filter = $request->query->has('transporteur_filter') ? $request->query->get('transporteur_filter') : "";
             $this->boutique_filter = $request->query->has('boutique_filter') ? $request->query->get('boutique_filter') : "";
             $iDisplayLength = $request->query->has('length') ? $request->query->get('length') : -1;
             $iDisplayStart = $request->query->has('start') ? intval($request->query->get('start')) : 0;
+            $q = $request->query->has('q') ? $q = $request->query->get('q') : "all";
             if ($q === "guest" || $q === "all") {
                 $livreurs = $boutique->getLivreurs();//livreurs étrangers: empruntés
                 if (null !== $livreurs) {
@@ -199,8 +200,8 @@ class Livreur_boutiqueController extends FOSRestController
      *      { "name"="Authorization",  "required"=true, "description"="Authorization token"}
      * },
      * requirements={
-     *      {"name"="id", "dataType"="integer", "required"=true, "requirement"="\d+", "description"="boutique_id"},
-     *      {"name"="transporteur_id", "dataType"="integer", "required"=true, "requirement"="\d+", "description"="transporteur Id"},
+     *      {"name"="id", "dataType"="integer","requirement"="\d+", "description"="boutique_id"},
+     *      {"name"="transporteur_id", "dataType"="integer", "requirement"="\d+", "description"="transporteur Id"},
      *  },
      * input={
      *    "class"="APM\TransportBundle\Entity\Livreur_boutique",
@@ -407,7 +408,7 @@ class Livreur_boutiqueController extends FOSRestController
      *      { "name"="Authorization", "required"="true", "description"="Authorization token"},
      * },
      * requirements = {
-     *      {"name"="id", "dataType"="integer", "required"=true, "requirement"="\d+", "description"="livreur Id"}
+     *      {"name"="id", "dataType"="integer", "requirement"="\d+", "description"="livreur Id"}
      * },
      * parameters = {
      *      {"name"="exec", "required"=true, "dataType"="string", "requirement"="\D+", "description"="needed to check the origin of the request", "format"="exec=go"}

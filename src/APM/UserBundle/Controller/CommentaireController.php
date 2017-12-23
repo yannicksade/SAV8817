@@ -57,7 +57,7 @@ class CommentaireController extends FOSRestController
      *      {"name"="start_filter", "dataType"="integer", "requirement"="\d+"},
      *  },
      *  requirements = {
-     *      {"name"="id", "required"=true, "requirement"="\d+", "dataType"="integer", "description"="offre_id"}
+     *      {"name"="id", "requirement"="\d+", "dataType"="integer", "description"="offre_id"}
      *  },
      * output={
      *   "class"="APM\UserBundle\Entity\Commentaire",
@@ -235,6 +235,9 @@ class CommentaireController extends FOSRestController
      * headers={
      *      { "name"="Authorization",  "required"=true, "description"="Authorization token"}
      * },
+     * requirements = {
+     *   {"name"="id", "requirement"="\d+", "dataType"="integer", "description"="offre_id"}
+     *  },
      * input={
      *    "class"="APM\UserBundle\Entity\Commentaire",
      *     "parsers" = {
@@ -426,7 +429,7 @@ class CommentaireController extends FOSRestController
      *      { "name"="Authorization", "required"="true", "description"="Authorization token"},
      * },
      * requirements = {
-     *      {"name"="id", "dataType"="integer", "required"=true, "requirement"="\d+", "description"="commentaire Id"}
+     *      {"name"="id", "dataType"="integer", "requirement"="\d+", "description"="commentaire Id"}
      * },
      * parameters = {
      *      {"name"="exec", "required"=true, "dataType"="string", "requirement"="\D+", "description"="needed to check the origin of the request", "format"="exec=go"}

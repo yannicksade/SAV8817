@@ -55,7 +55,9 @@ class QuotaController extends FOSRestController
      *      {"name"="length_filter", "dataType"="integer", "requirement"="\d+"},
      *      {"name"="start_filter", "dataType"="integer", "requirement"="\d+"},
      *  },
-     *
+     * requirements = {
+     *      {"name"="id", "dataType"="integer", "requirement"="\d+", "description"="boutique Id"}
+     * },
      * output={
      *   "class"="APM\MarketingBundle\Entity\Conseiller",
      *   "parsers" = {
@@ -240,6 +242,9 @@ class QuotaController extends FOSRestController
      * },
      * headers={
      *      { "name"="Authorization", "required"=true, "description"="Authorization token"}
+     * },
+     * requirements = {
+     *      {"name"="id", "dataType"="integer", "requirement"="\d+", "description"="boutique Id"}
      * },
      * input={
      *    "class"="APM\MarketingDistribueBundle\Entity\Quota",
@@ -448,7 +453,7 @@ class QuotaController extends FOSRestController
      *      { "name"="Authorization", "required"="true", "description"="Authorization token"},
      * },
      * requirements = {
-     *      {"name"="id", "dataType"="integer", "required"=true, "requirement"="\d+", "description"="quota Id"}
+     *      {"name"="id", "dataType"="integer", "requirement"="\d+", "description"="quota Id"}
      * },
      * parameters = {
      *      {"name"="exec", "required"=true, "dataType"="string", "requirement"="\D+", "description"="needed to check the origin of the request", "format"="exec=go"}

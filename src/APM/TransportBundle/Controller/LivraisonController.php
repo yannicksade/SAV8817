@@ -278,7 +278,7 @@ class LivraisonController extends FOSRestController
      *      },
      *    "name" = "Livraison",
      * },
-     * views = {"default", "transport" }
+     *      views = {"default", "transport" }
      * )
      * @ParamConverter("transaction", options={"mapping":{"transaction_id":"id"}})
      * Creates a new Livraison entity.
@@ -400,12 +400,11 @@ class LivraisonController extends FOSRestController
      *     views={"default", "transport"}
      * )
      * @ParamConverter("transaction", options={"mapping":{"transaction_id":"id"}})
-     * voir un livraison
      * @param Livraison $livraison
      * @param Transaction $transaction
      * @return JsonResponse
-     * @Get("/show/livraison/{id}")
-     * @Get("/show/livraison/{id}/transaction/{transaction_id}", name="_transaction", requirements={"transaction_id"="\d+"})
+     * @Get("/show/livraison/{id}", requirements={"id"="livraison_id"})
+     * @Get("/show/livraison/{id}/transaction/{transaction_id}", name="_transaction", requirements={"id"="livraison_id", "transaction_id"="\d+"})
      */
     public function showAction(Livraison $livraison, Transaction $transaction = null)
     {
@@ -521,7 +520,7 @@ class LivraisonController extends FOSRestController
      *      { "name"="Authorization", "required"="true", "description"="Authorization token"},
      * },
      * requirements = {
-     *      {"name"="id", "dataType"="integer", "required"=true, "requirement"="\d+", "description"="livraison Id"}
+     *      {"name"="id", "dataType"="integer", "requirement"="\d+", "description"="livraison Id"}
      * },
      * parameters = {
      *      {"name"="exec", "required"=true, "dataType"="string", "requirement"="\D+", "description"="needed to check the origin of the request", "format"="exec=go"}

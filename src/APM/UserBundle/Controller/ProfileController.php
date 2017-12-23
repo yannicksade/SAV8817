@@ -33,7 +33,6 @@ use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 class ProfileController extends FOSRestController
 {
     /**
-     * Show the user.
      * @ApiDoc(
      * resource=true,
      * description="Retrieve user profile.",
@@ -41,7 +40,7 @@ class ProfileController extends FOSRestController
      *      { "name"="Authorization", "required"="true", "description"="Authorization token"},
      * },
      * requirements= {
-     *      {"name"="id", "dataType"="integer", "required"=true, "requirement"="\d+", "description" = "user id"}
+     *      {"name"="id", "dataType"="integer", "requirement"="\d+", "description" = "user id"}
      * },
      * output={
      *   "class"="APM\UserBundle\Entity\Utilisateur",
@@ -76,7 +75,7 @@ class ProfileController extends FOSRestController
      *      { "name"="Authorization", "required"="true", "description"="Authorization token"},
      * },
      * requirements= {
-     *      {"name"="id", "dataType"="integer", "required"=true, "requirement"="\d+", "description" = "user id"}
+     *      {"name"="id", "dataType"="integer", "requirement"="\d+", "description" = "user id"}
      * },
      * input={
      *    "class"="APM\UserBundle\Entity\Admin",
@@ -145,7 +144,7 @@ class ProfileController extends FOSRestController
      *      { "name"="Authorization", "required"="true", "description"="Authorization token"},
      * },
      * requirements= {
-     *      {"name"="id", "dataType"="integer", "required"=true, "requirement"="\d+", "description" = "user id"}
+     *      {"name"="id", "dataType"="integer", "requirement"="\d+", "description" = "user id"}
      * },
      * input={
      *    "class"="APM\UserBundle\Entity\Utilisateur_avm",
@@ -214,7 +213,7 @@ class ProfileController extends FOSRestController
      *      { "name"="Authorization", "required"="true", "description"="Authorization token"},
      * },
      * requirements= {
-     *      {"name"="id", "dataType"="integer", "required"=true, "requirement"="\d+", "description" = "user id"}
+     *      {"name"="id", "dataType"="integer", "requirement"="\d+", "description" = "user id"}
      * },
      * parameters={
      *    {"name"="current_password", "required"=true, "dataType"="string", "requirement"="\D+", "your current password"},
@@ -261,7 +260,7 @@ class ProfileController extends FOSRestController
      *      { "name"="Authorization", "required"="true", "description"="Authorization token"},
      * },
      * requirements= {
-     *      {"name"="id", "dataType"="integer", "required"=true, "requirement"="\d+", "description" = "staff id"}
+     *      {"name"="id", "dataType"="integer", "requirement"="\d+", "description" = "staff id"}
      * },
      * parameters={
      *    {"name"="current_password", "required"=true, "dataType"="string", "requirement"="\D+", "your current password"},

@@ -67,7 +67,7 @@ class CommunicationController extends FOSRestController
      *      {"name"="start_filter", "dataType"="integer", "requirement"="\d+"},
      *  },
      * requirements={
-     *   {"name"="q", "required"=false, "dataType"="string", "requirement"="\D+", "description"="query request ==sender or receiver== e.g ?q=sender"}
+     *   {"name"="q", "dataType"="string", "requirement"="\D+", "description"="query request: sender, receiver ", "format"= "?q=sender | null"}
      * },
      * output={
      *   "class"="APM\UserBundle\Entity\Communication",
@@ -462,7 +462,7 @@ class CommunicationController extends FOSRestController
      *      { "name"="Authorization", "required"="true", "description"="Authorization token"},
      * },
      * requirements = {
-     *      {"name"="id", "dataType"="integer", "required"=true, "requirement"="\d+", "description"="communication Id"}
+     *      {"name"="id", "dataType"="integer", "requirement"="\d+", "description"="communication Id"}
      * },
      * parameters = {
      *      {"name"="exec", "required"=true, "dataType"="string", "requirement"="\D+", "description"="needed to check the origin of the request", "format"="exec=go"}
