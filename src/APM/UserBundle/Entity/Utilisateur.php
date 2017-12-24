@@ -29,6 +29,7 @@ abstract class Utilisateur extends BaseUser
      * @Groups({"owner_list", "others_list", "owner_user_details", "others_user_details", "reset"})
      */
     protected $username;
+
     /**
      * @Expose
      * @Groups({"owner_list", "others_list", "owner_user_details", "others_user_details"})
@@ -155,10 +156,8 @@ abstract class Utilisateur extends BaseUser
      */
     protected $image;
 
-
     /**
      * @Exclude
-     * @Assert\Image()
      * @Vich\UploadableField(mapping="entity_images", fileNameProperty="image")
      * @var File
      */

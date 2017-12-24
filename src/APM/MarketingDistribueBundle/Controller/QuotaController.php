@@ -59,7 +59,7 @@ class QuotaController extends FOSRestController
      *      {"name"="id", "dataType"="integer", "requirement"="\d+", "description"="boutique Id"}
      * },
      * output={
-     *   "class"="APM\MarketingBundle\Entity\Conseiller",
+     *   "class"="APM\MarketingDistribueBundle\Entity\Conseiller",
      *   "parsers" = {
      *      "Nelmio\ApiDocBundle\Parser\JmsMetadataParser"
      *    },

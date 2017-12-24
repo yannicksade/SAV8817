@@ -40,10 +40,11 @@ class RegistrationUserController extends FOSRestController
      * statusCodes={
      *     "output" = "Ends by sending a confirmation e-mail to your address",
      *     200="Returned when successful",
+     *     400="Returned when the data are not valid or an unknown error occurs",
      *     403="Returned when the user is not authorized to perform the action",
      *     404="Returned when the specified resource is not found",
      * },
-     *      views={"default","login"}
+     *      views={"default","profile"}
      * ),
      * @Post("/register")
      * @param Request $request
@@ -59,7 +60,7 @@ class RegistrationUserController extends FOSRestController
     /**
      * @ApiDoc(
      * resource=true,
-     * description="Activates your account by email",
+     * description="Activates a user account by email",
      * requirements = {
      *   {"name"="token", "dataType"="string", "requirement"="\D+", "description"="token ..."}
      * },
@@ -69,7 +70,7 @@ class RegistrationUserController extends FOSRestController
      *     400="Returned when the data are not valid or an unknown error occurs",
      *     404="Returned when the specified resource is not found with the provided token",
      * },
-     *     views={"default","login"}
+     *     views={"default","profile"}
      * ),
      * @param Request $request
      * @return JsonResponse|Response

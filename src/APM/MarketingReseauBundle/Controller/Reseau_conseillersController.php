@@ -35,11 +35,11 @@ class Reseau_conseillersController extends FOSRestController
      *      { "name"="Authorization", "required"="true", "description"="Authorization token"},
      * },
      * output={
-     *   "class"="APM\MarketingBundle\Entity\Conseiller",
+     *   "class"="APM\MarketingDistribueBundle\Entity\Conseiller",
      *   "parsers" = {
      *      "Nelmio\ApiDocBundle\Parser\JmsMetadataParser"
      *    },
-     *     "groups"={"net", "owner_list"}
+     *     "groups"={"net"},
      * },
      * statusCodes={
      *     "output" = "A network ",
@@ -121,11 +121,11 @@ class Reseau_conseillersController extends FOSRestController
      * },
      *
      * input={
-     *   "class"="APM\MarketingBundle\Entity\Conseiller",
+     *   "class"="APM\MarketingDistribueBundle\Entity\Conseiller",
      *   "parsers" = {
      *      "Nelmio\ApiDocBundle\Parser\JmsMetadataParser"
      *    },
-     *     "groups"={"net", "owner_list"}
+     *     "groups"={"net"}
      * },
      *      views={"default", "marketing"}
      * )
@@ -332,11 +332,11 @@ class Reseau_conseillersController extends FOSRestController
      * },
      *
      * input={
-     *   "class"="APM\MarketingBundle\Entity\Conseiller",
+     *   "class"="APM\MarketingDistribueBundle\Entity\Conseiller",
      *   "parsers" = {
      *      "Nelmio\ApiDocBundle\Parser\JmsMetadataParser"
      *    },
-     *     "groups"={"net", "owner_list"}
+     *     "groups"={"net"}
      * },
      *      views={"default", "marketing"}
      * )

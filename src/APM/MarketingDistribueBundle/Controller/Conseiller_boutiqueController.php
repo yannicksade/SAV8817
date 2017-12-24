@@ -56,7 +56,7 @@ class Conseiller_boutiqueController extends FOSRestController
      *  },
      *
      * output={
-     *   "class"="APM\MarketingBundle\Entity\Conseiller_boutique",
+     *   "class"="APM\MarketingDistribueBundle\Entity\Conseiller_boutique",
      *   "parsers" = {
      *      "Nelmio\ApiDocBundle\Parser\JmsMetadataParser"
      *    },

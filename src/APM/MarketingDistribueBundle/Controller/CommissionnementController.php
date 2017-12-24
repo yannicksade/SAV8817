@@ -68,7 +68,7 @@ class CommissionnementController extends FOSRestController
      *  },
      *
      * output={
-     *   "class"="APM\MarketingBundle\Entity\Commissionnement",
+     *   "class"="APM\MarketingDistribueBundle\Entity\Commissionnement",
      *   "parsers" = {
      *      "Nelmio\ApiDocBundle\Parser\JmsMetadataParser"
      *    },
@@ -312,7 +312,7 @@ class CommissionnementController extends FOSRestController
      *      {"name"="id", "requirement"="\d+", "dataType"="integer", "description"="boutique_id"}
      * },
      * input={
-     *   "class"="APM\MarketingBundle\Entity\Conseiller",
+     *   "class"="APM\MarketingDistribueBundle\Entity\Conseiller",
      *   "parsers" = {
      *      "Nelmio\ApiDocBundle\Parser\JmsMetadataParser"
      *    },

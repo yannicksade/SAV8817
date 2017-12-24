@@ -262,7 +262,7 @@ class CategorieController extends FOSRestController
      *      },
      *    "name" = "Categorie",
      * },
-     * views = {"default", "vente" }
+     *      views = {"default", "vente" }
      * )
      * @param Request $request
      * @param Boutique $boutique

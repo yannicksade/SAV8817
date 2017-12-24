@@ -38,7 +38,6 @@ class CommentaireController extends FOSRestController
     private $evaluationMin_filter;
     private $evaluationMax_filter;
 
-
     /**
      * @ApiDoc(
      * resource=true,

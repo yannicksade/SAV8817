@@ -30,6 +30,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
+use FOS\UserBundle\Form\Type\ChangePasswordFormType;
 class ProfileController extends FOSRestController
 {
     /**
@@ -50,8 +51,9 @@ class ProfileController extends FOSRestController
      *     "groups"={"owner_user_details", "owner_list"}
      * },
      * statusCodes={
-     *     "output" = "Return user profile",
+     *     "output" = "Return user or staff profile",
      *     200="Returned when successful",
+     *     400="Returned when the data are not valid or an unknown error occurs",
      *     403="Returned when the user is not authorized to perform the action",
      *     404="Returned when the specified resource is not found",
      * },
@@ -78,21 +80,22 @@ class ProfileController extends FOSRestController
      *      {"name"="id", "dataType"="integer", "requirement"="\d+", "description" = "user id"}
      * },
      * input={
-     *    "class"="APM\UserBundle\Entity\Admin",
+     *    "class"="APM\UserBundle\Entity\Utilisateur_avm",
      *   "parsers" = {
      *      "Nelmio\ApiDocBundle\Parser\ValidationParser"
      *    }
      * },
      * output={
-     *   "class"="APM\UserBundle\Entity\Admin",
+     *   "class"="APM\UserBundle\Entity\Utilisateur_avm",
      *   "parsers" = {
      *      "Nelmio\ApiDocBundle\Parser\JmsMetadataParser"
      *    },
-     *     "groups"={"owner_staff_details", "owner_list"}
+     *     "groups"={"owner_user_details", "owner_list"}
      * },
      * statusCodes={
      *     "output" = "Return user profile",
      *     200="Returned when successful",
+     *     400="Returned when the data are not valid or an unknown error occurs",
      *     403="Returned when the user is not authorized to perform the action",
      *     404="Returned when the specified resource is not found",
      * },
@@ -144,16 +147,16 @@ class ProfileController extends FOSRestController
      *      { "name"="Authorization", "required"="true", "description"="Authorization token"},
      * },
      * requirements= {
-     *      {"name"="id", "dataType"="integer", "requirement"="\d+", "description" = "user id"}
+     *      {"name"="id", "dataType"="integer", "requirement"="\d+", "description" = "staff id"}
      * },
      * input={
-     *    "class"="APM\UserBundle\Entity\Utilisateur_avm",
+     *    "class"="APM\UserBundle\Entity\Admin",
      *   "parsers" = {
      *      "Nelmio\ApiDocBundle\Parser\ValidationParser"
      *    }
      * },
      * output={
-     *   "class"="APM\UserBundle\Entity\Utilisateur_avm",
+     *   "class"="APM\UserBundle\Entity\Admin",
      *   "parsers" = {
      *      "Nelmio\ApiDocBundle\Parser\JmsMetadataParser"
      *    },
@@ -162,6 +165,7 @@ class ProfileController extends FOSRestController
      * statusCodes={
      *     "output" = "Return user profile",
      *     200="Returned when successful",
+     *     400="Returned when the data are not valid or an unknown error occurs",
      *     403="Returned when the user is not authorized to perform the action",
      *     404="Returned when the specified resource is not found",
      * },
@@ -216,12 +220,13 @@ class ProfileController extends FOSRestController
      *      {"name"="id", "dataType"="integer", "requirement"="\d+", "description" = "user id"}
      * },
      * parameters={
-     *    {"name"="current_password", "required"=true, "dataType"="string", "requirement"="\D+", "your current password"},
-     *    {"name"="plainPassword[first]", "required"=true, "dataType"="string", "requirement"="\D+", "your new password"},
-     *    {"name"="plainPassword[second]", "required"=true, "dataType"="string", "requirement"="\D+", "confirmation password"}
+     *    {"name"="current_password", "required"=true, "dataType"="password", "requirement"="\D+", "description"="your current password"},
+     *    {"name"="plainPassword[first]", "required"=true, "dataType"="password", "requirement"="\D+", "description"="your new password"},
+     *    {"name"="plainPassword[second]", "required"=true, "dataType"="password", "requirement"="\D+", "description"="confirmation password"}
      * },
      * statusCodes={
      *     200="Returned when successful",
+     *     400="Returned when the data are not valid or an unknown error occurs",
      *     403="Returned when the user is not authorized to perform the action",
      *     404="Returned when the specified resource is not found",
      * },
@@ -231,7 +236,7 @@ class ProfileController extends FOSRestController
      * @Post("/change-password/user/{id}")
      * @param Request $request
      * @param Utilisateur_avm $user
-     * @return FormInterface|JsonResponse
+     * @return FormInterface|JsonResponse|Response
      */
     public function changepasswordUserAction(Request $request, Utilisateur_avm $user)
     {
@@ -263,12 +268,13 @@ class ProfileController extends FOSRestController
      *      {"name"="id", "dataType"="integer", "requirement"="\d+", "description" = "staff id"}
      * },
      * parameters={
-     *    {"name"="current_password", "required"=true, "dataType"="string", "requirement"="\D+", "your current password"},
-     *    {"name"="plainPassword[first]", "required"=true, "dataType"="string", "requirement"="\D+", "your new password"},
-     *    {"name"="plainPassword[second]", "required"=true, "dataType"="string", "requirement"="\D+", "confirmation password"}
+     *    {"name"="current_password", "required"=true, "dataType"="password", "requirement"="\D+", "description"="your current password"},
+     *    {"name"="plainPassword[first]", "required"=true, "dataType"="password", "requirement"="\D+", "description"="your new password"},
+     *    {"name"="plainPassword[second]", "required"=true, "dataType"="password", "requirement"="\D+", "description"="confirmation password"}
      * },
      * statusCodes={
      *     200="Returned when successful",
+     *     400="Returned when the data are not valid or an unknown error occurs",
      *     403="Returned when the user is not authorized to perform the action",
      *     404="Returned when the specified resource is not found",
      * },
@@ -278,7 +284,7 @@ class ProfileController extends FOSRestController
      * @Post("/change-password/staff/{id}")
      * @param Request $request
      * @param Admin $user
-     * @return FormInterface|JsonResponse
+     * @return FormInterface|JsonResponse|Response
      */
     public function changepasswordStaffAction(Request $request, Admin $user)
     {

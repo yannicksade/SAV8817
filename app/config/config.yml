@@ -216,7 +216,7 @@ nelmio_cors:
 
 # Nelmio API Doc
 nelmio_api_doc:
-     name: Weasy Trade
+     name: Weasy Trade<<Empower your business>>
      motd:
           template:             'NelmioApiDocBundle::Components/motd.html.twig'
      cache:
@@ -227,15 +227,18 @@ nelmio_api_doc:
           name: access_token
           delivery: http
           type:     bearer # or basic
-          custom_endpoint: true
-        #endpoint: http://sandbox.example.com/
+          custom_endpoint: false
+       #endpoint: http://sandbox.example.com/
         accept_type:          application/json
         body_format:
             formats:           [form, json]
-            default_format:    form
+            default_format:    form  # x-www-form-urlencoded data or json-encoded if default to json
+
         request_format:
             formats:
                 json:           application/json
+            method:             accept_header
+            #default_format:    form
 
 # FOS REST Bundle
 fos_rest:

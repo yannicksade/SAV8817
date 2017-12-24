@@ -482,8 +482,7 @@ class TransactionController extends FOSRestController
      *      },
      *    "name" = "Transaction",
      * },
-     *
-     * views = {"default", "vente" }
+     *      views = {"default", "vente" }
      * )
      * @param Request $request
      * @param Transaction $transaction

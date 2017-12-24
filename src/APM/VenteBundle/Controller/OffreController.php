@@ -515,8 +515,7 @@ class OffreController extends FOSRestController implements ClassResourceInterfac
      *      },
      *    "name" = "Offre",
      * },
-     *
-     * views = {"default", "vente" }
+     *      views = {"default", "vente" }
      * )
      * @param Request $request
      * @param Offre $offre
