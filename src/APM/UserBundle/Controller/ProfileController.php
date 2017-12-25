@@ -61,6 +61,7 @@ class ProfileController extends FOSRestController
      * )
      * @param Utilisateur $user
      * @return JsonResponse
+     * @Patch("/show/profile/{id}", name="_pass")
      * @Get("/show/profile/{id}")
      */
     public function showAction(Utilisateur $user)
@@ -115,7 +116,8 @@ class ProfileController extends FOSRestController
             $response = $this->get('apm_user.update_profile_manager')->updateUser(Utilisateur_avm::class, $request, false, $user);
             if (is_object($response) && $response instanceof Utilisateur_avm) {
                 $utilisateur = $response;
-                return $this->routeRedirectView('api_user_show', ['id' => $utilisateur->getId()], Response::HTTP_NO_CONTENT);
+                $request->setMethod('GET');
+                return $this->routeRedirectView('api_user_show', ['id' => $utilisateur->getId()]);
             }
             return new JsonResponse($response, Response::HTTP_BAD_REQUEST);
 
@@ -184,7 +186,7 @@ class ProfileController extends FOSRestController
             $response = $this->get('apm_user.update_profile_manager')->updateUser(Admin::class, $request, false, $user);
             if (is_object($response) && $response instanceof Admin) {
                 $utilisateur = $response;
-                return $this->routeRedirectView('api_user_show', ['id' => $utilisateur->getId()], Response::HTTP_NO_CONTENT);
+                return $this->routeRedirectView('api_user_show', ['id' => $utilisateur->getId()]);
             }
 
             return new JsonResponse($response, Response::HTTP_BAD_REQUEST);

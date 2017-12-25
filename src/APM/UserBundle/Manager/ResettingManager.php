@@ -25,6 +25,8 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
 use FOS\RestBundle\View\View;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 class ResettingManager implements ContainerAwareInterface
 {
@@ -121,18 +123,18 @@ class ResettingManager implements ContainerAwareInterface
         return $this->container->get('pugx_user_manager');
     }
 
-    public function confirm($class, $request)
+    public function confirm($class, Request $request)
     {
-        if (!$request->query->has('token')) {
+        $token = '';
+        if ($request->query->has('token')) {
+            $token = $request->query->get('token');
+        } elseif ($request->request->has('token')) {
+            $token = $request->request->get('token');
+        }
+        if ($token == null) {
             return new JsonResponse('You must submit a token.', JsonResponse::HTTP_BAD_REQUEST);
         }
-        $token = $request->query->get('token');
 
-        if (null === $token) {
-            return new JsonResponse('You must submit a token.', JsonResponse::HTTP_BAD_REQUEST);
-        }
-
-        //-----------
         /** @var $formFactory FactoryInterface */
         $formFactory = $this->container->get('fos_user.resetting.form.factory');
 
@@ -143,7 +145,7 @@ class ResettingManager implements ContainerAwareInterface
         if (null === $user) {
             return new JsonResponse(
             // no translation provided for this in \FOS\UserBundle\Controller\ResettingController
-                sprintf('The user with "confirmation token" does not exist for value "%s"', $token),
+                sprintf('The user with "confirmation token" does not exist for value: "%s"', $token),
                 JsonResponse::HTTP_BAD_REQUEST
             );
         }
@@ -154,27 +156,34 @@ class ResettingManager implements ContainerAwareInterface
         /** @var $dispatcher EventDispatcherInterface */
         $dispatcher = $this->container->get('event_dispatcher');
         $view = (new view(null, 200))->setFormat("html");
-        $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
-            $data = array(
-                "username" => $user->getUsername(),
-                'message' => $this->container->get('translator')->trans('resetting.flash.success', [], 'FOSUserBundle'),
-                'target' => "http://localhost:4200/"
-            );
-            $view->setTemplate("@FOSUser/Registration/confirmed.html.twig")->setTemplateData($data);
-            $myResponse = $this->container->get("fos_rest.view_handler")->handle($view);
+        if ($request->isMethod('POST')) {
+            $form->submit($request->request->all());
+            if ($form->isValid()) {
+                $data = array(
+                    "username" => $user->getUsername(),
+                    'message' => $this->container->get('translator')->trans('resetting.flash.success', [], 'FOSUserBundle'),
+                    'target' => "http://localhost:4200/"
+                );
+                $view->setTemplate("@FOSUser/Registration/confirmed.html.twig")->setTemplateData($data);
+                $myResponse = $this->container->get("fos_rest.view_handler")->handle($view);
 
-            $event = new FormEvent($form, $request);
-            $dispatcher->dispatch(FOSUserEvents::RESETTING_RESET_SUCCESS, $event);
-            $userManager->updateUser($user);
+                $event = new FormEvent($form, $request);
+                $dispatcher->dispatch(FOSUserEvents::RESETTING_RESET_SUCCESS, $event);
+                $userManager->updateUser($user);
 
-            if (null === $response = $event->getResponse()) {
+                if (null === $response = $event->getResponse()) {
+                    return $myResponse;
+                }
+
+                $dispatcher->dispatch(FOSUserEvents::RESETTING_RESET_COMPLETED, new FilterUserResponseEvent($user, $request, $response));
+
                 return $myResponse;
+            } else {
+                return new JsonResponse([
+                    "status" => 400,
+                    "message" => $this->container->get('translator')->trans($form->getErrors(true, false), [], 'FOSUserBundle')
+                ], Response::HTTP_BAD_REQUEST);
             }
-
-            $dispatcher->dispatch(FOSUserEvents::RESETTING_RESET_COMPLETED, new FilterUserResponseEvent($user, $request, $response));
-
-            return $myResponse;
         }
         $event = new GetResponseUserEvent($user, $request);
         $dispatcher->dispatch(FOSUserEvents::RESETTING_RESET_INITIALIZE, $event);

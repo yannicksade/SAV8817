@@ -119,10 +119,15 @@ class RegistrationManager implements ContainerAwareInterface
 
     public function confirm($class, Request $request)
     {
-        if (!$request->query->has('token')) {
+        $token = '';
+        if ($request->query->has('token')) {
+            $token = $request->query->get('token');
+        } elseif ($request->request->has('token')) {
+            $token = $request->request->get('token');
+        }
+        if ($token == null) {
             return new JsonResponse('You must submit a token.', JsonResponse::HTTP_BAD_REQUEST);
         }
-        $token = $request->query->get('token');
         /** @var $userManager UserManagerInterface */
         $userManager = $this->discriminateAndGetManager($class);
         $user = $userManager->findUserByConfirmationToken($token);

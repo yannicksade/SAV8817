@@ -25,6 +25,12 @@ class ProfileUtilisateur_avmFormType extends AbstractType
             ->add('email', TextType::class)
             ->add('nom', TextType::class)
             ->add('prenom')
+            ->add('isAcheteur')
+            ->add('isVendeur')
+            ->add('isConseillerA1')
+            ->add('isGerantBoutique')
+            ->add('isTransporteurLivreur')
+            ->add('pointsDeFidelite')
             ->add('dateNaissance', TextType::class, array(
                 'attr' => ['class' => 'form-control', 'name' => 'dateNaissance'],
                 'required' => false,

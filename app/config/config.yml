@@ -90,7 +90,7 @@ swiftmailer:
     username:  %mailer_user%
     password:  %mailer_password%
     host:      %mailer_host%
-    #spool:     { type: memory }
+    spool:     { type: memory }
 
 # Fos user
 fos_user:
@@ -117,6 +117,9 @@ fos_user:
                 address:    resetting-password@esay-trade.com
                 sender_name: Easy Trade Team
             template:   '@FOSUser/Resetting/email.txt.twig'
+        form:
+            name: apm_user_resetting
+            type: APM\UserBundle\Form\Type\ResettingFormType
 
 # PUGXMultiuserBundle
 pugx_multi_user:
