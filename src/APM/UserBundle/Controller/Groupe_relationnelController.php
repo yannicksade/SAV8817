@@ -55,11 +55,11 @@ class Groupe_relationnelController extends FOSRestController
      *      {"name"="type_filter", "dataType"="integer"},
      *      {"name"="description_filter", "dataType"="string"},
      *      {"name"="proprietaire_filter", "dataType"="string"},
-     *      {"name"="length_filter", "dataType"="integer", "requirement"="\d+"},
-     *      {"name"="start_filter", "dataType"="integer", "requirement"="\d+"},
+     *      {"name"="length", "dataType"="integer", "requirement"="\d+"},
+     *      {"name"="start", "dataType"="integer", "requirement"="\d+"},
      *  },
-     * requirements={
-     *   {"name"="q", "dataType"="string", "requirement"="\D+", "description"="query request: owner, guest", "format"="?q=owner | null"}
+     * parameters={
+     *   {"name"="q", "dataType"="string", "required"=false, "description"="query: OWNER, GUEST", "format"="?q=owner"}
      * },
      * output={
      *   "class"="APM\UserBundle\Entity\Groupe_relationnel",
@@ -95,7 +95,7 @@ class Groupe_relationnelController extends FOSRestController
             $this->conversationalGroup_filter = $request->request->has('conversationalGroup_filter') ? $request->request->get('conversationalGroup_filter') : "";
             $this->type_filter = $request->request->has('type_filter') ? $request->request->get('type_filter') : "";
             $this->proprietaire_filter = $request->request->has('proprietaire_filter') ? $request->request->get('proprietaire_filter') : "";
-            $iDisplayLength = $request->request->has('length') ? $request->request->get('length') : -1;
+            $iDisplayLength = $request->request->has('length') ? intval($request->request->get('length')) : -1;
             $iDisplayStart = $request->request->has('start') ? intval($request->request->get('start')) : 0;
             $json = array();
             $json['items'] = array();

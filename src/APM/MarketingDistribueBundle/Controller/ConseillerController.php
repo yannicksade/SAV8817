@@ -53,8 +53,8 @@ class ConseillerController extends FOSRestController
      *      {"name"="matricule_filter", "dataType"="string"},
      *      {"name"="description_filter", "dataType"="string"},
      *      {"name"="valeurQuota_filter", "dataType"="integer"},
-     *      {"name"="length_filter", "dataType"="integer", "requirement"="\d+"},
-     *      {"name"="start_filter", "dataType"="integer", "requirement"="\d+"},
+     *      {"name"="length", "dataType"="integer", "requirement"="\d+"},
+     *      {"name"="start", "dataType"="integer", "requirement"="\d+"},
      *  },
      *
      * output={
@@ -91,7 +91,7 @@ class ConseillerController extends FOSRestController
             $this->description_filter = $request->request->has('description_filter') ? $request->request->get('description_filter') : "";
             $this->dateCreationReseauFrom_filter = $request->request->has('dateCreationReseauFrom_filter') ? $request->request->get('dateCreationReseauFrom_filter') : "";
             $this->dateCreationReseauTo_filter = $request->request->has('dateCreationReseauTo_filter') ? $request->request->get('dateCreationReseauTo_filter') : "";
-            $iDisplayLength = $request->request->has('length') ? $request->request->get('length') : -1;
+            $iDisplayLength = $request->request->has('length') ? intval($request->request->get('length')) : -1;
             $iDisplayStart = $request->request->has('start') ? intval($request->request->get('start')) : 0;
             $iTotalRecords = count($conseillers);
             if ($iDisplayLength < 0) $iDisplayLength = $iTotalRecords;

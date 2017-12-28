@@ -56,8 +56,8 @@ class BoutiqueController extends FOSRestController implements ClassResourceInter
      *      {"name"="code_filter", "dataType"="string"},
      *      {"name"="etat_filter", "dataType"="integer"},
      *      {"name"="designation_filter", "dataType"="string"},
-     *      {"name"="length_filter", "dataType"="integer", "requirement"="\d+"},
-     *      {"name"="start_filter", "dataType"="integer", "requirement"="\d+"},
+     *      {"name"="length", "dataType"="integer", "requirement"="\d+"},
+     *      {"name"="start", "dataType"="integer", "requirement"="\d+"},
      *  },
      * output={
      *   "class"="APM\VenteBundle\Entity\Boutique",
@@ -67,7 +67,7 @@ class BoutiqueController extends FOSRestController implements ClassResourceInter
      *     "groups"={"owner_list"}
      * },
      *  parameters= {
-     *      {"name"="q", "required"=false, "dataType"="string", "requirement"="\D+", "description"="query request==owner or shopkeeper==", "format"= "?q=owner"}
+     *      {"name"="q", "required"=false, "dataType"="string", "description"="OWNER|SHOPKEEPER", "format"= "?q=owner"}
      *  },
      * statusCodes={
      *     "output" = "A single or a collection of boutiques",
@@ -102,7 +102,7 @@ class BoutiqueController extends FOSRestController implements ClassResourceInter
             $this->designation_filter = $request->query->has('designation_filter') ? $request->query->get('designation_filter') : "";
             $this->etat_filter = $request->query->has('etat_filter') ? $request->query->get('etat_filter') : "";
             $iDisplayLength = $request->query->has('length') ? $request->query->get('length') : -1;
-            $iDisplayStart = $request->query->has('start') ? intval($request->query->get('start')) : 0;
+            $iDisplayStart = $request->query->has('start') ? $request->query->get('start') : 0;
             $selectedGroup = array("owner_list");
             $json = array();
             $json['items'] = array();
@@ -550,7 +550,7 @@ class BoutiqueController extends FOSRestController implements ClassResourceInter
         } catch (ConstraintViolationException $cve) {
             return new JsonResponse([
                 "status" => 400,
-                "message" => $this->get('translator')->trans("impossible d'enregistrer, vérifiez vos données", [], 'FOSUserBundle')
+                "message" => $this->get('translator')->trans("impossible de supprimer, vérifiez vos données", [], 'FOSUserBundle')
             ], Response::HTTP_FAILED_DEPENDENCY);
         } catch (AccessDeniedException $ads) {
             return new JsonResponse([

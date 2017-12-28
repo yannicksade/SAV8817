@@ -45,8 +45,8 @@ class Profile_transporteurController extends FOSRestController
      *      {"name"="code_filter", "dataType"="string"},
      *      {"name"="livreur_boutique", "dataType"="string"},
      *      {"name"="matricule_filter", "dataType"="string"},
-     *      {"name"="length_filter", "dataType"="integer", "requirement"="\d+"},
-     *      {"name"="start_filter", "dataType"="integer", "requirement"="\d+"},
+     *      {"name"="length", "dataType"="integer", "requirement"="\d+"},
+     *      {"name"="start", "dataType"="integer", "requirement"="\d+"},
      *  },
      *
      * output={
@@ -80,7 +80,7 @@ class Profile_transporteurController extends FOSRestController
             $this->matricule_filter = $request->query->has('matricule_filter') ? $request->query->get('matricule_filter') : "";
             $this->code_filter = $request->query->has('code_filter') ? $request->query->get('code_filter') : "";
             $this->livreur_boutique = $request->query->has('livreur_boutique') ? $request->query->get('livreur_boutique') : "";
-            $iDisplayLength = $request->query->has('length') ? $request->query->get('length') : -1;
+            $iDisplayLength = $request->query->has('length') ? intval($request->query->get('length')) : -1;
             $iDisplayStart = $request->query->has('start') ? intval($request->query->get('start')) : 0;
             $iTotalRecords = count($profile_transporteurs);
             if ($iDisplayLength < 0) $iDisplayLength = $iTotalRecords;

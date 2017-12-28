@@ -49,8 +49,8 @@ class Individu_to_groupeController extends FOSRestController
      *      {"name"="dateCreationTo_filter", "dataType"="dateTime", "pattern"="19-12-2017|DESC"},
      *      {"name"="description_filter", "dataType"="string"},
      *      {"name"="propriete_filter", "dataType"="integer"},
-     *      {"name"="length_filter", "dataType"="integer", "requirement"="\d+"},
-     *      {"name"="start_filter", "dataType"="integer", "requirement"="\d+"},
+     *      {"name"="length", "dataType"="integer", "requirement"="\d+"},
+     *      {"name"="start", "dataType"="integer", "requirement"="\d+"},
      *  },
      * output={
      *   "class"="APM\UserBundle\Entity\Individu_to_groupe",
@@ -90,7 +90,7 @@ class Individu_to_groupeController extends FOSRestController
             $this->propriete_filter = $request->request->has('propriete_filter') ? $request->request->get('propriete_filter') : "";
             $this->description_filter = $request->request->has('description_filter') ? $request->request->get('description_filter') : "";
             $this->utilisateur_filter = $request->request->has('utilisateur_filter') ? $request->request->get('utilisateur_filter') : "";
-            $iDisplayLength = $request->request->has('length') ? $request->request->get('length') : -1;
+            $iDisplayLength = $request->request->has('length') ? intval($request->request->get('length')) : -1;
             $iDisplayStart = $request->request->has('start') ? intval($request->request->get('start')) : 0;
             $json = array();
             $iTotalRecords = count($individu_to_groupes);

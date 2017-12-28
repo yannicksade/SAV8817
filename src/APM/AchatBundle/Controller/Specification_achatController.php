@@ -59,8 +59,8 @@ class Specification_achatController extends FOSRestController
      *      {"name"="demandeRabais_filter", "dataType"="boolean"},
      *      {"name"="echantillon_filter", "dataType"="boolean"},
      *      {"name"="utilisateur_filter", "dataType"="string", "pattern"="yannick|USERNAME"},
-     *      {"name"="length_filter", "dataType"="integer", "requirement"="\d+"},
-     *      {"name"="start_filter", "dataType"="integer", "requirement"="\d+"},
+     *      {"name"="length", "dataType"="integer", "requirement"="\d+"},
+     *      {"name"="start", "dataType"="integer", "requirement"="\d+"},
      *  },
      *
      * output={
@@ -108,7 +108,7 @@ class Specification_achatController extends FOSRestController
             $this->offre_filter = $request->query->has('offre_filter') ? $request->query->get('offre_filter') : "";
             $this->utilisateur_filter = $request->query->has('utilisateur_filter') ? $request->query->get('utilisateur_filter') : "";
 
-            $iDisplayLength = $request->query->has('length') ? $request->query->get('length') : -1;
+            $iDisplayLength = $request->query->has('length') ? intval($request->query->get('length')) : -1;
             $iDisplayStart = $request->query->has('start') ? intval($request->query->get('start')) : 0;
             $json = array();
             $iTotalRecords = count($specification_achats);

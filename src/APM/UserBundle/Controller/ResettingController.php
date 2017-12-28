@@ -23,6 +23,7 @@ use FOS\RestBundle\Controller\Annotations\Post;
 use FOS\RestBundle\Controller\Annotations\Get;
 use FOS\RestBundle\Controller\Annotations\RouteResource;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
+
 /**
  * Controller managing the resetting of the password.
  *
@@ -53,6 +54,32 @@ class ResettingController extends FOSRestController
     public function requestResetUserAction(Request $request)
     {
         return $this->get('apm_user.resetting_manager')->request(Utilisateur_avm::class, $request);
+    }
+
+    /**
+     * @ApiDoc(
+     * resource=true,
+     * description="Reset staff password",
+     *
+     * parameters = {
+     *     {"name"="username", "dataType"="string", "required"=true, "format"="yannick | ysade@avm.com", "description"="username or email"}
+     * },
+     *  statusCodes={
+     *     "output" = "Ends by returning the staff reset form",
+     *     200="Returned when successful",
+     *     400="Returned when the data are not valid or an unknown error occurs",
+     *     403="Returned when the user is not authorized to perform the action",
+     *     404="Returned when the specified resource is not found",
+     *  },
+     *     views={"default","profile"}
+     * ),
+     * @Post("/staff/request")
+     * @param Request $request
+     * @return FormInterface|JsonResponse|Response
+     */
+    public function requestResetStaffAction(Request $request)
+    {
+        return $this->get('apm_user.resetting_manager')->request(Admin::class, $request);
     }
 
     /**
@@ -89,34 +116,6 @@ class ResettingController extends FOSRestController
     /**
      * @ApiDoc(
      * resource=true,
-     * description="Reset staff password",
-     *
-     * parameters = {
-     *     {"name"="username", "dataType"="string", "required"=true, "format"="yannick | ysade@avm.com", "description"="username or email"}
-     * },
-     *
-     *  statusCodes={
-     *     "output" = "Ends by returning the staff reset form",
-     *     200="Returned when successful",
-     *     400="Returned when the data are not valid or an unknown error occurs",
-     *     403="Returned when the user is not authorized to perform the action",
-     *     404="Returned when the specified resource is not found",
-     *  },
-     *     views={"default","profile"}
-     * ),
-     * @Post("/staff/request")
-     * @Get("/get/form-user", name="_get_user_form")
-     * @param Request $request
-     * @return FormInterface|JsonResponse|Response
-     */
-    public function requestResetStaffAction(Request $request)
-    {
-        return $this->get('apm_user.resetting_manager')->request(Admin::class, $request);
-    }
-
-    /**
-     * @ApiDoc(
-     * resource=true,
      * description="Confirm resetting of staff password from e-mail",
      *  statusCodes={
      *     200="Returned when successful",
@@ -134,7 +133,6 @@ class ResettingController extends FOSRestController
      *     views={"default","profile"}
      * ),
      * @Post("/staff/confirm")
-     * @Get("/get/form-staff", name="_get_staff_form")
      * @param Request $request
      * @return FormInterface|JsonResponse|Response
      */
@@ -143,4 +141,23 @@ class ResettingController extends FOSRestController
         return $this->get('apm_user.resetting_manager')->confirm(Admin::class, $request);
     }
 
+    /**
+     * @Get("/get/confirm/staff-form")
+     * @param Request $request
+     * @return FormInterface|JsonResponse|Response
+     */
+    public function getResetFormStaffAction(Request $request)
+    {
+        return $this->get('apm_user.resetting_manager')->confirm(Admin::class, $request);
+    }
+
+    /**
+     * @Get("/get/confirm/user-form")
+     * @param Request $request
+     * @return FormInterface|JsonResponse|Response
+     */
+    public function getResetFormUserAction(Request $request)
+    {
+        return $this->get('apm_user.resetting_manager')->confirm(Utilisateur_avm::class, $request);
+    }
 }

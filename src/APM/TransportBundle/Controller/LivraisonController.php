@@ -63,8 +63,8 @@ class LivraisonController extends FOSRestController
      *      {"name"="livreur_boutique", "dataType"="string"},
      *      {"name"="priorite_filter", "dataType"="integer"},
      *      {"name"="valide_filter", "dataType"="boolean"},
-     *      {"name"="length_filter", "dataType"="integer", "requirement"="\d+"},
-     *      {"name"="start_filter", "dataType"="integer", "requirement"="\d+"},
+     *      {"name"="length", "dataType"="integer", "requirement"="\d+"},
+     *      {"name"="start", "dataType"="integer", "requirement"="\d+"},
      *  },
      *
      * output={
@@ -111,7 +111,7 @@ class LivraisonController extends FOSRestController
             $this->etat_filter = $request->query->has('etat_filter') ? $request->query->get('etat_filter') : "";
             $this->priorite_filter = $request->query->has('priorite_filter') ? $request->query->get('priorite_filter') : "";
             $this->valide_filter = $request->query->has('valide_filter') ? $request->query->get('valide_filter') : "";
-            $iDisplayLength = $request->query->has('length') ? $request->query->get('length') : -1;
+            $iDisplayLength = $request->query->has('length') ? intval($request->query->get('length')) : -1;
             $iDisplayStart = $request->query->has('start') ? intval($request->query->get('start')) : 0;
             $iTotalRecords = count($livraisons);
             if ($iDisplayLength < 0) $iDisplayLength = $iTotalRecords;

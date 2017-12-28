@@ -49,8 +49,8 @@ class Base_documentaireController extends FOSRestController
      *      {"name"="dateTo_filter", "dataType"="dateTime", "pattern"="19-12-2017|DESC"},
      *      {"name"="updatedAt_filter", "dataType"="dateTime", "pattern"="19-12-2017"},
      *      {"name"="proprietaire_filter", "dataType"="string", "pattern"="yannick|USERNAME"},
-     *      {"name"="length_filter", "dataType"="integer", "requirement"="\d+"},
-     *      {"name"="start_filter", "dataType"="integer", "requirement"="\d+"},
+     *      {"name"="length", "dataType"="integer", "requirement"="\d+"},
+     *      {"name"="start", "dataType"="integer", "requirement"="\d+"},
      *  },
      * output={
      *   "class"="APM\AnimationBundle\Entity\Base_documentaire",
@@ -86,7 +86,7 @@ class Base_documentaireController extends FOSRestController
             $this->dateTo_filter = $request->query->has('dateTo_filter') ? $request->query->get('dateTo_filter') : "";
             $this->updatedAt_filter = $request->query->has('updatedAt_filter') ? $request->query->get('updatedAt_filter') : "";
             $this->proprietaire_filter = $request->query->has('proprietaire_filter') ? $request->query->get('proprietaire_filter') : "";
-            $iDisplayLength = $request->query->has('length') ? $request->query->get('length') : -1;
+            $iDisplayLength = $request->query->has('length') ? intval($request->query->get('length')) : -1;
             $iDisplayStart = $request->query->has('start') ? intval($request->query->get('start')) : 0;
             $iTotalRecords = count($documents);
             if ($iDisplayLength < 0) $iDisplayLength = $iTotalRecords;

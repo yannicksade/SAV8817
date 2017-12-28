@@ -63,8 +63,8 @@ class CommissionnementController extends FOSRestController
      *      {"name"="creditDepenseTo_filter", "dataType"="integer"},
      *      {"name"="quantiteTo_filter", "dataType"="string"},
      *      {"name"="quantiteFrom_filter", "dataType"="string"},
-     *      {"name"="length_filter", "dataType"="integer", "requirement"="\d+"},
-     *      {"name"="start_filter", "dataType"="integer", "requirement"="\d+"},
+     *      {"name"="length", "dataType"="integer", "requirement"="\d+"},
+     *      {"name"="start", "dataType"="integer", "requirement"="\d+"},
      *  },
      *
      * output={
@@ -133,7 +133,7 @@ class CommissionnementController extends FOSRestController
             $this->conseiller_filter = $request->query->has('conseiller_filter') ? $request->query->get('conseiller_filter') : "";
             $this->commission_filter = $request->query->has('commission_filter') ? $request->query->get('commission_filter') : "";
 
-            $iDisplayLength = $request->query->has('length') ? $request->query->get('length') : -1;
+            $iDisplayLength = $request->query->has('length') ? intval($request->query->get('length')) : -1;
             $iDisplayStart = $request->query->has('start') ? intval($request->query->get('start')) : 0;
 
             $boutiques_commissionnements = new ArrayCollection($boutiques_commissionnements);

@@ -51,8 +51,8 @@ class Conseiller_boutiqueController extends FOSRestController
      *      {"name"="conseiller_filter", "dataType"="string"},
      *      {"name"="boutique_filter", "dataType"="string"},
      *      {"name"="gainValeur_filter", "dataType"="integer"},
-     *      {"name"="length_filter", "dataType"="integer", "requirement"="\d+"},
-     *      {"name"="start_filter", "dataType"="integer", "requirement"="\d+"},
+     *      {"name"="length", "dataType"="integer", "requirement"="\d+"},
+     *      {"name"="start", "dataType"="integer", "requirement"="\d+"},
      *  },
      *
      * output={
@@ -97,7 +97,7 @@ class Conseiller_boutiqueController extends FOSRestController
             $this->dateTo_filter = $request->query->has('dateTo_filter') ? $request->query->get('dateTo_filter') : "";
             $this->conseiller_filter = $request->query->has('conseiller_filter') ? $request->query->get('conseiller_filter') : "";
             $this->boutique_filter = $request->query->has('boutique_filter') ? $request->query->get('boutique_filter') : "";
-            $iDisplayLength = $request->query->has('length') ? $request->query->get('length') : -1;
+            $iDisplayLength = $request->query->has('length') ? intval($request->query->get('length')) : -1;
             $iDisplayStart = $request->query->has('start') ? intval($request->query->get('start')) : 0;
             $iTotalRecords = count($boutiques_conseillers);
             if ($iDisplayLength < 0) $iDisplayLength = $iTotalRecords;

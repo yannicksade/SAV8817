@@ -125,18 +125,19 @@ class ResettingManager implements ContainerAwareInterface
 
     public function confirm($class, Request $request)
     {
+        /** @var $formFactory FactoryInterface */
+        $formFactory = $this->container->get('fos_user.resetting.form.factory');
+        $form = $formFactory->createForm();
         $token = '';
         if ($request->query->has('token')) {
             $token = $request->query->get('token');
+            $form->remove('token');
         } elseif ($request->request->has('token')) {
             $token = $request->request->get('token');
         }
         if ($token == null) {
             return new JsonResponse('You must submit a token.', JsonResponse::HTTP_BAD_REQUEST);
         }
-
-        /** @var $formFactory FactoryInterface */
-        $formFactory = $this->container->get('fos_user.resetting.form.factory');
 
         /** @var $userManager UserManagerInterface */
         $userManager = $this->discriminateAndGetManager($class);
@@ -150,14 +151,18 @@ class ResettingManager implements ContainerAwareInterface
             );
         }
 
-        $form = $formFactory->createForm();
         $form->setData($user);
 
         /** @var $dispatcher EventDispatcherInterface */
         $dispatcher = $this->container->get('event_dispatcher');
         $view = (new view(null, 200))->setFormat("html");
         if ($request->isMethod('POST')) {
-            $form->submit($request->request->all());
+            if ($request->request->has('token')) {
+                $form->submit($request->request->all());
+            } else {
+                $form->handleRequest($request);
+            }
+
             if ($form->isValid()) {
                 $data = array(
                     "username" => $user->getUsername(),

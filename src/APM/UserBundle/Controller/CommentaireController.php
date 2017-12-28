@@ -52,8 +52,8 @@ class CommentaireController extends FOSRestController
      *      {"name"="description_filter", "dataType"="string"},
      *      {"name"="publiable_filter", "dataType"="boolean"},
      *      {"name"="utilisateur_filter", "dataType"="string"},
-     *      {"name"="length_filter", "dataType"="integer", "requirement"="\d+"},
-     *      {"name"="start_filter", "dataType"="integer", "requirement"="\d+"},
+     *      {"name"="length", "dataType"="integer", "requirement"="\d+"},
+     *      {"name"="start", "dataType"="integer", "requirement"="\d+"},
      *  },
      *  requirements = {
      *      {"name"="id", "requirement"="\d+", "dataType"="integer", "description"="offre_id"}
@@ -110,7 +110,7 @@ class CommentaireController extends FOSRestController
             $this->dateLimiteTo_filter = $request->query->has('dateLimiteTo_filter') ? $request->query->get('dateLimiteTo_filter') : "";
             $this->publiable_filter = $request->query->has('publiable_filter') ? $request->query->get('publiable_filter') : "";
             $this->utilisateur_filter = $request->query->has('utilisateur_filter') ? $request->query->get('utilisateur_filter') : "";
-            $iDisplayLength = $request->query->has('length') ? $request->query->get('length') : -1;
+            $iDisplayLength = $request->query->has('length') ? intval($request->query->get('length')) : -1;
             $iDisplayStart = $request->query->has('start') ? intval($request->query->get('start')) : 0;
             $json = array();
 

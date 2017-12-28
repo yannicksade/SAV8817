@@ -58,20 +58,6 @@ class RegistrationUserController extends FOSRestController
 
 
     /**
-     * @ApiDoc(
-     * resource=true,
-     * description="Activates a user account by email",
-     * requirements = {
-     *   {"name"="token", "dataType"="string", "requirement"="\D+", "description"="token ..."}
-     * },
-     *  statusCodes={
-     *     "output" = "HTML confirmation template",
-     *     200="Returned when successful",
-     *     400="Returned when the data are not valid or an unknown error occurs",
-     *     404="Returned when the specified resource is not found with the provided token",
-     * },
-     *     views={"default","profile"}
-     * ),
      * @param Request $request
      * @return JsonResponse|Response
      * @Get("/confirmation-password")

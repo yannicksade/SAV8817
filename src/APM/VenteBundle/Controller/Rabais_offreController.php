@@ -32,7 +32,6 @@ class Rabais_offreController extends FOSRestController
     private $beneficiaire_filter;
     private $code_filter;
     private $nombreDefois_filter;
-    private $quantite_filter;
     private $groupe_filter;
     private $vendeur_filter;
     private $offre_filter;
@@ -73,7 +72,7 @@ class Rabais_offreController extends FOSRestController
      *      {"name"="etat_filter", "dataType"="integer"},
      *      {"name"="quantiteMin_filter", "dataType"="integer"},
      *      {"name"="quantiteMax_filter", "dataType"="integer"},
-     *     {"name"="valeurMin_filter", "dataType"="string"},
+     *      {"name"="valeurMin_filter", "dataType"="string"},
      *      {"name"="valeurMax_filter", "dataType"="string"},
      *      {"name"="nombreUtilisation_filter", "dataType"="integer"},
      *
@@ -91,7 +90,7 @@ class Rabais_offreController extends FOSRestController
      *     "groups"={"owner_list"}
      * },
      *  parameters= {
-     *      {"name"="q", "required"="false", "dataType"="string", "requirement"="\D+", "description"="query request == on_product | received | made ==", "format"= "?q=on_product"}
+     *      {"name"="q", "required"=false, "dataType"="string", "description"="query: ON_PRODUCT | RECEIVED | MADE", "format"= "?q=on_product"}
      *  },
      * statusCodes={
      *     "output" = "A single or a collection of rabais",
@@ -137,7 +136,7 @@ class Rabais_offreController extends FOSRestController
             $this->permanence_filter = $request->query->has('permanence_filter') ? $request->query->get('permanence_filter') : "";
             $this->restreint_filter = $request->query->has('restreint_filter') ? $request->query->get('restreint_filter') : "";
 
-            $iDisplayLength = $request->query->has('length') ? $request->query->get('length') : -1;
+            $iDisplayLength = $request->query->has('length') ? intval($request->query->get('length')) : -1;
             $iDisplayStart = $request->query->has('start') ? intval($request->query->get('start')) : 0;
             $json = array();
             $rabais_offres = null;

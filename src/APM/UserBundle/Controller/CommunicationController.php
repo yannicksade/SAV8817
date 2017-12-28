@@ -63,11 +63,11 @@ class CommunicationController extends FOSRestController
      *      {"name"="valide_filter", "dataType"="boolean"},
      *      {"name"="emetteur_filter", "dataType"="string"},
      *      {"name"="recepteur_filter", "dataType"="string"},
-     *      {"name"="length_filter", "dataType"="integer", "requirement"="\d+"},
-     *      {"name"="start_filter", "dataType"="integer", "requirement"="\d+"},
+     *      {"name"="length", "dataType"="integer", "requirement"="\d+"},
+     *      {"name"="start", "dataType"="integer", "requirement"="\d+"},
      *  },
-     * requirements={
-     *   {"name"="q", "dataType"="string", "requirement"="\D+", "description"="query request: sender, receiver ", "format"= "?q=sender | null"}
+     * parameters={
+     *   {"name"="q", "dataType"="string", "required"=false, "description"="query: SENDER, RECEIVER ", "format"= "?q=sender"}
      * },
      * output={
      *   "class"="APM\UserBundle\Entity\Communication",
@@ -108,7 +108,7 @@ class CommunicationController extends FOSRestController
             $this->valide_filter = $request->query->has('valide_filter') ? $request->query->get('valide_filter') : "";
             $this->emetteur_filter = $request->query->has('emetteur_filter') ? $request->query->get('emetteur_filter') : "";
             $this->recepteur_filter = $request->query->has('recepteur_filter') ? $request->query->get('recepteur_filter') : "";
-            $iDisplayLength = $request->query->has('length') ? $request->query->get('length') : -1;
+            $iDisplayLength = $request->query->has('length') ? intval($request->query->get('length')) : -1;
             $iDisplayStart = $request->query->has('start') ? intval($request->query->get('start')) : 0;
             $json = array();
             $json['items'] = array();

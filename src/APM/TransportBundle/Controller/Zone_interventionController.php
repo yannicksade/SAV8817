@@ -50,8 +50,8 @@ class Zone_interventionController extends FOSRestController
      *      {"name"="adresse_filter", "dataType"="integer"},
      *      {"name"="pays_filter", "dataType"="integer"},
      *      {"name"="transporteur_filter", "dataType"="integer"},
-     *      {"name"="length_filter", "dataType"="integer", "requirement"="\d+"},
-     *      {"name"="start_filter", "dataType"="integer", "requirement"="\d+"},
+     *      {"name"="length", "dataType"="integer", "requirement"="\d+"},
+     *      {"name"="start", "dataType"="integer", "requirement"="\d+"},
      *  },
      * output={
      *   "class"="APM\TransportBundle\Entity\Zone_intervention",

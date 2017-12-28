@@ -66,6 +66,7 @@ class OffreController extends FOSRestController implements ClassResourceInterfac
      * @param Transaction|null $transaction
      * @return JsonResponse
      *
+     * @Delete("/cget/offres", name="s_format")
      * @Get("/cget/offres", name="s")
      * @Get("/cget/offres/boutique/{id}", name="s_boutique", requirements={"id"="boutique_id"})
      * @Get("/cget/offres/boutique/{id}/categorie/{categorie_id}", name="s_categorie", requirements={"id"="boutique_id", "categorie_id"="\d+"})
@@ -86,8 +87,8 @@ class OffreController extends FOSRestController implements ClassResourceInterfac
      *      {"name"="date_from_filter",  "dataType"="dateTime", "pattern"="19-12-2017|ASC"},
      *      {"name"="date_to_filter", "dataType"="dateTime", "pattern"="19-12-2017|DESC"},
      *      {"name"="etat_filter", "dataType"="integer", "pattern"="1,2,3,4,5,6,7,8|SELECT"},
-     *      {"name"="length_filter", "dataType"="integer"},
-     *      {"name"="start_filter", "dataType"="integer"},
+     *      {"name"="length", "dataType"="integer"},
+     *      {"name"="start", "dataType"="integer"},
      * },
      * output={
      *   "class"="APM\VenteBundle\Entity\Offre",
@@ -144,8 +145,8 @@ class OffreController extends FOSRestController implements ClassResourceInterfac
             $this->dateFrom_filter = $request->query->has('date_from_filter') ? $request->query->get('date_from_filter') : "";
             $this->dateTo_filter = $request->query->has('date_to_filter') ? $request->query->get('date_to_filter') : "";
             $this->etat_filter = $request->query->has('etat_filter') ? $request->query->get('etat_filter') : "";
-            $iDisplayLength = intval($request->query->has('length') ? $request->query->get('length') : -1);
-            $iDisplayStart = intval($request->query->has('start') ? $request->query->get('start') : 0);
+            $iDisplayLength = $request->query->has('length') ? intval($request->query->get('length')) : -1;
+            $iDisplayStart = $request->query->has('start') ? intval($request->query->get('start')) : 0;
             //-----Source -------
             $iTotalRecords = count($offres);
             $iDisplayLength = $iDisplayLength < 0 ? $iTotalRecords : $iDisplayLength;

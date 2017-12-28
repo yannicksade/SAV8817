@@ -43,8 +43,8 @@ class Livreur_boutiqueController extends FOSRestController
      *      {"name"="transporteur_filter", "dataType"="string"},
      *      {"name"="reference_filter", "dataType"="string"},
      *      {"name"="boutique_filter", "dataType"="integer"},
-     *      {"name"="length_filter", "dataType"="integer", "requirement"="\d+"},
-     *      {"name"="start_filter", "dataType"="integer", "requirement"="\d+"},
+     *      {"name"="length", "dataType"="integer", "requirement"="\d+"},
+     *      {"name"="start", "dataType"="integer", "requirement"="\d+"},
      *  },
      *
      * output={
@@ -54,9 +54,11 @@ class Livreur_boutiqueController extends FOSRestController
      *    },
      *     "groups"={"owner_list"}
      * },
+     *     parameters ={
+     *          {"name"="q", "dataType"="string", "required"=false, "description"="query: OWNER, GUEST ", "format"= "?q=owner"}
+     *     },
      *     requirements={
      *          {"name"="id", "dataType"="integer", "requirements"="\d+", "description"="boutique Id"},
-     *          {"name"="q", "dataType"="string", "requirement"="\D+", "description"="query request: owner, guest ", "format"= "?q=owner | null"}
      *     },
      * statusCodes={
      *     "output" = "A single or a collection of Livreurs of a boutique",
@@ -80,9 +82,9 @@ class Livreur_boutiqueController extends FOSRestController
             $this->reference_filter = $request->query->has('reference_filter') ? $request->query->get('reference_filter') : "";
             $this->transporteur_filter = $request->query->has('transporteur_filter') ? $request->query->get('transporteur_filter') : "";
             $this->boutique_filter = $request->query->has('boutique_filter') ? $request->query->get('boutique_filter') : "";
-            $iDisplayLength = $request->query->has('length') ? $request->query->get('length') : -1;
+            $iDisplayLength = $request->query->has('length') ? intval($request->query->get('length')) : -1;
             $iDisplayStart = $request->query->has('start') ? intval($request->query->get('start')) : 0;
-            $q = $request->query->has('q') ? $q = $request->query->get('q') : "all";
+            $q = $request->query->has('q') ? $request->query->get('q') : "all";
             if ($q === "guest" || $q === "all") {
                 $livreurs = $boutique->getLivreurs();//livreurs étrangers: empruntés
                 if (null !== $livreurs) {

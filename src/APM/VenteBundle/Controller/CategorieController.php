@@ -57,8 +57,8 @@ class CategorieController extends FOSRestController
      *      {"name"="categorieCourante_filter", "dataType"="string"},
      *      {"name"="date_from_filter", "dataType"="dateTime", "pattern"="19-12-2017|ASC"},
      *      {"name"="date_to_filter", "dataType"="dateTime", "pattern"="19-12-2017|DESC"},
-     *      {"name"="length_filter", "dataType"="integer", "requirement"="\d+"},
-     *      {"name"="start_filter", "dataType"="integer", "requirement"="\d+"},
+     *      {"name"="length", "dataType"="integer", "requirement"="\d+"},
+     *      {"name"="start", "dataType"="integer", "requirement"="\d+"},
      *  },
      * output={
      *   "class"="APM\VenteBundle\Entity\Categorie",
@@ -100,7 +100,7 @@ class CategorieController extends FOSRestController
             $this->dateFrom_filter = $request->query->has('date_from_filter') ? $request->query->get('date_from_filter') : "";
             $this->dateTo_filter = $request->query->has('date_to_filter') ? $request->query->get('date_to_filter') : "";
             $iDisplayLength = $request->query->has('length') ? $request->query->get('length') : -1;
-            $iDisplayStart = $request->query->has('start') ? intval($request->query->get('start')) : 0;
+            $iDisplayStart = $request->query->has('start') ? $request->query->get('start') : 0;
             $json = array();
             $selectedGroup = array("owner_list");
             $iTotalRecords = count($categories);

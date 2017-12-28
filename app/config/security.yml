@@ -99,6 +99,7 @@ security:
         - { path: ^/ping, role: IS_AUTHENTICATED_ANONYMOUSLY }
 
         - { path: ^/api/doc/profile, role: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/api/doc/vente, role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/api/doc, role: ROLE_USERAVM }
 
 

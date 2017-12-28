@@ -64,11 +64,11 @@ class TransactionController extends FOSRestController
      *      {"name"="boutique_filter", "dataType"="string"},
      *      {"name"="produit_filter", "dataType"="string"},
      *      {"name"="transactionProduit_filter", "dataType"="string"},
-     *      {"name"="length_filter", "dataType"="integer", "requirement"="\d+"},
-     *      {"name"="start_filter", "dataType"="integer", "requirement"="\d+"},
+     *      {"name"="length", "dataType"="integer", "requirement"="\d+"},
+     *      {"name"="start", "dataType"="integer", "requirement"="\d+"},
      *  },
-     * requirements={
-     *   {"name"="q", "dataType"="string", "requirement"="\D+", "description"=" ==sent | received | done or receiver == e.g ?q=sent"}
+     * parameters={
+     *   {"name"="q", "dataType"="string", "required"=false, "description"="query: SENT | RECEIVED | DONE", "format"="?q=sent"}
      * },
      * output={
      *   "class"="APM\VenteBundle\Entity\Transaction",

@@ -62,10 +62,12 @@ class Service_apres_venteController extends FOSRestController
      *      {"name"="affiliation_filter", "dataType"="string"},
      *      {"name"="commentaire_filter", "dataType"="string"},
      *      {"name"="client_filter", "dataType"="string", "pattern"="yannick|USERNAME"},
-     *      {"name"="length_filter", "dataType"="integer", "requirement"="\d+"},
-     *      {"name"="start_filter", "dataType"="integer", "requirement"="\d+"},
+     *      {"name"="length", "dataType"="integer", "requirement"="\d+"},
+     *      {"name"="start", "dataType"="integer", "requirement"="\d+"},
      *  },
-     *
+     ** parameters={
+     *      {"name"="q", "dataType"="string", "required"=false, "description"="BOUTIQUES ", "format"= "?q=boutiques"}
+     * },
      * output={
      *   "class"="APM\AchatBundle\Entity\Service_apres_vente",
      *   "parsers" = {

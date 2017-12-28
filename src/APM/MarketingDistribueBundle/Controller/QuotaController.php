@@ -52,8 +52,8 @@ class QuotaController extends FOSRestController
      *      {"name"="libelle_filter", "dataType"="string"},
      *      {"name"="description_filter", "dataType"="string"},
      *      {"name"="valeurQuota_filter", "dataType"="integer"},
-     *      {"name"="length_filter", "dataType"="integer", "requirement"="\d+"},
-     *      {"name"="start_filter", "dataType"="integer", "requirement"="\d+"},
+     *      {"name"="length", "dataType"="integer", "requirement"="\d+"},
+     *      {"name"="start", "dataType"="integer", "requirement"="\d+"},
      *  },
      * requirements = {
      *      {"name"="id", "dataType"="integer", "requirement"="\d+", "description"="boutique Id"}
@@ -91,7 +91,7 @@ class QuotaController extends FOSRestController
             $this->libelle_filter = $request->query->has('libelle_filter') ? $request->query->get('libelle_filter') : "";
             $this->description_filter = $request->query->has('description_filter') ? $request->query->get('description_filter') : "";
             $this->boutique_filter = $request->query->has('boutique_filter') ? $request->query->get('boutique_filter') : "";
-            $iDisplayLength = $request->query->has('length') ? $request->query->get('length') : -1;
+            $iDisplayLength = $request->query->has('length') ? intval($request->query->get('length')) : -1;
             $iDisplayStart = $request->query->has('start') ? intval($request->query->get('start')) : 0;
             $json = array();
             $iTotalRecords = count($quotas);

@@ -53,8 +53,8 @@ class Transaction_produitController extends FOSRestController
      *      {"name"="quantiteTo_filter", "dataType"="integer"},
      *      {"name"="designation_filter", "dataType"="string"},
      *      {"name"="reference_filter", "dataType"="string"},
-     *      {"name"="length_filter", "dataType"="integer", "requirement"="\d+"},
-     *      {"name"="start_filter", "dataType"="integer", "requirement"="\d+"},
+     *      {"name"="length", "dataType"="integer", "requirement"="\d+"},
+     *      {"name"="start", "dataType"="integer", "requirement"="\d+"},
      *  },
      * output={
      *   "class"="APM\VenteBundle\Entity\Transaction_produit",

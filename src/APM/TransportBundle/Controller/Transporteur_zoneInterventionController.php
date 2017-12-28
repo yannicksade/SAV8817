@@ -48,8 +48,8 @@ class Transporteur_zoneInterventionController extends FOSRestController
      * filters={
      *      {"name"="transporteur_filter", "dataType"="string"},
      *      {"name"="zoneIntervention_filter", "dataType"="string"},
-     *      {"name"="length_filter", "dataType"="integer", "requirement"="\d+"},
-     *      {"name"="start_filter", "dataType"="integer", "requirement"="\d+"},
+     *      {"name"="length", "dataType"="integer", "requirement"="\d+"},
+     *      {"name"="start", "dataType"="integer", "requirement"="\d+"},
      *  },
      *
      * output={
@@ -88,7 +88,7 @@ class Transporteur_zoneInterventionController extends FOSRestController
             $json = array();
             $this->transporteur_filter = $request->request->has('transporteur_filter') ? $request->request->get('transporteur_filter') : "";
             $this->zoneIntervention_filter = $request->request->has('zoneIntervention_filter') ? $request->request->get('zoneIntervention_filter') : "";
-            $iDisplayLength = $request->request->has('length') ? $request->request->get('length') : -1;
+            $iDisplayLength = $request->request->has('length') ? intval($request->request->get('length')) : -1;
             $iDisplayStart = $request->request->has('start') ? intval($request->request->get('start')) : 0;
             $iTotalRecords = count($transporteurs_zones);
             if ($iDisplayLength < 0) $iDisplayLength = $iTotalRecords;
