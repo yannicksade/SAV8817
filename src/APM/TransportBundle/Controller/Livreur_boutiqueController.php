@@ -239,7 +239,7 @@ class Livreur_boutiqueController extends FOSRestController
             $livreur_boutique->setTransporteur($transporteur);
             $livreur_boutique->setBoutiqueProprietaire($boutique);
             $transporteur->setLivreurBoutique($livreur_boutique);
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->getEM();
             $em->persist($livreur_boutique);
             $em->flush();
             return $this->routeRedirectView("api_transport_show_livreur", ['id' => $livreur_boutique->getId()], Response::HTTP_CREATED);
@@ -276,6 +276,11 @@ class Livreur_boutiqueController extends FOSRestController
             throw $this->createAccessDeniedException();
         }
         //----------------------------------------------------------------------------------------
+    }
+
+    private function getEM()
+    {
+        return $this->get('doctrine.orm.entity_manager');
     }
 
     /**
@@ -360,7 +365,7 @@ class Livreur_boutiqueController extends FOSRestController
                     "message" => $this->get('translator')->trans($form->getErrors(true, false), [], 'FOSUserBundle')
                 ], Response::HTTP_BAD_REQUEST);
             }
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->getEM();
             $em->flush();
             return $this->routeRedirectView("api_transport_show_livreur", ['id' => $livreur_boutique->getId()], Response::HTTP_OK);
         } catch (ConstraintViolationException $cve) {
@@ -440,7 +445,7 @@ class Livreur_boutiqueController extends FOSRestController
                 ], Response::HTTP_BAD_REQUEST);
             }
             $boutique = $livreur_boutique->getBoutiqueProprietaire();
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->getEM();
             $em->remove($livreur_boutique);
             $em->flush();
             return $this->routeRedirectView("api_transport_get_livreurs_boutique", [$boutique->getId()], Response::HTTP_OK);

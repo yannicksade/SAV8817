@@ -49,7 +49,7 @@ class OperationHandler
         $this->operation->setStatut(0);
         $this->operation->setMontant($montant);
         $this->operation->setDestinataireNonAvm($destinataireNonAVM);
-        $source->addTransaction($this->operation);
+        $source->addTransactionsEffectue($this->operation);
         $this->operation->setAuteur($source);
 
         if (null !== $quantite && null !== $offre) {

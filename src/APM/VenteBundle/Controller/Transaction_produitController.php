@@ -266,7 +266,6 @@ class Transaction_produitController extends FOSRestController
     {
         try {
             $this->createSecurity();
-            $em = $this->getDoctrine()->getManager();
             /** @var Transaction_produit $transaction_produit */
             $transaction_produit = TradeFactory::getTradeProvider('transaction_produit');
             $trans = null;
@@ -287,6 +286,7 @@ class Transaction_produitController extends FOSRestController
             }
             $this->createSecurity($transaction_produit->getProduit());
             $transaction_produit->setTransaction($transaction);
+            $em = $this->getEM();
             $em->persist($transaction);
             $em->persist($transaction_produit);
             $em->flush();
@@ -338,6 +338,11 @@ class Transaction_produitController extends FOSRestController
             }
         }
         //----------------------------------------------------------------------------------------
+    }
+
+    private function getEM()
+    {
+        return $this->get('doctrine.orm.entity_manager');
     }
 
     /**
@@ -424,7 +429,7 @@ class Transaction_produitController extends FOSRestController
                     "message" => $this->get('translator')->trans($form->getErrors(true, false), [], 'FOSUserBundle')
                 ], Response::HTTP_BAD_REQUEST);
             }
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->getEM();
             $em->flush();
             return $this->routeRedirectView("api_vente_show_transaction-produit", ['id' => $transaction_produit->getId()], Response::HTTP_OK);
         } catch (ConstraintViolationException $cve) {
@@ -496,7 +501,7 @@ class Transaction_produitController extends FOSRestController
                 ], Response::HTTP_BAD_REQUEST);
             }
             $transaction = $transaction_produit->getTransaction();
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->getEM();
             $em->remove($transaction_produit);
             $em->flush();
             return $this->routeRedirectView("api_vente_new_transaction-produit_transaction", [$transaction->getId()], Response::HTTP_OK);

@@ -256,8 +256,6 @@ class CommentaireController extends FOSRestController
     {
         try {
             $this->createSecurity($offre);
-            /** @var Session $session */
-            $session = $request->getSession();
             /** @var Commentaire $commentaire */
             $commentaire = TradeFactory::getTradeProvider("commentaire");
             $form = $this->createForm('APM\UserBundle\Form\CommentaireType', $commentaire);
@@ -271,7 +269,7 @@ class CommentaireController extends FOSRestController
             $this->createSecurity($offre);
             $commentaire->setUtilisateur($this->getUser());
             $commentaire->setOffre($offre);
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->getEM();
             $em->persist($commentaire);
             $em->flush();
             return $this->routeRedirectView("api_user_show_commentaire", ['id' => $commentaire->getId()], Response::HTTP_CREATED);
@@ -302,6 +300,11 @@ class CommentaireController extends FOSRestController
         }
         if (!$offre->getPubliable()) throw $this->createAccessDeniedException();
         //----------------------------------------------------------------------------------------
+    }
+
+    private function getEM()
+    {
+        return $this->get('doctrine.orm.entity_manager');
     }
 
     /**
@@ -386,7 +389,7 @@ class CommentaireController extends FOSRestController
                     "message" => $this->get('translator')->trans($form->getErrors(true, false), [], 'FOSUserBundle')
                 ], Response::HTTP_BAD_REQUEST);
             }
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->getEM();
             $em->flush();
             return $this->routeRedirectView("api_user_show_commentaire", ['id' => $commentaire->getId()], Response::HTTP_OK);
         } catch (ConstraintViolationException $cve) {
@@ -457,7 +460,7 @@ class CommentaireController extends FOSRestController
                     "message" => $this->get('translator')->trans('impossible de supprimer', [], 'FOSUserBundle')
                 ], Response::HTTP_BAD_REQUEST);
             }
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->getEM();
             $em->remove($commentaire);
             $em->flush();
             return $this->routeRedirectView("api_user_get_commentaires", [], Response::HTTP_OK);

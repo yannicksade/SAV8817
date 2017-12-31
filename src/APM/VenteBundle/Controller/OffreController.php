@@ -354,8 +354,6 @@ class OffreController extends FOSRestController implements ClassResourceInterfac
     {
         try {
             $this->createSecurity();
-            /** @var Session $session */
-            $session = $request->getSession();
             /** @var Offre $offre */
             $offre = TradeFactory::getTradeProvider('offre');
             $form = $this->createForm('APM\VenteBundle\Form\OffreType', $offre);
@@ -367,7 +365,7 @@ class OffreController extends FOSRestController implements ClassResourceInterfac
                 ], Response::HTTP_BAD_REQUEST);
             }
             $this->createSecurity($offre->getBoutique(), $offre->getCategorie());
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->getEM();
             $offre->setVendeur($this->getUser());
             $em->persist($offre);
             $em->flush();
@@ -391,8 +389,7 @@ class OffreController extends FOSRestController implements ClassResourceInterfac
      * @param Categorie $categorie
      * @param Boutique $boutique
      */
-    private
-    function createSecurity($boutique = null, $categorie = null)
+    private function createSecurity($boutique = null, $categorie = null)
     {
         //---------------------------------security-----------------------------------------------
         // Unable to access the controller unless you have a USERAVM role
@@ -415,6 +412,11 @@ class OffreController extends FOSRestController implements ClassResourceInterfac
             }
         }
         //----------------------------------------------------------------------------------------
+    }
+
+    private function getEM()
+    {
+        return $this->get('doctrine.orm.entity_manager');
     }
 
     /**
@@ -536,7 +538,7 @@ class OffreController extends FOSRestController implements ClassResourceInterfac
                     "message" => $this->get('translator')->trans($form->getErrors(true, false), [], 'FOSUserBundle')
                 ], Response::HTTP_BAD_REQUEST);
             }
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->getEM();
             $em->flush();
             return $this->routeRedirectView("api_vente_show_offre", ['id' => $offre->getId()], Response::HTTP_OK);
         } catch (ConstraintViolationException $cve) {
@@ -631,7 +633,7 @@ class OffreController extends FOSRestController implements ClassResourceInterfac
                 $param = array();
             }
 
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->getEM();
             $em->remove($offre);
             $em->flush();
             return $this->routeRedirectView($route, $param, Response::HTTP_OK);
@@ -663,7 +665,7 @@ class OffreController extends FOSRestController implements ClassResourceInterfac
             $session = $this->get('session');
             $id = $request->request->get('oData');
             $id = $session->get('offre_' . $id);
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->getEM();
             $offre = null;
             if (is_numeric($id))
                 /** @var Offre $offre */

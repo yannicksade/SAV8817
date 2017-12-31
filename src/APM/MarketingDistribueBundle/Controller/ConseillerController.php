@@ -80,7 +80,7 @@ class ConseillerController extends FOSRestController
     {
         try {
             $this->listAndShowSecurity();
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->getEM();
             $conseillers = $em->getRepository('APMMarketingDistribueBundle:conseiller')->findAll();
             $json = array();
             $this->matricule_filter = $request->request->has('matricule_filter') ? $request->request->get('matricule_filter') : "";
@@ -125,6 +125,11 @@ class ConseillerController extends FOSRestController
             throw $this->createAccessDeniedException();
         }
         //----------------------------------------------------------------------------------------
+    }
+
+    private function getEM()
+    {
+        return $this->get('doctrine.orm.entity_manager');
     }
 
     /**
@@ -262,7 +267,7 @@ class ConseillerController extends FOSRestController
             }
 
             $conseiller->setUtilisateur($this->getUser());
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->getEM();
             $em->persist($conseiller);
             $em->flush();
 
@@ -379,7 +384,7 @@ class ConseillerController extends FOSRestController
                     ], Response::HTTP_BAD_REQUEST
                 );
             }
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->getEM();
             $em->flush();
 
             return $this->routeRedirectView("api_marketing_show_conseiller", ['id' => $conseiller->getId()], Response::HTTP_OK);
@@ -419,7 +424,6 @@ class ConseillerController extends FOSRestController
         //----------------------------------------------------------------------------------------
     }
 
-
     /**
      * @ApiDoc(
      * resource=true,
@@ -457,7 +461,7 @@ class ConseillerController extends FOSRestController
                 ], Response::HTTP_BAD_REQUEST);
             }
             $user = $conseiller->getUtilisateur();
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->getEM();
             $em->remove($conseiller);
             $em->flush();
             return $this->routeRedirectView("api_user_show", [$user->getId()], Response::HTTP_OK);
@@ -478,5 +482,6 @@ class ConseillerController extends FOSRestController
             );
         }
     }
+
 
 }

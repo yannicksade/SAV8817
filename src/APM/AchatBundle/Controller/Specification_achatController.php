@@ -317,7 +317,7 @@ class Specification_achatController extends FOSRestController
             }
             $specification_achat->setUtilisateur($this->getUser());
             $specification_achat->setOffre($offre);
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->getEM();
             $em->persist($specification_achat);
             $em->flush();
             return $this->routeRedirectView("api_achat_show_specification", ['id' => $specification_achat->getId()], Response::HTTP_CREATED);
@@ -348,6 +348,11 @@ class Specification_achatController extends FOSRestController
             throw $this->createAccessDeniedException();
         }
         //----------------------------------------------------------------------------------------
+    }
+
+    private function getEM()
+    {
+        return $this->get('doctrine.orm.entity_manager');
     }
 
     /**
@@ -433,7 +438,7 @@ class Specification_achatController extends FOSRestController
                     ], Response::HTTP_BAD_REQUEST
                 );
             }
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->getEM();
             $em->flush();
             return $this->routeRedirectView("api_achat_show_specification ", ["id" => $specification_achat->getId()], Response::HTTP_OK);
         } catch (ConstraintViolationException $cve) {
@@ -508,7 +513,7 @@ class Specification_achatController extends FOSRestController
                     "message" => $this->get('translator')->trans('impossible de supprimer', [], 'FOSUserBundle')
                 ], Response::HTTP_BAD_REQUEST);
             }
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->getEM();
             $em->remove($specification_achat);
             $em->flush();
 
@@ -530,7 +535,6 @@ class Specification_achatController extends FOSRestController
                 , Response::HTTP_FORBIDDEN
             );
         }
-
     }
 
 }

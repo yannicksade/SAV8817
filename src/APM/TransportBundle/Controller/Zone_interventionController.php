@@ -249,7 +249,7 @@ class Zone_interventionController extends FOSRestController
             $transporteur = $form->get('transporteur')->getData();
             $this->createSecurity($transporteur);
             if (!$transporteur) $zone_intervention->setTransporteur($this->getUser()->getTransporteur());
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->getEM();
             $em->persist($zone_intervention);
             $em->flush();
 
@@ -295,6 +295,11 @@ class Zone_interventionController extends FOSRestController
             }
         }
         //----------------------------------------------------------------------------------------
+    }
+
+    private function getEM()
+    {
+        return $this->get('doctrine.orm.entity_manager');
     }
 
     /**
@@ -380,7 +385,7 @@ class Zone_interventionController extends FOSRestController
                     ], Response::HTTP_BAD_REQUEST
                 );
             }
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->getEM();
             $em->flush();
 
             return $this->routeRedirectView("api_transport_show_zoneintervention", ['id' => $zone_intervention->getId()], Response::HTTP_OK);
@@ -431,7 +436,6 @@ class Zone_interventionController extends FOSRestController
         //----------------------------------------------------------------------------------------
     }
 
-
     /**
      * @ApiDoc(
      * resource=true,
@@ -469,7 +473,7 @@ class Zone_interventionController extends FOSRestController
                     "message" => $this->get('translator')->trans('impossible de supprimer', [], 'FOSUserBundle')
                 ], Response::HTTP_BAD_REQUEST);
             }
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->getEM();
             $em->remove($zone_intervention);
             $em->flush();
             return $this->routeRedirectView("api_transport_get_zoneinterventions", [], Response::HTTP_OK);
@@ -490,5 +494,6 @@ class Zone_interventionController extends FOSRestController
             );
         }
     }
+
 
 }

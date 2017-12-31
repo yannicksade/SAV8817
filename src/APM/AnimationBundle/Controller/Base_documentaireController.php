@@ -256,7 +256,7 @@ class Base_documentaireController extends FOSRestController
                 ], Response::HTTP_BAD_REQUEST);
             }
             $document->setProprietaire($this->getUser());
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->getEM();
             $em->persist($document);
             $em->flush();
 
@@ -287,6 +287,11 @@ class Base_documentaireController extends FOSRestController
             throw $this->createAccessDeniedException();
         }
         //----------------------------------------------------------------------------------------
+    }
+
+    private function getEM()
+    {
+        return $this->get('doctrine.orm.entity_manager');
     }
 
     /**
@@ -373,7 +378,7 @@ class Base_documentaireController extends FOSRestController
                 );
             }
 
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->getEM();
             $em->flush();
 
             return $this->routeRedirectView("api_documentation_show_document", ["id" => $document->getId()], Response::HTTP_OK);
@@ -452,7 +457,7 @@ class Base_documentaireController extends FOSRestController
                 ], Response::HTTP_BAD_REQUEST);
             }
 
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->getEM();
             $em->remove($document);
             $em->flush();
 

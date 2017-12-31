@@ -218,7 +218,7 @@ class Transporteur_zoneInterventionController extends FOSRestController
             }
             if (null !== $zone_intervention) $transporteur_zoneIntervention->setZoneIntervention($zone_intervention);
             if (null !== $transporteur) $transporteur_zoneIntervention->setTransporteur($transporteur);
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->getEM();
             $em->persist($transporteur_zoneIntervention);
             $em->flush();
 
@@ -265,6 +265,11 @@ class Transporteur_zoneInterventionController extends FOSRestController
             }
         }
         //----------------------------------------------------------------------------------------
+    }
+
+    private function getEM()
+    {
+        return $this->get('doctrine.orm.entity_manager');
     }
 
     /**
@@ -375,7 +380,7 @@ class Transporteur_zoneInterventionController extends FOSRestController
                     "message" => $this->get('translator')->trans($form->getErrors(true, false), [], 'FOSUserBundle')
                 ], Response::HTTP_BAD_REQUEST);
             }
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->getEM();
             $em->flush();
 
             return $this->routeRedirectView("api_transport_show_transporteur-zoneintervention", ['id' => $transporteur_zoneintervention->getId()], Response::HTTP_OK);
@@ -436,7 +441,7 @@ class Transporteur_zoneInterventionController extends FOSRestController
                 ], Response::HTTP_BAD_REQUEST);
             }
             $transporteur = $transporteur_zoneintervention->getTransporteur();
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->getEM();
             $em->remove($transporteur_zoneintervention);
             $em->flush();
             return $this->routeRedirectView("api_transport_get_transporteur-zoneinterventions_transporteur", [$transporteur->getId()], Response::HTTP_OK);
@@ -457,4 +462,5 @@ class Transporteur_zoneInterventionController extends FOSRestController
             );
         }
     }
+
 }

@@ -276,7 +276,7 @@ class QuotaController extends FOSRestController
                 ], Response::HTTP_BAD_REQUEST);
             }
             $quotum->setBoutiqueProprietaire($boutique);
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->getEM();
             $em->persist($quotum);
             $em->flush();
 
@@ -317,6 +317,11 @@ class QuotaController extends FOSRestController
             }
         }
         //----------------------------------------------------------------------------------------
+    }
+
+    private function getEM()
+    {
+        return $this->get('doctrine.orm.entity_manager');
     }
 
     /**
@@ -402,7 +407,7 @@ class QuotaController extends FOSRestController
                     ], Response::HTTP_BAD_REQUEST
                 );
             }
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->getEM();
             $em->flush();
             return $this->routeRedirectView("api_marketing_show_commission", [$quotum->getId()], Response::HTTP_OK);
         } catch (ConstraintViolationException $cve) {
@@ -444,7 +449,6 @@ class QuotaController extends FOSRestController
 
     }
 
-
     /**
      * @ApiDoc(
      * resource=true,
@@ -482,7 +486,7 @@ class QuotaController extends FOSRestController
                 ], Response::HTTP_BAD_REQUEST);
             }
             $boutique = $quotum->getBoutiqueProprietaire();
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->getEM();
             $em->remove($quotum);
             $em->flush();
 
@@ -504,4 +508,5 @@ class QuotaController extends FOSRestController
             );
         }
     }
+
 }

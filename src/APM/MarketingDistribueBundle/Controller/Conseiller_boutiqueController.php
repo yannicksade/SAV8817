@@ -259,7 +259,7 @@ class Conseiller_boutiqueController extends FOSRestController
             $this->createSecurity($conseiller_boutique->getBoutique());
             if (null !== $boutique) $conseiller_boutique->setBoutique($boutique);
             $conseiller_boutique->setConseiller($user->getProfileConseiller());
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->getEM();
             $em->persist($conseiller_boutique);
             $em->flush();
 
@@ -296,13 +296,18 @@ class Conseiller_boutiqueController extends FOSRestController
         $conseiller = $user->getProfileConseiller();
         $oldConseiller = null;
         if ($boutique && null !== $conseiller) {//l'enregistrement devrait être unique
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->getEM();
             $oldConseiller = $em->getRepository('APMMarketingDistribueBundle:Conseiller_boutique')
                 ->findOneBy(['conseiller' => $conseiller, 'boutique' => $boutique]);
         }
 
         if (null === $conseiller || null !== $oldConseiller) throw $this->createAccessDeniedException();
         //----------------------------------------------------------------------------------------
+    }
+
+    private function getEM()
+    {
+        return $this->get('doctrine.orm.entity_manager');
     }
 
     /**
@@ -388,7 +393,7 @@ class Conseiller_boutiqueController extends FOSRestController
                     ], Response::HTTP_BAD_REQUEST
                 );
             }
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->getEM();
             $em->flush();
 
             return $this->routeRedirectView("api_marketing_show_conseillerboutique", ['id' => $conseiller_boutique->getId()], Response::HTTP_OK);
@@ -473,7 +478,7 @@ class Conseiller_boutiqueController extends FOSRestController
                     "message" => $this->get('translator')->trans('impossible de supprimer', [], 'FOSUserBundle')
                 ], Response::HTTP_BAD_REQUEST);
             }
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->getEM();
             $em->remove($conseiller_boutique);
             $em->flush();
             return $this->routeRedirectView("api_marketing_get_conseillerboutiques", [], Response::HTTP_OK);
@@ -494,4 +499,5 @@ class Conseiller_boutiqueController extends FOSRestController
             );
         }
     }
+
 }

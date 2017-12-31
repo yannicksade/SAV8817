@@ -261,7 +261,7 @@ class Individu_to_groupeController extends FOSRestController
             }
             $this->createSecurity($groupe_relationnel, $individu_to_groupe->getIndividu());
             $individu_to_groupe->setGroupeRelationnel($groupe_relationnel);
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->getEM();
             $em->persist($individu_to_groupe);
             return $this->routeRedirectView("api_user_show_individu-group", ['id' => $individu_to_groupe->getId()], Response::HTTP_CREATED);
         } catch (ConstraintViolationException $cve) {
@@ -295,7 +295,7 @@ class Individu_to_groupeController extends FOSRestController
             $user = $this->getUser();
             if ($individu) { //Evite la duplication de personne dans un meme groupe
                 $oldIndividu = null;
-                $em = $this->getDoctrine()->getManager();
+                $em = $this->getEM();
                 /** @var Individu_to_groupe $oldIndividu */
                 $oldIndividu = $em->getRepository('APMUserBundle:Individu_to_groupe')
                     ->findOneBy(['individu' => $individu]);
@@ -308,6 +308,11 @@ class Individu_to_groupeController extends FOSRestController
             }
         }
         //----------------------------------------------------------------------------------------
+    }
+
+    private function getEM()
+    {
+        return $this->get('doctrine.orm.entity_manager');
     }
 
     /**
@@ -392,7 +397,7 @@ class Individu_to_groupeController extends FOSRestController
                     "message" => $this->get('translator')->trans($form->getErrors(true, false), [], 'FOSUserBundle')
                 ], Response::HTTP_BAD_REQUEST);
             }
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->getEM();
             $em->flush();
             return $this->routeRedirectView("api_user_show_individu-group", ['id' => $individu_to_groupe->getId()], Response::HTTP_OK);
         } catch (ConstraintViolationException $cve) {
@@ -428,7 +433,6 @@ class Individu_to_groupeController extends FOSRestController
             throw $this->createAccessDeniedException();
         }
     }
-
 
     /**
      * @ApiDoc(
@@ -468,7 +472,7 @@ class Individu_to_groupeController extends FOSRestController
                 ], Response::HTTP_BAD_REQUEST);
             }
             $individu = $individu_to_groupe->getIndividu();
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->getEM();
             $em->remove($individu_to_groupe);
             $em->flush();
             return $this->routeRedirectView("api_user_get_individu-groups_user", ["user_id" => $individu->getId()], Response::HTTP_OK);
@@ -489,4 +493,5 @@ class Individu_to_groupeController extends FOSRestController
             );
         }
     }
+
 }

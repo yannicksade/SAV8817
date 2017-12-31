@@ -370,7 +370,7 @@ class Service_apres_venteController extends FOSRestController
             if (null !== $offre) $service_apres_vente->setOffre($offre);
             $this->createSecurity($service_apres_vente->getOffre());
             $service_apres_vente->setClient($this->getUser());
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->getEM();
             $em->persist($service_apres_vente);
             $em->flush();
 
@@ -421,6 +421,11 @@ class Service_apres_venteController extends FOSRestController
             if (!$clientDeOffre) throw $this->createAccessDeniedException();
         }
         //----------------------------------------------------------------------------------------
+    }
+
+    private function getEM()
+    {
+        return $this->get('doctrine.orm.entity_manager');
     }
 
     /**
@@ -507,7 +512,7 @@ class Service_apres_venteController extends FOSRestController
                     ], Response::HTTP_BAD_REQUEST
                 );
             }
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->getEM();
             $em->flush();
             return $this->routeRedirectView("api_achat_show_sav", ["id" => $service_apres_vente->getId()], Response::HTTP_OK);
         } catch (ConstraintViolationException $cve) {
@@ -527,6 +532,9 @@ class Service_apres_venteController extends FOSRestController
             );
         }
     }
+
+
+//------------------------ End INDEX ACTION --------------------------------------------
 
     /**
      * @param Service_apres_vente $service_apres_vente
@@ -551,9 +559,6 @@ class Service_apres_venteController extends FOSRestController
         }
         //----------------------------------------------------------------------------------------
     }
-
-
-//------------------------ End INDEX ACTION --------------------------------------------
 
     /**
      * @ApiDoc(
@@ -591,7 +596,7 @@ class Service_apres_venteController extends FOSRestController
                     "message" => $this->get('translator')->trans('impossible de supprimer', [], 'FOSUserBundle')
                 ], Response::HTTP_BAD_REQUEST);
             }
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->getEM();
             $em->remove($service_apres_vente);
             $em->flush();
 

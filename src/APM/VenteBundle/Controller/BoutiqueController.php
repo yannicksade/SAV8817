@@ -143,17 +143,16 @@ class BoutiqueController extends FOSRestController implements ClassResourceInter
     {
         //-----------------------------------security-------------------------------------------
         $this->denyAccessUnlessGranted('ROLE_BOUTIQUE', null, 'Unable to access this page!');
-        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_REMEMBERED') || !$this->getUser() instanceof Utilisateur) {
+        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_REMEMBERED') || !$this->getUser() instanceof Utilisateur_avm) {
             throw $this->createAccessDeniedException();
         }
-
     }
 
     private
     function adminSecurity()
     {
         //-----------------------------------security-------------------------------------------
-        $this->denyAccessUnlessGranted('ROLE_ADMIN', null, 'Unable to access this page!');
+        $this->denyAccessUnlessGranted('ROLE_STAFF', null, 'Unable to access this page!');
         if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY') || !$this->getUser() instanceof Admin) {
             throw $this->createAccessDeniedException();
         }
@@ -312,9 +311,7 @@ class BoutiqueController extends FOSRestController implements ClassResourceInter
     {
         //---------------------------------security-----------------------------------------------
         $this->denyAccessUnlessGranted('ROLE_BOUTIQUE', null, 'Unable to access this page!');
-        /* ensure that the user is logged in
-        */
-        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY') || !$this->getUser() instanceof Utilisateur) {
+        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY') || !$this->getUser() instanceof Utilisateur_avm) {
             throw $this->createAccessDeniedException();
         }
         //----------------------------------------------------------------------------------------
@@ -350,7 +347,7 @@ class BoutiqueController extends FOSRestController implements ClassResourceInter
     {
         //-----------------------------------security-------------------------------------------
         $this->denyAccessUnlessGranted('ROLE_USERAVM', null, 'Unable to access this page!');
-        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_REMEMBERED') || !$this->getUser() instanceof Utilisateur) {
+        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_REMEMBERED') || !$this->getUser() instanceof Utilisateur_avm) {
             throw $this->createAccessDeniedException();
         }
         //----------------------------------------------------------------------------------------
@@ -480,7 +477,7 @@ class BoutiqueController extends FOSRestController implements ClassResourceInter
         //---------------------------------security-----------------------------------------------
         $this->denyAccessUnlessGranted('ROLE_BOUTIQUE', null, 'Unable to access this page!');
         $user = $this->getUser();
-        if ((!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY')) || !$user instanceof Utilisateur || ($boutique->getProprietaire() !== $user)) {
+        if ((!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY')) || !$user instanceof Utilisateur_avm || ($boutique->getProprietaire() !== $user)) {
             throw $this->createAccessDeniedException();
         }
         //----------------------------------------------------------------------------------------

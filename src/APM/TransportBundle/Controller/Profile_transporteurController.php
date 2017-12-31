@@ -73,7 +73,7 @@ class Profile_transporteurController extends FOSRestController
     {
         try {
             $this->listeAndShowSecurity();
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->getEM();
             $transporteurs = $em->getRepository('APMTransportBundle:Profile_transporteur')->findAll();
             $profile_transporteurs = new ArrayCollection($transporteurs);
             $json = array();
@@ -112,6 +112,11 @@ class Profile_transporteurController extends FOSRestController
             throw $this->createAccessDeniedException();
         }
         //----------------------------------------------------------------------------------------
+    }
+
+    private function getEM()
+    {
+        return $this->get('doctrine.orm.entity_manager');
     }
 
     /**
@@ -209,7 +214,7 @@ class Profile_transporteurController extends FOSRestController
                 ], Response::HTTP_BAD_REQUEST);
             }
             $profile_transporteur->setUtilisateur($this->getUser());
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->getEM();
             $em->persist($profile_transporteur);
             $em->flush();
             return $this->routeRedirectView("api_transport_show_transporteur", ['id' => $profile_transporteur->getId()], Response::HTTP_CREATED);
@@ -239,7 +244,7 @@ class Profile_transporteurController extends FOSRestController
         //vérifier si l'utilisateur n'est pas déjà enregistré comme transporteur ou livreur
         /** @var Utilisateur_avm $user */
         $user = $this->getUser();
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->getEM();
         $utilisateur = null;
         $utilisateur = $em->getRepository('APMTransportBundle:Profile_transporteur')->findOneBy(['utilisateur' => $user->getId()]);
         if (null !== $utilisateur) throw $this->createAccessDeniedException();
@@ -327,7 +332,7 @@ class Profile_transporteurController extends FOSRestController
                     "message" => $this->get('translator')->trans($form->getErrors(true, false), [], 'FOSUserBundle')
                 ], Response::HTTP_BAD_REQUEST);
             }
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->getEM();
             $em->flush();
             return $this->routeRedirectView("api_transport_show_transporteur", ['id' => $profile_transporteur->getId()], Response::HTTP_OK);
         } catch (ConstraintViolationException $cve) {
@@ -405,7 +410,7 @@ class Profile_transporteurController extends FOSRestController
                 ], Response::HTTP_BAD_REQUEST);
             }
             $user = $profile_transporteur->getUtilisateur();
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->getEM();
             $em->remove($profile_transporteur);
             $em->flush();
             return $this->routeRedirectView("api_user_show", [$user->getId()], Response::HTTP_OK);

@@ -313,7 +313,6 @@ class CategorieController extends FOSRestController
         //---------------------------------security-----------------------------------------------
         // Unable to access the controller unless you have a USERAVM role
         $this->denyAccessUnlessGranted('ROLE_BOUTIQUE', null, 'Unable to access this page!');
-
         if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY')) {
             throw $this->createAccessDeniedException();
         }
@@ -500,6 +499,7 @@ class CategorieController extends FOSRestController
                 ], Response::HTTP_BAD_REQUEST);
             }
             $boutique = $categorie->getBoutique();
+            $em = $this->getEM();
             $em->remove($categorie);
             $em->flush();
             return $this->routeRedirectView("api_vente_get_categories", [$boutique->getId()], Response::HTTP_OK);

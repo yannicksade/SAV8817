@@ -159,7 +159,7 @@ class Reseau_conseillersController extends FOSRestController
             $advisor = ($selfConseiller !== $conseiller) ? null : $form->get('conseiller')->getData();
             $modification = $form->has('modification') ? $form->get('modification')->getData() : 1;
             $this->addSecurity($conseiller, $advisor, $modification);
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->getEM();
             if ($selfConseiller !== $conseiller) { //cas: quitter le réseau du maitre
                 if ($conseiller->getConseillerGauche() === $selfConseiller) {
                     $oldAdvisor = $conseiller->getConseillerGauche();
@@ -313,6 +313,11 @@ class Reseau_conseillersController extends FOSRestController
         //----------------------------------------------------------------------------------------
     }
 
+    private function getEM()
+    {
+        return $this->get('doctrine.orm.entity_manager');
+    }
+
     /**
      * @ApiDoc(
      * resource=true,
@@ -360,7 +365,7 @@ class Reseau_conseillersController extends FOSRestController
                     "message" => $this->get('translator')->trans($form->getErrors(true, false), [], 'FOSUserBundle')
                 ], Response::HTTP_BAD_REQUEST);
             }
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->getEM();
             $position = boolval($form->get('position')->getData());
             if ($position) {
                 $promotingChild = $advisorFictif->getConseillerGauche();
@@ -511,9 +516,5 @@ class Reseau_conseillersController extends FOSRestController
         //----------------------------------------------------------------------------------------
     }
 
-    private function getEM()
-    {
-        return $this->getDoctrine()->getManager();
-    }
 
 }

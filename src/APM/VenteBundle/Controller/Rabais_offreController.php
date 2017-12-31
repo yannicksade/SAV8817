@@ -396,7 +396,7 @@ class Rabais_offreController extends FOSRestController
             $this->createSecurity($offre, $rabais);
             $rabais_offre->setVendeur($this->getUser());
             $rabais_offre->setOffre($offre);
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->getEM();
             $em->persist($rabais_offre);
             $em->flush();
             return $this->routeRedirectView("api_vente_show_rabais", ['id' => $rabais_offre->getId()], Response::HTTP_CREATED);
@@ -446,6 +446,11 @@ class Rabais_offreController extends FOSRestController
             }
         }
         //----------------------------------------------------------------------------------------
+    }
+
+    private function getEM()
+    {
+        return $this->get('doctrine.orm.entity_manager');
     }
 
     /**
@@ -530,7 +535,7 @@ class Rabais_offreController extends FOSRestController
                     "message" => $this->get('translator')->trans($form->getErrors(true, false), [], 'FOSUserBundle')
                 ], Response::HTTP_BAD_REQUEST);
             }
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->getEM();
             $em->flush();
             return $this->routeRedirectView("api_vente_show_rabais", ['id' => $rabais_offre->getId()], Response::HTTP_OK);
         } catch (ConstraintViolationException $cve) {
@@ -614,7 +619,7 @@ class Rabais_offreController extends FOSRestController
                 ], Response::HTTP_BAD_REQUEST);
             }
             $offre = $rabais_offre->getOffre();
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->getEM();
             $em->remove($rabais_offre);
             $em->flush();
             return $this->routeRedirectView("api_vente_get_rabais_offre", [$offre->getId()], Response::HTTP_OK);

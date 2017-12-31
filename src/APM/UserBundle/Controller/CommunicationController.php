@@ -306,7 +306,7 @@ class CommunicationController extends FOSRestController
                 ], Response::HTTP_BAD_REQUEST);
             }
             $communication->setEmetteur($this->getUser());
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->getEM();
             $em->persist($communication);
             $em->flush();
             return $this->routeRedirectView("api_user_show_communication", ['id' => $communication->getId()], Response::HTTP_CREATED);
@@ -336,6 +336,11 @@ class CommunicationController extends FOSRestController
             throw $this->createAccessDeniedException();
         }
         //----------------------------------------------------------------------------------------
+    }
+
+    private function getEM()
+    {
+        return $this->get('doctrine.orm.entity_manager');
     }
 
     /**
@@ -420,7 +425,7 @@ class CommunicationController extends FOSRestController
                     "message" => $this->get('translator')->trans($form->getErrors(true, false), [], 'FOSUserBundle')
                 ], Response::HTTP_BAD_REQUEST);
             }
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->getEM();
             $em->flush();
             return $this->routeRedirectView("api_user_show_communication", ['id' => $communication->getId()], Response::HTTP_OK);
         } catch (ConstraintViolationException $cve) {
@@ -491,7 +496,7 @@ class CommunicationController extends FOSRestController
                     "message" => $this->get('translator')->trans('impossible de supprimer', [], 'FOSUserBundle')
                 ], Response::HTTP_BAD_REQUEST);
             }
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->getEM();
             $em->remove($communication);
             $em->flush();
             return $this->routeRedirectView("api_user_get_communications", [], Response::HTTP_OK);

@@ -378,7 +378,7 @@ class TransactionController extends FOSRestController
             }
             $transaction->setBoutique($boutique);
             $transaction->setAuteur($this->getUser());
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->getEM();
             $em->persist($transaction);
             $em->flush();
             return $this->routeRedirectView("api_vente_show_transaction", ['id' => $transaction->getId()], Response::HTTP_CREATED);
@@ -419,6 +419,11 @@ class TransactionController extends FOSRestController
         }
 
         //----------------------------------------------------------------------------------------
+    }
+
+    private function getEM()
+    {
+        return $this->get('doctrine.orm.entity_manager');
     }
 
     /**
@@ -502,7 +507,7 @@ class TransactionController extends FOSRestController
                     "message" => $this->get('translator')->trans($form->getErrors(true, false), [], 'FOSUserBundle')
                 ], Response::HTTP_BAD_REQUEST);
             }
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->getEM();
             $em->flush();
 
             return $this->routeRedirectView("api_vente_show_transaction", ['id' => $transaction->getId()], Response::HTTP_OK);
@@ -598,7 +603,7 @@ class TransactionController extends FOSRestController
                 $route = "api_vente_get_transactions";
                 $param = [];
             }
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->getEM();
             $em->remove($transaction);
             $em->flush();
             return $this->routeRedirectView($route, $param, Response::HTTP_OK);

@@ -290,7 +290,7 @@ class Groupe_offreController extends FOSRestController
             }
 
             $groupe_offre->setCreateur($this->getUser());
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->getEM();
             $em->persist($groupe_offre);
             $em->flush();
 
@@ -322,6 +322,11 @@ class Groupe_offreController extends FOSRestController
             throw $this->createAccessDeniedException();
         }
         //----------------------------------------------------------------------------------------
+    }
+
+    private function getEM()
+    {
+        return $this->get('doctrine.orm.entity_manager');
     }
 
     /**
@@ -370,7 +375,7 @@ class Groupe_offreController extends FOSRestController
                     ], Response::HTTP_BAD_REQUEST
                 );
             }
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->getEM();
             $em->flush();
 
             return $this->routeRedirectView("api_achat_show_groupeoffre", ["id" => $groupe_offre->getId()], Response::HTTP_OK);
@@ -485,7 +490,7 @@ class Groupe_offreController extends FOSRestController
                     "message" => $this->get('translator')->trans('impossible de supprimer', [], 'FOSUserBundle')
                 ], Response::HTTP_BAD_REQUEST);
             }
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->getEM();
             $em->remove($groupe_offre);
             $em->flush();
             return $this->routeRedirectView("api_achat_get_groupeoffres", [], Response::HTTP_OK);
@@ -507,4 +512,5 @@ class Groupe_offreController extends FOSRestController
             );
         }
     }
+
 }

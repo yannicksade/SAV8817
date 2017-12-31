@@ -290,7 +290,7 @@ class Groupe_relationnelController extends FOSRestController
                     "message" => $this->get('translator')->trans($form->getErrors(true, false), [], 'FOSUserBundle')
                 ], Response::HTTP_BAD_REQUEST);
             }
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->getEM();
             $groupe_relationnel->setProprietaire($this->getUser());
             $em->persist($groupe_relationnel);
             $em->flush();
@@ -310,7 +310,6 @@ class Groupe_relationnelController extends FOSRestController
         }
     }
 
-
     private function createSecurity()
     {
         //---------------------------------security-----------------------------------------------
@@ -322,6 +321,11 @@ class Groupe_relationnelController extends FOSRestController
             throw $this->createAccessDeniedException();
         }
         //----------------------------------------------------------------------------------------
+    }
+
+    private function getEM()
+    {
+        return $this->get('doctrine.orm.entity_manager');
     }
 
     /**
@@ -440,7 +444,7 @@ class Groupe_relationnelController extends FOSRestController
                     "message" => $this->get('translator')->trans($form->getErrors(true, false), [], 'FOSUserBundle')
                 ], Response::HTTP_BAD_REQUEST);
             }
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->getEM();
             $em->flush();
             return $this->routeRedirectView("api_user_show_grouperelationnel", ['id' => $groupe_relationnel->getId()], Response::HTTP_OK);
         } catch (ConstraintViolationException $cve) {
@@ -517,7 +521,7 @@ class Groupe_relationnelController extends FOSRestController
                     "message" => $this->get('translator')->trans('impossible de supprimer', [], 'FOSUserBundle')
                 ], Response::HTTP_BAD_REQUEST);
             }
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->getEM();
             $em->remove($groupe_relationnel);
             $em->flush();
             return $this->routeRedirectView("api_user_get_grouperelationnels", [], Response::HTTP_OK);

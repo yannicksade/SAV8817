@@ -341,7 +341,7 @@ class CommissionnementController extends FOSRestController
                 ], Response::HTTP_BAD_REQUEST);
             }
             $this->createSecurity($boutique, $commissionnement->getCommission());
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->getEM();
             $em->persist($commissionnement);
             $em->flush();
 
@@ -385,6 +385,11 @@ class CommissionnementController extends FOSRestController
         if (null !== $quota && $quota->getBoutiqueProprietaire() !== $boutique || $user !== $gerant && $user !== $proprietaire)
             throw $this->createAccessDeniedException();
         //----------------------------------------------------------------------------------------
+    }
+
+    private function getEM()
+    {
+        return $this->get('doctrine.orm.entity_manager');
     }
 
     /**
@@ -472,7 +477,7 @@ class CommissionnementController extends FOSRestController
                     ], Response::HTTP_BAD_REQUEST
                 );
             }
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->getEM();
             $em->flush();
 
             return $this->routeRedirectView("api_marketing_show_commissionnement", ['id' => $commissionnement->getId()], Response::HTTP_OK);
@@ -543,7 +548,7 @@ class CommissionnementController extends FOSRestController
                     "message" => $this->get('translator')->trans('impossible de supprimer', [], 'FOSUserBundle')
                 ], Response::HTTP_BAD_REQUEST);
             }
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->getEM();
             $em->remove($commissionnement);
             $em->flush();
             return $this->routeRedirectView("api_marketing_get_commissionnements", [], Response::HTTP_OK);

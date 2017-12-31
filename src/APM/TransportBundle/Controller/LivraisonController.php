@@ -322,7 +322,7 @@ class LivraisonController extends FOSRestController
                 $transaction->setShipped(true);
                 $transaction->setLivraison($livraison);
             }
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->getEM();
             $em->persist($livraison);
             $em->flush();
 
@@ -372,6 +372,11 @@ class LivraisonController extends FOSRestController
             }
         }
         //--------------------------------------------------------------------------------------------------------------
+    }
+
+    private function getEM()
+    {
+        return $this->get('doctrine.orm.entity_manager');
     }
 
     /**
@@ -469,7 +474,7 @@ class LivraisonController extends FOSRestController
                 $transaction->setShipped(true);
                 $transaction->setLivraison($livraison);
             }
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->getEM();
             $em->flush();
             return $this->routeRedirectView("api_transport_show_livraison", ['id' => $livraison->getId()], Response::HTTP_OK);
         } catch (ConstraintViolationException $cve) {
@@ -556,7 +561,7 @@ class LivraisonController extends FOSRestController
                 $route = "api_transport_get_livraisons";
                 $param = array();
             }
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->getEM();
             $em->remove($livraison);
             $em->flush();
             return $this->routeRedirectView($route, $param, Response::HTTP_OK);
@@ -578,5 +583,6 @@ class LivraisonController extends FOSRestController
         }
 
     }
+
 
 }
