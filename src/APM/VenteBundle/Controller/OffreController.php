@@ -16,6 +16,8 @@ use Doctrine\DBAL\Exception\ConstraintViolationException;
 use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\Routing\ClassResourceInterface;
 use FOS\RestBundle\View\View;
+use FOS\UserBundle\FOSUserEvents;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -216,8 +218,7 @@ class OffreController extends FOSRestController implements ClassResourceInterfac
     /**
      * @param Boutique $boutique
      */
-    private
-    function listAndShowSecurity($boutique = null)
+    private function listAndShowSecurity($boutique = null)
     {
         //-----------------------------------security-------------------------------------------
         // Unable to access the controller unless you have a USERAVM role
@@ -235,8 +236,7 @@ class OffreController extends FOSRestController implements ClassResourceInterfac
         //----------------------------------------------------------------------------------------
     }
 
-    private
-    function adminSecurity()
+    private function adminSecurity()
     {
         //-----------------------------------security-------------------------------------------
         $this->denyAccessUnlessGranted('ROLE_ADMIN', null, 'Unable to access this page!');
@@ -253,8 +253,7 @@ class OffreController extends FOSRestController implements ClassResourceInterfac
      * @param $iDisplayLength
      * @return array
      */
-    private
-    function handleResults($offres, $iTotalRecords, $iDisplayStart, $iDisplayLength)
+    private function handleResults($offres, $iTotalRecords, $iDisplayStart, $iDisplayLength)
     {
         //filtering
         if ($offres === null) return array();
@@ -419,39 +418,162 @@ class OffreController extends FOSRestController implements ClassResourceInterfac
         return $this->get('doctrine.orm.entity_manager');
     }
 
+
     /**
-     * Tout utilisateur AVM peut voir une offre
+     * @ApiDoc(
+     * resource=true,
+     * resourceDescription="Operations on offre.",
+     * description="Load offre image.",
+     * statusCodes={
+     *         201="Returned when successful",
+     *         204="Returned when none file treated",
+     *         400="Returned when the data are not valid or an unknown error occurred",
+     *         403="Returned when the user is not authorized to carry on the action",
+     *         404="Returned when the entity is not found",
+     * },
+     * headers={
+     *      { "name"="Authorization",  "required"=true, "description"="Authorization token"}
+     * },
+     * requirements = {
+     *      {"name"="id", "dataType"="integer", "requirement"="\d+", "description"="offre id"}
+     *  },
+     *
+     * parameters= {
+     *      {"name"="image1File", "dataType"="file", "required"= false, "description"="file 01 top"},
+     *      {"name"="file1[x]", "dataType"="integer", "required"= true, "description"="horizontal start point 01"},
+     *      {"name"="file1[y]", "dataType"="integer", "required"= true, "description"="vertical start point 01"},
+     *      {"name"="file1[w]", "dataType"="integer", "required"= true, "description"="width 01"},
+     *      {"name"="file1[h]", "dataType"="integer", "required"= true, "description"="height 01"},
+     *      {"name"="image2File", "dataType"="file", "required"= false, "description"="file 02 bottom"},
+     *      {"name"="file2[x]", "dataType"="integer", "required"= true, "description"="horizontal start point 02"},
+     *      {"name"="file2[y]", "dataType"="integer", "required"= true, "description"="vertical start point 02"},
+     *      {"name"="file2[w]", "dataType"="integer", "required"= true, "description"="width 02"},
+     *      {"name"="file2[h]", "dataType"="integer", "required"= true, "description"="height 02"},
+     *      {"name"="image3File", "dataType"="file", "required"= false, "description"="file 03 left side"},
+     *      {"name"="file3[x]", "dataType"="integer", "required"= true, "description"="horizontal start point 03"},
+     *      {"name"="file3[y]", "dataType"="integer", "required"= true, "description"="vertical start point 03"},
+     *      {"name"="file3[w]", "dataType"="integer", "required"= true, "description"="width 03"},
+     *      {"name"="file3[h]", "dataType"="integer", "required"= true, "description"="height 03"},
+     *      {"name"="image4File", "dataType"="file", "required"= false, "description"="file 04 right side"},
+     *      {"name"="file4[x]", "dataType"="integer", "required"= true, "description"="horizontal start point 04"},
+     *      {"name"="file4[y]", "dataType"="integer", "required"= true, "description"="vertical start point 04"},
+     *      {"name"="file4[w]", "dataType"="integer", "required"= true, "description"="width 04"},
+     *      {"name"="file4[h]", "dataType"="integer", "required"= true, "description"="height 04"},
+     *  },
+     * views = {"default", "vente" }
+     * )
      * @param Request $request
      * @param Offre $offre
-     * @return Response
-     *
-     * @get("/show-image/offre/{id}")
+     * @return View|JsonResponse
+     * @Post("/load-image/offre/{id}")
      */
-    public function showImageAction(Request $request, Offre $offre)
+    public function imageLoaderAction(Request $request, Offre $offre)
     {
-        $this->listAndShowSecurity();
-        $form = $this->createCrobForm($offre);
-        $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
-            $this->get('apm_core.crop_image')->setCropParameters(intval($_POST['x']), intval($_POST['y']), intval($_POST['w']), intval($_POST['h']), $offre->getImage(), $offre);
+        try {
+            $this->editAndDeleteSecurity($offre);
+            $em = $this->getEM();
+            $files = $_FILES;
+            $idFile = 0;
+            $fileProcessed = 0;
+            /** @var \ArrayObject $loadFileNames */
+            $loadFileNames = array();
+            /*$form = $this->createForm('APM\VenteBundle\Form\Type\ImageType', $offre);
+            $form->submit($request->files->all(), false);
+            if (!$form->isValid()) {
+                return new JsonResponse([
+                    "status" => Response::HTTP_BAD_REQUEST,
+                    "message" => $this->get('translator')->trans("Images non valides. required: [jpg, png, gif]", [], 'FOSUserBundle')
+                ], Response::HTTP_BAD_REQUEST
+                );
+            }*/
+            foreach ($files as $file) {
+                $idFile += 1;
+                //test de validité du type de fichier
+                if (preg_match('/^image\/*?/i', $file['type']) !== 1) {
+                    continue;
+                }
+                $fileName = $file['name'];
+                // enregister le fichier en local
+                $path = $this->getParameter('images_url') . '/' . $fileName;
+                if (!move_uploaded_file($file['tmp_name'], $path)) {
+                    continue;
+                }
+                $file = new File($path);
+                /* $imageIdFile = 'setImage' . $idFile . 'File';
+                 $offre->$imageIdFile($file);*/
 
-            return $this->redirectToRoute('apm_vente_offre_show', array('id' => $offre->getId()));
+
+                $fileName = md5(uniqid()) . '.' . $file->guessExtension();
+                $file->move($this->getParameter('images_url'), $fileName); // renommer le fichier
+                //traitement de l'image puis stockage
+                $x = $request->request->get('file' . $idFile)['x'];
+                $y = $request->request->get('file' . $idFile)['y'];
+                $w = $request->request->get('file' . $idFile)['w'];
+                $h = $request->request->get('file' . $idFile)['h'];
+                $this->get('apm_core.image_maker')->setCropParameters($x, $y, $w, $h, $fileName);
+                $fileProcessed++;
+                $imageId = 'setImage' . $idFile;
+                $offre->$imageId($fileName);
+                $loadFileNames[] = $idFile;
+
+                $em->flush();
+                $this->get('apm_core.image_maker')->liipImageResolver($fileName);//resolution et deplacement de l'images dans media/
+            }
+            $status = Response::HTTP_OK;
+            $response = [
+                "status" => 200,
+                "message" => $this->get('translator')->trans($fileProcessed . " fichier(s) traité(s)", [], 'FOSUserBundle')
+            ];
+
+            if ($fileProcessed <= 0) {
+                $status = Response::HTTP_NO_CONTENT;
+                $response = [
+                    "status" => Response::HTTP_NO_CONTENT,
+                    "message" => $this->get('translator')->trans("Aucun fichier traité, types de ficiers valides: [jpg, png, gif]", [], 'FOSUserBundle')
+                ];
+            }
+            return new JsonResponse($response, $status);
+        } catch (ConstraintViolationException $cve) {
+            return new JsonResponse([
+                "status" => 400,
+                "message" => $this->get('translator')->trans("impossible d'enregistrer, vérifiez vos données", [], 'FOSUserBundle')
+            ], Response::HTTP_BAD_REQUEST);
+        } catch (AccessDeniedException $ads) {
+            return new JsonResponse([
+                    "status" => 403,
+                    "message" => $this->get('translator')->trans("Access denied", [], 'FOSUserBundle'),
+                ]
+                , Response::HTTP_FORBIDDEN
+            );
         }
-
-        return $this->render('APMVenteBundle:offre:image.html.twig', array(
-            'offre' => $offre,
-            'crop_form' => $form->createView(),
-            'url_image' => $this->get('apm_core.packages_maker')->getPackages()->getUrl('/', 'resolve_img'),
-        ));
     }
 
-    private
-    function createCrobForm(Offre $offre)
+    /**
+     * @param Offre $offre
+     */
+    private function editAndDeleteSecurity($offre)
     {
-        return $this->createFormBuilder()
-            ->setAction($this->generateUrl('apm_vente_offre_show-image', array('id' => $offre->getId())))
-            ->setMethod('POST')
-            ->getForm();
+        //---------------------------------security-----------------------------------------------
+        // Unable to access the controller unless you have a USERAVM role
+        $this->denyAccessUnlessGranted('ROLE_USERAVM', null, 'Unable to access this page!');
+        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY') || !$this->getUser() instanceof Utilisateur_avm) {
+            throw $this->createAccessDeniedException();
+        }
+        if (null !== $offre) {
+            $boutique = $offre->getBoutique();
+            $user = $this->getUser();
+            $proprietaire = null;
+            $gerant = null;
+            if (null !== $boutique) {
+                $gerant = $boutique->getGerant();
+                $proprietaire = $boutique->getProprietaire();
+            }
+            if ($user !== $offre->getVendeur() && $user !== $gerant && $user !== $proprietaire) {
+                throw $this->createAccessDeniedException();
+            }
+        }
+        //----------------------------------------------------------------------------------------
+
     }
 
     /**
@@ -484,15 +606,12 @@ class OffreController extends FOSRestController implements ClassResourceInterfac
      *
      * @Get("/show/offre/{id}")
      */
-    public
-    function showAction(Offre $offre)
+    public function showAction(Offre $offre)
     {
         $this->listAndShowSecurity();
         $data = $this->get('apm_core.data_serialized')->getFormalData($offre, ["owner_offre_details", "owner_list"]);
         return new JsonResponse($data, 200);
     }
-
-//------------------------ End INDEX ACTION --------------------------------------------
 
     /**
      * @ApiDoc(
@@ -557,34 +676,6 @@ class OffreController extends FOSRestController implements ClassResourceInterfac
     }
 
     /**
-     * @param Offre $offre
-     */
-    private
-    function editAndDeleteSecurity($offre)
-    {
-        //---------------------------------security-----------------------------------------------
-        // Unable to access the controller unless you have a USERAVM role
-        $this->denyAccessUnlessGranted('ROLE_USERAVM', null, 'Unable to access this page!');
-        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY') || !$this->getUser() instanceof Utilisateur_avm) {
-            throw $this->createAccessDeniedException();
-        }
-        if (null !== $offre) {
-            $boutique = $offre->getBoutique();
-            $user = $this->getUser();
-            if (null !== $boutique) {
-                $gerant = $boutique->getGerant();
-                $proprietaire = $boutique->getProprietaire();
-            }
-            if ($user !== $offre->getVendeur() && $user !== $gerant && $user !== $proprietaire) {
-                throw $this->createAccessDeniedException();
-            }
-        }
-        //----------------------------------------------------------------------------------------
-
-    }
-
-
-    /**
      * @ApiDoc(
      * resource=true,
      * description="Delete objet of type offre.",
@@ -610,8 +701,7 @@ class OffreController extends FOSRestController implements ClassResourceInterfac
      * @return View|JsonResponse
      * @Delete("/delete/offre/{id}")
      */
-    public
-    function deleteAction(Request $request, Offre $offre)
+    public function deleteAction(Request $request, Offre $offre)
     {
         try {
             $this->editAndDeleteSecurity($offre);
@@ -621,22 +711,13 @@ class OffreController extends FOSRestController implements ClassResourceInterfac
                     "message" => $this->get('translator')->trans('impossible de supprimer', [], 'FOSUserBundle')
                 ], Response::HTTP_BAD_REQUEST);
             }
-            $boutique = $offre->getBoutique();
-            if ($boutique && $categorie = $offre->getCategorie()) {
-                $route = "api_vente_get_offres_categorie";
-                $param = array("categorie_id" => $categorie->getId());
-            } elseif ($boutique) {
-                $route = "api_vente_get_offres_boutique";
-                $param = array("id" => $boutique->getId());
-            } else {
-                $route = "api_vente_get_offres";
-                $param = array();
-            }
-
             $em = $this->getEM();
             $em->remove($offre);
             $em->flush();
-            return $this->routeRedirectView($route, $param, Response::HTTP_OK);
+            /** @var $dispatcher EventDispatcherInterface */
+            /*$dispatcher = $this->get('event_dispatcher');
+            $dispatcher->dispatch(APMEvents::REGISTRATION_INITIALIZE, $event);*/
+            return new JsonResponse(['status' => 200], Response::HTTP_OK);
         } catch (ConstraintViolationException $cve) {
             return new JsonResponse([
                 "status" => 400,
@@ -652,77 +733,5 @@ class OffreController extends FOSRestController implements ClassResourceInterfac
         }
     }
 
-    /**
-     * @param Request $request
-     * @return JsonResponse
-     *
-     * @Post("/image", name="image")
-     */
-    public function postAction(Request $request)
-    {
-        if ($request->isXmlHttpRequest() && $request->getMethod() === "POST") {
-            $this->listAndShowSecurity();
-            $session = $this->get('session');
-            $id = $request->request->get('oData');
-            $id = $session->get('offre_' . $id);
-            $em = $this->getEM();
-            $offre = null;
-            if (is_numeric($id))
-                /** @var Offre $offre */
-                $offre = $em->getRepository('APMVenteBundle:Offre')->find($id);
-            if ($offre !== null) {
-                /** @var Offre $offre */
-                //reception du fichier sur le serveur et stockage via vich
-                try {
-                    $this->editAndDeleteSecurity($offre);
-                    /*tester et stocker le fichier reçu sur le serveur*/
-                    if (isset($_FILES["myFile"])) {
-                        $file = $_FILES["myFile"];
-                    } else {
-                        $session->getFlashBag()->add('danger', "<strong>Aucun fichier chargé.</strong><br> Veuillez réessayez l'opération avec un fichier valide");
-                        return $this->json(json_encode(["item" => null]));
-                    }
-                    //test de validité du type de fichier
-                    if (preg_match('/^image\/*?/i', $file['type']) !== 1) {
-                        $session->getFlashBag()->add('danger', "<strong>Fichier Invalide.</strong><br>Vous devez charger une image valide!");
-                        return $this->json(json_encode(["item" => null]));
-                    }
-                    //générer un nom unique pour le fichier
-                    $path = $this->getParameter('images_url') . '/' . $file['name'];
-                    if (!move_uploaded_file($file['tmp_name'], $path)) {
-                        $session->getFlashBag()->add('danger', "<strong>L'opération a échoué.</strong><br>Aucune image chargée. Veuillez réessayez!");
-                        return $this->json(json_encode(["item" => null]));
-                    }
-                    /** @var File_NAME $file */
-                    $file = new File($path);
-                    $fileName = md5(uniqid()) . '.' . $file->guessExtension();
-                    $file->move($this->getParameter('images_url'), $fileName); // renomer le fichier
-                    $offre->setImage($fileName);
-                    $em->flush();
-                    $session->getFlashBag()->add('success', "Image mise à jour de l\'offre :<strong>" . $offre->getCode() . "</strong><br>");
-                    //traitement du fichier puis stockage
-                    $this->get('apm_core.crop_image')->setCropParameters(intval($_POST['x']), intval($_POST['y']), intval($_POST['w']), intval($_POST['h']), $offre->getImage(), $offre);
-                    $json["item"] = array(//permet au client de différencier les nouveaux éléments des élements juste modifiés
-                        "isNew" => false,
-                        "isImage" => true,
-                        "id" => $id,
-                    );
-                    $this->get('apm_core.crop_image')->liipImageResolver($offre->getImage());//resolution et deplacement de l'images dans media/
-
-                    return $this->json(json_encode($json));
-                } catch (ConstraintViolationException $e) {
-                    $session->getFlashBag()->add('danger', "<strong> Echec de la suppression </strong><br>La suppression a échouée due à une contrainte de données!");
-                    return $this->json(json_encode(["item" => null]));
-                } catch (AccessDeniedException $ads) {
-                    $session->getFlashBag()->add('danger', "Action interdite!<br>Vous n'êtes pas autorisés à effectuer cette opération!");
-                    return $this->json(json_encode(["item" => null]));
-                }
-            }
-            $session->getFlashBag()->add('info', "<strong>Aucune entité pour l'image</strong><br> Veuillez crééer une offre !");
-            return $this->json(json_encode(["item" => null]));
-
-        }
-        return new JsonResponse();
-    }
 
 }

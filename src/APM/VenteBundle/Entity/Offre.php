@@ -141,22 +141,78 @@ class Offre extends TradeFactory
      */
     private $apparenceNeuf;
 
+
     /**
      * @Expose
      * @Groups({"owner_list", "others_list", "owner_offre_details", "others_offre_details"})
      * @var string
      * @Type("string")
-     * @ORM\Column(name="image", type="string", nullable=true)
+     * @ORM\Column(name="image1", type="string", nullable=true)
      */
-    private $image;
+    private $image1;
+
 
     /**
      * @Exclude
      * @Assert\Image()
-     * @Vich\UploadableField(mapping="entity_images", fileNameProperty="image")
+     * @Vich\UploadableField(mapping="entity_images", fileNameProperty="image1")
      * @var File
      */
-    private $imageFile;
+    private $image1File;
+
+    /**
+     * @Exclude
+     * @Assert\Image()
+     * @Vich\UploadableField(mapping="entity_images", fileNameProperty="image2")
+     * @var File
+     */
+    private $image2File;
+
+    /**
+     * @Exclude
+     * @Assert\Image()
+     * @Vich\UploadableField(mapping="entity_images", fileNameProperty="image3")
+     * @var File
+     */
+    private $image3File;
+
+    /**
+     * @Exclude
+     * @Assert\Image()
+     * @Vich\UploadableField(mapping="entity_images", fileNameProperty="image4")
+     * @var File
+     */
+    private $image4File;
+
+    /**
+     * @Expose
+     * @Groups({"owner_list", "others_list", "owner_offre_details", "others_offre_details"})
+     * @var string
+     * @Type("string")
+     * @ORM\Column(name="image2", type="string", nullable=true)
+     */
+    private $image2;
+
+
+    /**
+     * @Expose
+     * @Groups({"owner_list", "others_list", "owner_offre_details", "others_offre_details"})
+     * @var string
+     * @Type("string")
+     * @ORM\Column(name="image3", type="string", nullable=true)
+     */
+    private $image3;
+
+
+    /**
+     * @Expose
+     * @Groups({"owner_list", "others_list", "owner_offre_details", "others_offre_details"})
+     * @var string
+     * @Type("string")
+     * @ORM\Column(name="image4", type="string", nullable=true)
+     */
+    private $image4;
+
 
     /**
      * @Expose
@@ -369,23 +425,53 @@ class Offre extends TradeFactory
         $this->updatedAt = $this->dateCreation = new \DateTime('now');
     }
 
-    public function getImageFile()
+    public function getImage1File()
     {
-        return $this->imageFile;
+        return $this->image1File;
     }
 
-    public function setImageFile(File $image = null)
+    public function setImage1File(File $image = null)
     {
-        $image !== '' ?: $image = null;
-        $this->imageFile = $image;
-
         // VERY IMPORTANT:
         // It is required that at least one field changes if you are using Doctrine,
         // otherwise the event listeners won't be called and the file is lost
         // if 'updatedAt' is not defined in your entity, use another property
+        $this->image1File = $image;
         $this->updatedAt = new \DateTime('now');
     }
 
+    public function getImage2File()
+    {
+        return $this->image2File;
+    }
+
+    public function setImage2File(File $image = null)
+    {
+        $this->image2File = $image;
+        $this->updatedAt = new \DateTime('now');
+    }
+
+    public function getImage3File()
+    {
+        return $this->image3File;
+    }
+
+    public function setImage3File(File $image = null)
+    {
+        $this->image3File = $image;
+        $this->updatedAt = new \DateTime('now');
+    }
+
+    public function getImage4File()
+    {
+        return $this->image4File;
+    }
+
+    public function setImage4File(File $image = null)
+    {
+        $this->image4File = $image;
+        $this->updatedAt = new \DateTime('now');
+    }
     /**
      * Get dataSheet
      *
@@ -548,25 +634,25 @@ class Offre extends TradeFactory
 
 
     /**
-     * Get image
+     * Get image1
      *
      * @return string
      */
-    public function getImage()
+    public function getImage1()
     {
-        return $this->image;
+        return $this->image1;
     }
 
     /**
-     * Set image
+     * Set image1
      *
-     * @param string $image
+     * @param string $image1
      *
      * @return Offre
      */
-    public function setImage($image)
+    public function setImage1($image1)
     {
-        $this->image = $image;
+        $this->image1 = $image1;
 
         return $this;
     }
@@ -1290,4 +1376,77 @@ class Offre extends TradeFactory
         $this->updatedAt = new \DateTime('now');
         return $this;
     }
+
+    /**
+     * Get image2
+     *
+     * @return string
+     */
+    public function getImage2()
+    {
+        return $this->image2;
+    }
+
+    /**
+     * Set image2
+     *
+     * @param string $image2
+     *
+     * @return Offre
+     */
+    public function setImage2($image2)
+    {
+        $this->image2 = $image2;
+
+        return $this;
+    }
+
+    /**
+     * Get image3
+     *
+     * @return string
+     */
+    public function getImage3()
+    {
+        return $this->image3;
+    }
+
+    /**
+     * Set image3
+     *
+     * @param string $image3
+     *
+     * @return Offre
+     */
+    public function setImage3($image3)
+    {
+        $this->image3 = $image3;
+
+        return $this;
+    }
+
+    /**
+     * Get image4
+     *
+     * @return string
+     */
+    public function getImage4()
+    {
+        return $this->image4;
+    }
+
+    /**
+     * Set image4
+     *
+     * @param string $image4
+     *
+     * @return Offre
+     */
+    public function setImage4($image4)
+    {
+        $this->image4 = $image4;
+
+        return $this;
+    }
+
 }

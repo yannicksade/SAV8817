@@ -9,6 +9,9 @@ services:
         calls:
               - ["setContainer", ["@service_container"]]
 
+    apm_core.directory_namer:
+        class: APM\CoreBundle\Util\DirectoryNamer
+
     apm_user.resetting_manager:
         class: APM\UserBundle\Manager\ResettingManager
         calls:
@@ -29,14 +32,22 @@ services:
         calls:
               - ['setValues', [%images_url%,%docs_url%, %resolve_images_url%]]
 
-    apm_core.vich_listener_remove:
+    apm_core.vich_listener.pre_remove:
         class: APM\CoreBundle\Event\Listener\VichEventListener
-        arguments: ['@liip_imagine.cache.manager', %basic_filter%]
+        calls:
+             -  ['setVars', ['@liip_imagine.cache.manager', %basic_filter%]]
         tags:
-             - { name: kernel.event_listener, event: vich_uploader.pre_remove }
+             - { name: kernel.event_listener, event: vich_uploader.pre_remove, method: onVichuploaderPreremove }
 
-    apm_core.crop_image:
-        class: APM\CoreBundle\Util\CropMaker
+    apm_core.vich_listener.post_upload:
+        class: APM\CoreBundle\Event\Listener\VichEventListener
+        calls:
+             -  ['setVars', [null, null, '@apm_core.image_maker']]
+        tags:
+             - { name: kernel.event_listener, event: vich_uploader.post_upload, method: onVichuploaderPostupload }
+
+    apm_core.image_maker:
+        class: APM\CoreBundle\Util\ImageMaker
         calls:
               - ['setContainer', ['@service_container', %basic_filter%]]
 

@@ -7,10 +7,10 @@ imports:
 # http://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
 parameters:
     locale: fr
-    images_url: dashboard/assets/entity/images
-    docs_url: dashboard/assets/brochure/files
-    resolve_images_url: http://localhost/SAV8817.git/web/app_dev.php/media/cache/resolve/basic_filter600x600/%images_url%
-    basic_filter: basic_filter600x600
+    images_url: assets/images
+    docs_url: assets/files
+    resolve_images_url: http://localhost/SAV8817.git/web/app_dev.php/media/cache/loaded_image/%images_url%
+    basic_filter: loaded_image #image initial
     fos_user.resetting.token_ttl: 86400
 
     #nelmio api docs
@@ -164,6 +164,8 @@ vich_uploader:
             uri_prefix:         %images_url%
             upload_destination: %kernel.root_dir%/../web/%images_url%
             namer:               vich_uploader.namer_uniqid
+            #directory_namer:     vich_uploader.directory_namer_subdir
+            #options: {chars_per_dir: 1, dirs: 2} #vich_uploader.namer_directory_propert
 
         brochures:
             uri_prefix:         %docs_url%
@@ -181,7 +183,7 @@ liip_imagine :
     filter_sets :
         # use the default cache configuration
         cache : ~
-        basic_filter600x600 :
+        loaded_image :
 # adjust the image quality to 75%
             #quality : 75
  # list of transformations to apply (the filters)
@@ -194,6 +196,25 @@ liip_imagine :
 
                     # set the starting coordinates of the crop
                     #start: [ %_x_%, %_y_% ]
+
+#oneup_flysystem:
+#    adapters:
+#        my_adapter:
+#            local:
+#                directory: %kernel.root_dir%/cache
+
+#    filesystems:
+#        my_filesystem:
+#            adapter: my_adapter
+
+            # optional - defines the default visibility of the filesystem: `public` or `private`(default)
+#            visibility: private
+#knp_gaufrette:
+#    adapters:
+#        foo:
+#            safe_local:
+#                directory:  %resolve_images_url%
+#                create:     true
 # Nelmio  Cors
 nelmio_cors:
     defaults:
