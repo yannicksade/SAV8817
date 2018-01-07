@@ -35,16 +35,38 @@ services:
     apm_core.vich_listener.pre_remove:
         class: APM\CoreBundle\Event\Listener\VichEventListener
         calls:
-             -  ['setVars', ['@liip_imagine.cache.manager', %basic_filter%]]
+             -  ['setVars', [null, '@liip_imagine.cache.manager', %basic_filter%]]
         tags:
              - { name: kernel.event_listener, event: vich_uploader.pre_remove, method: onVichuploaderPreremove }
 
-    apm_core.vich_listener.post_upload:
+    apm_core.vich_listener.pre_upload:
         class: APM\CoreBundle\Event\Listener\VichEventListener
         calls:
-             -  ['setVars', [null, null, '@apm_core.image_maker']]
+             -  ['setVars', ['@vich_uploader.upload_handler']]
         tags:
-             - { name: kernel.event_listener, event: vich_uploader.post_upload, method: onVichuploaderPostupload }
+             - { name: kernel.event_listener, event: vich_uploader.pre_upload, method: onVichuploaderPreupload }
+
+
+    apm_core.vich_listener.post_upload:
+            class: APM\CoreBundle\Event\Listener\VichEventListener
+            calls:
+                 -  ['setVars', [null, null]]
+            tags:
+                 - { name: kernel.event_listener, event: vich_uploader.post_upload, method: onVichuploaderPostupload }
+
+    apm_core.vich_listener.pre_inject:
+            class: APM\CoreBundle\Event\Listener\VichEventListener
+            calls:
+                 -  ['setVars', [null, null]]
+            tags:
+                 - { name: kernel.event_listener, event: vich_uploader.pre_inject, method: onVichuploaderPreinject }
+
+    apm_core.vich_listener.post_inject:
+            class: APM\CoreBundle\Event\Listener\VichEventListener
+            calls:
+                 -  ['setVars', [null, null]]
+            tags:
+                 - { name: kernel.event_listener, event: vich_uploader.post_inject, method: onVichuploaderPostinject }
 
     apm_core.image_maker:
         class: APM\CoreBundle\Util\ImageMaker

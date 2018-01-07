@@ -13,6 +13,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\HttpFoundation\File\File;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Vich\UploaderBundle\Mapping\Annotation as Vich;
@@ -154,35 +155,31 @@ class Offre extends TradeFactory
 
     /**
      * @Exclude
-     * @Assert\Image()
      * @Vich\UploadableField(mapping="entity_images", fileNameProperty="image1")
-     * @var File
+     * @var UploadedFile
      */
-    private $image1File;
+    private $imagefile1;
 
     /**
-     * @Exclude
-     * @Assert\Image()
+     * @Expose
      * @Vich\UploadableField(mapping="entity_images", fileNameProperty="image2")
      * @var File
      */
-    private $image2File;
+    private $imagefile2;
 
     /**
-     * @Exclude
-     * @Assert\Image()
+     * @Expose
      * @Vich\UploadableField(mapping="entity_images", fileNameProperty="image3")
      * @var File
      */
-    private $image3File;
+    private $imagefile3;
 
     /**
-     * @Exclude
-     * @Assert\Image()
+     * @Expose
      * @Vich\UploadableField(mapping="entity_images", fileNameProperty="image4")
      * @var File
      */
-    private $image4File;
+    private $imagefile4;
 
     /**
      * @Expose
@@ -425,51 +422,51 @@ class Offre extends TradeFactory
         $this->updatedAt = $this->dateCreation = new \DateTime('now');
     }
 
-    public function getImage1File()
+    public function getImagefile1()
     {
-        return $this->image1File;
+        return $this->imagefile1;
     }
 
-    public function setImage1File(File $image = null)
+    public function setImagefile1(File $image = null)
     {
         // VERY IMPORTANT:
         // It is required that at least one field changes if you are using Doctrine,
         // otherwise the event listeners won't be called and the file is lost
         // if 'updatedAt' is not defined in your entity, use another property
-        $this->image1File = $image;
+        $this->imagefile1 = $image;
         $this->updatedAt = new \DateTime('now');
     }
 
-    public function getImage2File()
+    public function getImagefile2()
     {
-        return $this->image2File;
+        return $this->imagefile2;
     }
 
-    public function setImage2File(File $image = null)
+    public function setImagefile2(File $image = null)
     {
-        $this->image2File = $image;
+        $this->imagefile2 = $image;
         $this->updatedAt = new \DateTime('now');
     }
 
-    public function getImage3File()
+    public function getImagefile3()
     {
-        return $this->image3File;
+        return $this->imagefile3;
     }
 
-    public function setImage3File(File $image = null)
+    public function setImagefile3(File $image = null)
     {
-        $this->image3File = $image;
+        $this->imagefile3 = $image;
         $this->updatedAt = new \DateTime('now');
     }
 
-    public function getImage4File()
+    public function getImagefile4()
     {
-        return $this->image4File;
+        return $this->imagefile4;
     }
 
-    public function setImage4File(File $image = null)
+    public function setImagefile4(File $image = null)
     {
-        $this->image4File = $image;
+        $this->imagefile4 = $image;
         $this->updatedAt = new \DateTime('now');
     }
     /**

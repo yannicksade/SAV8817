@@ -7,6 +7,7 @@ use APM\UserBundle\Entity\Admin;
 use APM\UserBundle\Entity\Utilisateur_avm;
 use APM\VenteBundle\Entity\Transaction;
 use APM\VenteBundle\Entity\Transaction_produit;
+use APM\VenteBundle\Form\OffreType;
 use Doctrine\Common\Collections\Collection;
 use APM\VenteBundle\Entity\Boutique;
 use APM\VenteBundle\Entity\Categorie;
@@ -17,8 +18,10 @@ use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\Routing\ClassResourceInterface;
 use FOS\RestBundle\View\View;
 use FOS\UserBundle\FOSUserEvents;
+use League\Flysystem\Exception;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\File\File;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -33,6 +36,10 @@ use FOS\RestBundle\Controller\Annotations\Put;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use Vich\UploaderBundle\Event\Event;
+use Vich\UploaderBundle\Event\Events;
+use Vich\UploaderBundle\Mapping\PropertyMapping;
+use Vich\UploaderBundle\Mapping\PropertyMappingFactory;
 
 /**
  * Offre controller.
@@ -439,22 +446,22 @@ class OffreController extends FOSRestController implements ClassResourceInterfac
      *  },
      *
      * parameters= {
-     *      {"name"="image1File", "dataType"="file", "required"= false, "description"="file 01 top"},
+     *      {"name"="imagefile1", "dataType"="file", "required"= false, "description"="file 01 top"},
      *      {"name"="file1[x]", "dataType"="integer", "required"= true, "description"="horizontal start point 01"},
      *      {"name"="file1[y]", "dataType"="integer", "required"= true, "description"="vertical start point 01"},
      *      {"name"="file1[w]", "dataType"="integer", "required"= true, "description"="width 01"},
      *      {"name"="file1[h]", "dataType"="integer", "required"= true, "description"="height 01"},
-     *      {"name"="image2File", "dataType"="file", "required"= false, "description"="file 02 bottom"},
+     *      {"name"="imagefile2", "dataType"="file", "required"= false, "description"="file 02 bottom"},
      *      {"name"="file2[x]", "dataType"="integer", "required"= true, "description"="horizontal start point 02"},
      *      {"name"="file2[y]", "dataType"="integer", "required"= true, "description"="vertical start point 02"},
      *      {"name"="file2[w]", "dataType"="integer", "required"= true, "description"="width 02"},
      *      {"name"="file2[h]", "dataType"="integer", "required"= true, "description"="height 02"},
-     *      {"name"="image3File", "dataType"="file", "required"= false, "description"="file 03 left side"},
+     *      {"name"="imagefile3", "dataType"="file", "required"= false, "description"="file 03 left side"},
      *      {"name"="file3[x]", "dataType"="integer", "required"= true, "description"="horizontal start point 03"},
      *      {"name"="file3[y]", "dataType"="integer", "required"= true, "description"="vertical start point 03"},
      *      {"name"="file3[w]", "dataType"="integer", "required"= true, "description"="width 03"},
      *      {"name"="file3[h]", "dataType"="integer", "required"= true, "description"="height 03"},
-     *      {"name"="image4File", "dataType"="file", "required"= false, "description"="file 04 right side"},
+     *      {"name"="imagefile4", "dataType"="file", "required"= false, "description"="file 04 right side"},
      *      {"name"="file4[x]", "dataType"="integer", "required"= true, "description"="horizontal start point 04"},
      *      {"name"="file4[y]", "dataType"="integer", "required"= true, "description"="vertical start point 04"},
      *      {"name"="file4[w]", "dataType"="integer", "required"= true, "description"="width 04"},
@@ -472,20 +479,10 @@ class OffreController extends FOSRestController implements ClassResourceInterfac
         try {
             $this->editAndDeleteSecurity($offre);
             $em = $this->getEM();
-            $files = $_FILES;
             $idFile = 0;
+            $files = $_FILES;
             $fileProcessed = 0;
-            /** @var \ArrayObject $loadFileNames */
-            $loadFileNames = array();
-            /*$form = $this->createForm('APM\VenteBundle\Form\Type\ImageType', $offre);
-            $form->submit($request->files->all(), false);
-            if (!$form->isValid()) {
-                return new JsonResponse([
-                    "status" => Response::HTTP_BAD_REQUEST,
-                    "message" => $this->get('translator')->trans("Images non valides. required: [jpg, png, gif]", [], 'FOSUserBundle')
-                ], Response::HTTP_BAD_REQUEST
-                );
-            }*/
+            $eventDispatcher = $this->get('event_dispatcher');
             foreach ($files as $file) {
                 $idFile += 1;
                 //test de validité du type de fichier
@@ -493,32 +490,38 @@ class OffreController extends FOSRestController implements ClassResourceInterfac
                     continue;
                 }
                 $fileName = $file['name'];
+                $path = $this->getParameter('images_url');
+                $filePath = $path . '/' . $fileName;
                 // enregister le fichier en local
-                $path = $this->getParameter('images_url') . '/' . $fileName;
-                if (!move_uploaded_file($file['tmp_name'], $path)) {
+                $imageIdFile = 'imagefile' . $idFile;
+                $mapping = new PropertyMapping($filePath, $imageIdFile);
+                $event = new Event($offre, $mapping);
+                $eventDispatcher->dispatch(Events::PRE_UPLOAD, $event);
+                if (!move_uploaded_file($file['tmp_name'], $filePath)) {
                     continue;
                 }
-                $file = new File($path);
-                /* $imageIdFile = 'setImage' . $idFile . 'File';
-                 $offre->$imageIdFile($file);*/
 
-
+                $file = new File($filePath);
                 $fileName = md5(uniqid()) . '.' . $file->guessExtension();
-                $file->move($this->getParameter('images_url'), $fileName); // renommer le fichier
+                $file->move($path, $fileName); // renommer le fichier
                 //traitement de l'image puis stockage
                 $x = $request->request->get('file' . $idFile)['x'];
                 $y = $request->request->get('file' . $idFile)['y'];
                 $w = $request->request->get('file' . $idFile)['w'];
                 $h = $request->request->get('file' . $idFile)['h'];
-                $this->get('apm_core.image_maker')->setCropParameters($x, $y, $w, $h, $fileName);
-                $fileProcessed++;
-                $imageId = 'setImage' . $idFile;
-                $offre->$imageId($fileName);
-                $loadFileNames[] = $idFile;
+                $this->get('apm_core.image_maker')->setCropParameters($x, $y, $w, $h, $fileName, $imageIdFile);
+                $eventDispatcher->dispatch(Events::POST_UPLOAD, $event);
 
-                $em->flush();
+                $eventDispatcher->dispatch(Events::PRE_INJECT, $event);
+                $setImageId = 'setImage' . $idFile;
+                $offre->$setImageId($fileName);
+                $eventDispatcher->dispatch(Events::POST_INJECT, $event);
+
+                $fileProcessed++;
                 $this->get('apm_core.image_maker')->liipImageResolver($fileName);//resolution et deplacement de l'images dans media/
             }
+            $em->flush();
+
             $status = Response::HTTP_OK;
             $response = [
                 "status" => 200,

@@ -38,9 +38,10 @@ class ImageMaker implements ContainerAwareInterface
      * @param $_w_
      * @param $_h_
      * @param $fileName
+     * @param $imageFile
      * @param Object_ $object
      */
-    public function setCropParameters($_x_, $_y_, $_w_, $_h_, $fileName, $object = null)
+    public function setCropParameters($_x_, $_y_, $_w_, $_h_, $fileName, $imageFile, $object = null)
     {
         //-----------------------------Traitement de l'image-----------------------------------------------
         $path = $this->container->getParameter('images_url') . '/' . $fileName;
@@ -75,7 +76,7 @@ class ImageMaker implements ContainerAwareInterface
                     $storage = $this->container->get('vich_uploader.storage');
                     /** @var PropertyMappingFactory $propertyMappingFactory */
                     $propertyMappingFactory = $this->container->get('vich_uploader.property_mapping_factory');
-                    $storage->remove($object, $propertyMappingFactory->fromField($object, 'imageFile'));
+                    $storage->remove($object, $propertyMappingFactory->fromField($object, $imageFile));
                 }
             }
         }

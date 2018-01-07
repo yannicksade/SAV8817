@@ -5,6 +5,7 @@ symfony
 composer.json
 /vendor/
 /web/bundles/
+/web/
 .idea/
 UPGRADE-2.2.md
 UPGRADE-2.3.md

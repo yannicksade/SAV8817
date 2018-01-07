@@ -7,6 +7,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\MoneyType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -162,11 +163,23 @@ class OffreType extends AbstractType
                 'attr' => ['class' => 'form-control type'],
                 ]
 
-            )
-            ->add('image1File', VichImageType::class, [
+            )/*->add('imagefile1', FileType::class, [
                 'required' => false,
-                'allow_delete' => true,
-            ]);
+
+            ])
+            ->add('imagefile2', FileType::class, [
+                'required' => false,
+
+            ])
+            ->add('imagefile3', FileType::class, [
+                'required' => false,
+
+            ])
+            ->add('imagefile4', FileType::class, [
+                'required' => false,
+
+            ])*/
+        ;
     }
 
 
