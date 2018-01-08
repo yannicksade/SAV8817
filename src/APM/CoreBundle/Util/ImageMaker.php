@@ -37,14 +37,14 @@ class ImageMaker implements ContainerAwareInterface
      * @param $_y_
      * @param $_w_
      * @param $_h_
-     * @param $fileName
+     * @param $path
      * @param $imageFile
      * @param Object_ $object
      */
-    public function setCropParameters($_x_, $_y_, $_w_, $_h_, $fileName, $imageFile, $object = null)
+    public function setCropParameters($_x_, $_y_, $_w_, $_h_, $path, $imageFile, $object = null)
     {
         //-----------------------------Traitement de l'image-----------------------------------------------
-        $path = $this->container->getParameter('images_url') . '/' . $fileName;
+        //$path = $this->container->getParameter('images_url') . '/' . $fileName;
         $filterManager = $this->container->get('liip_imagine.filter.manager');
         /** @var CacheManager $cacheManager */
         $cacheManager = $this->container->get('liip_imagine.cache.manager');
@@ -71,7 +71,7 @@ class ImageMaker implements ContainerAwareInterface
             if ($cacheManager->isStored($path, $this->filter)) { // Test whether the image is really stored
                 $session = $this->container->get('session');
                 $session->getFlashBag()->add('success', 'Image traitée <br/> Résolution:' . '<strong>' . $_w_ . 'x' . $_h_ . '</strong>px.<br> Opération effectuée avec succès');
-                if ($object) { // suppression de l'image vich d'origine
+                if ($object) { // suppression de l'image vich d'original
                     /** @var FileSystemStorage $storage */
                     $storage = $this->container->get('vich_uploader.storage');
                     /** @var PropertyMappingFactory $propertyMappingFactory */

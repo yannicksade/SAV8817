@@ -23,17 +23,17 @@ class VichEventListener
     /**
      * @var CacheManager | null
      */
-    private $caheManager; // cache liip
+    private $mediaCaheManager; // cache liip
     private $filter;
     /**
      * @var UploadHandler
      */
     private $handler;
 
-    function setVars(UploadHandler $handler = null, CacheManager $cacheManager = null, $filter = null)
+    function setVars(UploadHandler $handler = null, CacheManager $mediaCaheManager = null, $filter = null)
     {
         $this->handler = $handler;
-        $this->caheManager = $cacheManager;
+        $this->mediaCaheManager = $mediaCaheManager;
 
         $this->filter = $filter;
 
@@ -45,30 +45,20 @@ class VichEventListener
      */
     public function onVichuploaderPreremove(Event $event)
     {
+
         $object = $event->getObject();
         $mapping = $event->getMapping();
-        $image = $mapping->getFileName($object);
+        $image = $mapping->getUploadDir($object) . '/' . $mapping->getFileName($object);
         $prefix = $mapping->getUriPrefix();
         $path = $prefix . '/' . $image;
-        $this->caheManager->remove($path, $this->filter);
+        $this->mediaCaheManager->remove($path, $this->filter);
     }
 
     public function onVichuploaderPreupload(Event $event)
     {// remove vich files
         $object = $event->getObject();
-        $imageIdFile = $event->getMapping()->getFileNamePropertyName();
+        $imageIdFile = $event->getMapping()->getFilePropertyName();
         $this->handler->remove($object, $imageIdFile);
-
-
-        /*for ($i=1; $i<=10; $i++){
-            if($imageIdFile === 'image'.$i .'File'){
-                $getImageId = 'getImage'.$i;
-               $fileName = $object->$getImageId();
-
-            }
-
-        }*/
-
     }
 
     public function onVichuploaderPostupload(Event $event)

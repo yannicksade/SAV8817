@@ -167,7 +167,7 @@ vich_uploader:
             delete_on_update: true
             delete_on_remove: true
             namer:               vich_uploader.namer_uniqid
-            #directory_namer:     vich_uploader.directory_namer_subdir
+            directory_namer:     vich_uploader.directory_namer_subdir
             #options: {chars_per_dir: 1, dirs: 2} #vich_uploader.namer_directory_propert
 
 
