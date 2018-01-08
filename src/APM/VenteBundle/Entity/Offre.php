@@ -58,7 +58,6 @@ class Offre extends TradeFactory
      * @Type("DateTime<'d-m-Y H:i'>")
      * @Groups({"owner_offre_details"})
      * @var \DateTime
-     * @Assert\NotNull
      * @Assert\DateTime
      * @ORM\Column(name="dateCreation", type="datetime", nullable=false)
      */
@@ -155,28 +154,48 @@ class Offre extends TradeFactory
 
     /**
      * @Exclude
-     * @Vich\UploadableField(mapping="entity_images", fileNameProperty="image1")
+     * @Assert\File(
+     *     maxSize = "5024k",
+     *     mimeTypes = {"image/jpeg", "image/png", "image/gif"},
+     *     mimeTypesMessage = "Please upload a valid PDF"
+     * )
+     * @Vich\UploadableField(mapping="offre_images", fileNameProperty="image1")
      * @var UploadedFile
      */
     private $imagefile1;
 
     /**
-     * @Expose
-     * @Vich\UploadableField(mapping="entity_images", fileNameProperty="image2")
+     * @Exclude
+     * @Assert\File(
+     *     maxSize = "5024k",
+     *     mimeTypes = {"image/jpeg", "image/png", "image/gif"},
+     *     mimeTypesMessage = "Please upload a valid PDF"
+     * )
+     * @Vich\UploadableField(mapping="offre_images", fileNameProperty="image2")
      * @var File
      */
     private $imagefile2;
 
     /**
-     * @Expose
-     * @Vich\UploadableField(mapping="entity_images", fileNameProperty="image3")
+     * @Exclude
+     * @Assert\File(
+     *     maxSize = "5024k",
+     *     mimeTypes = {"image/jpeg", "image/png", "image/gif"},
+     *     mimeTypesMessage = "Please upload a valid image"
+     * )
+     * @Vich\UploadableField(mapping="offre_images", fileNameProperty="image3")
      * @var File
      */
     private $imagefile3;
 
     /**
-     * @Expose
-     * @Vich\UploadableField(mapping="entity_images", fileNameProperty="image4")
+     * @Exclude
+     * @Assert\File(
+     *     maxSize = "5024k",
+     *     mimeTypes = {"image/jpeg", "image/png", "image/gif"},
+     *     mimeTypesMessage = "Please upload a valid PDF"
+     * )
+     * @Vich\UploadableField(mapping="offre_images", fileNameProperty="image4")
      * @var File
      */
     private $imagefile4;
@@ -276,7 +295,6 @@ class Offre extends TradeFactory
      * @Groups({"owner_offre_details", "others_offre_details"})
      * @var integer
      * @Type("int")
-     * @Assert\Range(min=0, max=10)
      * @ORM\Column(name="rateEvaluation", type="smallint", nullable=true)
      */
     private $evaluation;

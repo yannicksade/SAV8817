@@ -166,13 +166,87 @@ class Boutique extends TradeFactory
     private $proprietaire;
 
     /**
-     * @var string
-     * @Type("string")
+     * @Exclude
+     * @Assert\File(
+     *     maxSize = "5024k",
+     *     mimeTypes = {"image/jpeg", "image/png", "image/gif"},
+     *     mimeTypesMessage = "Please upload a valid PDF"
+     * )
+     * @Vich\UploadableField(mapping="boutique_images", fileNameProperty="image1")
+     * @var UploadedFile
+     */
+    private $imagefile1;
+
+    /**
+     * @Exclude
+     * @Assert\File(
+     *     maxSize = "5024k",
+     *     mimeTypes = {"image/jpeg", "image/png", "image/gif"},
+     *     mimeTypesMessage = "Please upload a valid PDF"
+     * )
+     * @Vich\UploadableField(mapping="boutique_images", fileNameProperty="image2")
+     * @var File
+     */
+    private $imagefile2;
+
+    /**
+     * @Exclude
+     * @Assert\File(
+     *     maxSize = "5024k",
+     *     mimeTypes = {"image/jpeg", "image/png", "image/gif"},
+     *     mimeTypesMessage = "Please upload a valid PDF"
+     * )
+     * @Vich\UploadableField(mapping="boutique_images", fileNameProperty="image3")
+     * @var File
+     */
+    private $imagefile3;
+
+    /**
+     * @Exclude
+     * @Assert\File(
+     *     maxSize = "5024k",
+     *     mimeTypes = {"image/jpeg", "image/png", "image/gif"},
+     *     mimeTypesMessage = "Please upload a valid PDF"
+     * )
+     * @Vich\UploadableField(mapping="boutique_images", fileNameProperty="image4")
+     * @var File
+     */
+    private $imagefile4;
+    /**
      * @Expose
      * @Groups({"owner_boutique_details", "others_boutique_details", "owner_list", "others_list"})
-     * @ORM\Column(name="image", type="string", nullable=true)
+     * @var string
+     * @Type("string")
+     * @ORM\Column(name="image1", type="string", nullable=true)
      */
-    private $image;
+    private $image1;
+    /**
+     * @Expose
+     * @Groups({"owner_boutique_details", "others_boutique_details", "owner_list", "others_list"})
+     * @var string
+     * @Type("string")
+     * @ORM\Column(name="image2", type="string", nullable=true)
+     */
+    private $image2;
+
+    /**
+     * @Expose
+     * @Groups({"owner_boutique_details", "others_boutique_details", "owner_list", "others_list"})
+     * @var string
+     * @Type("string")
+     * @ORM\Column(name="image3", type="string", nullable=true)
+     */
+    private $image3;
+
+
+    /**
+     * @Expose
+     * @Groups({"owner_boutique_details", "others_boutique_details", "owner_list", "others_list"})
+     * @var string
+     * @Type("string")
+     * @ORM\Column(name="image4", type="string", nullable=true)
+     */
+    private $image4;
 
     /**
      * @var Collection
@@ -240,13 +314,6 @@ class Boutique extends TradeFactory
      */
     private $transactionsRecues;
 
-    /**
-     * @Exclude
-     * @Assert\Image()
-     * @Vich\UploadableField(mapping="entity_images", fileNameProperty="image")
-     * @var File
-     *     */
-    private $imageFile;
 
     /**
      * Constructor
@@ -273,14 +340,43 @@ class Boutique extends TradeFactory
         return $this->designation;
     }
 
-    public function getImageFile()
+    public function getImagefile1()
     {
-        return $this->imageFile;
+        return $this->imagefile1;
     }
 
-    public function setImageFile(File $image = null)
+    public function setImagefile1(File $image = null)
     {
-        $this->imageFile = $image;
+        $this->imagefile1 = $image;
+        if ($image) {
+            // if 'updatedAt' is not defined in your entity, use another property
+            $this->updatedAt = new \DateTime('now');
+        }
+    }
+
+    public function getImagefile2()
+    {
+        return $this->imagefile2;
+    }
+
+    public function setImagefile2(File $image = null)
+    {
+        $this->imagefile2 = $image;
+
+        if ($image) {
+            // if 'updatedAt' is not defined in your entity, use another property
+            $this->updatedAt = new \DateTime('now');
+        }
+    }
+
+    public function getImagefile3()
+    {
+        return $this->imagefile3;
+    }
+
+    public function setImagefile3(File $image = null)
+    {
+        $this->imagefile3 = $image;
 
         // VERY IMPORTANT:
         // It is required that at least one field changes if you are using Doctrine,
@@ -291,6 +387,23 @@ class Boutique extends TradeFactory
         }
     }
 
+    public function getImagefile4()
+    {
+        return $this->imagefile4;
+    }
+
+    public function setImagefile4(File $image = null)
+    {
+        $this->imagefile4 = $image;
+
+        // VERY IMPORTANT:
+        // It is required that at least one field changes if you are using Doctrine,
+        // otherwise the event listeners won't be called and the file is lost
+        if ($image) {
+            // if 'updatedAt' is not defined in your entity, use another property
+            $this->updatedAt = new \DateTime('now');
+        }
+    }
     /**
      * Get description
      *
@@ -956,6 +1069,102 @@ class Boutique extends TradeFactory
     public function setDateCreation($dateCreation)
     {
         $this->dateCreation = $dateCreation;
+
+        return $this;
+    }
+
+    /**
+     * Get image1
+     *
+     * @return string
+     */
+    public function getImage1()
+    {
+        return $this->image1;
+    }
+
+    /**
+     * Set image1
+     *
+     * @param string $image1
+     *
+     * @return Boutique
+     */
+    public function setImage1($image1)
+    {
+        $this->image1 = $image1;
+
+        return $this;
+    }
+
+    /**
+     * Get image2
+     *
+     * @return string
+     */
+    public function getImage2()
+    {
+        return $this->image2;
+    }
+
+    /**
+     * Set image2
+     *
+     * @param string $image2
+     *
+     * @return Boutique
+     */
+    public function setImage2($image2)
+    {
+        $this->image2 = $image2;
+
+        return $this;
+    }
+
+    /**
+     * Get image3
+     *
+     * @return string
+     */
+    public function getImage3()
+    {
+        return $this->image3;
+    }
+
+    /**
+     * Set image3
+     *
+     * @param string $image3
+     *
+     * @return Boutique
+     */
+    public function setImage3($image3)
+    {
+        $this->image3 = $image3;
+
+        return $this;
+    }
+
+    /**
+     * Get image4
+     *
+     * @return string
+     */
+    public function getImage4()
+    {
+        return $this->image4;
+    }
+
+    /**
+     * Set image4
+     *
+     * @param string $image4
+     *
+     * @return Boutique
+     */
+    public function setImage4($image4)
+    {
+        $this->image4 = $image4;
 
         return $this;
     }

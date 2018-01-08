@@ -15,4 +15,3 @@ services:
     apm_vente.offre:
         class: APM\VenteBundle\Trade\OffreHandler
         arguments: ['@apm_vente.operation']
-

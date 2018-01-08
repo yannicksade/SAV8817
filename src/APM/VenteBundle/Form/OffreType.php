@@ -178,7 +178,7 @@ class OffreType extends AbstractType
 
             ])
             ->add('imagefile4', VichImageType::class, [
-                'required' => true,
+                'required' => false,
                 'allow_delete' => true
 
             ]);
@@ -195,4 +195,5 @@ class OffreType extends AbstractType
             'allow_extra_fields' => true,
         ));
     }
+
 }

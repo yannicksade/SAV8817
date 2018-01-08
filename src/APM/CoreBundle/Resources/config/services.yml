@@ -26,23 +26,28 @@ services:
         class: APM\CoreBundle\Trade\DataSerializedHandler
         arguments: ['@jms_serializer', '@jms_serializer.serialization_context_factory']
 
-#---------- Upload files ---------
-    apm_core.packages_maker:
-        class: APM\CoreBundle\Util\PackagesMaker
+#------------------------------------- files services -------------------------------------------------------------
+#    apm_core.packages_maker:
+#        class: APM\CoreBundle\Util\PackagesMaker
+#        calls:
+#              - ['setValues', [%url_images%,%docs_url%, %resolve_images_url%]]
+
+    apm_core.image_maker:
+        class: APM\CoreBundle\Util\ImagesMaker
         calls:
-              - ['setValues', [%images_url%,%docs_url%, %resolve_images_url%]]
+              - ['setContainer', ['@service_container', %basic_filter%]]
 
     apm_core.vich_listener.pre_remove:
         class: APM\CoreBundle\Event\Listener\VichEventListener
         calls:
-             -  ['setVars', [null, '@liip_imagine.cache.manager', %basic_filter%]]
+             -  ['setVars', [null, null, '@liip_imagine.cache.manager', %basic_filter%]]
         tags:
              - { name: kernel.event_listener, event: vich_uploader.pre_remove, method: onVichuploaderPreremove }
 
     apm_core.vich_listener.pre_upload:
         class: APM\CoreBundle\Event\Listener\VichEventListener
         calls:
-             -  ['setVars', ['@vich_uploader.upload_handler']]
+             -  ['setVars', []]
         tags:
              - { name: kernel.event_listener, event: vich_uploader.pre_upload, method: onVichuploaderPreupload }
 
@@ -50,29 +55,25 @@ services:
     apm_core.vich_listener.post_upload:
             class: APM\CoreBundle\Event\Listener\VichEventListener
             calls:
-                 -  ['setVars', [null, null]]
+                 -  ['setVars', ['@apm_core.image_maker', '@vich_uploader.storage']]
             tags:
                  - { name: kernel.event_listener, event: vich_uploader.post_upload, method: onVichuploaderPostupload }
 
     apm_core.vich_listener.pre_inject:
             class: APM\CoreBundle\Event\Listener\VichEventListener
             calls:
-                 -  ['setVars', [null, null]]
+                 -  ['setVars', []]
             tags:
                  - { name: kernel.event_listener, event: vich_uploader.pre_inject, method: onVichuploaderPreinject }
 
     apm_core.vich_listener.post_inject:
             class: APM\CoreBundle\Event\Listener\VichEventListener
             calls:
-                 -  ['setVars', [null, null]]
+                 -  ['setVars', []]
             tags:
                  - { name: kernel.event_listener, event: vich_uploader.post_inject, method: onVichuploaderPostinject }
 
-    apm_core.image_maker:
-        class: APM\CoreBundle\Util\ImageMaker
-        calls:
-              - ['setContainer', ['@service_container', %basic_filter%]]
-
+#---- ----------- Authentication services -----------------------------------------------------------------------------
     apm_core_api.event.jwt_created_listener:
         class: APM\CoreBundle\Event\Listener\JWTCreatedListener
         arguments: ['@request_stack']

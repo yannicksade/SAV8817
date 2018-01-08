@@ -239,7 +239,7 @@ class CategorieController extends FOSRestController
     }
 
     /**
-     ** @ApiDoc(
+     * @ApiDoc(
      * resource=true,
      * resourceDescription="Operations on Categorie.",
      * description="Create an object of type Categorie.",

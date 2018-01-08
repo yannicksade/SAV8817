@@ -19,7 +19,6 @@ use Symfony\Component\HttpFoundation\Response;
 use FOS\RestBundle\Controller\Annotations\RouteResource;
 use FOS\RestBundle\Controller\Annotations\Get;
 use FOS\RestBundle\Controller\Annotations\Post;
-use FOS\RestBundle\Controller\Annotations\Put;
 use FOS\RestBundle\Controller\Annotations\Patch;
 use FOS\RestBundle\Controller\Annotations\Delete;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
@@ -263,9 +262,30 @@ class BoutiqueController extends FOSRestController implements ClassResourceInter
      *    "class"="APM\VenteBundle\Entity\Boutique",
      *     "parsers" = {
      *          "Nelmio\ApiDocBundle\Parser\ValidationParser"
-     *      },
-     *    "name" = "Boutique",
+     *      }
      * },
+     * parameters= {
+     *      {"name"="imagefile1[file]", "dataType"="file", "required"= false, "description"="file 01 top"},
+     *      {"name"="imagefile1[x]", "dataType"="integer", "required"= true, "description"="horizontal start point 01"},
+     *      {"name"="imagefile1[y]", "dataType"="integer", "required"= true, "description"="vertical start point 01"},
+     *      {"name"="imagefile1[w]", "dataType"="integer", "required"= true, "description"="width 01"},
+     *      {"name"="imagefile1[h]", "dataType"="integer", "required"= true, "description"="height 01"},
+     *      {"name"="imagefile2[file]", "dataType"="file", "required"= false, "description"="file 02 bottom"},
+     *      {"name"="imagefile2[x]", "dataType"="integer", "required"= true, "description"="horizontal start point 02"},
+     *      {"name"="imagefile2[y]", "dataType"="integer", "required"= true, "description"="vertical start point 02"},
+     *      {"name"="imagefile2[w]", "dataType"="integer", "required"= true, "description"="width 02"},
+     *      {"name"="imagefile2[h]", "dataType"="integer", "required"= true, "description"="height 02"},
+     *      {"name"="imagefile3[file]", "dataType"="file", "required"= false, "description"="file 03 left side"},
+     *      {"name"="imagefile3[x]", "dataType"="integer", "required"= true, "description"="horizontal start point 03"},
+     *      {"name"="imagefile3[y]", "dataType"="integer", "required"= true, "description"="vertical start point 03"},
+     *      {"name"="imagefile3[w]", "dataType"="integer", "required"= true, "description"="width 03"},
+     *      {"name"="imagefile3[h]", "dataType"="integer", "required"= true, "description"="height 03"},
+     *      {"name"="imagefile4[file]", "dataType"="file", "required"= false, "description"="file 04 right side"},
+     *      {"name"="imagefile4[x]", "dataType"="integer", "required"= true, "description"="horizontal start point 04"},
+     *      {"name"="imagefile4[y]", "dataType"="integer", "required"= true, "description"="vertical start point 04"},
+     *      {"name"="imagefile4[w]", "dataType"="integer", "required"= true, "description"="width 04"},
+     *      {"name"="imagefile4[h]", "dataType"="integer", "required"= true, "description"="height 04"},
+     *  },
      * views = {"default", "vente" }
      * )
      * @param Request $request
@@ -278,7 +298,7 @@ class BoutiqueController extends FOSRestController implements ClassResourceInter
         /** @var Boutique $boutique */
         $boutique = TradeFactory::getTradeProvider('boutique');
         $form = $this->createForm('APM\VenteBundle\Form\BoutiqueType', $boutique);
-        $form->submit($request->request->all());
+        $form->submit(array_merge($request->request->all(), $request->files->all()));
         if (!$form->isValid()) {
             return new JsonResponse([
                 "status" => 400,
@@ -421,17 +441,37 @@ class BoutiqueController extends FOSRestController implements ClassResourceInter
      *    "class"="APM\VenteBundle\Entity\Boutique",
      *     "parsers" = {
      *          "Nelmio\ApiDocBundle\Parser\ValidationParser"
-     *      },
-     *    "name" = "Boutique",
+     *      }
      * },
-     *
+     * parameters= {
+     *      {"name"="imagefile1[file]", "dataType"="file", "required"= false, "description"="file 01 top"},
+     *      {"name"="imagefile1[x]", "dataType"="integer", "required"= true, "description"="horizontal start point 01"},
+     *      {"name"="imagefile1[y]", "dataType"="integer", "required"= true, "description"="vertical start point 01"},
+     *      {"name"="imagefile1[w]", "dataType"="integer", "required"= true, "description"="width 01"},
+     *      {"name"="imagefile1[h]", "dataType"="integer", "required"= true, "description"="height 01"},
+     *      {"name"="imagefile2[file]", "dataType"="file", "required"= false, "description"="file 02 bottom"},
+     *      {"name"="imagefile2[x]", "dataType"="integer", "required"= true, "description"="horizontal start point 02"},
+     *      {"name"="imagefile2[y]", "dataType"="integer", "required"= true, "description"="vertical start point 02"},
+     *      {"name"="imagefile2[w]", "dataType"="integer", "required"= true, "description"="width 02"},
+     *      {"name"="imagefile2[h]", "dataType"="integer", "required"= true, "description"="height 02"},
+     *      {"name"="imagefile3[file]", "dataType"="file", "required"= false, "description"="file 03 left side"},
+     *      {"name"="imagefile3[x]", "dataType"="integer", "required"= true, "description"="horizontal start point 03"},
+     *      {"name"="imagefile3[y]", "dataType"="integer", "required"= true, "description"="vertical start point 03"},
+     *      {"name"="imagefile3[w]", "dataType"="integer", "required"= true, "description"="width 03"},
+     *      {"name"="imagefile3[h]", "dataType"="integer", "required"= true, "description"="height 03"},
+     *      {"name"="imagefile4[file]", "dataType"="file", "required"= false, "description"="file 04 right side"},
+     *      {"name"="imagefile4[x]", "dataType"="integer", "required"= true, "description"="horizontal start point 04"},
+     *      {"name"="imagefile4[y]", "dataType"="integer", "required"= true, "description"="vertical start point 04"},
+     *      {"name"="imagefile4[w]", "dataType"="integer", "required"= true, "description"="width 04"},
+     *      {"name"="imagefile4[h]", "dataType"="integer", "required"= true, "description"="height 04"},
+     *  },
      * views = {"default", "vente" }
      * )
      * @param Request $request
      * @param Boutique $boutique
      * @return View | JsonResponse
      *
-     * @Put("/edit/boutique/{id}")
+     * @Post("/edit/boutique/{id}")
      */
     public
     function editAction(Request $request, Boutique $boutique)
@@ -439,7 +479,7 @@ class BoutiqueController extends FOSRestController implements ClassResourceInter
         try {
             $this->editAndDeleteSecurity($boutique);
             $form = $this->createForm('APM\VenteBundle\Form\BoutiqueType', $boutique);
-            $form->submit($request->request->all(), false);
+            $form->submit(array_merge($request->request->all(), $request->files->all()), false);
             if (!$form->isValid()) {
                 return new JsonResponse([
                     "status" => 400,

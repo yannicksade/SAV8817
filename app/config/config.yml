@@ -7,9 +7,8 @@ imports:
 # http://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
 parameters:
     locale: fr
-    images_url: assets/images
-    docs_url: assets/files
-    resolve_images_url: http://localhost/SAV8817.git/web/app_dev.php/media/cache/loaded_image/%images_url%
+    url_images_offre: assets/images/offres
+    url_images_boutique: assets/images/boutiques
     basic_filter: loaded_image #image initial
     fos_user.resetting.token_ttl: 86400
 
@@ -160,21 +159,25 @@ web_profiler :
 vich_uploader:
     db_driver: orm # or mongodb or propel or phpcr
     mappings:
-        entity_images:
-            uri_prefix:         %images_url%
-            upload_destination: %kernel.root_dir%/../web/%images_url%
+        offre_images:
+            uri_prefix:         %url_images_offre%
+            upload_destination: %kernel.root_dir%/../web/%url_images_offre%
             inject_on_load: false
             delete_on_update: true
             delete_on_remove: true
             namer:               vich_uploader.namer_uniqid
             directory_namer:     vich_uploader.directory_namer_subdir
-            #options: {chars_per_dir: 1, dirs: 2} #vich_uploader.namer_directory_propert
+            #options: {chars_per_dir: 1, dirs: 2} #vich_uploader.namer_directory_property
 
-
-        brochures:
-            uri_prefix:         %docs_url%
-            upload_destination: %kernel.root_dir%/../web/%docs_url%
-            namer:              vich_uploader.namer_uniqid
+        boutique_images:
+            uri_prefix:         %url_images_boutique%
+            upload_destination: %kernel.root_dir%/../web/%url_images_boutique%
+            inject_on_load: false
+            delete_on_update: true
+            delete_on_remove: true
+            namer:               vich_uploader.namer_uniqid
+            directory_namer:     vich_uploader.directory_namer_subdir
+            #options: {chars_per_dir: 1, dirs: 2} #vich_uploader.namer_directory_property
 
 liip_imagine :
     # configure resolvers

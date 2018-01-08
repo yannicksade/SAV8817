@@ -17,29 +17,18 @@ use Doctrine\DBAL\Exception\ConstraintViolationException;
 use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\Routing\ClassResourceInterface;
 use FOS\RestBundle\View\View;
-use FOS\UserBundle\FOSUserEvents;
-use League\Flysystem\Exception;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\HttpFoundation\File\File;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
-use Symfony\Component\HttpFoundation\Session\Session;
 use FOS\RestBundle\Controller\Annotations\RouteResource;
 use FOS\RestBundle\Controller\Annotations\Get;
 use FOS\RestBundle\Controller\Annotations\Post;
 use FOS\RestBundle\Controller\Annotations\Patch;
 use FOS\RestBundle\Controller\Annotations\Delete;
-use FOS\RestBundle\Controller\Annotations\Put;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
-use Vich\UploaderBundle\Event\Event;
-use Vich\UploaderBundle\Event\Events;
-use Vich\UploaderBundle\Mapping\PropertyMapping;
-use Vich\UploaderBundle\Mapping\PropertyMappingFactory;
 
 /**
  * Offre controller.
@@ -343,12 +332,33 @@ class OffreController extends FOSRestController implements ClassResourceInterfac
      * headers={
      *      { "name"="Authorization",  "required"=true, "description"="Authorization token"}
      * },
+     * parameters= {
+     *      {"name"="imagefile1[file]", "dataType"="file", "required"= false, "description"="file 01 top"},
+     *      {"name"="imagefile1[x]", "dataType"="integer", "required"= true, "description"="horizontal start point 01"},
+     *      {"name"="imagefile1[y]", "dataType"="integer", "required"= true, "description"="vertical start point 01"},
+     *      {"name"="imagefile1[w]", "dataType"="integer", "required"= true, "description"="width 01"},
+     *      {"name"="imagefile1[h]", "dataType"="integer", "required"= true, "description"="height 01"},
+     *      {"name"="imagefile2[file]", "dataType"="file", "required"= false, "description"="file 02 bottom"},
+     *      {"name"="imagefile2[x]", "dataType"="integer", "required"= true, "description"="horizontal start point 02"},
+     *      {"name"="imagefile2[y]", "dataType"="integer", "required"= true, "description"="vertical start point 02"},
+     *      {"name"="imagefile2[w]", "dataType"="integer", "required"= true, "description"="width 02"},
+     *      {"name"="imagefile2[h]", "dataType"="integer", "required"= true, "description"="height 02"},
+     *      {"name"="imagefile3[file]", "dataType"="file", "required"= false, "description"="file 03 left side"},
+     *      {"name"="imagefile3[x]", "dataType"="integer", "required"= true, "description"="horizontal start point 03"},
+     *      {"name"="imagefile3[y]", "dataType"="integer", "required"= true, "description"="vertical start point 03"},
+     *      {"name"="imagefile3[w]", "dataType"="integer", "required"= true, "description"="width 03"},
+     *      {"name"="imagefile3[h]", "dataType"="integer", "required"= true, "description"="height 03"},
+     *      {"name"="imagefile4[file]", "dataType"="file", "required"= false, "description"="file 04 right side"},
+     *      {"name"="imagefile4[x]", "dataType"="integer", "required"= true, "description"="horizontal start point 04"},
+     *      {"name"="imagefile4[y]", "dataType"="integer", "required"= true, "description"="vertical start point 04"},
+     *      {"name"="imagefile4[w]", "dataType"="integer", "required"= true, "description"="width 04"},
+     *      {"name"="imagefile4[h]", "dataType"="integer", "required"= true, "description"="height 04"},
+     *  },
      * input={
      *    "class"="APM\VenteBundle\Entity\Offre",
      *     "parsers" = {
      *          "Nelmio\ApiDocBundle\Parser\ValidationParser"
      *      },
-     *    "name" = "Offre",
      * },
      * views = {"default", "vente" }
      * )
@@ -363,7 +373,7 @@ class OffreController extends FOSRestController implements ClassResourceInterfac
             /** @var Offre $offre */
             $offre = TradeFactory::getTradeProvider('offre');
             $form = $this->createForm('APM\VenteBundle\Form\OffreType', $offre);
-            $form->submit($request->request->all());
+            $form->submit(array_merge($request->request->all(), $request->files->all()));
             if (!$form->isValid()) {
                 return new JsonResponse([
                     "status" => 400,
@@ -447,25 +457,25 @@ class OffreController extends FOSRestController implements ClassResourceInterfac
      *
      * parameters= {
      *      {"name"="imagefile1[file]", "dataType"="file", "required"= false, "description"="file 01 top"},
-     *      {"name"="file1[x]", "dataType"="integer", "required"= true, "description"="horizontal start point 01"},
-     *      {"name"="file1[y]", "dataType"="integer", "required"= true, "description"="vertical start point 01"},
-     *      {"name"="file1[w]", "dataType"="integer", "required"= true, "description"="width 01"},
-     *      {"name"="file1[h]", "dataType"="integer", "required"= true, "description"="height 01"},
+     *      {"name"="imagefile1[x]", "dataType"="integer", "required"= true, "description"="horizontal start point 01"},
+     *      {"name"="imagefile1[y]", "dataType"="integer", "required"= true, "description"="vertical start point 01"},
+     *      {"name"="imagefile1[w]", "dataType"="integer", "required"= true, "description"="width 01"},
+     *      {"name"="imagefile1[h]", "dataType"="integer", "required"= true, "description"="height 01"},
      *      {"name"="imagefile2[file]", "dataType"="file", "required"= false, "description"="file 02 bottom"},
-     *      {"name"="file2[x]", "dataType"="integer", "required"= true, "description"="horizontal start point 02"},
-     *      {"name"="file2[y]", "dataType"="integer", "required"= true, "description"="vertical start point 02"},
-     *      {"name"="file2[w]", "dataType"="integer", "required"= true, "description"="width 02"},
-     *      {"name"="file2[h]", "dataType"="integer", "required"= true, "description"="height 02"},
+     *      {"name"="imagefile2[x]", "dataType"="integer", "required"= true, "description"="horizontal start point 02"},
+     *      {"name"="imagefile2[y]", "dataType"="integer", "required"= true, "description"="vertical start point 02"},
+     *      {"name"="imagefile2[w]", "dataType"="integer", "required"= true, "description"="width 02"},
+     *      {"name"="imagefile2[h]", "dataType"="integer", "required"= true, "description"="height 02"},
      *      {"name"="imagefile3[file]", "dataType"="file", "required"= false, "description"="file 03 left side"},
-     *      {"name"="file3[x]", "dataType"="integer", "required"= true, "description"="horizontal start point 03"},
-     *      {"name"="file3[y]", "dataType"="integer", "required"= true, "description"="vertical start point 03"},
-     *      {"name"="file3[w]", "dataType"="integer", "required"= true, "description"="width 03"},
-     *      {"name"="file3[h]", "dataType"="integer", "required"= true, "description"="height 03"},
+     *      {"name"="imagefile3[x]", "dataType"="integer", "required"= true, "description"="horizontal start point 03"},
+     *      {"name"="imagefile3[y]", "dataType"="integer", "required"= true, "description"="vertical start point 03"},
+     *      {"name"="imagefile3[w]", "dataType"="integer", "required"= true, "description"="width 03"},
+     *      {"name"="imagefile3[h]", "dataType"="integer", "required"= true, "description"="height 03"},
      *      {"name"="imagefile4[file]", "dataType"="file", "required"= false, "description"="file 04 right side"},
-     *      {"name"="file4[x]", "dataType"="integer", "required"= true, "description"="horizontal start point 04"},
-     *      {"name"="file4[y]", "dataType"="integer", "required"= true, "description"="vertical start point 04"},
-     *      {"name"="file4[w]", "dataType"="integer", "required"= true, "description"="width 04"},
-     *      {"name"="file4[h]", "dataType"="integer", "required"= true, "description"="height 04"},
+     *      {"name"="imagefile4[x]", "dataType"="integer", "required"= true, "description"="horizontal start point 04"},
+     *      {"name"="imagefile4[y]", "dataType"="integer", "required"= true, "description"="vertical start point 04"},
+     *      {"name"="imagefile4[w]", "dataType"="integer", "required"= true, "description"="width 04"},
+     *      {"name"="imagefile4[h]", "dataType"="integer", "required"= true, "description"="height 04"},
      *  },
      * views = {"default", "vente" }
      * )
@@ -479,50 +489,19 @@ class OffreController extends FOSRestController implements ClassResourceInterfac
         try {
             $this->editAndDeleteSecurity($offre);
             $em = $this->getEM();
-            $idFile = 0;
-            $files = $request->files->all();
-            $form = $this->createForm(OffreType::class);
-            $form->setData($offre);
-            $form->submit($files, false);
-            if (!$form->isValid()) {
+            $form = $this->createForm(OffreType::class, $offre);
+            $fileProcessed = $this->get('apm_core.images_loader')->loadImages($request, $em, $offre, $form);
+            if (!is_array($fileProcessed)) return new JsonResponse($fileProcessed, Response::HTTP_BAD_REQUEST);
+            if ($fileProcessed <= 0) {
                 return new JsonResponse([
-                    "status" => 400,
-                    "message" => $this->get('translator')->trans($form->getErrors(true, false), [], 'FOSUserBundle')
+                    "status" => Response::HTTP_BAD_REQUEST,
+                    "message" => $this->get('translator')->trans("Fichier trop grand ou invalide. type requis: [jpg, png, gif]", [], 'FOSUserBundle')
                 ], Response::HTTP_BAD_REQUEST);
             }
-            $fileProcessed = 0;
-            foreach ($files as $image) {
-                $idFile += 1;
-                $file = $image['file'];
-                /** @var UploadedFile $file */
-                if (null == $file || !$file->isValid()) continue;
-                $imageIdFile = 'imagefile' . $idFile;
-                $this->get('vich_uploader.upload_handler')->upload($offre, $imageIdFile);
-                $x = $request->request->get('file' . $idFile)['x'];
-                $y = $request->request->get('file' . $idFile)['y'];
-                $w = $request->request->get('file' . $idFile)['w'];
-                $h = $request->request->get('file' . $idFile)['h'];
-                $path = $this->get('vich_uploader.storage')->resolveUri($offre, $imageIdFile);
-                $this->get('apm_core.image_maker')->setCropParameters($x, $y, $w, $h, $path, $imageIdFile, $offre);
-
-                $fileProcessed++;
-            }
-            $em->flush();
-
-            $status = Response::HTTP_OK;
-            $response = [
+            return new JsonResponse([
                 "status" => 200,
-                "message" => $this->get('translator')->trans($fileProcessed . " fichier(s) traité(s)", [], 'FOSUserBundle')
-            ];
-
-            if ($fileProcessed <= 0) {
-                $status = Response::HTTP_NO_CONTENT;
-                $response = [
-                    "status" => Response::HTTP_NO_CONTENT,
-                    "message" => $this->get('translator')->trans("Aucun fichier traité, types de ficiers valides: [jpg, png, gif]", [], 'FOSUserBundle')
-                ];
-            }
-            return new JsonResponse($response, $status);
+                "message" => $this->get('translator')->trans($fileProcessed[0] . " fichier(s) chargé(s); " . $fileProcessed[1] . "image(s) traité(s)", [], 'FOSUserBundle')
+            ], Response::HTTP_OK);
         } catch (ConstraintViolationException $cve) {
             return new JsonResponse([
                 "status" => 400,
@@ -620,12 +599,33 @@ class OffreController extends FOSRestController implements ClassResourceInterfac
      * requirements = {
      *      {"name"="id", "dataType"="integer", "requirement"="\d+", "description"="offre Id"}
      * },
+     * parameters= {
+     *      {"name"="imagefile1[file]", "dataType"="file", "required"= false, "description"="file 01 top"},
+     *      {"name"="imagefile1[x]", "dataType"="integer", "required"= true, "description"="horizontal start point 01"},
+     *      {"name"="imagefile1[y]", "dataType"="integer", "required"= true, "description"="vertical start point 01"},
+     *      {"name"="imagefile1[w]", "dataType"="integer", "required"= true, "description"="width 01"},
+     *      {"name"="imagefile1[h]", "dataType"="integer", "required"= true, "description"="height 01"},
+     *      {"name"="imagefile2[file]", "dataType"="file", "required"= false, "description"="file 02 bottom"},
+     *      {"name"="imagefile2[x]", "dataType"="integer", "required"= true, "description"="horizontal start point 02"},
+     *      {"name"="imagefile2[y]", "dataType"="integer", "required"= true, "description"="vertical start point 02"},
+     *      {"name"="imagefile2[w]", "dataType"="integer", "required"= true, "description"="width 02"},
+     *      {"name"="imagefile2[h]", "dataType"="integer", "required"= true, "description"="height 02"},
+     *      {"name"="imagefile3[file]", "dataType"="file", "required"= false, "description"="file 03 left side"},
+     *      {"name"="imagefile3[x]", "dataType"="integer", "required"= true, "description"="horizontal start point 03"},
+     *      {"name"="imagefile3[y]", "dataType"="integer", "required"= true, "description"="vertical start point 03"},
+     *      {"name"="imagefile3[w]", "dataType"="integer", "required"= true, "description"="width 03"},
+     *      {"name"="imagefile3[h]", "dataType"="integer", "required"= true, "description"="height 03"},
+     *      {"name"="imagefile4[file]", "dataType"="file", "required"= false, "description"="file 04 right side"},
+     *      {"name"="imagefile4[x]", "dataType"="integer", "required"= true, "description"="horizontal start point 04"},
+     *      {"name"="imagefile4[y]", "dataType"="integer", "required"= true, "description"="vertical start point 04"},
+     *      {"name"="imagefile4[w]", "dataType"="integer", "required"= true, "description"="width 04"},
+     *      {"name"="imagefile4[h]", "dataType"="integer", "required"= true, "description"="height 04"},
+     *  },
      * input={
      *    "class"="APM\VenteBundle\Entity\Offre",
      *     "parsers" = {
      *          "Nelmio\ApiDocBundle\Parser\ValidationParser"
      *      },
-     *    "name" = "Offre",
      * },
      *      views = {"default", "vente" }
      * )
@@ -633,14 +633,14 @@ class OffreController extends FOSRestController implements ClassResourceInterfac
      * @param Offre $offre
      * @return View | JsonResponse
      *
-     * @Put("/edit/offre/{id}")
+     * @Post("/edit/offre/{id}")
      */
     public function editAction(Request $request, Offre $offre)
     {
         try {
             $this->editAndDeleteSecurity($offre);
             $form = $this->createForm('APM\VenteBundle\Form\OffreType', $offre);
-            $form->submit($request->request->all(), false);
+            $form->submit(array_merge($request->request->all(), $request->files->all()), false);
             if (!$form->isValid()) {
                 return new JsonResponse([
                     "status" => 400,
@@ -704,9 +704,6 @@ class OffreController extends FOSRestController implements ClassResourceInterfac
             $em = $this->getEM();
             $em->remove($offre);
             $em->flush();
-            /** @var $dispatcher EventDispatcherInterface */
-            /*$dispatcher = $this->get('event_dispatcher');
-            $dispatcher->dispatch(APMEvents::REGISTRATION_INITIALIZE, $event);*/
             return new JsonResponse(['status' => 200], Response::HTTP_OK);
         } catch (ConstraintViolationException $cve) {
             return new JsonResponse([
