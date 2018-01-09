@@ -33,12 +33,19 @@ class RegistrationStaffController extends FOSRestController
      * @ApiDoc(
      * resource=true,
      * description="Create a staff account",
-     *  input={
-     *   "class"="APM\UserBundle\Entity\Admin",
-     *   "parsers" = {
-     *      "Nelmio\ApiDocBundle\Parser\ValidationParser"
-     *    }
+     *
+     * parameters= {
+     *      {"name"="imagefilex", "dataType"="integer", "required"= true, "description"="horizontal start point"},
+     *      {"name"="imagefiley", "dataType"="integer", "required"= true, "description"="vertical start point"},
+     *      {"name"="imagefilew", "dataType"="integer", "required"= true, "description"="width"},
+     *      {"name"="imagefileh", "dataType"="integer", "required"= true, "description"="height"},
      *  },
+     * input={
+     *    "class"="APM\UserBundle\Form\Type\AdminFormType",
+     *     "parsers" = {
+     *          "Nelmio\ApiDocBundle\Parser\FormTypeParser"
+     *      }
+     * },
      *  statusCodes={
      *     "output" = "Ends by sending a confirmation e-mail to the staff's address",
      *     200="Returned when successful",
@@ -48,7 +55,7 @@ class RegistrationStaffController extends FOSRestController
      * },
      *     views={"default","profile"}
      * ),
-     * @Post("/register-staff")
+     * @Post("/register")
      * @param Request $request
      * @return JsonResponse|Response
      */

@@ -16,7 +16,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Vich\UploaderBundle\Mapping\PropertyMappingFactory;
 use Vich\UploaderBundle\Storage\StorageInterface;
-
+use Symfony\Component\Form\FormInterface;
 class ImagesMaker implements ContainerAwareInterface
 {
     /**
@@ -38,10 +38,11 @@ class ImagesMaker implements ContainerAwareInterface
         /** @var RequestStack $request */
         $request = $this->container->get('request_stack');
         $data = $request->getCurrentRequest()->request->all();
-        $x = $data[$imageIdFile]['x'];
-        $y = $data[$imageIdFile]['y'];
-        $w = $data[$imageIdFile]['w'];
-        $h = $data[$imageIdFile]['h'];
+
+        $x = $data[$imageIdFile . 'x'];
+        $y = $data[$imageIdFile . 'y'];
+        $w = $data[$imageIdFile . 'w'];
+        $h = $data[$imageIdFile . 'h'];
 
         /** @var StorageInterface $storage */
         $storage = $this->container->get('vich_uploader.storage');

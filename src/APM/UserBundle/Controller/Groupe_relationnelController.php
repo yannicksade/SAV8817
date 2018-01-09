@@ -261,12 +261,17 @@ class Groupe_relationnelController extends FOSRestController
      * headers={
      *      { "name"="Authorization",  "required"=true, "description"="Authorization token"}
      * },
+     * parameters= {
+     *      {"name"="imagefilex", "dataType"="integer", "required"= true, "description"="horizontal start point"},
+     *      {"name"="imagefiley", "dataType"="integer", "required"= true, "description"="vertical start point"},
+     *      {"name"="imagefilew", "dataType"="integer", "required"= true, "description"="width"},
+     *      {"name"="imagefileh", "dataType"="integer", "required"= true, "description"="height"},
+     *  },
      * input={
-     *    "class"="APM\UserBundle\Entity\Groupe_relationnel",
+     *    "class"="APM\UserBundle\Form\Groupe_relationnelType",
      *     "parsers" = {
-     *          "Nelmio\ApiDocBundle\Parser\ValidationParser"
-     *      },
-     *    "name" = "Groupe_relationnel",
+     *          "Nelmio\ApiDocBundle\Parser\FormTypeParser"
+     *      }
      * },
      * views = {"default", "user" }
      * )
@@ -281,9 +286,9 @@ class Groupe_relationnelController extends FOSRestController
             $this->createSecurity();
             /** @var Groupe_relationnel $groupe_relationnel */
             $groupe_relationnel = TradeFactory::getTradeProvider("groupe_relationnel");
-            $form = $this->createForm('APM\UserBundle\Form\Groupe_relationnelType');
-            $form->setData($groupe_relationnel);
-            $form->submit($request->request->all());
+            $form = $this->createForm('APM\UserBundle\Form\Groupe_relationnelType', $groupe_relationnel);
+            $data = $request->request->has($form->getName()) ? $request->request->get($form->getName()) : $data[$form->getName()] = array();
+            $form->submit(array_merge($data, $request->files->get($form->getName())));
             if (!$form->isValid()) {
                 return new JsonResponse([
                     "status" => 400,
@@ -416,28 +421,33 @@ class Groupe_relationnelController extends FOSRestController
      * requirements = {
      *      {"name"="id", "dataType"="integer", "requirement"="\d+", "description"="groupe_relationnel Id"}
      * },
+     * parameters= {
+     *      {"name"="imagefilex", "dataType"="integer", "required"= true, "description"="horizontal start point"},
+     *      {"name"="imagefiley", "dataType"="integer", "required"= true, "description"="vertical start point"},
+     *      {"name"="imagefilew", "dataType"="integer", "required"= true, "description"="width"},
+     *      {"name"="imagefileh", "dataType"="integer", "required"= true, "description"="height"},
+     *  },
      * input={
-     *    "class"="APM\UserBundle\Entity\Groupe_relationnel",
+     *    "class"="APM\UserBundle\Form\Groupe_relationnelType",
      *     "parsers" = {
-     *          "Nelmio\ApiDocBundle\Parser\ValidationParser"
+     *          "Nelmio\ApiDocBundle\Parser\FormTypeParser"
      *      },
-     *    "name" = "Groupe_relationnel",
      * },
-     *
      * views = {"default", "user" }
      * )
      * @param Request $request
      * @param Groupe_relationnel $groupe_relationnel
      * @return View | JsonResponse
      *
-     * @Put("/edit/grouperelationnel/{id}")
+     * @Post("/edit/grouperelationnel/{id}")
      */
     public function editAction(Request $request, Groupe_relationnel $groupe_relationnel)
     {
         try {
             $this->editAndDeleteSecurity($groupe_relationnel);
             $form = $this->createForm('APM\UserBundle\Form\Groupe_relationnelType', $groupe_relationnel);
-            $form->submit($request->request->all(), false);
+            $data = $request->request->has($form->getName()) ? $request->request->get($form->getName()) : $data[$form->getName()] = array();
+            $form->submit(array_merge($data, $request->files->get($form->getName())), false);
             if (!$form->isValid()) {
                 return new JsonResponse([
                     "status" => 400,

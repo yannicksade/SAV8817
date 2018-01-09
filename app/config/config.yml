@@ -7,8 +7,15 @@ imports:
 # http://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
 parameters:
     locale: fr
-    url_images_offre: assets/images/offres
-    url_images_boutique: assets/images/boutiques
+    url_offre_images: assets/images/offres
+    url_boutique_images: assets/images/boutiques
+    url_group_images: assets/images/group_users
+    url_user_images: assets/images/users
+    url_animation_images: assets/images/animations
+    url_animation_files: assets/files/animations
+    url_boutique_files: assets/files/boutiques
+    url_offre_files: assets/files/offres
+
     basic_filter: loaded_image #image initial
     fos_user.resetting.token_ttl: 86400
 
@@ -160,24 +167,72 @@ vich_uploader:
     db_driver: orm # or mongodb or propel or phpcr
     mappings:
         offre_images:
-            uri_prefix:         %url_images_offre%
-            upload_destination: %kernel.root_dir%/../web/%url_images_offre%
+            uri_prefix:         %url_offre_images%
+            upload_destination: %kernel.root_dir%/../web/%url_offre_images%
             inject_on_load: false
             delete_on_update: true
             delete_on_remove: true
             namer:               vich_uploader.namer_uniqid
             directory_namer:     vich_uploader.directory_namer_subdir
             #options: {chars_per_dir: 1, dirs: 2} #vich_uploader.namer_directory_property
-
+        offre_files:
+            uri_prefix:         %url_offre_files%
+            upload_destination: %kernel.root_dir%/../web/%url_offre_files%
+            inject_on_load: false
+            delete_on_update: true
+            delete_on_remove: true
+            namer:               vich_uploader.namer_uniqid
+            directory_namer:     vich_uploader.directory_namer_subdir
         boutique_images:
-            uri_prefix:         %url_images_boutique%
-            upload_destination: %kernel.root_dir%/../web/%url_images_boutique%
+            uri_prefix:         %url_boutique_images%
+            upload_destination: %kernel.root_dir%/../web/%url_boutique_images%
             inject_on_load: false
             delete_on_update: true
             delete_on_remove: true
             namer:               vich_uploader.namer_uniqid
             directory_namer:     vich_uploader.directory_namer_subdir
             #options: {chars_per_dir: 1, dirs: 2} #vich_uploader.namer_directory_property
+        boutique_files:
+            uri_prefix:         %url_boutique_files%
+            upload_destination: %kernel.root_dir%/../web/%url_boutique_files%
+            inject_on_load: false
+            delete_on_update: true
+            delete_on_remove: true
+            namer:               vich_uploader.namer_uniqid
+            directory_namer:     vich_uploader.directory_namer_subdir
+        group_users_images:
+            uri_prefix:         %url_group_images%
+            upload_destination: %kernel.root_dir%/../web/%url_group_images%
+            inject_on_load: false
+            delete_on_update: true
+            delete_on_remove: true
+            namer:               vich_uploader.namer_uniqid
+            directory_namer:     vich_uploader.directory_namer_subdir
+            #options: {chars_per_dir: 1, dirs: 2} #vich_uploader.namer_directory_property
+        user_images:
+            uri_prefix:         %url_user_images%
+            upload_destination: %kernel.root_dir%/../web/%url_user_images%
+            inject_on_load: false
+            delete_on_update: true
+            delete_on_remove: true
+            namer:               vich_uploader.namer_uniqid
+            directory_namer:     vich_uploader.directory_namer_subdir
+        animation_images:
+            uri_prefix:         %url_animation_images%
+            upload_destination: %kernel.root_dir%/../web/%url_animation_images%
+            inject_on_load: false
+            delete_on_update: true
+            delete_on_remove: true
+            namer:               vich_uploader.namer_uniqid
+            directory_namer:     vich_uploader.directory_namer_subdir
+        animation_files:
+            uri_prefix:         %url_animation_files%
+            upload_destination: %kernel.root_dir%/../web/%url_animation_files%
+            inject_on_load: false
+            delete_on_update: true
+            delete_on_remove: true
+            namer:               vich_uploader.namer_uniqid
+            directory_namer:     vich_uploader.directory_namer_subdir
 
 liip_imagine :
     # configure resolvers
@@ -251,7 +306,7 @@ nelmio_api_doc:
      motd:
           template:             'NelmioApiDocBundle::Components/motd.html.twig'
      cache:
-         enabled: true
+         enabled: false
      sandbox:
         enabled:  true
         authentication:

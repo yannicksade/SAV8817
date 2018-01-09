@@ -80,11 +80,17 @@ class ProfileController extends FOSRestController
      * requirements= {
      *      {"name"="id", "dataType"="integer", "requirement"="\d+", "description" = "user id"}
      * },
+     * parameters= {
+     *      {"name"="imagefilex", "dataType"="integer", "required"= true, "description"="horizontal start point"},
+     *      {"name"="imagefiley", "dataType"="integer", "required"= true, "description"="vertical start point"},
+     *      {"name"="imagefilew", "dataType"="integer", "required"= true, "description"="width"},
+     *      {"name"="imagefileh", "dataType"="integer", "required"= true, "description"="height"},
+     *  },
      * input={
-     *    "class"="APM\UserBundle\Entity\Utilisateur_avm",
-     *   "parsers" = {
-     *      "Nelmio\ApiDocBundle\Parser\ValidationParser"
-     *    }
+     *    "class"="APM\UserBundle\Form\Type\ProfileUtilisateur_avmFormType",
+     *     "parsers" = {
+     *          "Nelmio\ApiDocBundle\Parser\FormTypeParser"
+     *      }
      * },
      * output={
      *   "class"="APM\UserBundle\Entity\Utilisateur_avm",
@@ -106,9 +112,9 @@ class ProfileController extends FOSRestController
      * @param Utilisateur_avm $user
      * @return View|JsonResponse|Response
      *
-     * @Patch("/patch/profile/user/{id}")
+     * @Post("/edit/profile/user/{id}")
      */
-    public function patchUserAction(Request $request, Utilisateur_avm $user)
+    public function editUserAction(Request $request, Utilisateur_avm $user)
     {
         try {
             $this->securityUser($user);
@@ -151,11 +157,17 @@ class ProfileController extends FOSRestController
      * requirements= {
      *      {"name"="id", "dataType"="integer", "requirement"="\d+", "description" = "staff id"}
      * },
+     * parameters= {
+     *      {"name"="imagefilex", "dataType"="integer", "required"= true, "description"="horizontal start point"},
+     *      {"name"="imagefiley", "dataType"="integer", "required"= true, "description"="vertical start point"},
+     *      {"name"="imagefilew", "dataType"="integer", "required"= true, "description"="width"},
+     *      {"name"="imagefileh", "dataType"="integer", "required"= true, "description"="height"},
+     *  },
      * input={
-     *    "class"="APM\UserBundle\Entity\Admin",
-     *   "parsers" = {
-     *      "Nelmio\ApiDocBundle\Parser\ValidationParser"
-     *    }
+     *    "class"="APM\UserBundle\Form\Type\AdminFormType",
+     *     "parsers" = {
+     *          "Nelmio\ApiDocBundle\Parser\FormTypeParser"
+     *      }
      * },
      * output={
      *   "class"="APM\UserBundle\Entity\Admin",
@@ -177,9 +189,9 @@ class ProfileController extends FOSRestController
      * @param Admin $user
      * @return View|JsonResponse
      *
-     * @Patch("/patch/profile/staff/{id}")
+     * @Post("/edit/profile/staff/{id}")
      */
-    public function patchStaffAction(Request $request, Admin $user)
+    public function editStaffAction(Request $request, Admin $user)
     {
         try {
             $this->securityStaff($user);

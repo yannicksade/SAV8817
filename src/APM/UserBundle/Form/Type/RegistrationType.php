@@ -13,8 +13,6 @@ use Symfony\Component\Form\Extension\Core\Type\ResetType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Vich\UploaderBundle\Form\Type\VichFileType;
-use Vich\UploaderBundle\Form\Type\VichImageType;
 
 class RegistrationType extends AbstractType
 {
@@ -55,9 +53,8 @@ class RegistrationType extends AbstractType
             ->add('telephone', NumberType::class)
             ->add('adresse', TextType::class)
             ->add('profession', TextType::class)
-            ->add('imageFile', VichImageType::class, [
+            ->add('imagefile', FileType::class, [
                 'required' => false,
-                'allow_delete' => true,
             ])
 
         ;

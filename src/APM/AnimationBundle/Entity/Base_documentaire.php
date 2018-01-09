@@ -56,23 +56,46 @@ class Base_documentaire extends TradeFactory
     private $objet;
 
     /**
+     * @Exclude
+     * @Assert\File( maxSize = "1024k",
+     *     mimeTypes = {"application/x-pdf", "application/pdf", "text/plain", "text/html"},
+     *     mimeTypesMessage = "Please upload a valid PDF"
+     * )
+     * @Vich\UploadableField(mapping="animation_files", fileNameProperty="animation")
+     * @var File
+     */
+    private $animationfile;
+
+    /**
      * @var string
      * @Expose
-     * @Groups({"others_document_details", "owner_document_details"})
-     * @ORM\Column(name="brochure", type="string")
+     * @Groups({"others_advert_details", "owner_advert_details"})
+     * @ORM\Column(name="animation", type="string")
      */
-    private $brochure;
+    private $animation;
+
 
     /**
      * @Exclude
-     * @Assert\File( maxSize = "1024k",
-     *     mimeTypes = {"application/pdf", "application/x-pdf"},
+     * @Assert\File(
+     *     maxSize = "5024k",
+     *     mimeTypes = {"image/jpeg", "image/png", "image/gif"},
      *     mimeTypesMessage = "Please upload a valid PDF"
      * )
-     * @Vich\UploadableField(mapping="brochures", fileNameProperty="brochure")
+     * @Vich\UploadableField(mapping="animation_images", fileNameProperty="image")
      * @var File
      */
-    private $productFile;
+    private $imagefile;
+
+    /**
+     * @Expose
+     * @Groups({"owner_list", "others_list", "owner_animation_details", "others_animation_details"})
+     * @var string
+     * @Type("string")
+     * @ORM\Column(name="image", type="string", nullable=true)
+     */
+    private $image;
+
 
     /**
      * @var \DateTime
@@ -127,24 +150,35 @@ class Base_documentaire extends TradeFactory
         $this->date = $this->updatedAt =  new \DateTime();
     }
 
-    public function getProductFile()
+    public function getAnimationfile()
     {
-        return $this->productFile;
+        return $this->animationfile;
     }
 
-    public function setProductFile(File $brochure = null)
+    public function setAnimationfile(File $brochure = null)
     {
-        $this->productFile = $brochure;
-
-        // VERY IMPORTANT:
-        // It is required that at least one field changes if you are using Doctrine,
-        // otherwise the event listeners won't be called and the file is lost
+        $this->animationfile = $brochure;
+        
         if ($brochure) {
             // if 'updatedAt' is not defined in your entity, use another property
             $this->updatedAt = new \DateTime('now');
         }
     }
 
+    public function getImagefile()
+    {
+        return $this->imagefile;
+    }
+
+    public function setImagefile(File $brochure = null)
+    {
+        $this->imagefile = $brochure;
+
+        if ($brochure) {
+            // if 'updatedAt' is not defined in your entity, use another property
+            $this->updatedAt = new \DateTime('now');
+        }
+    }
     /**
      * Get description
      *
@@ -280,29 +314,6 @@ class Base_documentaire extends TradeFactory
         return $this->objet;
     }
 
-    /**
-     * Get brochure
-     *
-     * @return string
-     */
-    public function getBrochure()
-    {
-        return $this->brochure;
-    }
-
-    /**
-     * Set brochure
-     *
-     * @param string $brochure
-     *
-     * @return Base_documentaire
-     */
-    public function setBrochure($brochure)
-    {
-        $this->brochure = $brochure;
-
-        return $this;
-    }
 
     /**
      * Get updatedAt
@@ -360,5 +371,53 @@ class Base_documentaire extends TradeFactory
     public function getProduits()
     {
         return $this->produits;
+    }
+
+    /**
+     * Get animation
+     *
+     * @return string
+     */
+    public function getAnimation()
+    {
+        return $this->animation;
+    }
+
+    /**
+     * Set animation
+     *
+     * @param string $animation
+     *
+     * @return Base_documentaire
+     */
+    public function setAnimation($animation)
+    {
+        $this->animation = $animation;
+
+        return $this;
+    }
+
+    /**
+     * Get image
+     *
+     * @return string
+     */
+    public function getImage()
+    {
+        return $this->image;
+    }
+
+    /**
+     * Set image
+     *
+     * @param string $image
+     *
+     * @return Base_documentaire
+     */
+    public function setImage($image)
+    {
+        $this->image = $image;
+
+        return $this;
     }
 }

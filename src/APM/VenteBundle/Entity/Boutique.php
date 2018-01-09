@@ -90,6 +90,27 @@ class Boutique extends TradeFactory
     private $nationalite;
 
     /**
+     * @Expose
+     * @Groups({"owner_boutique_details", "others_boutique_details"})
+     * @var string
+     * @Type("string")
+     * @ORM\Column(name="brochure", type="string", length=255, nullable=true)
+     */
+    private $brochure;
+
+    /**
+     * @Exclude
+     * @Assert\File(
+     *     maxSize = "10024k",
+     *     mimeTypes = {"application/x-pdf", "application/pdf", "text/plain"},
+     *     mimeTypesMessage = "Please upload a valid PDF"
+     * )
+     * @Vich\UploadableField(mapping="boutique_files", fileNameProperty="brochure")
+     * @var UploadedFile
+     */
+    private $brochurefile;
+
+    /**
      * @var boolean
      * @Type("bool")
      * @Expose
@@ -340,6 +361,18 @@ class Boutique extends TradeFactory
         return $this->designation;
     }
 
+    public function getBrochurefile()
+    {
+        return $this->brochurefile;
+    }
+
+    public function setBrochurefile(File $brochure = null)
+    {
+        $this->brochurefile = $brochure;
+        if ($brochure) {
+            $this->updatedAt = new \DateTime('now');
+        }
+    }
     public function getImagefile1()
     {
         return $this->imagefile1;
@@ -396,9 +429,6 @@ class Boutique extends TradeFactory
     {
         $this->imagefile4 = $image;
 
-        // VERY IMPORTANT:
-        // It is required that at least one field changes if you are using Doctrine,
-        // otherwise the event listeners won't be called and the file is lost
         if ($image) {
             // if 'updatedAt' is not defined in your entity, use another property
             $this->updatedAt = new \DateTime('now');
@@ -978,30 +1008,6 @@ class Boutique extends TradeFactory
     }
 
     /**
-     * Get image
-     *
-     * @return string
-     */
-    public function getImage()
-    {
-        return $this->image;
-    }
-
-    /**
-     * Set image
-     *
-     * @param string $image
-     *
-     * @return Boutique
-     */
-    public function setImage($image)
-    {
-        $this->image = $image;
-
-        return $this;
-    }
-
-    /**
      * Get updatedAt
      *
      * @return \DateTime
@@ -1165,6 +1171,30 @@ class Boutique extends TradeFactory
     public function setImage4($image4)
     {
         $this->image4 = $image4;
+
+        return $this;
+    }
+
+    /**
+     * Get brochure
+     *
+     * @return string
+     */
+    public function getBrochure()
+    {
+        return $this->brochure;
+    }
+
+    /**
+     * Set brochure
+     *
+     * @param string $brochure
+     *
+     * @return Boutique
+     */
+    public function setBrochure($brochure)
+    {
+        $this->brochure = $brochure;
 
         return $this;
     }

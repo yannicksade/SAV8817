@@ -5,6 +5,7 @@ namespace APM\UserBundle\Form\Type;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\CountryType;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -46,9 +47,8 @@ class ProfileAdminFormType extends AbstractType
                 /*'empty_value'=> 1,
                  'empty_data'=> null*/
             ))
-            ->add('imageFile', VichImageType::class, [
+            ->add('imagefile', FileType::class, [
                 'required' => false,
-                'allow_delete' => true,
             ]);
     }
 

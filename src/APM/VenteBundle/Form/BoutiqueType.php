@@ -5,6 +5,7 @@ namespace APM\VenteBundle\Form;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\CountryType;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -38,12 +39,23 @@ class BoutiqueType extends AbstractType
                 ],
                 'required' => false
             ))
-            ->add('imageFile', VichImageType::class, [
+            ->add('gerant')
+            ->add('imagefile1', FileType::class, [
                 'required' => false,
-                'allow_delete' => true,
+            ])
+            ->add('imagefile2', FileType::class, [
+                'required' => false,
+            ])
+            ->add('imagefile3', FileType::class, [
+                'required' => false,
 
             ])
-            ->add('gerant'); //<= le proprietaire doit rechercher le gérant avec son code, le system lui renverra son profile pour validation
+            ->add('imagefile4', FileType::class, [
+                'required' => false,
+            ])
+            ->add('brochurefile', FileType::class, [
+                'required' => false,
+            ]); //<= le proprietaire doit rechercher le gérant avec son code, le system lui renverra son profile pour validation
     }
 
     /**

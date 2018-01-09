@@ -62,7 +62,8 @@ class ProfileManager implements ContainerAwareInterface
                 ];
             }
             $form->setData($user);
-            $form->submit($request->request->all(), $clearMissing);
+            $data = $request->request->has($form->getName()) ? $request->request->get($form->getName()) : $data[$form->getName()] = array();
+            $form->submit(array_merge($data, $request->files->get($form->getName())), $clearMissing);
             if (!$form->isValid()) {
                 return [
                     "status" => 400,

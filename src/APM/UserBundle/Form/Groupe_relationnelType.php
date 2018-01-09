@@ -4,6 +4,7 @@ namespace APM\UserBundle\Form;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -34,12 +35,9 @@ class Groupe_relationnelType extends AbstractType
                     'COLLABORATEUR' => 7,
                     'Autre' => 8
                 ]))
-            ->add('imageFile', VichImageType::class, [
+            ->add('imagefile', FileType::class, [
                 'required' => false,
-                'allow_delete' => true,
-
-            ])
-            ;
+            ]);
     }
 
     /**

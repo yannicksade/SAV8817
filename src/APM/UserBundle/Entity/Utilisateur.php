@@ -147,22 +147,6 @@ abstract class Utilisateur extends BaseUser
      * @Groups({"owner_user_details"})
      */
     protected $adresse;
-
-    /**
-     * @var string
-     * @ORM\Column(name="image", type="string", nullable=true)
-     * @Expose
-     * @Groups({"owner_list", "others_list", "owner_user_details", "others_user_details"})
-     */
-    protected $image;
-
-    /**
-     * @Exclude
-     * @Vich\UploadableField(mapping="entity_images", fileNameProperty="image")
-     * @var File
-     */
-    protected $imageFile;
-
     /**
      * @Expose
      * @Groups({"owner_user_details", "others_user_details"})
@@ -170,24 +154,43 @@ abstract class Utilisateur extends BaseUser
      * @var \DateTime
      */
     protected $updatedAt;
+    /**
+     * @Exclude
+     * @Assert\File(
+     *     maxSize = "5024k",
+     *     mimeTypes = {"image/jpeg", "image/png", "image/gif"},
+     *     mimeTypesMessage = "Please upload a valid PDF"
+     * )
+     * @Vich\UploadableField(mapping="user_images", fileNameProperty="image")
+     * @var UploadedFile
+     */
+    private $imagefile;
+    /**
+     * @Expose
+     * @Groups({"owner_list", "others_list", "owner_user_details", "others_user_details"})
+     * @var string
+     * @Type("string")
+     * @ORM\Column(name="image", type="string", nullable=true)
+     */
+    private $image;
 
-    public function getImageFile()
+    public function getImagefile()
     {
-        return $this->imageFile;
+        return $this->imagefile;
     }
 
-    public function setImageFile(File $image = null)
+    public function setImagefile(File $image = null)
     {
-        $this->imageFile = $image;
-
         // VERY IMPORTANT:
         // It is required that at least one field changes if you are using Doctrine,
         // otherwise the event listeners won't be called and the file is lost
+        // if 'updatedAt' is not defined in your entity, use another property
+        $this->imagefile = $image;
         if ($image) {
-            // if 'updatedAt' is not defined in your entity, use another property
             $this->updatedAt = new \DateTime('now');
         }
     }
+
 
     /**
      * Get nom

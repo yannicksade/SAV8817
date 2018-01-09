@@ -72,7 +72,8 @@ class RegistrationManager implements ContainerAwareInterface
             $formFactory = $this->container->get('pugx_multi_user.registration_form_factory');
             $form = $formFactory->createForm();
             $form->setData($user);
-            $form->submit($request->request->all());
+            $data = $request->request->has($form->getName()) ? $request->request->get($form->getName()) : $data[$form->getName()] = array();
+            $form->submit(array_merge($data, $request->files->get($form->getName())));
 
             if (!$form->isValid()) {
                 $event = new FormEvent($form, $request);

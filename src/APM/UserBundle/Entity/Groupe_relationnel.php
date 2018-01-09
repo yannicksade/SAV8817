@@ -16,7 +16,8 @@ use JMS\Serializer\Annotation\ExclusionPolicy;
 use JMS\Serializer\Annotation\Expose;
 use JMS\Serializer\Annotation\Exclude;
 use JMS\Serializer\Annotation\Groups;
-
+use JMS\Serializer\Annotation\MaxDepth;
+use JMS\Serializer\Annotation\Type;
 /**
  * Groupe_Relationnel
  *
@@ -106,20 +107,25 @@ class Groupe_relationnel extends TradeFactory
     private $boutique;
 
     /**
-     * @var string
+     * @Exclude
+     * @Assert\File(
+     *     maxSize = "5024k",
+     *     mimeTypes = {"image/jpeg", "image/png", "image/gif"},
+     *     mimeTypesMessage = "Please upload a valid PDF"
+     * )
+     * @Vich\UploadableField(mapping="group_users_images", fileNameProperty="image")
+     * @var UploadedFile
+     */
+    private $imagefile;
+
+    /**
      * @Expose
      * @Groups({"others_list", "owner_list", "owner_groupeR_details", "others_groupeR_details"})
+     * @var string
+     * @Type("string")
      * @ORM\Column(name="image", type="string", nullable=true)
      */
     private $image;
-
-    /**
-     * @Exclude
-     * @Assert\Image()
-     * @Vich\UploadableField(mapping="entity_images", fileNameProperty="image")
-     * @var File
-     *     */
-    private $imageFile;
 
     /**
      * @Expose
@@ -164,20 +170,16 @@ class Groupe_relationnel extends TradeFactory
         $this->dateCreation = $this->updatedAt = new \DateTime('now');
     }
 
-    public function getImageFile()
+
+    public function getImagefile()
     {
-        return $this->imageFile;
+        return $this->imagefile;
     }
 
-    public function setImageFile(File $image = null)
+    public function setImagefile(File $image = null)
     {
-        $this->imageFile = $image;
-
-        // VERY IMPORTANT:
-        // It is required that at least one field changes if you are using Doctrine,
-        // otherwise the event listeners won't be called and the file is lost
+        $this->imagefile = $image;
         if ($image) {
-            // if 'updatedAt' is not defined in your entity, use another property
             $this->updatedAt = new \DateTime('now');
         }
     }
@@ -436,29 +438,6 @@ class Groupe_relationnel extends TradeFactory
         $this->conversationalGroup = $conversationalGroup;
     }
 
-    /**
-     * Get image
-     *
-     * @return string
-     */
-    public function getImage()
-    {
-        return $this->image;
-    }
-
-    /**
-     * Set image
-     *
-     * @param string $image
-     *
-     * @return Groupe_relationnel
-     */
-    public function setImage($image)
-    {
-        $this->image = $image;
-
-        return $this;
-    }
 
     /**
      * Get updatedAt
@@ -507,4 +486,28 @@ class Groupe_relationnel extends TradeFactory
 
         return $this;
     }
+
+    /**
+     * @return string $image
+     */
+    public function getImage()
+    {
+
+        return $this->image;
+    }
+
+    /**
+     * Set image1
+     *
+     * @param string $image
+     *
+     * @return Groupe_relationnel
+     */
+    public function setImage($image)
+    {
+        $this->image = $image;
+
+        return $this;
+    }
+
 }

@@ -205,7 +205,7 @@ class Base_documentaireController extends FOSRestController
     {
         $this->listAndShowSecurity();
         $downloadHandler = $this->get('vich_uploader.download_handler');
-        $fileName = $document->getBrochure();
+        $fileName = $document->getAnimation();
         $fileName = explode('.', $fileName);
         $fileName = $document->getObjet() . '.' . $fileName[1];
         return $downloadHandler->downloadObject($document, $fileField = 'productFile', $objectClass = null, $fileName);
@@ -227,12 +227,17 @@ class Base_documentaireController extends FOSRestController
      * requirements={
      *      {"name"="id", "requirement"="\d+", "dataType"="integer", "description"="offre_id"}
      * },
+     * parameters= {
+     *      {"name"="imagefilex", "dataType"="integer", "required"= true, "description"="horizontal start point"},
+     *      {"name"="imagefiley", "dataType"="integer", "required"= true, "description"="vertical start point"},
+     *      {"name"="imagefilew", "dataType"="integer", "required"= true, "description"="width"},
+     *      {"name"="imagefileh", "dataType"="integer", "required"= true, "description"="height"},
+     *  },
      * input={
-     *    "class"="APM\AchatBundle\Entity\Base_documentaire",
+     *    "class"="APM\AnimationBundle\Form\Base_documentaireType",
      *     "parsers" = {
-     *          "Nelmio\ApiDocBundle\Parser\ValidationParser"
+     *          "Nelmio\ApiDocBundle\Parser\FormTypeParser"
      *      },
-     *    "name" = "Base_documentaire",
      * },
      *  views = {"default", "animation" }
      * )
@@ -248,7 +253,8 @@ class Base_documentaireController extends FOSRestController
             /** @var Base_documentaire $document */
             $document = TradeFactory::getTradeProvider("base_documentaire");
             $form = $this->createForm('APM\AnimationBundle\Form\Base_documentaireType', $document);
-            $form->submit($request->request->all());
+            $data = $request->request->has($form->getName()) ? $request->request->get($form->getName()) : $data[$form->getName()] = array();
+            $form->submit(array_merge($data, $request->files->get($form->getName())));
             if (!$form->isValid()) {
                 return new JsonResponse([
                     "status" => 400,
@@ -348,12 +354,17 @@ class Base_documentaireController extends FOSRestController
      * requirements = {
      *      {"name"="id", "dataType"="integer", "requirement"="\d+", "description"="document Id"}
      * },
+     * parameters= {
+     *      {"name"="imagefilex", "dataType"="integer", "required"= true, "description"="horizontal start point"},
+     *      {"name"="imagefiley", "dataType"="integer", "required"= true, "description"="vertical start point"},
+     *      {"name"="imagefilew", "dataType"="integer", "required"= true, "description"="width"},
+     *      {"name"="imagefileh", "dataType"="integer", "required"= true, "description"="height"},
+     *  },
      * input={
-     *     "class"="APM\AchatBundle\Entity\Base_documentaire",
+     *    "class"="APM\AnimationBundle\Form\Base_documentaireType",
      *     "parsers" = {
-     *          "Nelmio\ApiDocBundle\Parser\ValidationParser"
+     *          "Nelmio\ApiDocBundle\Parser\FormTypeParser"
      *      },
-     *    "name" = "Document",
      * },
      *     views={"default","animation"}
      *)
@@ -361,14 +372,15 @@ class Base_documentaireController extends FOSRestController
      * @param Base_documentaire $document
      * @return View | JsonResponse
      *
-     * @Put("/edit/document/{id}")
+     * @Post("/edit/document/{id}")
      */
     public function editAction(Request $request, Base_documentaire $document)
     {
         try {
             $this->editAndDeleteSecurity($document);
             $form = $this->createForm('APM\AnimationBundle\Form\Base_documentaireType', $document);
-            $form->submit($request->request->all(), false);
+            $data = $request->request->has($form->getName()) ? $request->request->get($form->getName()) : $data[$form->getName()] = array();
+            $form->submit(array_merge($data, $request->files->get($form->getName())), false);
             if (!$form->isValid()) {
                 return new JsonResponse(
                     [

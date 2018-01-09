@@ -10,6 +10,7 @@ use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\MoneyType;
+use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\PercentType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
@@ -17,6 +18,7 @@ use Symfony\Component\Form\Extension\Core\Type\TimeType;
 use Symfony\Component\Form\Extension\Core\Type\UrlType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Vich\UploaderBundle\Form\Type\VichFileType;
 use Vich\UploaderBundle\Form\Type\VichImageType;
 
 class OffreType extends AbstractType
@@ -164,23 +166,21 @@ class OffreType extends AbstractType
                 ]
 
             )
-            ->add('imagefile1', VichImageType::class, [
+            ->add('imagefile1', FileType::class, [
                 'required' => false,
-                'allow_delete' => true
             ])
-            ->add('imagefile2', VichImageType::class, [
+            ->add('imagefile2', FileType::class, [
                 'required' => false,
-                'allow_delete' => true
             ])
-            ->add('imagefile3', VichImageType::class, [
+            ->add('imagefile3', FileType::class, [
                 'required' => false,
-                'allow_delete' => true
 
             ])
-            ->add('imagefile4', VichImageType::class, [
+            ->add('imagefile4', FileType::class, [
                 'required' => false,
-                'allow_delete' => true
-
+            ])
+            ->add('brochurefile', FileType::class, [
+                'required' => false,
             ]);
     }
 
@@ -191,8 +191,7 @@ class OffreType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(array(
-            'data_class' => 'APM\VenteBundle\Entity\Offre',
-            'allow_extra_fields' => true,
+            'data_class' => 'APM\VenteBundle\Entity\Offre'
         ));
     }
 

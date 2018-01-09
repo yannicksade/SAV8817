@@ -31,12 +31,19 @@ class RegistrationUserController extends FOSRestController
      * @ApiDoc(
      * resource=true,
      * description="Create a user account",
+     *
+     * parameters= {
+     *      {"name"="imagefilex", "dataType"="integer", "required"= true, "description"="horizontal start point"},
+     *      {"name"="imagefiley", "dataType"="integer", "required"= true, "description"="vertical start point"},
+     *      {"name"="imagefilew", "dataType"="integer", "required"= true, "description"="width"},
+     *      {"name"="imagefileh", "dataType"="integer", "required"= true, "description"="height"},
+     *  },
      * input={
-     *   "class"="APM\UserBundle\Entity\Utilisateur_avm",
-     *   "parsers" = {
-     *      "Nelmio\ApiDocBundle\Parser\ValidationParser"
-     *    }
-     *     },
+     *    "class"="APM\UserBundle\Form\Type\Utilisateur_avmFormType",
+     *     "parsers" = {
+     *          "Nelmio\ApiDocBundle\Parser\FormTypeParser"
+     *      }
+     * },
      * statusCodes={
      *     "output" = "Ends by sending a confirmation e-mail to your address",
      *     200="Returned when successful",

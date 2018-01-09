@@ -23,12 +23,11 @@ class Base_documentaireType extends AbstractType
         $builder
             ->add('objet', TextType::class, ['required' => false])
             ->add('description', TextareaType::class, ['required' => false])
-            ->add('productFile', VichFileType::class, [
+            ->add('imagefile', FileType::class, [
                 'required' => false,
-                'allow_delete' => true,
-                /* 'download_link' => function (Base_documentaire $document)use($router) {
-                     return $router->generateRouteTo('apm_animation_base_documentaire_download', $document->getId());
-                 },*/
+            ])
+            ->add('animationfile', FileType::class, [
+                'required' => false,
             ]);
     }
 

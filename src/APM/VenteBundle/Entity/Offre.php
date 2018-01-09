@@ -23,6 +23,7 @@ use JMS\Serializer\Annotation\Exclude;
 use JMS\Serializer\Annotation\Groups;
 use JMS\Serializer\Annotation\MaxDepth;
 use JMS\Serializer\Annotation\Type;
+
 /**
  * Offre
  *
@@ -48,10 +49,21 @@ class Offre extends TradeFactory
      * @Groups({"owner_offre_details", "others_offre_details"})
      * @var string
      * @Type("string")
-     * @Assert\Url
-     * @ORM\Column(name="dataSheet", type="string", length=255, nullable=true)
+     * @ORM\Column(name="brochure", type="string", length=255, nullable=true)
      */
-    private $dataSheet;
+    private $brochure;
+
+    /**
+     * @Exclude
+     * @Assert\File(
+     *     maxSize = "10024k",
+     *     mimeTypes = {"application/x-pdf", "application/pdf", "text/plain"},
+     *     mimeTypesMessage = "Please upload a valid PDF"
+     * )
+     * @Vich\UploadableField(mapping="offre_files", fileNameProperty="brochure")
+     * @var File
+     */
+    private $brochurefile;
 
     /**
      * @Expose
@@ -85,6 +97,7 @@ class Offre extends TradeFactory
 
     /**
      * @var string
+     *
      * @Type("string")
      * @Expose
      * @Groups({"owner_list", "others_list", "owner_offre_details", "others_offre_details"})
@@ -141,17 +154,6 @@ class Offre extends TradeFactory
      */
     private $apparenceNeuf;
 
-
-    /**
-     * @Expose
-     * @Groups({"owner_list", "others_list", "owner_offre_details", "others_offre_details"})
-     * @var string
-     * @Type("string")
-     * @ORM\Column(name="image1", type="string", nullable=true)
-     */
-    private $image1;
-
-
     /**
      * @Exclude
      * @Assert\File(
@@ -199,6 +201,15 @@ class Offre extends TradeFactory
      * @var File
      */
     private $imagefile4;
+
+    /**
+     * @Expose
+     * @Groups({"owner_list", "others_list", "owner_offre_details", "others_offre_details"})
+     * @var string
+     * @Type("string")
+     * @ORM\Column(name="image1", type="string", nullable=true)
+     */
+    private $image1;
 
     /**
      * @Expose
@@ -440,6 +451,19 @@ class Offre extends TradeFactory
         $this->updatedAt = $this->dateCreation = new \DateTime('now');
     }
 
+    public function getBrochurefile()
+    {
+        return $this->brochurefile;
+    }
+
+    public function setBrochurefile(File $brochure = null)
+    {
+        $this->brochurefile = $brochure;
+        if ($brochure) {
+            $this->updatedAt = new \DateTime('now');
+        }
+    }
+
     public function getImagefile1()
     {
         return $this->imagefile1;
@@ -452,7 +476,9 @@ class Offre extends TradeFactory
         // otherwise the event listeners won't be called and the file is lost
         // if 'updatedAt' is not defined in your entity, use another property
         $this->imagefile1 = $image;
-        $this->updatedAt = new \DateTime('now');
+        if ($image) {
+            $this->updatedAt = new \DateTime('now');
+        }
     }
 
     public function getImagefile2()
@@ -463,7 +489,9 @@ class Offre extends TradeFactory
     public function setImagefile2(File $image = null)
     {
         $this->imagefile2 = $image;
-        $this->updatedAt = new \DateTime('now');
+        if ($image) {
+            $this->updatedAt = new \DateTime('now');
+        }
     }
 
     public function getImagefile3()
@@ -474,7 +502,9 @@ class Offre extends TradeFactory
     public function setImagefile3(File $image = null)
     {
         $this->imagefile3 = $image;
-        $this->updatedAt = new \DateTime('now');
+        if ($image) {
+            $this->updatedAt = new \DateTime('now');
+        }
     }
 
     public function getImagefile4()
@@ -485,33 +515,11 @@ class Offre extends TradeFactory
     public function setImagefile4(File $image = null)
     {
         $this->imagefile4 = $image;
-        $this->updatedAt = new \DateTime('now');
-    }
-    /**
-     * Get dataSheet
-     *
-     * @return string
-     */
-    public function getDataSheet()
-    {
-        return $this->dataSheet;
+        if ($image) {
+            $this->updatedAt = new \DateTime('now');
+        }
     }
 
-    /**
-     * Set dataSheet
-     *
-     * @param string $dataSheet
-     *
-     * @return Offre
-     */
-    public function setDataSheet($dataSheet)
-    {
-        $dataSheet !== '' ?: $dataSheet = null;
-        $this->dataSheet = $dataSheet;
-        $this->updatedAt = new \DateTime('now');
-
-        return $this;
-    }
 
     /**
      * Get dateCreation
@@ -1269,11 +1277,6 @@ class Offre extends TradeFactory
         return $this->service_apres_ventes;
     }
 
-    public function __toString()
-    {
-        return $this->designation;
-    }
-
     /**
      * Get updatedAt
      *
@@ -1464,4 +1467,32 @@ class Offre extends TradeFactory
         return $this;
     }
 
+    /**
+     * Get brochure
+     *
+     * @return string
+     */
+    public function getBrochure()
+    {
+        return $this->brochure;
+    }
+
+    /**
+     * Set brochure
+     *
+     * @param string $brochure
+     *
+     * @return Offre
+     */
+    public function setBrochure($brochure)
+    {
+        $this->brochure = $brochure;
+
+        return $this;
+    }
+
+    public function __toString()
+    {
+        return $this->designation;
+    }
 }

@@ -100,7 +100,7 @@ security:
 
         - { path: ^/api/doc/profile, role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/api/doc/vente, role: IS_AUTHENTICATED_ANONYMOUSLY }
-        - { path: ^/api/doc, role: ROLE_USERAVM }
+        - { path: ^/api/doc, role: IS_AUTHENTICATED_ANONYMOUSLY }
 
 
         - { path: ^/login, role: IS_AUTHENTICATED_ANONYMOUSLY } # This is for All users logged in or anonymous
