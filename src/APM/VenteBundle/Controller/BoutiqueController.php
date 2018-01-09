@@ -477,6 +477,7 @@ class BoutiqueController extends FOSRestController implements ClassResourceInter
     {
         try {
             $this->editAndDeleteSecurity($boutique);
+            $oldGerant = $boutique->getGerant();
             $form = $this->createForm('APM\VenteBundle\Form\BoutiqueType', $boutique);
             $data = $request->request->has($form->getName()) ? $request->request->get($form->getName()) : $data[$form->getName()] = array();
             $form->submit(array_merge($data, $request->files->get($form->getName())), false);
@@ -487,8 +488,8 @@ class BoutiqueController extends FOSRestController implements ClassResourceInter
                 ], Response::HTTP_BAD_REQUEST);
             }
             //si le proprietaire change de gerant, il est remplacé dans touts les offres de la boutique
-            $oldGerant = $boutique->getGerant();
-            $this->personnelBoutique($boutique, $oldGerant, $editForm->get('gerant')->getData());
+
+            $this->personnelBoutique($boutique, $oldGerant, $boutique->getGerant());
             $em = $this->getEM();
             $em->flush();
             return $this->routeRedirectView("api_vente_show_boutique", ['id' => $boutique->getId()], Response::HTTP_OK);

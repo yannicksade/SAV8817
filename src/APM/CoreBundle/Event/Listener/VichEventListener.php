@@ -14,6 +14,7 @@ use Liip\ImagineBundle\Imagine\Cache\CacheManager;
 use Vich\UploaderBundle\Event\Event;
 use Vich\UploaderBundle\Storage\StorageInterface;
 use FOS\RestBundle\Request\ParamFetcher;
+
 class VichEventListener
 {
     /**
@@ -53,6 +54,7 @@ class VichEventListener
         $path = $prefix . '/' . $image;
         $this->mediaCaheManager->remove($path, $this->filter);
     }
+
     public function onVichuploaderPreupload(Event $event)
     {// remove vich files
     }
@@ -74,10 +76,15 @@ class VichEventListener
     public function onVichuploaderPostupload(Event $event)
     {
         $object = $event->getObject();
-        $imageIdFile = $event->getMapping()->getFilePropertyName();
-
-        $this->imagesMaker->treatImage($imageIdFile, $object);
-
+        $mapping = $event->getMapping();
+        $imageIdFile = $mapping->getFilePropertyName();
+        $fileMimeType = $mapping->getFile($object)->getMimeType();
+        if ($fileMimeType === "image/jpeg"
+            || $fileMimeType === "image/png"
+            || $fileMimeType === "image/gif"
+        ) {
+            $this->imagesMaker->treatImage($imageIdFile, $object);
+        }
     }
 
 }

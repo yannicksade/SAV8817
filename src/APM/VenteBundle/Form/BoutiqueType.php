@@ -26,6 +26,17 @@ class BoutiqueType extends AbstractType
                 'required' => false,
                 'placeholder' => 'choisir un pays>>'
             ])
+            ->add('etat', ChoiceType::class, [
+                'choices' => [
+                    'En activite' => 0,
+                    'Fermee' => 1,
+                    'Vente suspendue' => 2,
+                    'Vente sur commande' => 3,
+                    'Sous traitance' => 7,
+                    'Vente interdite' => 8,
+                ],
+                'attr' => ['class' => 'form-control etat'],
+            ])
             ->add('designation', TextType::class)
       /*      ->add('raisonSociale', TextType::class, ['required' => false])*/
             ->add('statutSocial', ChoiceType::class, array(
