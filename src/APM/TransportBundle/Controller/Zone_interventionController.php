@@ -21,6 +21,7 @@ use FOS\RestBundle\Controller\Annotations\Delete;
 use FOS\RestBundle\Controller\Annotations\Put;
 use FOS\RestBundle\Controller\Annotations\Patch;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 /**
@@ -219,12 +220,16 @@ class Zone_interventionController extends FOSRestController
      * headers={
      *      { "name"="Authorization",  "required"=true, "description"="Authorization token"}
      * },
+     * authentication= true,
+     * authenticationRoles= {
+     *          "ROLE_TRANSPORTEUR",
+     *           "ROLE_BOUTIQUE"
+     *     },
      * input={
-     *    "class"="APM\TransportBundle\Entity\Zone_intervention",
+     *     "class"="APM\TransportBundle\Form\Zone_interventionType",
      *     "parsers" = {
-     *          "Nelmio\ApiDocBundle\Parser\ValidationParser"
-     *      },
-     *    "name" = "zone_intervention",
+     *          "Nelmio\ApiDocBundle\Parser\FormTypeParser"
+     *      }
      * },
      *      views = {"default", "transport" }
      * )
@@ -239,7 +244,8 @@ class Zone_interventionController extends FOSRestController
             /** @var Zone_intervention $zone_intervention */
             $zone_intervention = TradeFactory::getTradeProvider("zone_intervention");
             $form = $this->createForm('APM\TransportBundle\Form\Zone_interventionType', $zone_intervention);
-            $form->submit($request->request->all());
+            $data = $request->request->has($form->getName()) ? $request->request->get($form->getName()) : $data[$form->getName()] = array();
+            $form->submit($data);
             if (!$form->isValid()) {
                 return new JsonResponse([
                     "status" => 400,
@@ -356,12 +362,16 @@ class Zone_interventionController extends FOSRestController
      * requirements = {
      *      {"name"="id", "dataType"="integer", "requirement"="\d+", "description"="Zone_intervention Id"}
      * },
+     * authentication= true,
+     * authenticationRoles= {
+     *          "ROLE_TRANSPORTEUR",
+     *           "ROLE_BOUTIQUE"
+     *     },
      * input={
-     *    "class"="APM\TransportBundle\Entity\Zone_intervention",
+     *     "class"="APM\TransportBundle\Form\Zone_interventionType",
      *     "parsers" = {
-     *          "Nelmio\ApiDocBundle\Parser\ValidationParser"
-     *      },
-     *    "name" = "zone_intervention",
+     *          "Nelmio\ApiDocBundle\Parser\FormTypeParser"
+     *      }
      * },
      *
      * views = {"default", "transport" }
@@ -388,7 +398,7 @@ class Zone_interventionController extends FOSRestController
             $em = $this->getEM();
             $em->flush();
 
-            return $this->routeRedirectView("api_transport_show_zoneintervention", ['id' => $zone_intervention->getId()], Response::HTTP_OK);
+            return new JsonResponse(['status' => 200], Response::HTTP_OK);
 
         } catch (ConstraintViolationException $cve) {
             return new JsonResponse(
@@ -476,7 +486,7 @@ class Zone_interventionController extends FOSRestController
             $em = $this->getEM();
             $em->remove($zone_intervention);
             $em->flush();
-            return $this->routeRedirectView("api_transport_get_zoneinterventions", [], Response::HTTP_OK);
+            return new JsonResponse(['status' => 200], Response::HTTP_OK);
         } catch (ConstraintViolationException $cve) {
             return new JsonResponse(
                 [

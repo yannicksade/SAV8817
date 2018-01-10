@@ -277,12 +277,15 @@ class CommunicationController extends FOSRestController
      * headers={
      *      { "name"="Authorization",  "required"=true, "description"="Authorization token"}
      * },
+     * authentication= true,
+     * authenticationRoles= {
+     *          "ROLE_USERAVM"
+     *     },
      * input={
-     *    "class"="APM\UserBundle\Entity\Communication",
+     *    "class"="APM\UserBundle\Form\CommunicationType",
      *     "parsers" = {
-     *          "Nelmio\ApiDocBundle\Parser\ValidationParser"
-     *      },
-     *    "name" = "Communication",
+     *          "Nelmio\ApiDocBundle\Parser\FormTypeParser"
+     *      }
      * },
      * views = {"default", "user" }
      * )
@@ -298,7 +301,8 @@ class CommunicationController extends FOSRestController
             /** @var Communication $communication */
             $communication = TradeFactory::getTradeProvider("communication");
             $form = $this->createForm('APM\UserBundle\Form\CommunicationType', $communication);
-            $form->submit($request->request->all());
+            $data = $request->request->has($form->getName()) ? $request->request->get($form->getName()) : $data[$form->getName()] = array();
+            $form->submit($data);
             if (!$form->isValid()) {
                 return new JsonResponse([
                     "status" => 400,
@@ -397,12 +401,15 @@ class CommunicationController extends FOSRestController
      * requirements = {
      *      {"name"="id", "dataType"="integer", "requirement"="\d+", "description"="communication Id"}
      * },
+     * authentication= true,
+     * authenticationRoles= {
+     *          "ROLE_USERAVM"
+     *     },
      * input={
-     *    "class"="APM\UserBundle\Entity\Communication",
+     *    "class"="APM\UserBundle\Form\CommunicationType",
      *     "parsers" = {
-     *          "Nelmio\ApiDocBundle\Parser\ValidationParser"
-     *      },
-     *    "name" = "Communication",
+     *          "Nelmio\ApiDocBundle\Parser\FormTypeParser"
+     *      }
      * },
      *
      * views = {"default", "user" }
@@ -418,7 +425,8 @@ class CommunicationController extends FOSRestController
         try {
             $this->editAndDeleteSecurity($communication);
             $form = $this->createForm('APM\UserBundle\Form\CommunicationType', $communication);
-            $form->submit($request->request->all(), false);
+            $data = $request->request->has($form->getName()) ? $request->request->get($form->getName()) : $data[$form->getName()] = array();
+            $form->submit($data, false);
             if (!$form->isValid()) {
                 return new JsonResponse([
                     "status" => 400,
@@ -427,7 +435,7 @@ class CommunicationController extends FOSRestController
             }
             $em = $this->getEM();
             $em->flush();
-            return $this->routeRedirectView("api_user_show_communication", ['id' => $communication->getId()], Response::HTTP_OK);
+            return new JsonResponse(['status' => 200], Response::HTTP_OK);
         } catch (ConstraintViolationException $cve) {
             return new JsonResponse([
                 "status" => 400,
@@ -499,7 +507,7 @@ class CommunicationController extends FOSRestController
             $em = $this->getEM();
             $em->remove($communication);
             $em->flush();
-            return $this->routeRedirectView("api_user_get_communications", [], Response::HTTP_OK);
+            return new JsonResponse(['status' => 200], Response::HTTP_OK);
         } catch (ConstraintViolationException $cve) {
             return new JsonResponse(
                 [

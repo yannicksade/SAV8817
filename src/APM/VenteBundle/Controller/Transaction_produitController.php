@@ -246,12 +246,15 @@ class Transaction_produitController extends FOSRestController
      *  requirements={
      *      {"name"="id", "required"=true, "requirement"="\d+", "dataType"="integer", "description"= "transaction_produit Id"}
      *  },
+     * authentication= true,
+     * authenticationRoles= {
+     *          "ROLE_USERAVM"
+     *     },
      * input={
-     *    "class"="APM\VenteBundle\Entity\Transaction_produit",
+     *    "class"="APM\VenteBundle\Form\Transaction_produitType",
      *     "parsers" = {
-     *          "Nelmio\ApiDocBundle\Parser\ValidationParser"
-     *      },
-     *    "name" = "Transaction_produit",
+     *          "Nelmio\ApiDocBundle\Parser\FormTypeParser"
+     *      }
      * },
      *      views = {"default", "vente" }
      * )
@@ -277,7 +280,8 @@ class Transaction_produitController extends FOSRestController
             }
             $form = $this->createForm('APM\VenteBundle\Form\Transaction_produitType', $transaction_produit);
             if (null !== $transaction) $form->remove('transaction'); else $transaction = $trans;
-            $form->submit($request->request->all());
+            $data = $request->request->has($form->getName()) ? $request->request->get($form->getName()) : $data[$form->getName()] = array();
+            $form->submit($data);
             if (!$form->isValid()) {
                 return new JsonResponse([
                     "status" => 400,
@@ -400,12 +404,15 @@ class Transaction_produitController extends FOSRestController
      * requirements = {
      *      {"name"="id", "dataType"="integer", "requirement"="\d+", "description"="transaction_produit Id"}
      * },
+     * authentication= true,
+     * authenticationRoles= {
+     *          "ROLE_USERAVM"
+     *     },
      * input={
-     *    "class"="APM\VenteBundle\Entity\Transaction_produit",
+     *    "class"="APM\VenteBundle\Form\Transaction_produitType",
      *     "parsers" = {
-     *          "Nelmio\ApiDocBundle\Parser\ValidationParser"
-     *      },
-     *    "name" = "Transaction_produit",
+     *          "Nelmio\ApiDocBundle\Parser\FormTypeParser"
+     *      }
      * },
      *
      * views = {"default", "vente" }
@@ -422,7 +429,8 @@ class Transaction_produitController extends FOSRestController
         try {
             $this->editAndDeleteSecurity($transaction_produit);
             $form = $this->createForm('APM\VenteBundle\Form\Transaction_produitType', $transaction_produit);
-            $form->submit($request->request->all(), false);
+            $data = $request->request->has($form->getName()) ? $request->request->get($form->getName()) : $data[$form->getName()] = array();
+            $form->submit($data, false);
             if (!$form->isValid()) {
                 return new JsonResponse([
                     "status" => 400,
@@ -431,7 +439,7 @@ class Transaction_produitController extends FOSRestController
             }
             $em = $this->getEM();
             $em->flush();
-            return $this->routeRedirectView("api_vente_show_transaction-produit", ['id' => $transaction_produit->getId()], Response::HTTP_OK);
+            return new JsonResponse(['status' => 200], Response::HTTP_OK);
         } catch (ConstraintViolationException $cve) {
             return new JsonResponse([
                 "status" => 400,
@@ -500,11 +508,10 @@ class Transaction_produitController extends FOSRestController
                     "message" => $this->get('translator')->trans('impossible de supprimer', [], 'FOSUserBundle')
                 ], Response::HTTP_BAD_REQUEST);
             }
-            $transaction = $transaction_produit->getTransaction();
             $em = $this->getEM();
             $em->remove($transaction_produit);
             $em->flush();
-            return $this->routeRedirectView("api_vente_new_transaction-produit_transaction", [$transaction->getId()], Response::HTTP_OK);
+            return new JsonResponse(['status' => 200], Response::HTTP_OK);
         } catch (ConstraintViolationException $cve) {
             return new JsonResponse(
                 [

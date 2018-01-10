@@ -61,7 +61,6 @@ class ProfileController extends FOSRestController
      * )
      * @param Utilisateur $user
      * @return JsonResponse
-     * @Patch("/show/profile/{id}", name="_pass")
      * @Get("/show/profile/{id}")
      */
     public function showAction(Utilisateur $user)
@@ -80,18 +79,23 @@ class ProfileController extends FOSRestController
      * requirements= {
      *      {"name"="id", "dataType"="integer", "requirement"="\d+", "description" = "user id"}
      * },
-     * parameters= {
-     *      {"name"="imagefilex", "dataType"="integer", "required"= true, "description"="horizontal start point"},
-     *      {"name"="imagefiley", "dataType"="integer", "required"= true, "description"="vertical start point"},
-     *      {"name"="imagefilew", "dataType"="integer", "required"= true, "description"="width"},
-     *      {"name"="imagefileh", "dataType"="integer", "required"= true, "description"="height"},
-     *  },
+     * authentication= true,
+     * authenticationRoles= {
+     *          "ROLE_USERAVM"
+     *     },
      * input={
      *    "class"="APM\UserBundle\Form\Type\ProfileUtilisateur_avmFormType",
      *     "parsers" = {
      *          "Nelmio\ApiDocBundle\Parser\FormTypeParser"
      *      }
      * },
+     * parameters= {
+     *      {"name"="imagefilex", "dataType"="integer", "required"= true, "description"="horizontal start point"},
+     *      {"name"="imagefiley", "dataType"="integer", "required"= true, "description"="vertical start point"},
+     *      {"name"="imagefilew", "dataType"="integer", "required"= true, "description"="width"},
+     *      {"name"="imagefileh", "dataType"="integer", "required"= true, "description"="height"},
+     *  },
+     *
      * output={
      *   "class"="APM\UserBundle\Entity\Utilisateur_avm",
      *   "parsers" = {
@@ -100,7 +104,7 @@ class ProfileController extends FOSRestController
      *     "groups"={"owner_user_details", "owner_list"}
      * },
      * statusCodes={
-     *     "output" = "Return user profile",
+     *     "output" = "Return user profile if POST is used",
      *     200="Returned when successful",
      *     400="Returned when the data are not valid or an unknown error occurs",
      *     403="Returned when the user is not authorized to perform the action",
@@ -112,6 +116,7 @@ class ProfileController extends FOSRestController
      * @param Utilisateur_avm $user
      * @return View|JsonResponse|Response
      *
+     * @Put("/edit/profile/user/{id}")
      * @Post("/edit/profile/user/{id}")
      */
     public function editUserAction(Request $request, Utilisateur_avm $user)
@@ -125,7 +130,9 @@ class ProfileController extends FOSRestController
                 $request->setMethod('GET');
                 return $this->routeRedirectView('api_user_show', ['id' => $utilisateur->getId()]);
             }
-            return new JsonResponse($response, Response::HTTP_BAD_REQUEST);
+            $response = $request->isMethod('PUT') ? new JsonResponse(['status' => 200], Response::HTTP_OK) : $this->routeRedirectView("api_user_show", ['id' => $user->getId()], Response::HTTP_OK);
+
+            return $response;
 
         } catch (AccessDeniedException $ads) {
             return new JsonResponse([
@@ -154,6 +161,16 @@ class ProfileController extends FOSRestController
      * headers={
      *      { "name"="Authorization", "required"="true", "description"="Authorization token"},
      * },
+     * authentication= true,
+     * authenticationRoles= {
+     *          "ROLE_STAFF"
+     *     },
+     * input={
+     *     "class"="APM\UserBundle\Form\Type\ProfileAdminFormType",
+     *     "parsers" = {
+     *          "Nelmio\ApiDocBundle\Parser\FormTypeParser"
+     *      }
+     * },
      * requirements= {
      *      {"name"="id", "dataType"="integer", "requirement"="\d+", "description" = "staff id"}
      * },
@@ -163,12 +180,7 @@ class ProfileController extends FOSRestController
      *      {"name"="imagefilew", "dataType"="integer", "required"= true, "description"="width"},
      *      {"name"="imagefileh", "dataType"="integer", "required"= true, "description"="height"},
      *  },
-     * input={
-     *    "class"="APM\UserBundle\Form\Type\AdminFormType",
-     *     "parsers" = {
-     *          "Nelmio\ApiDocBundle\Parser\FormTypeParser"
-     *      }
-     * },
+     *
      * output={
      *   "class"="APM\UserBundle\Entity\Admin",
      *   "parsers" = {
@@ -177,7 +189,7 @@ class ProfileController extends FOSRestController
      *     "groups"={"owner_user_details", "owner_list"}
      * },
      * statusCodes={
-     *     "output" = "Return user profile",
+     *     "output" = "Return user profile if POST is used",
      *     200="Returned when successful",
      *     400="Returned when the data are not valid or an unknown error occurs",
      *     403="Returned when the user is not authorized to perform the action",
@@ -189,6 +201,7 @@ class ProfileController extends FOSRestController
      * @param Admin $user
      * @return View|JsonResponse
      *
+     * @Put("/edit/profile/staff/{id}")
      * @Post("/edit/profile/staff/{id}")
      */
     public function editStaffAction(Request $request, Admin $user)
@@ -201,8 +214,8 @@ class ProfileController extends FOSRestController
                 return $this->routeRedirectView('api_user_show', ['id' => $utilisateur->getId()]);
             }
 
-            return new JsonResponse($response, Response::HTTP_BAD_REQUEST);
-
+            $response = $request->isMethod('PUT') ? new JsonResponse(['status' => 200], Response::HTTP_OK) : $this->routeRedirectView("api_user_show", ['id' => $user->getId()], Response::HTTP_OK);
+            return $response;
         } catch (AccessDeniedException $ads) {
             return new JsonResponse([
                     "status" => 403,

@@ -27,7 +27,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use FOS\RestBundle\Controller\Annotations\RouteResource;
 use FOS\RestBundle\Controller\Annotations\Get;
 use FOS\RestBundle\Controller\Annotations\Post;
-use FOS\RestBundle\Controller\Annotations\Patch;
+use FOS\RestBundle\Controller\Annotations\Put;
 use FOS\RestBundle\Controller\Annotations\Delete;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -68,7 +68,6 @@ class OffreController extends FOSRestController implements ClassResourceInterfac
      * @param Transaction|null $transaction
      * @return JsonResponse
      *
-     * @Delete("/cget/offres", name="s_format")
      * @Get("/cget/offres", name="s")
      * @Get("/cget/offres/boutique/{id}", name="s_boutique", requirements={"id"="boutique_id"})
      * @Get("/cget/offres/boutique/{id}/categorie/{categorie_id}", name="s_categorie", requirements={"id"="boutique_id", "categorie_id"="\d+"})
@@ -336,10 +335,16 @@ class OffreController extends FOSRestController implements ClassResourceInterfac
      * headers={
      *      { "name"="Authorization",  "required"=true, "description"="Authorization token"}
      * },
-     *  authentication= true,
-     *  authenticationRoles= {
-     *          "ROLE_"
+     * authentication= true,
+     * authenticationRoles= {
+     *          "ROLE_USERAVM"
      *     },
+     * input={
+     *    "class"="APM\VenteBundle\Form\OffreType",
+     *     "parsers" = {
+     *          "Nelmio\ApiDocBundle\Parser\FormTypeParser"
+     *      }
+     * },
      * parameters= {
      *      {"name"="imagefile1x", "dataType"="integer", "required"= true, "description"="horizontal start point 01"},
      *      {"name"="imagefile1y", "dataType"="integer", "required"= true, "description"="vertical start point 01"},
@@ -362,12 +367,6 @@ class OffreController extends FOSRestController implements ClassResourceInterfac
      *      {"name"="imagefile4h", "dataType"="integer", "required"= true, "description"="height 04"},
      *
      *  },
-     * input={
-     *    "class"="APM\VenteBundle\Form\OffreType",
-     *     "parsers" = {
-     *          "Nelmio\ApiDocBundle\Parser\FormTypeParser"
-     *      },
-     * },
      * views = {"default", "vente" }
      * )
      * @param Request $request
@@ -495,6 +494,16 @@ class OffreController extends FOSRestController implements ClassResourceInterfac
      * headers={
      *      { "name"="Authorization", "required"="true", "description"="Authorization token"}
      * },
+     * authentication= true,
+     * authenticationRoles= {
+     *          "ROLE_USERAVM"
+     *     },
+     * input={
+     *    "class"="APM\VenteBundle\Form\OffreType",
+     *     "parsers" = {
+     *          "Nelmio\ApiDocBundle\Parser\FormTypeParser"
+     *      }
+     * },
      * requirements = {
      *      {"name"="id", "dataType"="integer", "requirement"="\d+", "description"="offre Id"}
      * },
@@ -519,18 +528,13 @@ class OffreController extends FOSRestController implements ClassResourceInterfac
      *      {"name"="imagefile4w", "dataType"="integer", "required"= true, "description"="width 04"},
      *      {"name"="imagefile4h", "dataType"="integer", "required"= true, "description"="height 04"},
      *  },
-     * input={
-     *   "class"="APM\VenteBundle\Form\OffreType",
-     *     "parsers" = {
-     *          "Nelmio\ApiDocBundle\Parser\FormTypeParser"
-     *      }
-     * },
      *      views = {"default", "vente" }
      * )
      * @param Request $request
      * @param Offre $offre
      * @return View | JsonResponse
      *
+     * @Put("/edit/offre/{id}")
      * @Post("/edit/offre/{id}")
      */
     public function editAction(Request $request, Offre $offre)
@@ -548,7 +552,8 @@ class OffreController extends FOSRestController implements ClassResourceInterfac
             }
             $em = $this->getEM();
             $em->flush();
-            return $this->routeRedirectView("api_vente_show_offre", ['id' => $offre->getId()], Response::HTTP_OK);
+            $response = $request->isMethod('PUT') ? new JsonResponse(['status' => 200], Response::HTTP_OK) : $this->routeRedirectView("api_vente_show_offre", ['id' => $offre->getId()], Response::HTTP_OK);
+            return $response;
         } catch (ConstraintViolationException $cve) {
             return new JsonResponse([
                 "status" => 400,

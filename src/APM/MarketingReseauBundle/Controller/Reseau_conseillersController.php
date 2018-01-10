@@ -42,7 +42,7 @@ class Reseau_conseillersController extends FOSRestController
      *     "groups"={"net"},
      * },
      * statusCodes={
-     *     "output" = "A network ",
+     *     "output" = "A network of advisors",
      *     200="Returned when successful",
      *     403="Returned when the user is not authorized to perform the action",
      *     404="Returned when the specified resource is not found",
@@ -53,7 +53,7 @@ class Reseau_conseillersController extends FOSRestController
      * @return JsonResponse
      *
      * @Get("/get")
-     * @Put("/get/conseiller/{id}", name="_conseiller", requirements={"id"="conseiller_id"})
+     * @Get("/get/conseiller/{id}", name="_conseiller", requirements={"id"="conseiller_id"})
      */
     public function getAction(Conseiller $conseiller = null)
     {
@@ -71,7 +71,7 @@ class Reseau_conseillersController extends FOSRestController
                 }
             }
             $data = $this->get('apm_core.data_serialized')->getFormalData($conseiller, array("net", "owner_list"));
-            return new JsonResponse($data, 200);
+            return new JsonResponse($data, Response::HTTP_OK);
         } catch (AccessDeniedException $ads) {
             return new JsonResponse([
                     "status" => 403,
@@ -119,13 +119,15 @@ class Reseau_conseillersController extends FOSRestController
      * requirements = {
      *      {"name"="id", "dataType"="integer", "requirement"="\d+", "description"="conseiller Id"}
      * },
-     *
+     * authentication= true,
+     * authenticationRoles= {
+     *          "ROLE_CONSEILLER"
+     *     },
      * input={
-     *   "class"="APM\MarketingDistribueBundle\Entity\Conseiller",
-     *   "parsers" = {
-     *      "Nelmio\ApiDocBundle\Parser\JmsMetadataParser"
-     *    },
-     *     "groups"={"net"}
+     *     "class"="APM\MarketingReseauBundle\Form\Reseau_conseillersType",
+     *     "parsers" = {
+     *          "Nelmio\ApiDocBundle\Parser\FormTypeParser"
+     *      }
      * },
      *      views={"default", "marketing"}
      * )
@@ -148,7 +150,8 @@ class Reseau_conseillersController extends FOSRestController
                 $form->remove('modification');
                 $form->remove('position');
             }
-            $form->submit($request->request->all());
+            $data = $request->request->has($form->getName()) ? $request->request->get($form->getName()) : $data[$form->getName()] = array();
+            $form->submit($data);
             if (!$form->isValid()) {
                 return new JsonResponse([
                     "status" => 400,
@@ -336,12 +339,15 @@ class Reseau_conseillersController extends FOSRestController
      *      {"name"="id", "dataType"="integer", "requirement"="\d+", "description"="$advisorFictif Id"}
      * },
      *
+     * authentication= true,
+     * authenticationRoles= {
+     *          "ROLE_CONSEILLER"
+     *     },
      * input={
-     *   "class"="APM\MarketingDistribueBundle\Entity\Conseiller",
-     *   "parsers" = {
-     *      "Nelmio\ApiDocBundle\Parser\JmsMetadataParser"
-     *    },
-     *     "groups"={"net"}
+     *     "class"="APM\MarketingReseauBundle\Form\Reseau_conseillersType",
+     *     "parsers" = {
+     *          "Nelmio\ApiDocBundle\Parser\FormTypeParser"
+     *      }
      * },
      *      views={"default", "marketing"}
      * )
@@ -358,7 +364,8 @@ class Reseau_conseillersController extends FOSRestController
             $form = $this->createForm('APM\MarketingReseauBundle\Form\Reseau_conseillersType');
             $form->remove('conseiller');
             $form->remove('modification');
-            $form->submit($request->request->all());
+            $data = $request->request->has($form->getName()) ? $request->request->get($form->getName()) : $data[$form->getName()] = array();
+            $form->submit($data);
             if (!$form->isValid()) {
                 return new JsonResponse([
                     "status" => 400,
@@ -409,7 +416,7 @@ class Reseau_conseillersController extends FOSRestController
 
                 $em->flush();
             }
-            return $this->routeRedirectView("api_marketing_get_reseau", [], Response::HTTP_CREATED);
+            return new JsonResponse(['status' => 200, 'message' => 'now, get network without parameters'], Response::HTTP_OK);
 
         } catch (ConstraintViolationException $cve) {
             return new JsonResponse([
@@ -460,8 +467,15 @@ class Reseau_conseillersController extends FOSRestController
      *      { "name"="Authorization", "required"=true, "description"="Authorization token"}
      * },
      *
-     * parameters = {
-     *      {"name"="nombreInstanceReseau", "required"=true, "dataType"="integer", "requirement"="\d+", "description"="0 or 1 for network creation"}
+     * authentication= true,
+     * authenticationRoles= {
+     *          "ROLE_CONSEILLER_A2"
+     *     },
+     * input={
+     *     "class"="APM\MarketingReseauBundle\Form\CreateReseau_conseillersType",
+     *     "parsers" = {
+     *          "Nelmio\ApiDocBundle\Parser\FormTypeParser"
+     *      }
      * },
      *  views = {"default", "marketing" }
      * )
@@ -476,6 +490,15 @@ class Reseau_conseillersController extends FOSRestController
             /** @var Utilisateur_avm $user */
             $user = $this->getUser();
             $conseiller = $user->getProfileConseiller();
+            $form = $this->createForm('APM\MarketingReseauBundle\Form\CreateReseau_conseillersType', $conseiller);
+            $data = $request->request->has($form->getName()) ? $request->request->get($form->getName()) : $data[$form->getName()] = array();
+            $form->submit($data);
+            if (!$form->isValid()) {
+                return new JsonResponse([
+                    "status" => 400,
+                    "message" => $this->get('translator')->trans($form->getErrors(true, false), [], 'FOSUserBundle')
+                ], Response::HTTP_BAD_REQUEST);
+            }
             $conseiller->setMasterConseiller($conseiller);
             $conseiller->setNombreInstanceReseau(1);
             $em = $this->getEM();

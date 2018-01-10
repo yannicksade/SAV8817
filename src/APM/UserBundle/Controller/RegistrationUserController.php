@@ -38,12 +38,14 @@ class RegistrationUserController extends FOSRestController
      *      {"name"="imagefilew", "dataType"="integer", "required"= true, "description"="width"},
      *      {"name"="imagefileh", "dataType"="integer", "required"= true, "description"="height"},
      *  },
+     *
      * input={
-     *    "class"="APM\UserBundle\Form\Type\Utilisateur_avmFormType",
+     *     "class"="APM\UserBundle\Form\Type\Utilisateur_avmFormType",
      *     "parsers" = {
      *          "Nelmio\ApiDocBundle\Parser\FormTypeParser"
      *      }
      * },
+     *
      * statusCodes={
      *     "output" = "Ends by sending a confirmation e-mail to your address",
      *     200="Returned when successful",

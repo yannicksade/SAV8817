@@ -224,6 +224,16 @@ class Base_documentaireController extends FOSRestController
      * headers={
      *      { "name"="Authorization", "required"=true, "description"="Authorization token"}
      * },
+     * authentication= true,
+     * authenticationRoles= {
+     *          "ROLE_USERAVM"
+     *     },
+     * input={
+     *     "class"="APM\AnimationBundle\Form\Base_documentaireType",
+     *     "parsers" = {
+     *          "Nelmio\ApiDocBundle\Parser\FormTypeParser"
+     *      }
+     * },
      * requirements={
      *      {"name"="id", "requirement"="\d+", "dataType"="integer", "description"="offre_id"}
      * },
@@ -233,12 +243,6 @@ class Base_documentaireController extends FOSRestController
      *      {"name"="imagefilew", "dataType"="integer", "required"= true, "description"="width"},
      *      {"name"="imagefileh", "dataType"="integer", "required"= true, "description"="height"},
      *  },
-     * input={
-     *    "class"="APM\AnimationBundle\Form\Base_documentaireType",
-     *     "parsers" = {
-     *          "Nelmio\ApiDocBundle\Parser\FormTypeParser"
-     *      },
-     * },
      *  views = {"default", "animation" }
      * )
      * @param Request $request
@@ -351,6 +355,16 @@ class Base_documentaireController extends FOSRestController
      * headers={
      *      { "name"="Authorization", "required"=true, "description"="Authorization token"}
      * },
+     * authentication= true,
+     * authenticationRoles= {
+     *          "ROLE_USERAVM"
+     *     },
+     * input={
+     *     "class"="APM\AnimationBundle\Form\Base_documentaireType",
+     *     "parsers" = {
+     *          "Nelmio\ApiDocBundle\Parser\FormTypeParser"
+     *      }
+     * },
      * requirements = {
      *      {"name"="id", "dataType"="integer", "requirement"="\d+", "description"="document Id"}
      * },
@@ -360,18 +374,13 @@ class Base_documentaireController extends FOSRestController
      *      {"name"="imagefilew", "dataType"="integer", "required"= true, "description"="width"},
      *      {"name"="imagefileh", "dataType"="integer", "required"= true, "description"="height"},
      *  },
-     * input={
-     *    "class"="APM\AnimationBundle\Form\Base_documentaireType",
-     *     "parsers" = {
-     *          "Nelmio\ApiDocBundle\Parser\FormTypeParser"
-     *      },
-     * },
      *     views={"default","animation"}
      *)
      * @param Request $request
      * @param Base_documentaire $document
      * @return View | JsonResponse
      *
+     * @Put("/edit/document/{id}")
      * @Post("/edit/document/{id}")
      */
     public function editAction(Request $request, Base_documentaire $document)
@@ -392,9 +401,8 @@ class Base_documentaireController extends FOSRestController
 
             $em = $this->getEM();
             $em->flush();
-
-            return $this->routeRedirectView("api_documentation_show_document", ["id" => $document->getId()], Response::HTTP_OK);
-
+            $response = $request->isMethod('PUT') ? new JsonResponse(['status' => 200], Response::HTTP_OK) : $this->routeRedirectView("api_documentation_show_document", ["id" => $document->getId()], Response::HTTP_OK);
+            return $response;
         } catch (ConstraintViolationException $cve) {
             return new JsonResponse(
                 [
@@ -468,13 +476,10 @@ class Base_documentaireController extends FOSRestController
                     "message" => $this->get('translator')->trans('impossible de supprimer', [], 'FOSUserBundle')
                 ], Response::HTTP_BAD_REQUEST);
             }
-
             $em = $this->getEM();
             $em->remove($document);
             $em->flush();
-
-            return $this->routeRedirectView("api_documentation_get_documents", [], Response::HTTP_OK);
-
+            return new JsonResponse(['status' => 200], Response::HTTP_OK);
         } catch (ConstraintViolationException $cve) {
             return new JsonResponse(
                 [

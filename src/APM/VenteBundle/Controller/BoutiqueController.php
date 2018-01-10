@@ -19,7 +19,7 @@ use Symfony\Component\HttpFoundation\Response;
 use FOS\RestBundle\Controller\Annotations\RouteResource;
 use FOS\RestBundle\Controller\Annotations\Get;
 use FOS\RestBundle\Controller\Annotations\Post;
-use FOS\RestBundle\Controller\Annotations\Patch;
+use FOS\RestBundle\Controller\Annotations\Put;
 use FOS\RestBundle\Controller\Annotations\Delete;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
@@ -258,6 +258,16 @@ class BoutiqueController extends FOSRestController implements ClassResourceInter
      * headers={
      *      { "name"="Authorization",  "required"=true, "description"="Authorization token"}
      * },
+     * authentication= true,
+     * authenticationRoles= {
+     *          "ROLE_BOUTIQUE"
+     *     },
+     * input={
+     *    "class"="APM\VenteBundle\Form\BoutiqueType",
+     *     "parsers" = {
+     *          "Nelmio\ApiDocBundle\Parser\FormTypeParser"
+     *      }
+     * },
      * parameters= {
      *      {"name"="imagefile1x", "dataType"="integer", "required"= true, "description"="horizontal start point 01"},
      *      {"name"="imagefile1y", "dataType"="integer", "required"= true, "description"="vertical start point 01"},
@@ -279,12 +289,6 @@ class BoutiqueController extends FOSRestController implements ClassResourceInter
      *      {"name"="imagefile4w", "dataType"="integer", "required"= true, "description"="width 04"},
      *      {"name"="imagefile4h", "dataType"="integer", "required"= true, "description"="height 04"},
      *  },
-     * input={
-     *    "class"="APM\VenteBundle\Form\BoutiqueType",
-     *     "parsers" = {
-     *          "Nelmio\ApiDocBundle\Parser\FormTypeParser"
-     *      },
-     * },
      * views = {"default", "vente" }
      * )
      * @param Request $request
@@ -343,45 +347,6 @@ class BoutiqueController extends FOSRestController implements ClassResourceInter
         return $this->get('doctrine.orm.entity_manager');
     }
 
-    public
-    function showImageAction(Request $request, Boutique $boutique)
-    {
-        $this->listAndShowSecurity();
-        $form = $this->createCrobForm($boutique);
-        $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
-            $this->get('apm_core.crop_image')->setCropParameters(intval($_POST['x']), intval($_POST['y']), intval($_POST['w']), intval($_POST['h']), $boutique->getImage(), $boutique);
-
-            return $this->redirectToRoute('apm_vente_boutique_show', array('id' => $boutique->getId()));
-        }
-
-        return $this->render('APMVenteBundle:boutique:image.html.twig', array(
-            'boutique' => $boutique,
-            'crop_form' => $form->createView(),
-            'url_image' => $this->get('apm_core.packages_maker')->getPackages()->getUrl('/', 'resolve_img'),
-        ));
-    }
-
-    private
-    function listAndShowSecurity()
-    {
-        //-----------------------------------security-------------------------------------------
-        $this->denyAccessUnlessGranted('ROLE_USERAVM', null, 'Unable to access this page!');
-        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_REMEMBERED') || !$this->getUser() instanceof Utilisateur_avm) {
-            throw $this->createAccessDeniedException();
-        }
-        //----------------------------------------------------------------------------------------
-    }
-
-    private
-    function createCrobForm(Boutique $boutique)
-    {
-        return $this->createFormBuilder()
-            ->setAction($this->generateUrl('apm_vente_boutique_show-image', array('id' => $boutique->getId())))
-            ->setMethod('POST')
-            ->getForm();
-    }
-
     /**
      * @ApiDoc(
      * resource=true,
@@ -420,6 +385,17 @@ class BoutiqueController extends FOSRestController implements ClassResourceInter
         return new JsonResponse($data, 200);
     }
 
+    private
+    function listAndShowSecurity()
+    {
+        //-----------------------------------security-------------------------------------------
+        $this->denyAccessUnlessGranted('ROLE_USERAVM', null, 'Unable to access this page!');
+        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_REMEMBERED') || !$this->getUser() instanceof Utilisateur_avm) {
+            throw $this->createAccessDeniedException();
+        }
+        //----------------------------------------------------------------------------------------
+    }
+
     /**
      * @ApiDoc(
      * resource=true,
@@ -433,6 +409,16 @@ class BoutiqueController extends FOSRestController implements ClassResourceInter
      * },
      * headers={
      *      { "name"="Authorization", "required"="true", "description"="Authorization token"}
+     * },
+     * authentication= true,
+     * authenticationRoles= {
+     *          "ROLE_BOUTIQUE"
+     *     },
+     * input={
+     *    "class"="APM\VenteBundle\Form\BoutiqueType",
+     *     "parsers" = {
+     *          "Nelmio\ApiDocBundle\Parser\FormTypeParser"
+     *      }
      * },
      * requirements = {
      *      {"name"="id", "dataType"="integer", "requirement"="\d+", "description"="boutique Id"}
@@ -458,22 +444,16 @@ class BoutiqueController extends FOSRestController implements ClassResourceInter
      *      {"name"="imagefile4w", "dataType"="integer", "required"= true, "description"="width 04"},
      *      {"name"="imagefile4h", "dataType"="integer", "required"= true, "description"="height 04"},
      *  },
-     * input={
-     *    "class"="APM\VenteBundle\Form\BoutiqueType",
-     *     "parsers" = {
-     *          "Nelmio\ApiDocBundle\Parser\FormTypeParser"
-     *      },
-     * },
      * views = {"default", "vente" }
      * )
      * @param Request $request
      * @param Boutique $boutique
      * @return View | JsonResponse
      *
+     * @Put("/edit/boutique/{id}")
      * @Post("/edit/boutique/{id}")
      */
-    public
-    function editAction(Request $request, Boutique $boutique)
+    public function editAction(Request $request, Boutique $boutique)
     {
         try {
             $this->editAndDeleteSecurity($boutique);
@@ -492,7 +472,8 @@ class BoutiqueController extends FOSRestController implements ClassResourceInter
             $this->personnelBoutique($boutique, $oldGerant, $boutique->getGerant());
             $em = $this->getEM();
             $em->flush();
-            return $this->routeRedirectView("api_vente_show_boutique", ['id' => $boutique->getId()], Response::HTTP_OK);
+            $response = $request->isMethod('PUT') ? new JsonResponse(['status' => 200], Response::HTTP_OK) : $this->routeRedirectView("api_vente_show_boutique", ['id' => $boutique->getId()], Response::HTTP_OK);
+            return $response;
         } catch (ConstraintViolationException $cve) {
             return new JsonResponse([
                 "status" => 400,
@@ -584,7 +565,7 @@ class BoutiqueController extends FOSRestController implements ClassResourceInter
             $em = $this->getEM();
             $em->remove($boutique);
             $em->flush();
-            return $this->routeRedirectView("api_vente_get_boutiques", [], Response::HTTP_OK);
+            return new JsonResponse(['status' => Response::HTTP_OK], Response::HTTP_OK);
         } catch (ConstraintViolationException $cve) {
             return new JsonResponse([
                 "status" => 400,

@@ -184,12 +184,15 @@ class Profile_transporteurController extends FOSRestController
      * headers={
      *      { "name"="Authorization",  "required"=true, "description"="Authorization token"}
      * },
+     * authentication= true,
+     * authenticationRoles= {
+     *          "ROLE_TRANSPORTEUR"
+     *     },
      * input={
-     *    "class"="APM\TransportBundle\Entity\Profile_transporteur",
+     *     "class"="APM\TransportBundle\Form\Profile_transporteurType",
      *     "parsers" = {
-     *          "Nelmio\ApiDocBundle\Parser\ValidationParser"
-     *      },
-     *    "name" = "Transporteur",
+     *          "Nelmio\ApiDocBundle\Parser\FormTypeParser"
+     *      }
      * },
      * views = {"default", "transport" }
      * )
@@ -206,7 +209,8 @@ class Profile_transporteurController extends FOSRestController
             $profile_transporteur = TradeFactory::getTradeProvider("transporteur");
             $form = $this->createForm('APM\TransportBundle\Form\Profile_transporteurType', $profile_transporteur);
             $form->remove('utilisateur');
-            $form->submit($request->request->all());
+            $data = $request->request->has($form->getName()) ? $request->request->get($form->getName()) : $data[$form->getName()] = array();
+            $form->submit($data);
             if (!$form->isValid()) {
                 return new JsonResponse([
                     "status" => 400,
@@ -305,27 +309,30 @@ class Profile_transporteurController extends FOSRestController
      * requirements = {
      *      {"name"="id", "dataType"="integer", "requirement"="\d+", "description"="transporteur Id"}
      * },
+     * authentication= true,
+     * authenticationRoles= {
+     *          "ROLE_TRANSPORTEUR"
+     *     },
      * input={
-     *    "class"="APM\TransportBundle\Entity\Profile_transporteur",
+     *     "class"="APM\TransportBundle\Form\Profile_transporteurType",
      *     "parsers" = {
-     *          "Nelmio\ApiDocBundle\Parser\ValidationParser"
-     *      },
-     *    "name" = "Transport",
+     *          "Nelmio\ApiDocBundle\Parser\FormTypeParser"
+     *      }
      * },
-     *
      * views = {"default", "transport" }
      * )
      * @param Request $request
      * @param Profile_transporteur $profile_transporteur
      * @return View | JsonResponse
-     * @Post("/edit/transporteur/{id}")
+     * @Put("/edit/transporteur/{id}")
      */
     public function editAction(Request $request, Profile_transporteur $profile_transporteur)
     {
         try {
             $this->editAndDeleteSecurity($profile_transporteur);
             $form = $this->createForm('APM\TransportBundle\Form\Profile_transporteurType', $profile_transporteur);
-            $form->submit($request->request->all(), false);
+            $data = $request->request->has($form->getName()) ? $request->request->get($form->getName()) : $data[$form->getName()] = array();
+            $form->submit($data, false);
             if (!$form->isValid()) {
                 return new JsonResponse([
                     "status" => 400,
@@ -334,7 +341,7 @@ class Profile_transporteurController extends FOSRestController
             }
             $em = $this->getEM();
             $em->flush();
-            return $this->routeRedirectView("api_transport_show_transporteur", ['id' => $profile_transporteur->getId()], Response::HTTP_OK);
+            return new JsonResponse(['status' => 200], Response::HTTP_OK);
         } catch (ConstraintViolationException $cve) {
             return new JsonResponse(
                 [
@@ -409,11 +416,10 @@ class Profile_transporteurController extends FOSRestController
                     "message" => $this->get('translator')->trans('impossible de supprimer', [], 'FOSUserBundle')
                 ], Response::HTTP_BAD_REQUEST);
             }
-            $user = $profile_transporteur->getUtilisateur();
             $em = $this->getEM();
             $em->remove($profile_transporteur);
             $em->flush();
-            return $this->routeRedirectView("api_user_show", [$user->getId()], Response::HTTP_OK);
+            return new JsonResponse(['status' => 200], Response::HTTP_OK);
         } catch (ConstraintViolationException $cve) {
             return new JsonResponse(
                 [

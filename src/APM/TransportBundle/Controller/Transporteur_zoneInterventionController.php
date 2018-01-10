@@ -27,6 +27,7 @@ use FOS\RestBundle\Controller\Annotations\Delete;
 use FOS\RestBundle\Controller\Annotations\Put;
 use FOS\RestBundle\Controller\Annotations\Patch;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 /**
@@ -182,15 +183,19 @@ class Transporteur_zoneInterventionController extends FOSRestController
      * headers={
      *      { "name"="Authorization",  "required"=true, "description"="Authorization token"}
      * },
+     * authentication= true,
+     * authenticationRoles= {
+     *          "ROLE_TRANSPORTEUR"
+     *     },
+     * input={
+     *     "class"="APM\TransportBundle\Form\Transporteur_zoneInterventionType",
+     *     "parsers" = {
+     *          "Nelmio\ApiDocBundle\Parser\FormTypeParser"
+     *      }
+     * },
      * requirements={
      *      {"name"="id", "required"=true, "requirement"="\d+", "dataType"="integer", "description"="transporteur Id"},
      *      {"name"="zone_id", "required"=true, "requirement"="\d+", "dataType"="integer", "description"="ZoneIntervention Id"}
-     * },
-     * input={
-     *    "class"="APM\TransportBundle\Entity\Transporteur_zoneintervention",
-     *     "parsers" = {
-     *          "Nelmio\ApiDocBundle\Parser\ValidationParser"
-     *      }
      * },
      *      views = {"default", "transport" }
      * )
@@ -209,7 +214,8 @@ class Transporteur_zoneInterventionController extends FOSRestController
             /** @var Transporteur_zoneintervention $transporteur_zoneIntervention */
             $transporteur_zoneIntervention = TradeFactory::getTradeProvider('transporteur_zoneIntervention');
             $form = $this->createForm('APM\TransportBundle\Transporteur_zoneInterventionType', $transporteur_zoneIntervention);
-            $form->submit($request->request->all());
+            $data = $request->request->has($form->getName()) ? $request->request->get($form->getName()) : $data[$form->getName()] = array();
+            $form->submit($data);
             if (!$form->isValid()) {
                 return new JsonResponse([
                     "status" => 400,
@@ -354,11 +360,16 @@ class Transporteur_zoneInterventionController extends FOSRestController
      * requirements = {
      *      {"name"="id", "dataType"="integer", "requirement"="\d+", "description"="transporteur_zoneintervention Id"}
      * },
+     * authentication= true,
+     * authenticationRoles= {
+     *          "ROLE_TRANSPORTEUR",
+     *           "ROLE_BOUTIQUE"
+     *     },
      * input={
-     *    "class"="APM\TransportBundle\Entity\Transporteur_zoneintervention",
+     *     "class"="APM\TransportBundle\Form\Transporteur_zoneInterventionType",
      *     "parsers" = {
-     *          "Nelmio\ApiDocBundle\Parser\ValidationParser"
-     *      },
+     *          "Nelmio\ApiDocBundle\Parser\FormTypeParser"
+     *      }
      * },
      * views = {"default", "transport" }
      * )
@@ -366,7 +377,7 @@ class Transporteur_zoneInterventionController extends FOSRestController
      * @param Transporteur_zoneintervention $transporteur_zoneintervention
      * @return JsonResponse| View
      *
-     * @Post("/edit/transporteur-zone/{id}")
+     * @Put("/edit/transporteur-zone/{id}")
      */
     public function editAction(Request $request, Transporteur_zoneintervention $transporteur_zoneintervention)
     {
@@ -382,9 +393,7 @@ class Transporteur_zoneInterventionController extends FOSRestController
             }
             $em = $this->getEM();
             $em->flush();
-
-            return $this->routeRedirectView("api_transport_show_transporteur-zoneintervention", ['id' => $transporteur_zoneintervention->getId()], Response::HTTP_OK);
-
+            return new JsonResponse(['status' => 200], Response::HTTP_OK);
         } catch (ConstraintViolationException $cve) {
             return new JsonResponse(
                 [
@@ -440,11 +449,10 @@ class Transporteur_zoneInterventionController extends FOSRestController
                     "message" => $this->get('translator')->trans('impossible de supprimer', [], 'FOSUserBundle')
                 ], Response::HTTP_BAD_REQUEST);
             }
-            $transporteur = $transporteur_zoneintervention->getTransporteur();
             $em = $this->getEM();
             $em->remove($transporteur_zoneintervention);
             $em->flush();
-            return $this->routeRedirectView("api_transport_get_transporteur-zoneinterventions_transporteur", [$transporteur->getId()], Response::HTTP_OK);
+            return new JsonResponse(['status' => 200], Response::HTTP_OK);
         } catch (ConstraintViolationException $cve) {
             return new JsonResponse(
                 [

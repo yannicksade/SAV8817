@@ -23,7 +23,7 @@ use FOS\RestBundle\Controller\Annotations\RouteResource;
 use FOS\RestBundle\Controller\Annotations\Get;
 use FOS\RestBundle\Controller\Annotations\Post;
 use FOS\RestBundle\Controller\Annotations\Delete;
-use FOS\RestBundle\Controller\Annotations\Patch;
+use FOS\RestBundle\Controller\Annotations\Put;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
@@ -271,12 +271,15 @@ class LivraisonController extends FOSRestController
      * headers={
      *      { "name"="Authorization",  "required"=true, "description"="Authorization token"}
      * },
+     * authentication= true,
+     * authenticationRoles= {
+     *          "ROLE_USERAVM"
+     *     },
      * input={
-     *    "class"="APM\TransportBundle\Entity\Livraison",
+     *    "class"="APM\TransportBundle\Form\LivraisonType",
      *     "parsers" = {
-     *          "Nelmio\ApiDocBundle\Parser\ValidationParser"
-     *      },
-     *    "name" = "Livraison",
+     *          "Nelmio\ApiDocBundle\Parser\FormTypeParser"
+     *      }
      * },
      *      views = {"default", "transport" }
      * )
@@ -302,7 +305,8 @@ class LivraisonController extends FOSRestController
             $livraison = TradeFactory::getTradeProvider("livraison");
             $form = $this->createForm('APM\TransportBundle\Form\LivraisonType', $livraison);
             if (null !== $transaction) $form->remove('operations');
-            $form->submit($request->request->all());
+            $data = $request->request->has($form->getName()) ? $request->request->get($form->getName()) : $data[$form->getName()] = array();
+            $form->submit($data);
             if (!$form->isValid()) {
                 return new JsonResponse([
                     "status" => 400,
@@ -439,12 +443,16 @@ class LivraisonController extends FOSRestController
      * requirements = {
      *      {"name"="id", "dataType"="integer", "requirement"="\d+", "description"="livraison Id"}
      * },
+     *
+     * authentication= true,
+     * authenticationRoles= {
+     *          "ROLE_USERAVM"
+     *     },
      * input={
-     *    "class"="APM\TransportBundle\Entity\Livraison",
+     *    "class"="APM\TransportBundle\Form\LivraisonType",
      *     "parsers" = {
-     *          "Nelmio\ApiDocBundle\Parser\ValidationParser"
-     *      },
-     *    "name" = "Transport",
+     *          "Nelmio\ApiDocBundle\Parser\FormTypeParser"
+     *      }
      * },
      *
      * views = {"default", "transport" }
@@ -453,14 +461,15 @@ class LivraisonController extends FOSRestController
      * @param Livraison $livraison
      * @return View | JsonResponse
      *
-     * @Get("/edit/livraison/{id}")
+     * @Put("/edit/livraison/{id}")
      */
     public function editAction(Request $request, Livraison $livraison)
     {
         try {
             $this->editAndDeleteSecurity($livraison);
             $form = $this->createForm('APM\TransportBundle\Form\LivraisonType', $livraison);
-            $form->submit($request->request->all(), false);
+            $data = $request->request->has($form->getName()) ? $request->request->get($form->getName()) : $data[$form->getName()] = array();
+            $form->submit($data, false);
             if (!$form->isValid()) {
                 return new JsonResponse([
                     "status" => 400,
@@ -476,7 +485,7 @@ class LivraisonController extends FOSRestController
             }
             $em = $this->getEM();
             $em->flush();
-            return $this->routeRedirectView("api_transport_show_livraison", ['id' => $livraison->getId()], Response::HTTP_OK);
+            return new JsonResponse(['status' => 200], Response::HTTP_OK);
         } catch (ConstraintViolationException $cve) {
             return new JsonResponse(
                 [
@@ -554,17 +563,10 @@ class LivraisonController extends FOSRestController
                     "message" => $this->get('translator')->trans('impossible de supprimer', [], 'FOSUserBundle')
                 ], Response::HTTP_BAD_REQUEST);
             }
-            if (null !== ($boutique = $livraison->getBoutique())) {
-                $route = "api_transport_get_livraisons_boutique";
-                $param = array("id" => $boutique->getId());
-            } else {
-                $route = "api_transport_get_livraisons";
-                $param = array();
-            }
             $em = $this->getEM();
             $em->remove($livraison);
             $em->flush();
-            return $this->routeRedirectView($route, $param, Response::HTTP_OK);
+            return new JsonResponse(['status' => 200], Response::HTTP_OK);
         } catch (ConstraintViolationException $cve) {
             return new JsonResponse(
                 [

@@ -83,7 +83,7 @@ class Rabais_offreController extends FOSRestController
      *      {"name"="start_filter", "dataType"="integer", "requirement"="\d+"},
      *  },
      * output={
-     *   "class"="APM\VenteBundle\Entity\Boutique",
+     *   "class"="APM\VenteBundle\Entity\Rabais_offre",
      *   "parsers" = {
      *      "Nelmio\ApiDocBundle\Parser\JmsMetadataParser"
      *    },
@@ -365,12 +365,15 @@ class Rabais_offreController extends FOSRestController
      *  requirements={
      *      {"name"="id", "requirement"="\d+", "dataType"="integer", "description"= "rabais_offre Id"}
      *  },
+     * authentication= true,
+     * authenticationRoles= {
+     *          "ROLE_USERAVM"
+     *     },
      * input={
-     *     "class"="APM\VenteBundle\Entity\Rabais_offre",
+     *    "class"="APM\VenteBundle\Form\Rabais_offreType",
      *     "parsers" = {
-     *          "Nelmio\ApiDocBundle\Parser\ValidationParser"
-     *      },
-     *    "name" = "Rabais_offre",
+     *          "Nelmio\ApiDocBundle\Parser\FormTypeParser"
+     *      }
      * },
      *     views = {"default", "vente" }
      * )
@@ -386,7 +389,8 @@ class Rabais_offreController extends FOSRestController
             /** @var Rabais_offre $rabais_offre */
             $rabais_offre = TradeFactory::getTradeProvider('rabais');
             $form = $this->createForm('APM\VenteBundle\Form\Rabais_offreType', $rabais_offre);
-            $form->submit($request->request->all());
+            $data = $request->request->has($form->getName()) ? $request->request->get($form->getName()) : $data[$form->getName()] = array();
+            $form->submit($data);
             if (!$form->isValid()) {
                 return new JsonResponse([
                     "status" => 400,
@@ -507,12 +511,15 @@ class Rabais_offreController extends FOSRestController
      * requirements = {
      *      {"name"="id", "dataType"="integer", "requirement"="\d+", "description"="Rabais_offre Id"}
      * },
+     * authentication= true,
+     * authenticationRoles= {
+     *          "ROLE_USERAVM"
+     *     },
      * input={
-     *    "class"="APM\VenteBundle\Entity\Rabais_offre",
+     *    "class"="APM\VenteBundle\Form\Rabais_offreType",
      *     "parsers" = {
-     *          "Nelmio\ApiDocBundle\Parser\ValidationParser"
-     *      },
-     *    "name" = "Rabais_offre",
+     *          "Nelmio\ApiDocBundle\Parser\FormTypeParser"
+     *      }
      * },
      *
      * views = {"default", "vente" }
@@ -528,7 +535,8 @@ class Rabais_offreController extends FOSRestController
         try {
             $this->editAndDeleteSecurity($rabais_offre);
             $form = $this->createForm('APM\VenteBundle\Form\Rabais_offreType', $rabais_offre);
-            $form->submit($request->request->all(), false);
+            $data = $request->request->has($form->getName()) ? $request->request->get($form->getName()) : $data[$form->getName()] = array();
+            $form->submit($data, false);
             if (!$form->isValid()) {
                 return new JsonResponse([
                     "status" => 400,
@@ -537,7 +545,7 @@ class Rabais_offreController extends FOSRestController
             }
             $em = $this->getEM();
             $em->flush();
-            return $this->routeRedirectView("api_vente_show_rabais", ['id' => $rabais_offre->getId()], Response::HTTP_OK);
+            return new JsonResponse(['status' => 200], Response::HTTP_OK);
         } catch (ConstraintViolationException $cve) {
             return new JsonResponse([
                 "status" => 400,
@@ -622,7 +630,7 @@ class Rabais_offreController extends FOSRestController
             $em = $this->getEM();
             $em->remove($rabais_offre);
             $em->flush();
-            return $this->routeRedirectView("api_vente_get_rabais_offre", [$offre->getId()], Response::HTTP_OK);
+            return new JsonResponse(['status' => 200], Response::HTTP_OK);
         } catch (ConstraintViolationException $cve) {
             return new JsonResponse(
                 [

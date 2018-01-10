@@ -27,7 +27,6 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use FOS\RestBundle\View\View;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-
 class ResettingManager implements ContainerAwareInterface
 {
 
@@ -126,7 +125,7 @@ class ResettingManager implements ContainerAwareInterface
     public function confirm($class, Request $request)
     {
         /** @var $formFactory FactoryInterface */
-        $formFactory = $this->container->get('fos_user.resetting.form.factory');
+        $formFactory = $this->container->get('fos_user.resetting.form.factory'); // the form is apm_user_resetting_form
         $form = $formFactory->createForm();
         $token = '';
         if ($request->query->has('token')) {
@@ -158,7 +157,8 @@ class ResettingManager implements ContainerAwareInterface
         $view = (new view(null, 200))->setFormat("html");
         if ($request->isMethod('POST')) {
             if ($request->request->has('token')) {
-                $form->submit($request->request->all());
+                $data = $request->request->has($form->getName()) ? $request->request->get($form->getName()) : $data[$form->getName()] = array();
+                $form->submit($data);
             } else {
                 $form->handleRequest($request);
             }
@@ -231,7 +231,8 @@ class ResettingManager implements ContainerAwareInterface
 
             $form = $formFactory->createForm();
             $form->setData($user);
-            $form->submit($request->request->all());
+            $data = $request->request->has($form->getName()) ? $request->request->get($form->getName()) : $data[$form->getName()] = array();
+            $form->submit($data);
 
             if (!$form->isValid()) {
                 return new JsonResponse([

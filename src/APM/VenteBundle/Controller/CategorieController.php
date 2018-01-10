@@ -255,12 +255,15 @@ class CategorieController extends FOSRestController
      * headers={
      *      { "name"="Authorization",  "required"=true, "description"="Authorization token"}
      * },
+     * authentication= true,
+     * authenticationRoles= {
+     *          "ROLE_BOUTIQUE"
+     *     },
      * input={
-     *    "class"="APM\VenteBundle\Entity\Categorie",
+     *    "class"="APM\VenteBundle\Form\CategorieType",
      *     "parsers" = {
-     *          "Nelmio\ApiDocBundle\Parser\ValidationParser"
-     *      },
-     *    "name" = "Categorie",
+     *          "Nelmio\ApiDocBundle\Parser\FormTypeParser"
+     *      }
      * },
      *      views = {"default", "vente" }
      * )
@@ -276,7 +279,8 @@ class CategorieController extends FOSRestController
             /** @var Categorie $categorie */
             $categorie = TradeFactory::getTradeProvider('categorie');
             $form = $this->createForm(CategorieType::class, $categorie);
-            $form->submit($request->request->all());
+            $data = $request->request->has($form->getName()) ? $request->request->get($form->getName()) : $data[$form->getName()] = array();
+            $form->submit($data);
             if (!$form->isValid()) {
                 return new JsonResponse([
                     "status" => 400,
@@ -393,14 +397,16 @@ class CategorieController extends FOSRestController
      * requirements = {
      *      {"name"="id", "dataType"="integer", "requirement"="\d+", "description"="categorie Id"}
      * },
+     * authentication= true,
+     * authenticationRoles= {
+     *          "ROLE_BOUTIQUE"
+     *     },
      * input={
-     *    "class"="APM\VenteBundle\Entity\Categorie",
+     *    "class"="APM\VenteBundle\Form\CategorieType",
      *     "parsers" = {
-     *          "Nelmio\ApiDocBundle\Parser\ValidationParser"
-     *      },
-     *    "name" = "Categorie",
+     *          "Nelmio\ApiDocBundle\Parser\FormTypeParser"
+     *      }
      * },
-     *
      * views = {"default", "vente" }
      * )
      * @param Request $request
@@ -414,7 +420,8 @@ class CategorieController extends FOSRestController
         try {
             $this->editAndDeleteSecurity($categorie);
             $form = $this->createForm('APM\VenteBundle\Form\CategorieType', $categorie);
-            $form->submit($request->request->all(), false);
+            $data = $request->request->has($form->getName()) ? $request->request->get($form->getName()) : $data[$form->getName()] = array();
+            $form->submit($data, false);
             if (!$form->isValid()) {
                 return new JsonResponse([
                     "status" => 400,
@@ -423,7 +430,7 @@ class CategorieController extends FOSRestController
             }
             $em = $this->getEM();
             $em->flush();
-            return $this->routeRedirectView("api_vente_show_categorie", ['id' => $categorie->getId()], Response::HTTP_OK);
+            return new JsonResponse(['status' => 200], Response::HTTP_OK);
         } catch (ConstraintViolationException $cve) {
             return new JsonResponse(
                 [
@@ -498,11 +505,10 @@ class CategorieController extends FOSRestController
                     "message" => $this->get('translator')->trans('impossible de supprimer', [], 'FOSUserBundle')
                 ], Response::HTTP_BAD_REQUEST);
             }
-            $boutique = $categorie->getBoutique();
             $em = $this->getEM();
             $em->remove($categorie);
             $em->flush();
-            return $this->routeRedirectView("api_vente_get_categories", [$boutique->getId()], Response::HTTP_OK);
+            return new JsonResponse(['status' => 200], Response::HTTP_OK);
         } catch (ConstraintViolationException $cve) {
             return new JsonResponse([
                 "status" => 400,

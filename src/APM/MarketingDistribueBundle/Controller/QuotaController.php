@@ -12,6 +12,7 @@ use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\View\View;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use FOS\RestBundle\Controller\Annotations\RouteResource;
 use FOS\RestBundle\Controller\Annotations\Get;
@@ -246,12 +247,15 @@ class QuotaController extends FOSRestController
      * requirements = {
      *      {"name"="id", "dataType"="integer", "requirement"="\d+", "description"="boutique Id"}
      * },
+     * authentication= true,
+     * authenticationRoles= {
+     *          "ROLE_BOUTIQUE"
+     *     },
      * input={
-     *    "class"="APM\MarketingDistribueBundle\Entity\Quota",
+     *     "class"="APM\MarketingDistribueBundle\Form\QuotaType",
      *     "parsers" = {
-     *          "Nelmio\ApiDocBundle\Parser\ValidationParser"
-     *      },
-     *    "name" = "Commission",
+     *          "Nelmio\ApiDocBundle\Parser\FormTypeParser"
+     *      }
      * },
      *  views = {"default", "marketing" }
      * )
@@ -268,7 +272,8 @@ class QuotaController extends FOSRestController
             /** @var Quota $quotum */
             $quotum = TradeFactory::getTradeProvider("quota");
             $form = $this->createForm('APM\MarketingDistribueBundle\Form\QuotaType', $quotum);
-            $form->submit($request->request->all());
+            $data = $request->request->has($form->getName()) ? $request->request->get($form->getName()) : $data[$form->getName()] = array();
+            $form->submit($data);
             if (!$form->isValid()) {
                 return new JsonResponse([
                     "status" => 400,
@@ -378,12 +383,15 @@ class QuotaController extends FOSRestController
      * requirements = {
      *      {"name"="id", "dataType"="integer", "requirement"="\d+", "description"="commission Id"}
      * },
+     * authentication= true,
+     * authenticationRoles= {
+     *          "ROLE_BOUTIQUE"
+     *     },
      * input={
-     *    "class"="APM\MarketingDistribueBundle\Entity\Quota",
+     *     "class"="APM\MarketingDistribueBundle\Form\QuotaType",
      *     "parsers" = {
-     *          "Nelmio\ApiDocBundle\Parser\ValidationParser"
-     *      },
-     *    "name" = "Quota",
+     *          "Nelmio\ApiDocBundle\Parser\FormTypeParser"
+     *      }
      * },
      *     views={"default","marketing"}
      * )
@@ -409,7 +417,7 @@ class QuotaController extends FOSRestController
             }
             $em = $this->getEM();
             $em->flush();
-            return $this->routeRedirectView("api_marketing_show_commission", [$quotum->getId()], Response::HTTP_OK);
+            return new JsonResponse(['status' => 200], Response::HTTP_OK);
         } catch (ConstraintViolationException $cve) {
             return new JsonResponse(
                 [
@@ -485,12 +493,10 @@ class QuotaController extends FOSRestController
                     "message" => $this->get('translator')->trans('impossible de supprimer', [], 'FOSUserBundle')
                 ], Response::HTTP_BAD_REQUEST);
             }
-            $boutique = $quotum->getBoutiqueProprietaire();
             $em = $this->getEM();
             $em->remove($quotum);
             $em->flush();
-
-            return $this->routeRedirectView("api_marketing_get_commissions_boutique", [$boutique->getId()], Response::HTTP_OK);
+            return new JsonResponse(['status' => 200], Response::HTTP_OK);
         } catch (ConstraintViolationException $cve) {
             return new JsonResponse(
                 [

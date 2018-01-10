@@ -32,13 +32,5 @@ class Conseiller_boutiqueType extends AbstractType
         ));
     }
 
-//    /**
-//     * {@inheritdoc}
-//     */
-//    public function getBlockPrefix()
-//    {
-//        return 'apm_marketingdistribuebundle_conseiller_boutique';
-//    }
-//
 
 }

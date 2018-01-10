@@ -40,8 +40,15 @@ class RegistrationStaffController extends FOSRestController
      *      {"name"="imagefilew", "dataType"="integer", "required"= true, "description"="width"},
      *      {"name"="imagefileh", "dataType"="integer", "required"= true, "description"="height"},
      *  },
+     * headers={
+     *      { "name"="Authorization", "required"="true", "description"="Authorization token"},
+     * },
+     * authentication= true,
+     * authenticationRoles= {
+     *         "ROLE_GESTIONNAIRE"
+     *     },
      * input={
-     *    "class"="APM\UserBundle\Form\Type\AdminFormType",
+     *     "class"="APM\UserBundle\Form\Type\AdminFormType",
      *     "parsers" = {
      *          "Nelmio\ApiDocBundle\Parser\FormTypeParser"
      *      }

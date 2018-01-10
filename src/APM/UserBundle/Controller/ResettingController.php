@@ -95,10 +95,12 @@ class ResettingController extends FOSRestController
      *  requirements = {
      *      {"name"="token", "dataType"="password", "requirement"="\D+", "required"=true, "description"="token..."},
      *   },
-     *  parameters = {
-     *    {"name"="plainPassword[first]", "dataType"="password", "required"=true},
-     *    {"name"="plainPassword[second]", "dataType"="password", "required"=true}
-     * },
+     *  input={
+     *     "class"="APM\UserBundle\Form\Type\ResettingFormType",
+     *     "parsers" = {
+     *          "Nelmio\ApiDocBundle\Parser\FormTypeParser"
+     *      }
+     *  },
      *     views={"default","profile"}
      * ),
      * @Post("/user/confirm")
@@ -126,10 +128,12 @@ class ResettingController extends FOSRestController
      *  requirements = {
      *      {"name"="token", "dataType"="password", "requirement"="\D+", "required"=true, "description"="token..."},
      *   },
-     *  parameters = {
-     *    {"name"="plainPassword[first]", "dataType"="password", "required"=true},
-     *    {"name"="plainPassword[second]", "dataType"="password", "required"=true}
-     * },
+     *  input={
+     *     "class"="APM\UserBundle\Form\Type\ResettingFormType",
+     *     "parsers" = {
+     *          "Nelmio\ApiDocBundle\Parser\FormTypeParser"
+     *      }
+     *  },
      *     views={"default","profile"}
      * ),
      * @Post("/staff/confirm")

@@ -12,6 +12,7 @@ use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\View\View;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use FOS\RestBundle\Controller\Annotations\RouteResource;
 use FOS\RestBundle\Controller\Annotations\Get;
@@ -237,12 +238,15 @@ class ConseillerController extends FOSRestController
      * headers={
      *      { "name"="Authorization", "required"=true, "description"="Authorization token"}
      * },
+     * authentication= true,
+     * authenticationRoles= {
+     *          "ROLE_CONSEILLER"
+     *     },
      * input={
-     *    "class"="APM\MarketingDistribueBundle\Entity\Conseiller",
+     *     "class"="APM\MarketingDistribueBundle\Form\ConseillerType",
      *     "parsers" = {
-     *          "Nelmio\ApiDocBundle\Parser\ValidationParser"
-     *      },
-     *    "name" = "Conseiller",
+     *          "Nelmio\ApiDocBundle\Parser\FormTypeParser"
+     *      }
      * },
      *  views = {"default", "marketing" }
      * )
@@ -258,7 +262,8 @@ class ConseillerController extends FOSRestController
             /** @var Conseiller $conseiller */
             $conseiller = TradeFactory::getTradeProvider("conseiller");
             $form = $this->createForm('APM\MarketingDistribueBundle\Form\ConseillerType', $conseiller);
-            $form->submit($request->request->all());
+            $data = $request->request->has($form->getName()) ? $request->request->get($form->getName()) : $data[$form->getName()] = array();
+            $form->submit($data);
             if (!$form->isValid()) {
                 return new JsonResponse([
                     "status" => 400,
@@ -355,12 +360,15 @@ class ConseillerController extends FOSRestController
      * requirements = {
      *      {"name"="id", "dataType"="integer", "requirement"="\d+", "description"="conseiller Id"}
      * },
+     * authentication= true,
+     * authenticationRoles= {
+     *          "ROLE_CONSEILLER"
+     *     },
      * input={
-     *    "class"="APM\MarketingDistribueBundle\Entity\Conseiller",
+     *     "class"="APM\MarketingDistribueBundle\Form\ConseillerType",
      *     "parsers" = {
-     *          "Nelmio\ApiDocBundle\Parser\ValidationParser"
-     *      },
-     *    "name" = "Conseiller",
+     *          "Nelmio\ApiDocBundle\Parser\FormTypeParser"
+     *      }
      * },
      *     views={"default","marketing"}
      * )
@@ -368,14 +376,15 @@ class ConseillerController extends FOSRestController
      * @param Conseiller $conseiller
      * @return View | JsonResponse
      *
-     * @Post("/edit/conseiller/{id}")
+     * @Put("/edit/conseiller/{id}")
      */
     public function editAction(Request $request, Conseiller $conseiller)
     {
         try {
             $this->editAndDeleteSecurity($conseiller);
             $form = $this->createForm('APM\MarketingDistribueBundle\Form\ConseillerType', $conseiller);
-            $form->submit($request->request->all(), false);
+            $data = $request->request->has($form->getName()) ? $request->request->get($form->getName()) : $data[$form->getName()] = array();
+            $form->submit($data, false);
             if (!$form->isValid()) {
                 return new JsonResponse(
                     [
@@ -387,7 +396,7 @@ class ConseillerController extends FOSRestController
             $em = $this->getEM();
             $em->flush();
 
-            return $this->routeRedirectView("api_marketing_show_conseiller", ['id' => $conseiller->getId()], Response::HTTP_OK);
+            return new JsonResponse(['status' => 200], Response::HTTP_OK);
 
         } catch (ConstraintViolationException $cve) {
             return new JsonResponse(
@@ -460,11 +469,10 @@ class ConseillerController extends FOSRestController
                     "message" => $this->get('translator')->trans('impossible de supprimer', [], 'FOSUserBundle')
                 ], Response::HTTP_BAD_REQUEST);
             }
-            $user = $conseiller->getUtilisateur();
             $em = $this->getEM();
             $em->remove($conseiller);
             $em->flush();
-            return $this->routeRedirectView("api_user_show", [$user->getId()], Response::HTTP_OK);
+            return new JsonResponse(['status' => 200], Response::HTTP_OK);
         } catch (ConstraintViolationException $cve) {
             return new JsonResponse(
                 [

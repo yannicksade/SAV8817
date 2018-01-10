@@ -260,12 +260,15 @@ class Groupe_offreController extends FOSRestController
      * headers={
      *      { "name"="Authorization",  "required"=true, "description"="Authorization token"}
      * },
+     * authentication= true,
+     * authenticationRoles= {
+     *          "ROLE_USERAVM"
+     *     },
      * input={
-     *    "class"="APM\AchatBundle\Entity\Groupe_offre",
+     *     "class"="APM\AnimationBundle\Form\Base_documentaireType",
      *     "parsers" = {
-     *          "Nelmio\ApiDocBundle\Parser\ValidationParser"
-     *      },
-     *    "name" = "GroupeOffre",
+     *          "Nelmio\ApiDocBundle\Parser\FormTypeParser"
+     *      }
      * },
      * views = {"default", "achat" }
      * )
@@ -281,7 +284,8 @@ class Groupe_offreController extends FOSRestController
             /** @var Groupe_offre $groupe_offre */
             $groupe_offre = TradeFactory::getTradeProvider("groupe_offre");
             $form = $this->createForm('APM\AchatBundle\Form\Groupe_offreType', $groupe_offre);
-            $form->submit($request->request->all());
+            $data = $request->request->has($form->getName()) ? $request->request->get($form->getName()) : $data[$form->getName()] = array();
+            $form->submit($data);
             if (!$form->isValid()) {
                 return new JsonResponse([
                     "status" => 400,
@@ -296,11 +300,11 @@ class Groupe_offreController extends FOSRestController
 
             return $this->routeRedirectView("api_achat_show_groupeoffre", ['id' => $groupe_offre->getId()], Response::HTTP_CREATED);
 
-        } catch (ConstraintViolationException $cve) {
-            return new JsonResponse([
-                "status" => 400,
-                "message" => $this->get('translator')->trans("impossible d'enregistrer, vérifiez vos données", [], 'FOSUserBundle')
-            ], Response::HTTP_BAD_REQUEST);
+            /*} catch (ConstraintViolationException $cve) {
+                return new JsonResponse([
+                    "status" => 400,
+                    "message" => $this->get('translator')->trans("impossible d'enregistrer, vérifiez vos données", [], 'FOSUserBundle')
+                ], Response::HTTP_BAD_REQUEST);*/
         } catch (AccessDeniedException $ads) {
             return new JsonResponse([
                     "status" => 403,
@@ -350,8 +354,7 @@ class Groupe_offreController extends FOSRestController
      *    "class"="APM\AchatBundle\Entity\Groupe_offre",
      *     "parsers" = {
      *          "Nelmio\ApiDocBundle\Parser\ValidationParser"
-     *      },
-     *    "name" = "GroupeOffre",
+     *      }
      * },
      *
      * views = {"default", "achat" }
@@ -366,7 +369,8 @@ class Groupe_offreController extends FOSRestController
         try {
             $this->editAndDeleteSecurity($groupe_offre);
             $form = $this->createForm('APM\AchatBundle\Form\Groupe_offreType', $groupe_offre);
-            $form->submit($request->request->all(), false);
+            $data = $request->request->has($form->getName()) ? $request->request->get($form->getName()) : $data[$form->getName()] = array();
+            $form->submit($data, false);
             if (!$form->isValid()) {
                 return new JsonResponse(
                     [
@@ -377,8 +381,7 @@ class Groupe_offreController extends FOSRestController
             }
             $em = $this->getEM();
             $em->flush();
-
-            return $this->routeRedirectView("api_achat_show_groupeoffre", ["id" => $groupe_offre->getId()], Response::HTTP_OK);
+            return new JsonResponse(['status' => 200], Response::HTTP_OK);
 
         } catch (ConstraintViolationException $cve) {
             return new JsonResponse(
@@ -493,7 +496,7 @@ class Groupe_offreController extends FOSRestController
             $em = $this->getEM();
             $em->remove($groupe_offre);
             $em->flush();
-            return $this->routeRedirectView("api_achat_get_groupeoffres", [], Response::HTTP_OK);
+            return new JsonResponse(['status' => 200], Response::HTTP_OK);
 
         } catch (ConstraintViolationException $cve) {
             return new JsonResponse(

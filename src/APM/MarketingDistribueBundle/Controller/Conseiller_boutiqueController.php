@@ -22,6 +22,7 @@ use FOS\RestBundle\Controller\Annotations\Delete;
 use FOS\RestBundle\Controller\Annotations\Put;
 use FOS\RestBundle\Controller\Annotations\Patch;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 /**
@@ -223,12 +224,15 @@ class Conseiller_boutiqueController extends FOSRestController
      * headers={
      *      { "name"="Authorization", "required"=true, "description"="Authorization token"}
      * },
+     * authentication= true,
+     * authenticationRoles= {
+     *          "ROLE_CONSEILLER"
+     *     },
      * input={
-     *    "class"="APM\MarketingDistribueBundle\Entity\Conseiller_boutique",
+     *     "class"="APM\MarketingDistribueBundle\Form\Conseiller_boutiqueType",
      *     "parsers" = {
-     *          "Nelmio\ApiDocBundle\Parser\ValidationParser"
-     *      },
-     *    "name" = "Conseiller_boutique",
+     *          "Nelmio\ApiDocBundle\Parser\FormTypeParser"
+     *      }
      * },
      *  views = {"default", "marketing" }
      * )
@@ -247,7 +251,8 @@ class Conseiller_boutiqueController extends FOSRestController
             $conseiller_boutique = TradeFactory::getTradeProvider("conseiller_boutique");
             $form = $this->createForm('APM\MarketingDistribueBundle\Form\Conseiller_boutiqueType', $conseiller_boutique);
             if (null !== $boutique) $form->remove('boutique');
-            $form->submit($request->request->all());
+            $data = $request->request->has($form->getName()) ? $request->request->get($form->getName()) : $data[$form->getName()] = array();
+            $form->submit($data);
             if (!$form->isValid()) {
                 return new JsonResponse([
                     "status" => 400,
@@ -364,12 +369,15 @@ class Conseiller_boutiqueController extends FOSRestController
      * requirements = {
      *      {"name"="id", "dataType"="integer", "requirement"="\d+", "description"="conseiller_boutique Id"}
      * },
+     * authentication= true,
+     * authenticationRoles= {
+     *          "ROLE_CONSEILLER"
+     *     },
      * input={
-     *    "class"="APM\MarketingDistribueBundle\Entity\Conseiller_boutique",
+     *     "class"="APM\MarketingDistribueBundle\Form\Conseiller_boutiqueType",
      *     "parsers" = {
-     *          "Nelmio\ApiDocBundle\Parser\ValidationParser"
-     *      },
-     *    "name" = "Conseiller_boutique",
+     *          "Nelmio\ApiDocBundle\Parser\FormTypeParser"
+     *      }
      * },
      *     views={"default","marketing"}
      * )
@@ -384,7 +392,8 @@ class Conseiller_boutiqueController extends FOSRestController
         try {
             $this->editAndDeleteSecurity($conseiller_boutique, $conseiller_boutique->getConseiller());
             $form = $this->createForm('APM\MarketingDistribueBundle\Form\Conseiller_boutiqueType', $conseiller_boutique);
-            $form->submit($request->request->all(), false);
+            $data = $request->request->has($form->getName()) ? $request->request->get($form->getName()) : $data[$form->getName()] = array();
+            $form->submit($data, false);
             if (!$form->isValid()) {
                 return new JsonResponse(
                     [
@@ -396,7 +405,7 @@ class Conseiller_boutiqueController extends FOSRestController
             $em = $this->getEM();
             $em->flush();
 
-            return $this->routeRedirectView("api_marketing_show_conseillerboutique", ['id' => $conseiller_boutique->getId()], Response::HTTP_OK);
+            return new JsonResponse(['status' => 200], Response::HTTP_OK);
 
         } catch (ConstraintViolationException $cve) {
             return new JsonResponse(
@@ -481,7 +490,7 @@ class Conseiller_boutiqueController extends FOSRestController
             $em = $this->getEM();
             $em->remove($conseiller_boutique);
             $em->flush();
-            return $this->routeRedirectView("api_marketing_get_conseillerboutiques", [], Response::HTTP_OK);
+            return new JsonResponse(['status' => 200], Response::HTTP_OK);
         } catch (ConstraintViolationException $cve) {
             return new JsonResponse(
                 [

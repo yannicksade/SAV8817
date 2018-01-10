@@ -230,12 +230,15 @@ class Individu_to_groupeController extends FOSRestController
      *      {"name"="id", "dataType"="integer", "requirement"="\d+", "description"="groupe_relationnel Id"}
      * },
      *
+     * authentication= true,
+     * authenticationRoles= {
+     *          "ROLE_USERAVM"
+     *     },
      * input={
-     *    "class"="APM\UserBundle\Entity\Individu_to_groupe",
+     *    "class"="APM\UserBundle\Form\Individu_to_groupeType",
      *     "parsers" = {
-     *          "Nelmio\ApiDocBundle\Parser\ValidationParser"
-     *      },
-     *    "name" = "Individu_to_groupe",
+     *          "Nelmio\ApiDocBundle\Parser\FormTypeParser"
+     *      }
      * },
      *      views = {"default", "user" }
      * )
@@ -243,7 +246,7 @@ class Individu_to_groupeController extends FOSRestController
      * @param Groupe_relationnel $groupe_relationnel
      * @return View | JsonResponse
      *
-     * @Get("/new/relation/group/{id}", name="_group")
+     * @Post("/new/relation/group/{id}", name="_group")
      */
     public function newAction(Request $request, Groupe_relationnel $groupe_relationnel)
     {
@@ -252,7 +255,8 @@ class Individu_to_groupeController extends FOSRestController
             /** @var Individu_to_groupe $individu_to_groupe */
             $individu_to_groupe = TradeFactory::getTradeProvider("individu_to_groupe");
             $form = $this->createForm('APM\UserBundle\Form\Individu_to_groupeType', $individu_to_groupe);
-            $form->submit($request->request->all());
+            $data = $request->request->has($form->getName()) ? $request->request->get($form->getName()) : $data[$form->getName()] = array();
+            $form->submit($data);
             if (!$form->isValid()) {
                 return new JsonResponse([
                     "status" => 400,
@@ -369,12 +373,15 @@ class Individu_to_groupeController extends FOSRestController
      * requirements = {
      *      {"name"="id", "dataType"="integer", "requirement"="\d+", "description"="Individu_to_groupe Id"}
      * },
+     * authentication= true,
+     * authenticationRoles= {
+     *          "ROLE_USERAVM"
+     *     },
      * input={
-     *    "class"="APM\UserBundle\Entity\Individu_to_groupe",
+     *    "class"="APM\UserBundle\Form\Individu_to_groupeType",
      *     "parsers" = {
-     *          "Nelmio\ApiDocBundle\Parser\ValidationParser"
-     *      },
-     *    "name" = "Individu_to_groupe",
+     *          "Nelmio\ApiDocBundle\Parser\FormTypeParser"
+     *      }
      * },
      *
      * views = {"default", "user" }
@@ -390,7 +397,8 @@ class Individu_to_groupeController extends FOSRestController
         try {
             $this->editAndDeleteSecurity($individu_to_groupe);
             $form = $this->createForm('APM\UserBundle\Form\Individu_to_groupeType', $individu_to_groupe);
-            $form->submit($request->request->all(), false);
+            $data = $request->request->has($form->getName()) ? $request->request->get($form->getName()) : $data[$form->getName()] = array();
+            $form->submit($data, false);
             if (!$form->isValid()) {
                 return new JsonResponse([
                     "status" => 400,
@@ -399,7 +407,7 @@ class Individu_to_groupeController extends FOSRestController
             }
             $em = $this->getEM();
             $em->flush();
-            return $this->routeRedirectView("api_user_show_individu-group", ['id' => $individu_to_groupe->getId()], Response::HTTP_OK);
+            return new JsonResponse(['status' => 200], Response::HTTP_OK);
         } catch (ConstraintViolationException $cve) {
             return new JsonResponse(
                 [
@@ -471,11 +479,10 @@ class Individu_to_groupeController extends FOSRestController
                     "message" => $this->get('translator')->trans('impossible de supprimer', [], 'FOSUserBundle')
                 ], Response::HTTP_BAD_REQUEST);
             }
-            $individu = $individu_to_groupe->getIndividu();
             $em = $this->getEM();
             $em->remove($individu_to_groupe);
             $em->flush();
-            return $this->routeRedirectView("api_user_get_individu-groups_user", ["user_id" => $individu->getId()], Response::HTTP_OK);
+            return new JsonResponse(['status' => 200], Response::HTTP_OK);
         } catch (ConstraintViolationException $cve) {
             return new JsonResponse(
                 [

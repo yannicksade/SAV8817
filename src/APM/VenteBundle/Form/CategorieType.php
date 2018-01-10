@@ -18,8 +18,8 @@ class CategorieType extends AbstractType
 
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $categorie = $builder->getData();
-        $this->boutique_id = $categorie->getBoutique();
+        /*$categorie = $builder->getData();
+        $this->boutique_id = $categorie->getBoutique();*/
         $builder
             ->add('designation', TextType::class)
             ->add('description', TextareaType::class, [
@@ -43,12 +43,12 @@ class CategorieType extends AbstractType
                 'required' => false,
                 'placeholder' => 'aucune',
                 'class' => 'APMVenteBundle:Categorie',
-                'query_builder' => function (EntityRepository $er) {
+                /*'query_builder' => function (EntityRepository $er) {
                     return $er->createQueryBuilder('c')
                         ->where('c.boutique = :btq_id')
                         ->setParameter('btq_id', $this->boutique_id)
                         ->orderBy('c.designation', 'ASC');
-                }
+                }*/
             ]);
 //        $builder->get('categorieCourante')->addModelTransformer(
 //        new ObjectToStringTransformer());

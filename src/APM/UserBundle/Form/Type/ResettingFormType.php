@@ -33,6 +33,6 @@ class ResettingFormType extends AbstractType
      */
     public function getBlockPrefix()
     {
-        return 'apm_user_resetting';
+        return 'apm_user_resetting_form';
     }
 }

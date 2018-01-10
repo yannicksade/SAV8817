@@ -261,23 +261,27 @@ class Groupe_relationnelController extends FOSRestController
      * headers={
      *      { "name"="Authorization",  "required"=true, "description"="Authorization token"}
      * },
-     * parameters= {
-     *      {"name"="imagefilex", "dataType"="integer", "required"= true, "description"="horizontal start point"},
-     *      {"name"="imagefiley", "dataType"="integer", "required"= true, "description"="vertical start point"},
-     *      {"name"="imagefilew", "dataType"="integer", "required"= true, "description"="width"},
-     *      {"name"="imagefileh", "dataType"="integer", "required"= true, "description"="height"},
-     *  },
+     * authentication= true,
+     * authenticationRoles= {
+     *          "ROLE_USERAVM"
+     *     },
      * input={
      *    "class"="APM\UserBundle\Form\Groupe_relationnelType",
      *     "parsers" = {
      *          "Nelmio\ApiDocBundle\Parser\FormTypeParser"
      *      }
      * },
+     * parameters= {
+     *      {"name"="imagefilex", "dataType"="integer", "required"= true, "description"="horizontal start point"},
+     *      {"name"="imagefiley", "dataType"="integer", "required"= true, "description"="vertical start point"},
+     *      {"name"="imagefilew", "dataType"="integer", "required"= true, "description"="width"},
+     *      {"name"="imagefileh", "dataType"="integer", "required"= true, "description"="height"},
+     *  },
      * views = {"default", "user" }
      * )
      * @param Request $request
      * @return View | JsonResponse
-     *
+     * @Put("/new/grouperelationnel")
      * @Post("/new/grouperelationnel")
      */
     public function newAction(Request $request)
@@ -299,7 +303,8 @@ class Groupe_relationnelController extends FOSRestController
             $groupe_relationnel->setProprietaire($this->getUser());
             $em->persist($groupe_relationnel);
             $em->flush();
-            return $this->routeRedirectView("api_user_show_grouperelationnel", ['id' => $groupe_relationnel->getId()], Response::HTTP_CREATED);
+            $response = $request->isMethod('PUT') ? new JsonResponse(['status' => 200], Response::HTTP_OK) : $this->routeRedirectView("api_user_show_grouperelationnel", ['id' => $groupe_relationnel->getId()], Response::HTTP_CREATED);
+            return $response;
         } catch (ConstraintViolationException $cve) {
             return new JsonResponse([
                 "status" => 400,
@@ -418,6 +423,16 @@ class Groupe_relationnelController extends FOSRestController
      * headers={
      *      { "name"="Authorization", "required"="true", "description"="Authorization token"}
      * },
+     * authentication= true,
+     * authenticationRoles= {
+     *          "ROLE_USERAVM"
+     *     },
+     * input={
+     *    "class"="APM\UserBundle\Form\Groupe_relationnelType",
+     *     "parsers" = {
+     *          "Nelmio\ApiDocBundle\Parser\FormTypeParser"
+     *      }
+     * },
      * requirements = {
      *      {"name"="id", "dataType"="integer", "requirement"="\d+", "description"="groupe_relationnel Id"}
      * },
@@ -427,12 +442,6 @@ class Groupe_relationnelController extends FOSRestController
      *      {"name"="imagefilew", "dataType"="integer", "required"= true, "description"="width"},
      *      {"name"="imagefileh", "dataType"="integer", "required"= true, "description"="height"},
      *  },
-     * input={
-     *    "class"="APM\UserBundle\Form\Groupe_relationnelType",
-     *     "parsers" = {
-     *          "Nelmio\ApiDocBundle\Parser\FormTypeParser"
-     *      },
-     * },
      * views = {"default", "user" }
      * )
      * @param Request $request
@@ -534,7 +543,7 @@ class Groupe_relationnelController extends FOSRestController
             $em = $this->getEM();
             $em->remove($groupe_relationnel);
             $em->flush();
-            return $this->routeRedirectView("api_user_get_grouperelationnels", [], Response::HTTP_OK);
+            return new JsonResponse(['status' => 200], Response::HTTP_OK);
         } catch (ConstraintViolationException $cve) {
             return new JsonResponse(
                 [

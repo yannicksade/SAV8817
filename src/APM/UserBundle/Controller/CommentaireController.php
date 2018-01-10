@@ -237,12 +237,15 @@ class CommentaireController extends FOSRestController
      * requirements = {
      *   {"name"="id", "requirement"="\d+", "dataType"="integer", "description"="offre_id"}
      *  },
+     * authentication= true,
+     * authenticationRoles= {
+     *          "ROLE_USERAVM"
+     *     },
      * input={
-     *    "class"="APM\UserBundle\Entity\Commentaire",
+     *    "class"="APM\UserBundle\Form\CommentaireType",
      *     "parsers" = {
-     *          "Nelmio\ApiDocBundle\Parser\ValidationParser"
-     *      },
-     *    "name" = "Commentaire",
+     *          "Nelmio\ApiDocBundle\Parser\FormTypeParser"
+     *      }
      * },
      * views = {"default", "user" }
      * )
@@ -259,7 +262,8 @@ class CommentaireController extends FOSRestController
             /** @var Commentaire $commentaire */
             $commentaire = TradeFactory::getTradeProvider("commentaire");
             $form = $this->createForm('APM\UserBundle\Form\CommentaireType', $commentaire);
-            $form->submit($request->request->all());
+            $data = $request->request->has($form->getName()) ? $request->request->get($form->getName()) : $data[$form->getName()] = array();
+            $form->submit($data);
             if (!$form->isValid()) {
                 return new JsonResponse([
                     "status" => 400,
@@ -361,14 +365,16 @@ class CommentaireController extends FOSRestController
      * requirements = {
      *      {"name"="id", "dataType"="integer", "requirement"="\d+", "description"="commentaire Id"}
      * },
+     * authentication= true,
+     * authenticationRoles= {
+     *          "ROLE_USERAVM"
+     *     },
      * input={
-     *    "class"="APM\UserBundle\Entity\Commentaire",
+     *    "class"="APM\UserBundle\Form\CommentaireType",
      *     "parsers" = {
-     *          "Nelmio\ApiDocBundle\Parser\ValidationParser"
-     *      },
-     *    "name" = "User",
+     *          "Nelmio\ApiDocBundle\Parser\FormTypeParser"
+     *      }
      * },
-     *
      * views = {"default", "user" }
      * )
      * @param Request $request
@@ -382,7 +388,8 @@ class CommentaireController extends FOSRestController
         try {
             $this->editAndDeleteSecurity($commentaire);
             $form = $this->createForm('APM\UserBundle\Form\CommentaireType', $commentaire);
-            $form->submit($request->request->all(), false);
+            $form->submit($data, false);
+            $data = $request->request->has($form->getName()) ? $request->request->get($form->getName()) : $data[$form->getName()] = array();
             if (!$form->isValid()) {
                 return new JsonResponse([
                     "status" => 400,
@@ -391,7 +398,7 @@ class CommentaireController extends FOSRestController
             }
             $em = $this->getEM();
             $em->flush();
-            return $this->routeRedirectView("api_user_show_commentaire", ['id' => $commentaire->getId()], Response::HTTP_OK);
+            return new JsonResponse(['status' => 200], Response::HTTP_OK);
         } catch (ConstraintViolationException $cve) {
             return new JsonResponse([
                 "status" => 400,
@@ -463,7 +470,7 @@ class CommentaireController extends FOSRestController
             $em = $this->getEM();
             $em->remove($commentaire);
             $em->flush();
-            return $this->routeRedirectView("api_user_get_commentaires", [], Response::HTTP_OK);
+            return new JsonResponse(['status' => 200], Response::HTTP_OK);
         } catch (ConstraintViolationException $cve) {
             return new JsonResponse(
                 [

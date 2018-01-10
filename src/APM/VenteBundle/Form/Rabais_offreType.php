@@ -24,8 +24,8 @@ class Rabais_offreType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         /** @var Utilisateur_avm $vendeur */
-        $vendeur = $builder->getData()->getOffre()->getVendeur();
-        $this->groupes = $vendeur->getGroupesProprietaire()->last();
+        /*  $vendeur = $builder->getData()->getOffre()->getVendeur();
+          $this->groupes = $vendeur->getGroupesProprietaire()->last();*/
 
         $builder
             ->add('dateLimite', DateTimeType::class)
@@ -43,14 +43,14 @@ class Rabais_offreType extends AbstractType
             ])
             ->add('beneficiaireRabais', EntityType::class, [
                 'class' => 'APMUserBundle:Utilisateur_avm',
-                'query_builder' => function (EntityRepository $er) {
+                /*'query_builder' => function (EntityRepository $er) {
                     return $er->createQueryBuilder('u')
                         ->join('u.individuGroupes', 'ig_id')
                         ->addSelect('ig_id')
                         ->where('ig_id.groupeRelationnel = :grp_id')
                         ->setParameter('grp_id', $this->groupes);
                 },
-
+                */
             ])
             ->add('description')
             ->add('restreint', CheckboxType::class, ['required' => false])

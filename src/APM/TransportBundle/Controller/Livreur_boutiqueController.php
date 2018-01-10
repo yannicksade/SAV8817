@@ -16,10 +16,11 @@ use FOS\RestBundle\Controller\Annotations\RouteResource;
 use FOS\RestBundle\Controller\Annotations\Get;
 use FOS\RestBundle\Controller\Annotations\Post;
 use FOS\RestBundle\Controller\Annotations\Delete;
-use FOS\RestBundle\Controller\Annotations\Patch;
+use FOS\RestBundle\Controller\Annotations\Put;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 /**
@@ -48,10 +49,10 @@ class Livreur_boutiqueController extends FOSRestController
      *  },
      *
      * output={
-     * "class"="APM\TransportBundle\Entity\Livreur_boutique",
-     * "parsers" = {
-     *      "Nelmio\ApiDocBundle\Parser\JmsMetadataParser"
-     *    },
+     *          "class"="APM\TransportBundle\Entity\Livreur_boutique",
+     *          "parsers" = {
+     *               "Nelmio\ApiDocBundle\Parser\JmsMetadataParser"
+     *           },
      *     "groups"={"owner_list"}
      * },
      *     parameters ={
@@ -201,17 +202,20 @@ class Livreur_boutiqueController extends FOSRestController
      * headers={
      *      { "name"="Authorization",  "required"=true, "description"="Authorization token"}
      * },
+     * authentication= true,
+     * authenticationRoles= {
+     *          "ROLE_BOUTIQUE"
+     *     },
+     * input={
+     *     "class"="APM\TransportBundle\Form\Livreur_boutiqueType",
+     *     "parsers" = {
+     *          "Nelmio\ApiDocBundle\Parser\FormTypeParser"
+     *      }
+     * },
      * requirements={
      *      {"name"="id", "dataType"="integer","requirement"="\d+", "description"="boutique_id"},
      *      {"name"="transporteur_id", "dataType"="integer", "requirement"="\d+", "description"="transporteur Id"},
      *  },
-     * input={
-     *    "class"="APM\TransportBundle\Entity\Livreur_boutique",
-     *     "parsers" = {
-     *          "Nelmio\ApiDocBundle\Parser\ValidationParser"
-     *      },
-     *    "name" = "Livreur",
-     * },
      *      views = {"default", "transport" }
      * )
      * @ParamConverter("transporteur", options={"mapping":{"transporteur_id":"id"}})
@@ -228,7 +232,8 @@ class Livreur_boutiqueController extends FOSRestController
             /** @var Livreur_boutique $livreur_boutique */
             $livreur_boutique = TradeFactory::getTradeProvider("livreur_boutique");
             $form = $this->createForm('APM\TransportBundle\Form\Livreur_boutiqueType', $livreur_boutique);
-            $form->submit($request->request->all());
+            $data = $request->request->has($form->getName()) ? $request->request->get($form->getName()) : $data[$form->getName()] = array();
+            $form->submit($data);
             if (!$form->isValid()) {
                 return new JsonResponse([
                     "status" => 400,
@@ -337,12 +342,15 @@ class Livreur_boutiqueController extends FOSRestController
      * requirements = {
      *      {"name"="id", "dataType"="integer", "requirement"="\d+", "description"="livreur_boutique Id"}
      * },
+     * authentication= true,
+     * authenticationRoles= {
+     *          "ROLE_BOUTIQUE"
+     *     },
      * input={
-     *    "class"="APM\TransportBundle\Entity\Livreur_boutique",
+     *     "class"="APM\TransportBundle\Form\Livreur_boutiqueType",
      *     "parsers" = {
-     *          "Nelmio\ApiDocBundle\Parser\ValidationParser"
-     *      },
-     *    "name" = "Transport",
+     *          "Nelmio\ApiDocBundle\Parser\FormTypeParser"
+     *      }
      * },
      *
      * views = {"default", "transport" }
@@ -351,14 +359,15 @@ class Livreur_boutiqueController extends FOSRestController
      * @param Livreur_boutique $livreur_boutique
      * @return View | JsonResponse
      *
-     * @Post("/edit/livreur/{id}")
+     * @Put("/edit/livreur/{id}")
      */
     public function editAction(Request $request, Livreur_boutique $livreur_boutique)
     {
         try {
             $this->editAndDeleteSecurity($livreur_boutique);
             $form = $this->createForm('APM\TransportBundle\Form\Livreur_boutiqueType', $livreur_boutique);
-            $form->submit($request->request->all(), false);
+            $data = $request->request->has($form->getName()) ? $request->request->get($form->getName()) : $data[$form->getName()] = array();
+            $form->submit($data, false);
             if (!$form->isValid()) {
                 return new JsonResponse([
                     "status" => 400,
@@ -367,7 +376,7 @@ class Livreur_boutiqueController extends FOSRestController
             }
             $em = $this->getEM();
             $em->flush();
-            return $this->routeRedirectView("api_transport_show_livreur", ['id' => $livreur_boutique->getId()], Response::HTTP_OK);
+            return new JsonResponse(['status' => 200], Response::HTTP_OK);
         } catch (ConstraintViolationException $cve) {
             return new JsonResponse(
                 [
@@ -444,11 +453,10 @@ class Livreur_boutiqueController extends FOSRestController
                     "message" => $this->get('translator')->trans('impossible de supprimer', [], 'FOSUserBundle')
                 ], Response::HTTP_BAD_REQUEST);
             }
-            $boutique = $livreur_boutique->getBoutiqueProprietaire();
             $em = $this->getEM();
             $em->remove($livreur_boutique);
             $em->flush();
-            return $this->routeRedirectView("api_transport_get_livreurs_boutique", [$boutique->getId()], Response::HTTP_OK);
+            return new JsonResponse(['status' => 200], Response::HTTP_OK);
         } catch (ConstraintViolationException $cve) {
             return new JsonResponse(
                 [

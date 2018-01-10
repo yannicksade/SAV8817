@@ -288,12 +288,15 @@ class Specification_achatController extends FOSRestController
      * requirements={
      *      {"name"="id", "requirement"="\d+", "dataType"="integer", "description"="offre_id"}
      * },
+     * authentication= true,
+     * authenticationRoles= {
+     *          "ROLE_USERAVM"
+     *     },
      * input={
-     *    "class"="APM\AchatBundle\Entity\Specification_achat",
+     *     "class"="APM\AchatBundle\Form\Specification_achatType",
      *     "parsers" = {
-     *          "Nelmio\ApiDocBundle\Parser\ValidationParser"
-     *      },
-     *    "name" = "Specification_achat",
+     *          "Nelmio\ApiDocBundle\Parser\FormTypeParser"
+     *      }
      * },
      *  views = {"default", "achat" }
      * )
@@ -309,6 +312,8 @@ class Specification_achatController extends FOSRestController
             /** @var Specification_achat $specification_achat */
             $specification_achat = TradeFactory::getTradeProvider("specification_achat");
             $form = $this->createForm('APM\AchatBundle\Form\Specification_achatType', $specification_achat);
+            $data = $request->request->has($form->getName()) ? $request->request->get($form->getName()) : $data[$form->getName()] = array();
+            $form->submit($data);
             if (!$form->isValid()) {
                 return new JsonResponse([
                     "status" => 400,
@@ -409,12 +414,15 @@ class Specification_achatController extends FOSRestController
      * requirements = {
      *      {"name"="id", "dataType"="integer", "requirement"="\d+", "description"="specification Id"}
      * },
-     * input={
-     *    "class"="APM\AchatBundle\Entity\Specification_achat",
-     *    "parsers" = {
-     *          "Nelmio\ApiDocBundle\Parser\ValidationParser"
+     * authentication= true,
+     * authenticationRoles= {
+     *          "ROLE_USERAVM"
      *     },
-     *    "name" = "Specification_achat",
+     * input={
+     *     "class"="APM\AchatBundle\Form\Specification_achatType",
+     *     "parsers" = {
+     *          "Nelmio\ApiDocBundle\Parser\FormTypeParser"
+     *      }
      * },
      *     views={"default","achat"}
      * )
@@ -429,7 +437,8 @@ class Specification_achatController extends FOSRestController
         try {
             $this->editAndDeleteSecurity($specification_achat);
             $form = $this->createForm('APM\AchatBundle\Form\Specification_achatType', $specification_achat);
-            $form->submit($request->request->all(), false);
+            $data = $request->request->has($form->getName()) ? $request->request->get($form->getName()) : $data[$form->getName()] = array();
+            $form->submit($data, false);
             if (!$form->isValid()) {
                 return new JsonResponse(
                     [
@@ -440,7 +449,7 @@ class Specification_achatController extends FOSRestController
             }
             $em = $this->getEM();
             $em->flush();
-            return $this->routeRedirectView("api_achat_show_specification ", ["id" => $specification_achat->getId()], Response::HTTP_OK);
+            return new JsonResponse(['status' => 200], Response::HTTP_OK);
         } catch (ConstraintViolationException $cve) {
             return new JsonResponse(
                 [
@@ -516,9 +525,7 @@ class Specification_achatController extends FOSRestController
             $em = $this->getEM();
             $em->remove($specification_achat);
             $em->flush();
-
-            return $this->routeRedirectView("api_achat_get_specifications", [], Response::HTTP_OK);
-
+            return new JsonResponse(['status' => 200], Response::HTTP_OK);
         } catch (ConstraintViolationException $cve) {
             return new JsonResponse(
                 [

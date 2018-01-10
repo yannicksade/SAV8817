@@ -346,12 +346,15 @@ class TransactionController extends FOSRestController
      *      { "name"="Authorization",  "required"=true, "description"="Authorization token"}
      * },
      *
+     * authentication= true,
+     * authenticationRoles= {
+     *          "ROLE_USERAVM"
+     *     },
      * input={
-     *    "class"="APM\VenteBundle\Entity\Transaction",
+     *    "class"="APM\VenteBundle\Form\TransactionType",
      *     "parsers" = {
-     *          "Nelmio\ApiDocBundle\Parser\ValidationParser"
-     *      },
-     *    "name" = "Transaction",
+     *          "Nelmio\ApiDocBundle\Parser\FormTypeParser"
+     *      }
      * },
      *      views = {"default", "vente" }
      * )
@@ -369,7 +372,8 @@ class TransactionController extends FOSRestController
             /** @var Transaction $transaction */
             $transaction = TradeFactory::getTradeProvider('transaction');
             $form = $this->createForm('APM\VenteBundle\Form\TransactionType', $transaction);
-            $form->submit($request->request->all());
+            $data = $request->request->has($form->getName()) ? $request->request->get($form->getName()) : $data[$form->getName()] = array();
+            $form->submit($data);
             if (!$form->isValid()) {
                 return new JsonResponse([
                     "status" => 400,
@@ -480,12 +484,15 @@ class TransactionController extends FOSRestController
      * requirements = {
      *      {"name"="id", "dataType"="integer", "requirement"="\d+", "description"="transaction Id"}
      * },
+     * authentication= true,
+     * authenticationRoles= {
+     *          "ROLE_USERAVM"
+     *     },
      * input={
-     *    "class"="APM\VenteBundle\Entity\Transaction",
+     *    "class"="APM\VenteBundle\Form\TransactionType",
      *     "parsers" = {
-     *          "Nelmio\ApiDocBundle\Parser\ValidationParser"
-     *      },
-     *    "name" = "Transaction",
+     *          "Nelmio\ApiDocBundle\Parser\FormTypeParser"
+     *      }
      * },
      *      views = {"default", "vente" }
      * )
@@ -500,7 +507,8 @@ class TransactionController extends FOSRestController
         try {
             $this->editAndDeleteSecurity($transaction);
             $form = $this->createForm('APM\VenteBundle\Form\TransactionType', $transaction);
-            $form->submit($request->request->all(), false);
+            $data = $request->request->has($form->getName()) ? $request->request->get($form->getName()) : $data[$form->getName()] = array();
+            $form->submit($data, false);
             if (!$form->isValid()) {
                 return new JsonResponse([
                     "status" => 400,
@@ -509,8 +517,7 @@ class TransactionController extends FOSRestController
             }
             $em = $this->getEM();
             $em->flush();
-
-            return $this->routeRedirectView("api_vente_show_transaction", ['id' => $transaction->getId()], Response::HTTP_OK);
+            return new JsonResponse(['status' => 200], Response::HTTP_OK);
         } catch (ConstraintViolationException $cve) {
             return new JsonResponse([
                 "status" => 400,
@@ -596,17 +603,10 @@ class TransactionController extends FOSRestController
                     "message" => $this->get('translator')->trans('impossible de supprimer', [], 'FOSUserBundle')
                 ], Response::HTTP_BAD_REQUEST);
             }
-            if ($boutique = $transaction->getBoutique()) {
-                $route = "api_vente_get_transactions_boutique";
-                $param = ["id" => $boutique->getId()];
-            } else {
-                $route = "api_vente_get_transactions";
-                $param = [];
-            }
             $em = $this->getEM();
             $em->remove($transaction);
             $em->flush();
-            return $this->routeRedirectView($route, $param, Response::HTTP_OK);
+            return new JsonResponse(['status' => 200], Response::HTTP_OK);
         } catch (ConstraintViolationException $cve) {
             return new JsonResponse(
                 [

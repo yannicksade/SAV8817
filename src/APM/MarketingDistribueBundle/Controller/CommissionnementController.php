@@ -311,12 +311,15 @@ class CommissionnementController extends FOSRestController
      * requirements={
      *      {"name"="id", "requirement"="\d+", "dataType"="integer", "description"="boutique_id"}
      * },
+     * authentication= true,
+     * authenticationRoles= {
+     *          "ROLE_BOUTIQUE"
+     *     },
      * input={
-     *   "class"="APM\MarketingDistribueBundle\Entity\Conseiller",
-     *   "parsers" = {
-     *      "Nelmio\ApiDocBundle\Parser\JmsMetadataParser"
-     *    },
-     *     "groups"={"create_net"}
+     *     "class"="APM\MarketingDistribueBundle\Form\CommissionnementType",
+     *     "parsers" = {
+     *          "Nelmio\ApiDocBundle\Parser\FormTypeParser"
+     *      }
      * },
      *  views = {"default", "marketing" }
      * )
@@ -333,7 +336,8 @@ class CommissionnementController extends FOSRestController
             /** @var Commissionnement $commissionnement */
             $commissionnement = TradeFactory::getTradeProvider("commissionnement");
             $form = $this->createForm('APM\MarketingDistribueBundle\Form\CommissionnementType', $commissionnement);
-            $form->submit($request->request->all());
+            $data = $request->request->has($form->getName()) ? $request->request->get($form->getName()) : $data[$form->getName()] = array();
+            $form->submit($data);
             if (!$form->isValid()) {
                 return new JsonResponse([
                     "status" => 400,
@@ -447,12 +451,15 @@ class CommissionnementController extends FOSRestController
      * requirements = {
      *      {"name"="id", "dataType"="integer", "requirement"="\d+", "description"="commissionnement Id"}
      * },
+     * authentication= true,
+     * authenticationRoles= {
+     *          "ROLE_SUPER_ADMIN"
+     *     },
      * input={
-     *    "class"="APM\MarketingDistribueBundle\Entity\Commissionnement",
+     *     "class"="APM\MarketingDistribueBundle\Form\CommissionnementType",
      *     "parsers" = {
-     *          "Nelmio\ApiDocBundle\Parser\ValidationParser"
-     *      },
-     *    "name" = "Commissionnement",
+     *          "Nelmio\ApiDocBundle\Parser\FormTypeParser"
+     *      }
      * },
      *     views={"default","marketing"}
      * )
@@ -468,7 +475,8 @@ class CommissionnementController extends FOSRestController
         try {
             $this->editSecurity();
             $form = $this->createForm('APM\MarketingDistribueBundle\Form\CommissionnementType', $commissionnement);
-            $form->submit($request->request->all(), false);
+            $data = $request->request->has($form->getName()) ? $request->request->get($form->getName()) : $data[$form->getName()] = array();
+            $form->submit($data, false);
             if (!$form->isValid()) {
                 return new JsonResponse(
                     [
@@ -480,7 +488,7 @@ class CommissionnementController extends FOSRestController
             $em = $this->getEM();
             $em->flush();
 
-            return $this->routeRedirectView("api_marketing_show_commissionnement", ['id' => $commissionnement->getId()], Response::HTTP_OK);
+            return new JsonResponse(['status' => 200], Response::HTTP_OK);
 
         } catch (ConstraintViolationException $cve) {
             return new JsonResponse(
@@ -551,7 +559,7 @@ class CommissionnementController extends FOSRestController
             $em = $this->getEM();
             $em->remove($commissionnement);
             $em->flush();
-            return $this->routeRedirectView("api_marketing_get_commissionnements", [], Response::HTTP_OK);
+            return new JsonResponse(['status' => 200], Response::HTTP_OK);
         } catch (ConstraintViolationException $cve) {
             return new JsonResponse(
                 [
