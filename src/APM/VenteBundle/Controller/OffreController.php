@@ -327,7 +327,7 @@ class OffreController extends FOSRestController implements ClassResourceInterfac
      * resourceDescription="Operations on offre.",
      * description="Create an object of type Offre.",
      * statusCodes={
-     *         201="Returned when successful",
+     *         201="The details are returned when successful",
      *         400="Returned when the data are not valid or an unknown error occurred",
      *         403="Returned when the user is not authorized to carry on the action",
      *         404="Returned when the entity is not found",
@@ -344,6 +344,13 @@ class OffreController extends FOSRestController implements ClassResourceInterfac
      *     "parsers" = {
      *          "Nelmio\ApiDocBundle\Parser\FormTypeParser"
      *      }
+     * },
+     * output={
+     *   "class"="APM\VenteBundle\Entity\Offre",
+     *   "parsers" = {
+     *      "Nelmio\ApiDocBundle\Parser\JmsMetadataParser"
+     *    },
+     *     "groups"={"owner_offre_details", "owner_list"}
      * },
      * parameters= {
      *      {"name"="imagefile1x", "dataType"="integer", "required"= true, "description"="horizontal start point 01"},
@@ -486,7 +493,8 @@ class OffreController extends FOSRestController implements ClassResourceInterfac
      * resourceDescription="Operations on Offre",
      * description="Update an object of type Offre.",
      * statusCodes={
-     *         200="Returned when successful",
+     *         "output"="PUT or POST method can be used",
+     *         200="The details are returned only on POST when successful",
      *         400="Returned when the data are not valid or an unknown error occurred",
      *         403="Returned when the user is not authorized to carry on the action",
      *         404="Returned when the entity is not found",
@@ -503,6 +511,13 @@ class OffreController extends FOSRestController implements ClassResourceInterfac
      *     "parsers" = {
      *          "Nelmio\ApiDocBundle\Parser\FormTypeParser"
      *      }
+     * },
+     * output={
+     *   "class"="APM\VenteBundle\Entity\Offre",
+     *   "parsers" = {
+     *      "Nelmio\ApiDocBundle\Parser\JmsMetadataParser"
+     *    },
+     *     "groups"={"owner_offre_details", "owner_list"}
      * },
      * requirements = {
      *      {"name"="id", "dataType"="integer", "requirement"="\d+", "description"="offre Id"}

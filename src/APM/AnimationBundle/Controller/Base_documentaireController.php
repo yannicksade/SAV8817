@@ -217,7 +217,7 @@ class Base_documentaireController extends FOSRestController
      * resourceDescription="Operations on Base_documentaire.",
      * description="Create an object of type Base_documentaire.",
      * statusCodes={
-     *         201="Returned when successful",
+     *         201="The details are returned when successful",
      *         400="Returned when the data are not valid or an unknown error occurred",
      *         403="Returned when the user is not authorized to carry on the action",
      * },
@@ -233,6 +233,13 @@ class Base_documentaireController extends FOSRestController
      *     "parsers" = {
      *          "Nelmio\ApiDocBundle\Parser\FormTypeParser"
      *      }
+     * },
+     * output={
+     *   "class"="APM\AnimationBundle\Entity\Base_documentaire",
+     *   "parsers" = {
+     *      "Nelmio\ApiDocBundle\Parser\JmsMetadataParser"
+     *    },
+     *     "groups"={"owner_document_details", "owner_list"}
      * },
      * requirements={
      *      {"name"="id", "requirement"="\d+", "dataType"="integer", "description"="offre_id"}
@@ -315,7 +322,7 @@ class Base_documentaireController extends FOSRestController
      *      {"name"="id", "dataType"="integer", "requirement"="\d+", "description"="document_id"}
      * },
      * output={
-     *   "class"="APM\AchatBundle\Entity\Base_documentaire",
+     *   "class"="APM\AnimationBundle\Entity\Base_documentaire",
      *   "parsers" = {
      *      "Nelmio\ApiDocBundle\Parser\JmsMetadataParser"
      *    },
@@ -347,7 +354,8 @@ class Base_documentaireController extends FOSRestController
      * resourceDescription="Operations on Base_documentaire",
      * description="Update an object of type base_documentaire.",
      * statusCodes={
-     *         200="Returned when successful",
+     *         "output"="PUT or POST method can be used",
+     *         200="The details are returned only on POST when successful",
      *         400="Returned when the data are not valid or an unknown error occurred",
      *         403="Returned when the user is not authorized to carry on the action",
      *         404="Returned when the entity is not found",
@@ -364,6 +372,13 @@ class Base_documentaireController extends FOSRestController
      *     "parsers" = {
      *          "Nelmio\ApiDocBundle\Parser\FormTypeParser"
      *      }
+     * },
+     * output={
+     *   "class"="APM\AnimationBundle\Entity\Base_documentaire",
+     *   "parsers" = {
+     *      "Nelmio\ApiDocBundle\Parser\JmsMetadataParser"
+     *    },
+     *     "groups"={"owner_document_details", "owner_list"}
      * },
      * requirements = {
      *      {"name"="id", "dataType"="integer", "requirement"="\d+", "description"="document Id"}

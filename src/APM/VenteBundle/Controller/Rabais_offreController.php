@@ -354,7 +354,7 @@ class Rabais_offreController extends FOSRestController
      * resourceDescription="Operations on Rabais_offre.",
      * description="Create an object of type Rabais_offre.",
      * statusCodes={
-     *         201="Returned when successful",
+     *         201="The details are returned when successful",
      *         400="Returned when the data are not valid or an unknown error occurred",
      *         403="Returned when the user is not authorized to carry on the action",
      *         404="Returned when the entity is not found",
@@ -374,6 +374,13 @@ class Rabais_offreController extends FOSRestController
      *     "parsers" = {
      *          "Nelmio\ApiDocBundle\Parser\FormTypeParser"
      *      }
+     * },
+     * output={
+     *   "class"="APM\VenteBundle\Entity\Rabais_offre",
+     *   "parsers" = {
+     *      "Nelmio\ApiDocBundle\Parser\JmsMetadataParser"
+     *    },
+     *     "groups"={"owner_offre_details", "owner_list"}
      * },
      *     views = {"default", "vente" }
      * )

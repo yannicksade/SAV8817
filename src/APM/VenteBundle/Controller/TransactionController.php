@@ -337,7 +337,7 @@ class TransactionController extends FOSRestController
      * resourceDescription="Operations on Transaction.",
      * description="Create an object of type Transaction.",
      * statusCodes={
-     *         201="Returned when successful",
+     *         201="The details are returned when successful",
      *         400="Returned when the data are not valid or an unknown error occurred",
      *         403="Returned when the user is not authorized to carry on the action",
      *         404="Returned when the entity is not found",
@@ -355,6 +355,13 @@ class TransactionController extends FOSRestController
      *     "parsers" = {
      *          "Nelmio\ApiDocBundle\Parser\FormTypeParser"
      *      }
+     * },
+     * output={
+     *   "class"="APM\VenteBundle\Entity\Transaction",
+     *   "parsers" = {
+     *      "Nelmio\ApiDocBundle\Parser\JmsMetadataParser"
+     *    },
+     *     "groups"={"owner_transaction_details", "owner_list"}
      * },
      *      views = {"default", "vente" }
      * )

@@ -175,7 +175,7 @@ class Transporteur_zoneInterventionController extends FOSRestController
      * resourceDescription="Operations on transporteur zoneIntervention.",
      * description="Create an object of type Transporteur_zoneIntervention.",
      * statusCodes={
-     *         201="Returned when successful",
+     *         201="The details are returned when successful",
      *         400="Returned when the data are not valid or an unknown error occurred",
      *         403="Returned when the user is not authorized to carry on the action",
      *         404="Returned when the entity is not found",
@@ -185,13 +185,21 @@ class Transporteur_zoneInterventionController extends FOSRestController
      * },
      * authentication= true,
      * authenticationRoles= {
-     *          "ROLE_TRANSPORTEUR"
+     *          "ROLE_TRANSPORTEUR",
+     *          "ROLE_BOUTIQUE"
      *     },
      * input={
      *     "class"="APM\TransportBundle\Form\Transporteur_zoneInterventionType",
      *     "parsers" = {
      *          "Nelmio\ApiDocBundle\Parser\FormTypeParser"
      *      }
+     * },
+     * output={
+     *   "class"="APM\TransportBundle\Entity\Transporteur_zoneIntervention",
+     *   "parsers" = {
+     *      "Nelmio\ApiDocBundle\Parser\JmsMetadataParser"
+     *    },
+     *     "groups"={"owner_transporteurZ_details", "owner_list"}
      * },
      * requirements={
      *      {"name"="id", "required"=true, "requirement"="\d+", "dataType"="integer", "description"="transporteur Id"},

@@ -252,7 +252,7 @@ class Groupe_offreController extends FOSRestController
      * resourceDescription="Operations on groupeOffre.",
      * description="Create an object of type groupe offre.",
      * statusCodes={
-     *         201="Returned when successful",
+     *         201="The details are returned when successful",
      *         400="Returned when the data are not valid or an unknown error occurred",
      *         403="Returned when the user is not authorized to carry on the action",
      *         404="Returned when the entity is not found",
@@ -265,10 +265,17 @@ class Groupe_offreController extends FOSRestController
      *          "ROLE_USERAVM"
      *     },
      * input={
-     *     "class"="APM\AnimationBundle\Form\Base_documentaireType",
+     *     "class"="APM\AchatBundle\Form\Groupe_offreType",
      *     "parsers" = {
      *          "Nelmio\ApiDocBundle\Parser\FormTypeParser"
      *      }
+     * },
+     * output={
+     *   "class"="APM\AchatBundle\Entity\Groupe_offre",
+     *   "parsers" = {
+     *      "Nelmio\ApiDocBundle\Parser\JmsMetadataParser"
+     *    },
+     *     "groups"={"owner_groupeO_details", "owner_list"}
      * },
      * views = {"default", "achat" }
      * )
@@ -350,13 +357,16 @@ class Groupe_offreController extends FOSRestController
      * requirements = {
      *      {"name"="id", "dataType"="integer", "requirement"="\d+", "description"="groupe offre Id"}
      * },
+     * authentication= true,
+     * authenticationRoles= {
+     *          "ROLE_USERAVM"
+     *     },
      * input={
-     *    "class"="APM\AchatBundle\Entity\Groupe_offre",
+     *     "class"="APM\AchatBundle\Form\Groupe_offreType",
      *     "parsers" = {
-     *          "Nelmio\ApiDocBundle\Parser\ValidationParser"
+     *          "Nelmio\ApiDocBundle\Parser\FormTypeParser"
      *      }
      * },
-     *
      * views = {"default", "achat" }
      * )
      * @param Request $request

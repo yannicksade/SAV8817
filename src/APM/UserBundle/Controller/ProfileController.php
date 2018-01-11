@@ -89,6 +89,13 @@ class ProfileController extends FOSRestController
      *          "Nelmio\ApiDocBundle\Parser\FormTypeParser"
      *      }
      * },
+     * output={
+     *   "class"="APM\UserBundle\Entity\Utilisateur_avm",
+     *   "parsers" = {
+     *      "Nelmio\ApiDocBundle\Parser\JmsMetadataParser"
+     *    },
+     *     "groups"={"owner_user_details", "owner_list"}
+     * },
      * parameters= {
      *      {"name"="imagefilex", "dataType"="integer", "required"= true, "description"="horizontal start point"},
      *      {"name"="imagefiley", "dataType"="integer", "required"= true, "description"="vertical start point"},
@@ -104,8 +111,8 @@ class ProfileController extends FOSRestController
      *     "groups"={"owner_user_details", "owner_list"}
      * },
      * statusCodes={
-     *     "output" = "Return user profile if POST is used",
-     *     200="Returned when successful",
+     *     "output" = "PUT or POST method can be used",
+     *     200="The details are returned only on POST when successful",
      *     400="Returned when the data are not valid or an unknown error occurs",
      *     403="Returned when the user is not authorized to perform the action",
      *     404="Returned when the specified resource is not found",
@@ -189,8 +196,8 @@ class ProfileController extends FOSRestController
      *     "groups"={"owner_user_details", "owner_list"}
      * },
      * statusCodes={
-     *     "output" = "Return user profile if POST is used",
-     *     200="Returned when successful",
+     *     "output" = "PUT or POST method can be used",
+     *     200="The details are returned only on POST when successful",
      *     400="Returned when the data are not valid or an unknown error occurs",
      *     403="Returned when the user is not authorized to perform the action",
      *     404="Returned when the specified resource is not found",
@@ -246,10 +253,15 @@ class ProfileController extends FOSRestController
      * requirements= {
      *      {"name"="id", "dataType"="integer", "requirement"="\d+", "description" = "user id"}
      * },
-     * parameters={
-     *    {"name"="current_password", "required"=true, "dataType"="password", "requirement"="\D+", "description"="your current password"},
-     *    {"name"="plainPassword[first]", "required"=true, "dataType"="password", "requirement"="\D+", "description"="your new password"},
-     *    {"name"="plainPassword[second]", "required"=true, "dataType"="password", "requirement"="\D+", "description"="confirmation password"}
+     * authentication= true,
+     * authenticationRoles= {
+     *          "ROLE_STAFF"
+     *     },
+     * input={
+     *     "class"="APM\UserBundle\Form\Type\ChangePasswordFormType",
+     *     "parsers" = {
+     *          "Nelmio\ApiDocBundle\Parser\FormTypeParser"
+     *      }
      * },
      * statusCodes={
      *     200="Returned when successful",
@@ -294,10 +306,15 @@ class ProfileController extends FOSRestController
      * requirements= {
      *      {"name"="id", "dataType"="integer", "requirement"="\d+", "description" = "staff id"}
      * },
-     * parameters={
-     *    {"name"="current_password", "required"=true, "dataType"="password", "requirement"="\D+", "description"="your current password"},
-     *    {"name"="plainPassword[first]", "required"=true, "dataType"="password", "requirement"="\D+", "description"="your new password"},
-     *    {"name"="plainPassword[second]", "required"=true, "dataType"="password", "requirement"="\D+", "description"="confirmation password"}
+     * authentication= true,
+     * authenticationRoles= {
+     *          "ROLE_STAFF"
+     *     },
+     * input={
+     *     "class"="APM\UserBundle\Form\Type\ChangePasswordFormType",
+     *     "parsers" = {
+     *          "Nelmio\ApiDocBundle\Parser\FormTypeParser"
+     *      }
      * },
      * statusCodes={
      *     200="Returned when successful",

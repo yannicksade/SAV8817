@@ -269,7 +269,7 @@ class CommunicationController extends FOSRestController
      * resourceDescription="Operations on Communication.",
      * description="Create an object of type Communication.",
      * statusCodes={
-     *         201="Returned when successful",
+     *         201="The details are returned when successful",
      *         400="Returned when the data are not valid or an unknown error occurred",
      *         403="Returned when the user is not authorized to carry on the action",
      *         404="Returned when the entity is not found",
@@ -286,6 +286,13 @@ class CommunicationController extends FOSRestController
      *     "parsers" = {
      *          "Nelmio\ApiDocBundle\Parser\FormTypeParser"
      *      }
+     * },
+     * output={
+     *   "class"="APM\UserBundle\Entity\Communication",
+     *   "parsers" = {
+     *      "Nelmio\ApiDocBundle\Parser\JmsMetadataParser"
+     *    },
+     *     "groups"={"owner_communication_details", "owner_list"}
      * },
      * views = {"default", "user" }
      * )

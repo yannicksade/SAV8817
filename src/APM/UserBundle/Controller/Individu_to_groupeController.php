@@ -218,7 +218,7 @@ class Individu_to_groupeController extends FOSRestController
      * resourceDescription="Operations on Individu_to_groupe.",
      * description="Create an object of type Individu_to_groupe.",
      * statusCodes={
-     *         201="Returned when successful",
+     *         201="The details are returned when successful",
      *         400="Returned when the data are not valid or an unknown error occurred",
      *         403="Returned when the user is not authorized to carry on the action",
      *         404="Returned when the entity is not found",
@@ -239,6 +239,13 @@ class Individu_to_groupeController extends FOSRestController
      *     "parsers" = {
      *          "Nelmio\ApiDocBundle\Parser\FormTypeParser"
      *      }
+     * },
+     * output={
+     *   "class"="APM\UserBundle\Entity\Individu_to_groupe",
+     *   "parsers" = {
+     *      "Nelmio\ApiDocBundle\Parser\JmsMetadataParser"
+     *    },
+     *     "groups"={"owner_individuToG_details", "owner_list"}
      * },
      *      views = {"default", "user" }
      * )
@@ -334,7 +341,7 @@ class Individu_to_groupeController extends FOSRestController
      *   "parsers" = {
      *      "Nelmio\ApiDocBundle\Parser\JmsMetadataParser"
      *    },
-     *     "groups"={"owner_individuToG", "owner_list"}
+     *     "groups"={"owner_individuToG_details", "owner_list"}
      * },
      * statusCodes={
      *     "output" = "A single Object",
@@ -352,7 +359,7 @@ class Individu_to_groupeController extends FOSRestController
     public function showAction(Individu_to_groupe $individu_to_groupe)
     {
         $this->listeAndShowSecurity($individu_to_groupe->getGroupeRelationnel());
-        $data = $this->get('apm_core.data_serialized')->getFormalData($individu_to_groupe, ["owner_individuToG", "owner_list"]);
+        $data = $this->get('apm_core.data_serialized')->getFormalData($individu_to_groupe, ["owner_individuToG_details", "owner_list"]);
         return new JsonResponse($data, 200);
     }
 

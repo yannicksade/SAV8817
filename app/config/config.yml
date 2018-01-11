@@ -124,7 +124,7 @@ fos_user:
                 sender_name: Easy Trade Team
             template:   '@FOSUser/Resetting/email.txt.twig'
         form:
-            name: apm_user_resetting_form
+            name: apm_user_resetting
             type: APM\UserBundle\Form\Type\ResettingFormType
 
 # PUGXMultiuserBundle

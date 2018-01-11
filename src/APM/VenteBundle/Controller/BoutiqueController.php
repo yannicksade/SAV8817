@@ -250,7 +250,7 @@ class BoutiqueController extends FOSRestController implements ClassResourceInter
      * resourceDescription="Operations on Boutique.",
      * description="Create an object of type Boutique.",
      * statusCodes={
-     *         201="Returned when successful",
+     *         201="The details are returned when successful",
      *         400="Returned when the data are not valid or an unknown error occurred",
      *         403="Returned when the user is not authorized to carry on the action",
      *         404="Returned when the entity is not found",
@@ -267,6 +267,13 @@ class BoutiqueController extends FOSRestController implements ClassResourceInter
      *     "parsers" = {
      *          "Nelmio\ApiDocBundle\Parser\FormTypeParser"
      *      }
+     * },
+     * output={
+     *   "class"="APM\VenteBundle\Entity\Boutique",
+     *   "parsers" = {
+     *      "Nelmio\ApiDocBundle\Parser\JmsMetadataParser"
+     *    },
+     *     "groups"={"owner_boutique_details", "owner_list"}
      * },
      * parameters= {
      *      {"name"="imagefile1x", "dataType"="integer", "required"= true, "description"="horizontal start point 01"},
@@ -402,7 +409,8 @@ class BoutiqueController extends FOSRestController implements ClassResourceInter
      * resourceDescription="Operations on Boutique",
      * description="Update an object of type Boutique.",
      * statusCodes={
-     *         200="Returned when successful",
+     *         "output"="PUT or POST method can be used and returns 200",
+     *         200="The details are returned only on POST when successful",
      *         400="Returned when the data are not valid or an unknown error occurred",
      *         403="Returned when the user is not authorized to carry on the action",
      *         404="Returned when the entity is not found",
@@ -419,6 +427,13 @@ class BoutiqueController extends FOSRestController implements ClassResourceInter
      *     "parsers" = {
      *          "Nelmio\ApiDocBundle\Parser\FormTypeParser"
      *      }
+     * },
+     * output={
+     *   "class"="APM\VenteBundle\Entity\Boutique",
+     *   "parsers" = {
+     *      "Nelmio\ApiDocBundle\Parser\JmsMetadataParser"
+     *    },
+     *     "groups"={"owner_boutique_details", "owner_list"}
      * },
      * requirements = {
      *      {"name"="id", "dataType"="integer", "requirement"="\d+", "description"="boutique Id"}

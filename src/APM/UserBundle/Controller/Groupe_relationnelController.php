@@ -253,7 +253,7 @@ class Groupe_relationnelController extends FOSRestController
      * resourceDescription="Operations on Groupe_relationnel.",
      * description="Create an object of type Groupe_relationnel.",
      * statusCodes={
-     *         201="Returned when successful",
+     *         201="The details are returned when successful",
      *         400="Returned when the data are not valid or an unknown error occurred",
      *         403="Returned when the user is not authorized to carry on the action",
      *         404="Returned when the entity is not found",
@@ -271,6 +271,13 @@ class Groupe_relationnelController extends FOSRestController
      *          "Nelmio\ApiDocBundle\Parser\FormTypeParser"
      *      }
      * },
+     * output={
+     *   "class"="APM\UserBundle\Entity\Groupe_relationnel",
+     *   "parsers" = {
+     *      "Nelmio\ApiDocBundle\Parser\JmsMetadataParser"
+     *    },
+     *     "groups"={"owner_groupeR_details", "owner_list"}
+     * },
      * parameters= {
      *      {"name"="imagefilex", "dataType"="integer", "required"= true, "description"="horizontal start point"},
      *      {"name"="imagefiley", "dataType"="integer", "required"= true, "description"="vertical start point"},
@@ -281,7 +288,6 @@ class Groupe_relationnelController extends FOSRestController
      * )
      * @param Request $request
      * @return View | JsonResponse
-     * @Put("/new/grouperelationnel")
      * @Post("/new/grouperelationnel")
      */
     public function newAction(Request $request)
@@ -338,39 +344,6 @@ class Groupe_relationnelController extends FOSRestController
         return $this->get('doctrine.orm.entity_manager');
     }
 
-    /**
-     * @param Request $request
-     * @param Groupe_relationnel $groupe_relationnel
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
-     *
-     * @get("/show-image/grouperelationnel/{id}")
-     */
-    public function showImageAction(Request $request, Groupe_relationnel $groupe_relationnel)
-    {
-        $this->listAndShowSecurity();
-        $form = $this->createCrobForm($groupe_relationnel);
-        $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
-            $this->get('apm_core.crop_image')->setCropParameters(intval($_POST['x']), intval($_POST['y']), intval($_POST['w']), intval($_POST['h']), $groupe_relationnel->getImage(), $groupe_relationnel);
-
-            return $this->redirectToRoute('apm_user_groupe-relationnel_show', array('id' => $groupe_relationnel->getId()));
-        }
-
-        return $this->render('APMUserBundle:groupe_relationnel:image.html.twig', array(
-            'groupe_relationnel' => $groupe_relationnel,
-            'crop_form' => $form->createView(),
-            'url_image' => $this->get('apm_core.packages_maker')->getPackages()->getUrl('/', 'resolve_img'),
-        ));
-    }
-
-    private
-    function createCrobForm(Groupe_relationnel $groupe_relationnel)
-    {
-        return $this->createFormBuilder()
-            ->setAction($this->generateUrl('apm_user_groupe-relationnel_show-image', array('id' => $groupe_relationnel->getId())))
-            ->setMethod('POST')
-            ->getForm();
-    }
 
     /**
      * @ApiDoc(
@@ -415,7 +388,8 @@ class Groupe_relationnelController extends FOSRestController
      * resourceDescription="Operations on Groupe_relationnel",
      * description="Update an object of type Groupe_relationnel.",
      * statusCodes={
-     *         200="Returned when successful",
+     *         "output"="PUT or POST methods can be used",
+     *         200="The details are returned only on POST when successful",
      *         400="Returned when the data are not valid or an unknown error occurred",
      *         403="Returned when the user is not authorized to carry on the action",
      *         404="Returned when the entity is not found",
@@ -433,6 +407,13 @@ class Groupe_relationnelController extends FOSRestController
      *          "Nelmio\ApiDocBundle\Parser\FormTypeParser"
      *      }
      * },
+     * output={
+     *   "class"="APM\UserBundle\Entity\Groupe_relationnel",
+     *   "parsers" = {
+     *      "Nelmio\ApiDocBundle\Parser\JmsMetadataParser"
+     *    },
+     *     "groups"={"owner_groupeR_details", "owner_list"}
+     * },
      * requirements = {
      *      {"name"="id", "dataType"="integer", "requirement"="\d+", "description"="groupe_relationnel Id"}
      * },
@@ -448,6 +429,7 @@ class Groupe_relationnelController extends FOSRestController
      * @param Groupe_relationnel $groupe_relationnel
      * @return View | JsonResponse
      *
+     * @Put("/edit/grouperelationnel/{id}")
      * @Post("/edit/grouperelationnel/{id}")
      */
     public function editAction(Request $request, Groupe_relationnel $groupe_relationnel)
