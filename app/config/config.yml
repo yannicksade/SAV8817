@@ -160,9 +160,6 @@ pugx_multi_user:
                      name: apm_utilisateur_avm_profile
                      validation_groups:  [Profile, Default]
 
-web_profiler :
-    intercept_redirects : false
-
 vich_uploader:
     db_driver: orm # or mongodb or propel or phpcr
     mappings:
@@ -401,10 +398,6 @@ lexik_jwt_authentication:
         #    enabled: false
          #   name:    bearer
 
-
-# CSA Guzzle
-csa_guzzle:
-    profiler: %kernel.debug%
 
 
 # JMS Serializer
