@@ -1,4 +1,4 @@
-APM\VenteBundle\Entity\Transaction
+APM\VenteBundle\Entity\Transaction:
     exclusion_policy: ALL
     properties:
         code:

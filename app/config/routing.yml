@@ -14,11 +14,11 @@ _liip_imagine:
 
 NelmioApiDocBundle:
     resource: "@NelmioApiDocBundle/Resources/config/routing.yml"
-    prefix: "/api/doc"
+    prefix: /api/doc
 
 nelmio_api_swagger:
     resource: "@NelmioApiDocBundle/Resources/config/swagger_routing.yml"
-    prefix: /api/docs/swagger
+    prefix: /api/doc/swagger
 
 fos_user_registration_check_email:
     path:     /check-email-mask

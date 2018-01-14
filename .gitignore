@@ -7,11 +7,7 @@ composer.json
 /web/bundles/
 /web/
 .idea/
-UPGRADE-2.2.md
-UPGRADE-2.3.md
-UPGRADE-2.4.md
-UPGRADE-2.8.md
-UPGRADE.md
+UPGRADE-4.0.md
 
 web/docs_bootstrap
 

@@ -38,7 +38,7 @@ security:
             security: false
 
         healthcheck:
-            pattern: ^/ping$
+            pattern: ^/test
             anonymous: true
 
         api_register_user:
@@ -96,7 +96,8 @@ security:
     access_control:
 
     #     pages accessibles aux utilisateurs anonymes
-        - { path: ^/ping, role: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/test, role: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/test/send-email, role: IS_AUTHENTICATED_ANONYMOUSLY }
 
         - { path: ^/api/doc/profile, role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/api/doc/vente, role: IS_AUTHENTICATED_ANONYMOUSLY }

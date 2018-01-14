@@ -19,7 +19,7 @@ services:
 
     apm_user.rest_mailer:
         class: APM\CoreBundle\Util\RestMailer
-        public: true
+        #public: true
         parent: fos_user.mailer.twig_swift
 
     apm_core.data_serialized:

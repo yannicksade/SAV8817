@@ -1,4 +1,4 @@
-APM\VenteBundle\Entity\Categorie
+APM\VenteBundle\Entity\Categorie:
     exclusion_policy: ALL
     properties:
         code:

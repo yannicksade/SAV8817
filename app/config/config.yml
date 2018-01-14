@@ -96,7 +96,9 @@ swiftmailer:
     username:  %mailer_user%
     password:  %mailer_password%
     host:      %mailer_host%
-    spool:     { type: memory }
+    spool:
+        type: file
+        path: %kernel.root_dir%/spool
 
 # Fos user
 fos_user:
@@ -108,19 +110,19 @@ fos_user:
         mailer: apm_user.rest_mailer
     #use_username_form_type: true
     from_email:
-        address:           webmaster@esay-trade.com
+        address:           info@weasytrade.com
         sender_name:       webmaster
     registration:
         confirmation:
             enabled: true
             from_email:
-                address:     yannicksade@gmail.com
+                address:     info@weasytrade.com
                 sender_name: Easy Trade Team
             template:   '@FOSUser/Registration/email.txt.twig'
     resetting:
         email:
             from_email:
-                address:    resetting-password@esay-trade.com
+                address:    info@weasytrade.com
                 sender_name: Easy Trade Team
             template:   '@FOSUser/Resetting/email.txt.twig'
         form:

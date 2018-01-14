@@ -206,6 +206,7 @@ class Utilisateur_avm extends Utilisateur
     private $transporteur;
 
     /**
+     * @var Conseiller
      * @ORM\OneToOne(targetEntity="APM\MarketingDistribueBundle\Entity\Conseiller", mappedBy="utilisateur", cascade={"persist","remove"})
      * @Expose
      * @Groups({"owner_user_details"})

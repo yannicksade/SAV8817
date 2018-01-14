@@ -1,4 +1,4 @@
-APM\VenteBundle\Entity\Rabais_offre
+APM\VenteBundle\Entity\Rabais_offre:
     exclusion_policy: ALL
     properties:
         code:
