@@ -191,40 +191,117 @@ class ControllerExtensionModuleSosearchpro extends Controller {
 	}
 	
 	//=== Theme Custom Code====
-	public function getHeader(){
-		$header_directory  = DIR_CATALOG.'view/theme/'.$this->config->get('theme_default_directory').'/template/header/';
-		if (is_dir($header_directory)) {
-			$file_header = scandir($header_directory);
-			
-			foreach ($file_header as  $item_header) {
-				if (strpos($item_header, '.tpl') == true) {
-					
-					list($fileName_header) = explode('.tpl',$item_header); 
-					$fileNames_header[] = ucfirst($fileName_header);
-					
-				}
-			}
-		} 
-		return  isset($fileNames_header) ? $fileNames_header : '' ;
-	}
+
+    public function _breadcrumbs()
+    {
+        $this->data['breadcrumbs'] = array();
+
+        $this->data['breadcrumbs'][] = array(
+            'text' => $this->language->get('text_home'),
+            'href' => $this->url->link('common/dashboard', 'token=' . $this->session->data['token'], 'SSL')
+        );
+
+        $this->data['breadcrumbs'][] = array(
+            'text' => $this->language->get('text_module'),
+            'href' => $this->url->link('extension/extension', 'token=' . $this->session->data['token'], 'SSL')
+        );
+
+        if (!isset($this->request->get['module_id'])) {
+            $this->data['breadcrumbs'][] = array(
+                'text' => $this->language->get('heading_title'),
+                'href' => $this->url->link('extension/module/so_searchpro', 'token=' . $this->session->data['token'], 'SSL')
+            );
+        } else {
+            $this->data['breadcrumbs'][] = array(
+                'text' => $this->language->get('heading_title'),
+                'href' => $this->url->link('extension/module/so_searchpro', 'token=' . $this->session->data['token'] . '&module_id=' . $this->request->get['module_id'], 'SSL')
+            );
+        }
+        return $this->data['breadcrumbs'];
+    }
+
+    protected function validate()
+    {
+        if (!$this->user->hasPermission('modify', 'extension/module/so_searchpro')) {
+            $this->error['warning'] = $this->language->get('error_permission');
+        }
+
+        if ((utf8_strlen($this->request->post['name']) < 3) || (utf8_strlen($this->request->post['name']) > 64)) {
+            $this->error['name'] = $this->language->get('error_name');
+        }
+
+        $this->load->model('localisation/language');
+        $languages = $this->model_localisation_language->getLanguages();
+
+        foreach ($languages as $language) {
+            $module_description = $this->request->post['module_description'];
+            if ((utf8_strlen($module_description[$language['language_id']]['head_name']) < 3) || (utf8_strlen($module_description[$language['language_id']]['head_name']) > 64)) {
+                $this->error['head_name'] = $this->language->get('error_head_name');
+            }
+            if ((utf8_strlen($module_description[$language['language_id']]['str_keyword']) < 3) || (utf8_strlen($module_description[$language['language_id']]['str_keyword']) > 64)) {
+                $this->error['module_description'] = $this->language->get('error_str_keyword');
+            }
+        }
+
+        if ($this->request->post['width'] != '0' && !filter_var($this->request->post['width'], FILTER_VALIDATE_INT) || $this->request->post['width'] < 0) {
+            $this->error['width'] = $this->language->get('error_width');
+        }
+
+        if ($this->request->post['height'] != '0' && !filter_var($this->request->post['height'], FILTER_VALIDATE_INT) || $this->request->post['height'] < 0) {
+            $this->error['height'] = $this->language->get('error_height');
+        }
+
+        if ($this->request->post['limit'] != '0' && !filter_var($this->request->post['limit'], FILTER_VALIDATE_INT) || $this->request->post['limit'] < 0) {
+            $this->error['limit'] = $this->language->get('error_limit');
+        }
+
+        if ($this->request->post['character'] != '0' && !filter_var($this->request->post['character'], FILTER_VALIDATE_INT) || $this->request->post['character'] < 0) {
+            $this->error['character'] = $this->language->get('error_character');
+        }
+
+        if ($this->request->post['cache_time'] != '0' && !filter_var($this->request->post['cache_time'], FILTER_VALIDATE_INT) || $this->request->post['cache_time'] < 0) {
+            $this->error['cache_time'] = $this->language->get('error_cache_time');
+        }
+
+        return !$this->error;
+    }
+	
 	public function getLayoutMod($name=null){
 		$log_directory  = DIR_CATALOG.'view/theme/'.$this->config->get('theme_default_directory').'/template/extension/module/'.$name;
 		if (is_dir($log_directory)) {
 			$files = scandir($log_directory);
-			
+
 			foreach ($files as  $value) {
 				if (strpos($value, '.tpl') == true) {
-					
-					list($fileName) = explode('.tpl',$value); 
+
+                    list($fileName) = explode('.tpl', $value);
 					$fileNames[] = ucfirst($fileName);
-					
+
 				}
 			}
-		} 
+        }
 		$fileNames = isset($fileNames) ? $fileNames : '';
 		return $fileNames;
 	}
-	
+
+    public function getHeader()
+    {
+        $header_directory = DIR_CATALOG . 'view/theme/' . $this->config->get('theme_default_directory') . '/template/header/';
+        if (is_dir($header_directory)) {
+            $file_header = scandir($header_directory);
+
+            foreach ($file_header as $item_header) {
+                if (strpos($item_header, '.tpl') == true) {
+
+                    list($fileName_header) = explode('.tpl', $item_header);
+                    $fileNames_header[] = ucfirst($fileName_header);
+
+                }
+            }
+        }
+        return isset($fileNames_header) ? $fileNames_header : '';
+    }
+
 	public function remove_cache()
 	{
 		$folder_cache = DIR_CACHE.'so/';
@@ -233,7 +310,9 @@ class ControllerExtensionModuleSosearchpro extends Controller {
 			self::mageDelTree($folder_cache);
 		}
 	}
-	function mageDelTree($path) {
+
+    function mageDelTree($path)
+    {
 		if (is_dir($path)) {
 			$entries = scandir($path);
 			foreach ($entries as $entry) {
@@ -246,81 +325,11 @@ class ControllerExtensionModuleSosearchpro extends Controller {
 			@unlink($path);
 		}
 	}
-	public function addModule($code, $data) {
+
+    public function addModule($code, $data)
+    {
 		$this->db->query("INSERT INTO `" . DB_PREFIX . "module` SET `name` = '" . $this->db->escape($data['name']) . "', `code` = '" . $this->db->escape($code) . "', `setting` = '" . $this->db->escape(json_encode($data)) . "'");
 		$result = $this->db->query("SELECT LAST_INSERT_ID() as module_id");
 		return $result->row['module_id'];
-	}	
-
-	protected function validate() {
-		if (!$this->user->hasPermission('modify', 'extension/module/so_searchpro')) {
-			$this->error['warning'] = $this->language->get('error_permission');
-		}
-
-		if ((utf8_strlen($this->request->post['name']) < 3) || (utf8_strlen($this->request->post['name']) > 64)) {
-			$this->error['name'] = $this->language->get('error_name');
-		}
-
-		$this->load->model('localisation/language');
-		$languages = $this->model_localisation_language->getLanguages();
-		
-		foreach($languages as $language){
-			$module_description = $this->request->post['module_description'];
-			if ((utf8_strlen($module_description[$language['language_id']]['head_name']) < 3) || (utf8_strlen($module_description[$language['language_id']]['head_name']) > 64)) {
-				$this->error['head_name'] = $this->language->get('error_head_name');
-			}
-			if ((utf8_strlen($module_description[$language['language_id']]['str_keyword']) < 3) || (utf8_strlen($module_description[$language['language_id']]['str_keyword']) > 64)) {
-				$this->error['module_description'] = $this->language->get('error_str_keyword');
-			}
-		}
-		
-		if ($this->request->post['width'] != '0' && !filter_var($this->request->post['width'],FILTER_VALIDATE_INT) || $this->request->post['width'] < 0) {
-			$this->error['width'] = $this->language->get('error_width');
-		}
-		
-		if ($this->request->post['height'] != '0' && !filter_var($this->request->post['height'],FILTER_VALIDATE_INT) || $this->request->post['height'] < 0) {
-			$this->error['height'] = $this->language->get('error_height');
-		}		
-
-		if ($this->request->post['limit'] != '0' && !filter_var($this->request->post['limit'],FILTER_VALIDATE_INT) || $this->request->post['limit'] < 0) {
-			$this->error['limit'] = $this->language->get('error_limit');
-		}
-		
-		if ($this->request->post['character'] != '0' && !filter_var($this->request->post['character'],FILTER_VALIDATE_INT) || $this->request->post['character'] < 0) {
-			$this->error['character'] = $this->language->get('error_character');
-		}
-		
-		if ($this->request->post['cache_time'] != '0' && !filter_var($this->request->post['cache_time'],FILTER_VALIDATE_INT) || $this->request->post['cache_time'] < 0) {
-			$this->error['cache_time'] = $this->language->get('error_cache_time');
-		}
-
-		return !$this->error;
-	}
-
-	public function _breadcrumbs(){
-		$this->data['breadcrumbs'] = array();
-
-		$this->data['breadcrumbs'][] = array(
-			'text' => $this->language->get('text_home'),
-			'href' => $this->url->link('common/dashboard', 'token=' . $this->session->data['token'], 'SSL')
-		);
-
-		$this->data['breadcrumbs'][] = array(
-			'text' => $this->language->get('text_module'),
-			'href' => $this->url->link('extension/extension', 'token=' . $this->session->data['token'], 'SSL')
-		);
-
-		if (!isset($this->request->get['module_id'])) {
-			$this->data['breadcrumbs'][] = array(
-				'text' => $this->language->get('heading_title'),
-				'href' => $this->url->link('extension/module/so_searchpro', 'token=' . $this->session->data['token'], 'SSL')
-			);
-		} else {
-			$this->data['breadcrumbs'][] = array(
-				'text' => $this->language->get('heading_title'),
-				'href' => $this->url->link('extension/module/so_searchpro', 'token=' . $this->session->data['token'] . '&module_id=' . $this->request->get['module_id'], 'SSL')
-			);
-		}
-		return $this->data['breadcrumbs'];
 	}
 }

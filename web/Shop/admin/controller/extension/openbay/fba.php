@@ -210,6 +210,23 @@ class ControllerExtensionOpenbayFba extends Controller {
         $this->response->setOutput($this->load->view('extension/openbay/fba_settings', $data));
     }
 
+    protected function validate()
+    {
+        if (!$this->user->hasPermission('modify', 'extension/openbay/fba')) {
+            $this->error['warning'] = $this->language->get('error_permission');
+        }
+
+        if (!$this->request->post['openbay_fba_api_key']) {
+            $this->error['api_key'] = $this->language->get('error_api_key');
+        }
+
+        if (!$this->request->post['openbay_fba_api_account_id']) {
+            $this->error['api_account_id'] = $this->language->get('error_api_account_id');
+        }
+
+        return !$this->error;
+    }
+
     public function verifyCredentials() {
         $this->load->language('extension/openbay/fba_settings');
 
@@ -238,22 +255,6 @@ class ControllerExtensionOpenbayFba extends Controller {
 
         $this->response->addHeader('Content-Type: application/json');
         $this->response->setOutput(json_encode($response));
-    }
-
-    protected function validate() {
-        if (!$this->user->hasPermission('modify', 'extension/openbay/fba')) {
-            $this->error['warning'] = $this->language->get('error_permission');
-        }
-
-        if (!$this->request->post['openbay_fba_api_key']) {
-            $this->error['api_key'] = $this->language->get('error_api_key');
-        }
-
-        if (!$this->request->post['openbay_fba_api_account_id']) {
-            $this->error['api_account_id'] = $this->language->get('error_api_account_id');
-        }
-
-        return !$this->error;
     }
 
     public function fulfillment() {

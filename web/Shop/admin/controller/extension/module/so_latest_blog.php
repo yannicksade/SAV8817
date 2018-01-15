@@ -1,7 +1,8 @@
 <?php
 class ControllerExtensionModuleSolatestblog extends Controller {
-	private $error = array();
 	public $data = array();
+    private $error = array();
+
 	public function index() {
 		// Load language
 		$this->load->language('extension/module/so_latest_blog');
@@ -330,27 +331,35 @@ class ControllerExtensionModuleSolatestblog extends Controller {
 
 		}
 	}
-	public function remove_cache()
-	{
-		$folder_cache = DIR_CACHE.'so/';
-		if(file_exists($folder_cache))
-		{
-			self::mageDelTree($folder_cache);
-		}
-	}
-	function mageDelTree($path) {
-		if (is_dir($path)) {
-			$entries = scandir($path);
-			foreach ($entries as $entry) {
-				if ($entry != '.' && $entry != '..') {
-					self::mageDelTree($path.'/'.$entry);
-				}
-			}
-			@rmdir($path);
+
+    public function _breadcrumbs()
+    {
+        $this->data['breadcrumbs'] = array();
+
+        $this->data['breadcrumbs'][] = array(
+            'text' => $this->language->get('text_home'),
+            'href' => $this->url->link('common/dashboard', 'token=' . $this->session->data['token'], 'SSL')
+        );
+
+        $this->data['breadcrumbs'][] = array(
+            'text' => $this->language->get('text_module'),
+            'href' => $this->url->link('extension/module', 'token=' . $this->session->data['token'], 'SSL')
+        );
+
+        if (!isset($this->request->get['module_id'])) {
+            $this->data['breadcrumbs'][] = array(
+                'text' => $this->language->get('heading_title'),
+                'href' => $this->url->link('extension/module/so_latest_blog', 'token=' . $this->session->data['token'], 'SSL')
+            );
 		} else {
-			@unlink($path);
+            $this->data['breadcrumbs'][] = array(
+                'text' => $this->language->get('heading_title'),
+                'href' => $this->url->link('extension/module/so_latest_blog', 'token=' . $this->session->data['token'] . '&module_id=' . $this->request->get['module_id'], 'SSL')
+            );
 		}
+        return $this->data['breadcrumbs'];
 	}
+
 	public function checkDatabase() {
 		$database_not_found = $this->validateTable();
 		if(!$database_not_found) {
@@ -358,7 +367,7 @@ class ControllerExtensionModuleSolatestblog extends Controller {
 		}
 		return false;
 	}
-	
+
 	public function validateTable() {
 		$table_name = $this->db->escape('simple_blog_article');
 
@@ -369,7 +378,8 @@ class ControllerExtensionModuleSolatestblog extends Controller {
 		return $query->num_rows;
 	}
 
-	protected function validate() {
+    protected function validate()
+    {
 		if (!$this->user->hasPermission('modify', 'extension/module/so_latest_blog')) {
 			$this->error['warning'] = $this->language->get('error_permission');
 		}
@@ -387,11 +397,11 @@ class ControllerExtensionModuleSolatestblog extends Controller {
 				$this->error['head_name'] = $this->language->get('error_head_name');
 			}
 		}
-		
+
 		if ($this->request->post['category'] == null) {
 			$this->error['category'] = $this->language->get('error_category');
 		}
-		
+
 		if (!filter_var($this->request->post['category_depth'],FILTER_VALIDATE_FLOAT) || $this->request->post['category_depth'] < 0) {
 			$this->error['category_depth'] = $this->language->get('error_category_depth');
 		}
@@ -459,46 +469,45 @@ class ControllerExtensionModuleSolatestblog extends Controller {
 		}
 		return !$this->error;
 	}
-	//=== Theme Custom Code====
+
 	public function getLayoutMod($name=null){
 		$log_directory  = DIR_CATALOG.'view/theme/'.$this->config->get('theme_default_directory').'/template/extension/module/'.$name;
 		if (is_dir($log_directory)) {
 			$files = scandir($log_directory);
 			foreach ($files as  $value) {
 				if (strpos($value, '.tpl') == true && strpos($value, '_') === false) {
-					list($fileName) = explode('.tpl',$value); 
+                    list($fileName) = explode('.tpl', $value);
 					$fileNames[] = ucfirst($fileName);
 				}
 			}
-		} 
+        }
 		$fileNames = isset($fileNames) ? $fileNames : '';
 		return $fileNames;
 	}
-	public function _breadcrumbs(){
-		$this->data['breadcrumbs'] = array();
 
-		$this->data['breadcrumbs'][] = array(
-			'text' => $this->language->get('text_home'),
-			'href' => $this->url->link('common/dashboard', 'token=' . $this->session->data['token'], 'SSL')
-		);
+    //=== Theme Custom Code====
 
-		$this->data['breadcrumbs'][] = array(
-			'text' => $this->language->get('text_module'),
-			'href' => $this->url->link('extension/module', 'token=' . $this->session->data['token'], 'SSL')
-		);
+    public function remove_cache()
+    {
+        $folder_cache = DIR_CACHE . 'so/';
+        if (file_exists($folder_cache)) {
+            self::mageDelTree($folder_cache);
+        }
+    }
 
-		if (!isset($this->request->get['module_id'])) {
-			$this->data['breadcrumbs'][] = array(
-				'text' => $this->language->get('heading_title'),
-				'href' => $this->url->link('extension/module/so_latest_blog', 'token=' . $this->session->data['token'], 'SSL')
-			);
+    function mageDelTree($path)
+    {
+        if (is_dir($path)) {
+            $entries = scandir($path);
+            foreach ($entries as $entry) {
+                if ($entry != '.' && $entry != '..') {
+                    self::mageDelTree($path . '/' . $entry);
+                }
+            }
+            @rmdir($path);
 		} else {
-			$this->data['breadcrumbs'][] = array(
-				'text' => $this->language->get('heading_title'),
-				'href' => $this->url->link('extension/module/so_latest_blog', 'token=' . $this->session->data['token'] . '&module_id=' . $this->request->get['module_id'], 'SSL')
-			);
+            @unlink($path);
 		}
-		return $this->data['breadcrumbs'];
 	}
 
 	public function autocomplete() {

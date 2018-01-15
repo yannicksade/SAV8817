@@ -12,104 +12,6 @@ class ControllerLocalisationZone extends Controller {
 		$this->getList();
 	}
 
-	public function add() {
-		$this->load->language('localisation/zone');
-
-		$this->document->setTitle($this->language->get('heading_title'));
-
-		$this->load->model('localisation/zone');
-
-		if (($this->request->server['REQUEST_METHOD'] == 'POST') && $this->validateForm()) {
-			$this->model_localisation_zone->addZone($this->request->post);
-
-			$this->session->data['success'] = $this->language->get('text_success');
-
-			$url = '';
-
-			if (isset($this->request->get['sort'])) {
-				$url .= '&sort=' . $this->request->get['sort'];
-			}
-
-			if (isset($this->request->get['order'])) {
-				$url .= '&order=' . $this->request->get['order'];
-			}
-
-			if (isset($this->request->get['page'])) {
-				$url .= '&page=' . $this->request->get['page'];
-			}
-
-			$this->response->redirect($this->url->link('localisation/zone', 'token=' . $this->session->data['token'] . $url, true));
-		}
-
-		$this->getForm();
-	}
-
-	public function edit() {
-		$this->load->language('localisation/zone');
-
-		$this->document->setTitle($this->language->get('heading_title'));
-
-		$this->load->model('localisation/zone');
-
-		if (($this->request->server['REQUEST_METHOD'] == 'POST') && $this->validateForm()) {
-			$this->model_localisation_zone->editZone($this->request->get['zone_id'], $this->request->post);
-
-			$this->session->data['success'] = $this->language->get('text_success');
-
-			$url = '';
-
-			if (isset($this->request->get['sort'])) {
-				$url .= '&sort=' . $this->request->get['sort'];
-			}
-
-			if (isset($this->request->get['order'])) {
-				$url .= '&order=' . $this->request->get['order'];
-			}
-
-			if (isset($this->request->get['page'])) {
-				$url .= '&page=' . $this->request->get['page'];
-			}
-
-			$this->response->redirect($this->url->link('localisation/zone', 'token=' . $this->session->data['token'] . $url, true));
-		}
-
-		$this->getForm();
-	}
-
-	public function delete() {
-		$this->load->language('localisation/zone');
-
-		$this->document->setTitle($this->language->get('heading_title'));
-
-		$this->load->model('localisation/zone');
-
-		if (isset($this->request->post['selected']) && $this->validateDelete()) {
-			foreach ($this->request->post['selected'] as $zone_id) {
-				$this->model_localisation_zone->deleteZone($zone_id);
-			}
-
-			$this->session->data['success'] = $this->language->get('text_success');
-
-			$url = '';
-
-			if (isset($this->request->get['sort'])) {
-				$url .= '&sort=' . $this->request->get['sort'];
-			}
-
-			if (isset($this->request->get['order'])) {
-				$url .= '&order=' . $this->request->get['order'];
-			}
-
-			if (isset($this->request->get['page'])) {
-				$url .= '&page=' . $this->request->get['page'];
-			}
-
-			$this->response->redirect($this->url->link('localisation/zone', 'token=' . $this->session->data['token'] . $url, true));
-		}
-
-		$this->getList();
-	}
-
 	protected function getList() {
 		if (isset($this->request->get['sort'])) {
 			$sort = $this->request->get['sort'];
@@ -262,6 +164,52 @@ class ControllerLocalisationZone extends Controller {
 		$this->response->setOutput($this->load->view('localisation/zone_list', $data));
 	}
 
+    public function add()
+    {
+        $this->load->language('localisation/zone');
+
+        $this->document->setTitle($this->language->get('heading_title'));
+
+        $this->load->model('localisation/zone');
+
+        if (($this->request->server['REQUEST_METHOD'] == 'POST') && $this->validateForm()) {
+            $this->model_localisation_zone->addZone($this->request->post);
+
+            $this->session->data['success'] = $this->language->get('text_success');
+
+            $url = '';
+
+            if (isset($this->request->get['sort'])) {
+                $url .= '&sort=' . $this->request->get['sort'];
+            }
+
+            if (isset($this->request->get['order'])) {
+                $url .= '&order=' . $this->request->get['order'];
+            }
+
+            if (isset($this->request->get['page'])) {
+                $url .= '&page=' . $this->request->get['page'];
+            }
+
+            $this->response->redirect($this->url->link('localisation/zone', 'token=' . $this->session->data['token'] . $url, true));
+        }
+
+        $this->getForm();
+    }
+
+    protected function validateForm()
+    {
+        if (!$this->user->hasPermission('modify', 'localisation/zone')) {
+            $this->error['warning'] = $this->language->get('error_permission');
+        }
+
+        if ((utf8_strlen($this->request->post['name']) < 3) || (utf8_strlen($this->request->post['name']) > 64)) {
+            $this->error['name'] = $this->language->get('error_name');
+        }
+
+        return !$this->error;
+    }
+
 	protected function getForm() {
 		$data['heading_title'] = $this->language->get('heading_title');
 
@@ -371,16 +319,72 @@ class ControllerLocalisationZone extends Controller {
 		$this->response->setOutput($this->load->view('localisation/zone_form', $data));
 	}
 
-	protected function validateForm() {
-		if (!$this->user->hasPermission('modify', 'localisation/zone')) {
-			$this->error['warning'] = $this->language->get('error_permission');
-		}
+    public function edit()
+    {
+        $this->load->language('localisation/zone');
 
-		if ((utf8_strlen($this->request->post['name']) < 3) || (utf8_strlen($this->request->post['name']) > 64)) {
-			$this->error['name'] = $this->language->get('error_name');
-		}
+        $this->document->setTitle($this->language->get('heading_title'));
 
-		return !$this->error;
+        $this->load->model('localisation/zone');
+
+        if (($this->request->server['REQUEST_METHOD'] == 'POST') && $this->validateForm()) {
+            $this->model_localisation_zone->editZone($this->request->get['zone_id'], $this->request->post);
+
+            $this->session->data['success'] = $this->language->get('text_success');
+
+            $url = '';
+
+            if (isset($this->request->get['sort'])) {
+                $url .= '&sort=' . $this->request->get['sort'];
+            }
+
+            if (isset($this->request->get['order'])) {
+                $url .= '&order=' . $this->request->get['order'];
+            }
+
+            if (isset($this->request->get['page'])) {
+                $url .= '&page=' . $this->request->get['page'];
+            }
+
+            $this->response->redirect($this->url->link('localisation/zone', 'token=' . $this->session->data['token'] . $url, true));
+        }
+
+        $this->getForm();
+    }
+
+    public function delete()
+    {
+        $this->load->language('localisation/zone');
+
+        $this->document->setTitle($this->language->get('heading_title'));
+
+        $this->load->model('localisation/zone');
+
+        if (isset($this->request->post['selected']) && $this->validateDelete()) {
+            foreach ($this->request->post['selected'] as $zone_id) {
+                $this->model_localisation_zone->deleteZone($zone_id);
+            }
+
+            $this->session->data['success'] = $this->language->get('text_success');
+
+            $url = '';
+
+            if (isset($this->request->get['sort'])) {
+                $url .= '&sort=' . $this->request->get['sort'];
+            }
+
+            if (isset($this->request->get['order'])) {
+                $url .= '&order=' . $this->request->get['order'];
+            }
+
+            if (isset($this->request->get['page'])) {
+                $url .= '&page=' . $this->request->get['page'];
+            }
+
+            $this->response->redirect($this->url->link('localisation/zone', 'token=' . $this->session->data['token'] . $url, true));
+        }
+
+        $this->getList();
 	}
 
 	protected function validateDelete() {

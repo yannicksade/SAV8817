@@ -12,55 +12,6 @@ class ControllerToolUpload extends Controller {
 		$this->getList();
 	}
 
-	public function delete() {
-		$this->load->language('tool/upload');
-
-		$this->document->setTitle($this->language->get('heading_title'));
-
-		$this->load->model('tool/upload');
-
-		if (isset($this->request->post['selected']) && $this->validateDelete()) {
-			foreach ($this->request->post['selected'] as $upload_id) {
-				// Remove file before deleting DB record.
-				$upload_info = $this->model_tool_upload->getUpload($upload_id);
-
-				if ($upload_info && is_file(DIR_UPLOAD . $upload_info['filename'])) {
-					unlink(DIR_UPLOAD . $upload_info['filename']);
-				}
-
-				$this->model_tool_upload->deleteUpload($upload_id);
-			}
-
-			$this->session->data['success'] = $this->language->get('text_success');
-
-			$url = '';
-
-			if (isset($this->request->get['filter_name'])) {
-				$url .= '&filter_name=' . urlencode(html_entity_decode($this->request->get['filter_name'], ENT_QUOTES, 'UTF-8'));
-			}
-
-			if (isset($this->request->get['filter_date_added'])) {
-				$url .= '&filter_date_added=' . $this->request->get['filter_date_added'];
-			}
-
-			if (isset($this->request->get['sort'])) {
-				$url .= '&sort=' . $this->request->get['sort'];
-			}
-
-			if (isset($this->request->get['order'])) {
-				$url .= '&order=' . $this->request->get['order'];
-			}
-
-			if (isset($this->request->get['page'])) {
-				$url .= '&page=' . $this->request->get['page'];
-			}
-
-			$this->response->redirect($this->url->link('tool/upload', 'token=' . $this->session->data['token'] . $url, true));
-		}
-
-		$this->getList();
-	}
-
 	protected function getList() {
 		if (isset($this->request->get['filter_name'])) {
 			$filter_name = $this->request->get['filter_name'];
@@ -154,7 +105,7 @@ class ControllerToolUpload extends Controller {
 		}
 
 		$data['heading_title'] = $this->language->get('heading_title');
-		
+
 		$data['text_list'] = $this->language->get('text_list');
 		$data['text_no_results'] = $this->language->get('text_no_results');
 		$data['text_confirm'] = $this->language->get('text_confirm');
@@ -257,6 +208,56 @@ class ControllerToolUpload extends Controller {
 
 		$this->response->setOutput($this->load->view('tool/upload', $data));
 	}
+
+    public function delete()
+    {
+        $this->load->language('tool/upload');
+
+        $this->document->setTitle($this->language->get('heading_title'));
+
+        $this->load->model('tool/upload');
+
+        if (isset($this->request->post['selected']) && $this->validateDelete()) {
+            foreach ($this->request->post['selected'] as $upload_id) {
+                // Remove file before deleting DB record.
+                $upload_info = $this->model_tool_upload->getUpload($upload_id);
+
+                if ($upload_info && is_file(DIR_UPLOAD . $upload_info['filename'])) {
+                    unlink(DIR_UPLOAD . $upload_info['filename']);
+                }
+
+                $this->model_tool_upload->deleteUpload($upload_id);
+            }
+
+            $this->session->data['success'] = $this->language->get('text_success');
+
+            $url = '';
+
+            if (isset($this->request->get['filter_name'])) {
+                $url .= '&filter_name=' . urlencode(html_entity_decode($this->request->get['filter_name'], ENT_QUOTES, 'UTF-8'));
+            }
+
+            if (isset($this->request->get['filter_date_added'])) {
+                $url .= '&filter_date_added=' . $this->request->get['filter_date_added'];
+            }
+
+            if (isset($this->request->get['sort'])) {
+                $url .= '&sort=' . $this->request->get['sort'];
+            }
+
+            if (isset($this->request->get['order'])) {
+                $url .= '&order=' . $this->request->get['order'];
+            }
+
+            if (isset($this->request->get['page'])) {
+                $url .= '&page=' . $this->request->get['page'];
+            }
+
+            $this->response->redirect($this->url->link('tool/upload', 'token=' . $this->session->data['token'] . $url, true));
+        }
+
+        $this->getList();
+    }
 
 	protected function validateDelete() {
 		if (!$this->user->hasPermission('modify', 'tool/upload')) {

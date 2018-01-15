@@ -227,6 +227,58 @@ class ControllerExtensionPaymentKlarnaCheckout extends Controller {
 		$this->response->setOutput($this->load->view('extension/payment/klarna_checkout', $data));
 	}
 
+    protected function validate()
+    {
+        $this->load->model('extension/payment/klarna_checkout');
+        $this->load->model('localisation/geo_zone');
+
+        if (version_compare(phpversion(), '5.4.0', '<')) {
+            $this->error['warning'] = $this->language->get('error_php_version');
+        }
+
+        if (!$this->user->hasPermission('modify', 'extension/payment/klarna_checkout')) {
+            $this->error['warning'] = $this->language->get('error_permission');
+        }
+
+        if (!$this->config->get('config_secure')) {
+            $this->error['warning'] = $this->language->get('error_ssl');
+        }
+
+        if (empty($this->request->post['klarna_checkout_account'])) {
+            $this->error['account_warning'] = $this->language->get('error_account_minimum');
+        } else {
+            $countries = array();
+
+            foreach ($this->request->post['klarna_checkout_account'] as $key => $account) {
+                if (in_array($account['country'], $countries)) {
+                    $this->error['account_warning'] = $this->language->get('error_account_countries');
+
+                    break;
+                } else {
+                    $countries[] = $account['country'];
+                }
+
+                if (!$account['merchant_id']) {
+                    $this->error['account'][$key]['merchant_id'] = $this->language->get('error_merchant_id');
+                }
+
+                if (!$account['secret']) {
+                    $this->error['account'][$key]['secret'] = $this->language->get('error_secret');
+                }
+
+                if (!$account['locale']) {
+                    $this->error['account'][$key]['locale'] = $this->language->get('error_locale');
+                }
+            }
+        }
+
+        if ($this->error && !isset($this->error['warning'])) {
+            $this->error['warning'] = $this->language->get('error_warning');
+        }
+
+        return !$this->error;
+    }
+
 	public function order() {
 		$this->load->language('extension/payment/klarna_checkout');
 
@@ -736,56 +788,5 @@ class ControllerExtensionPaymentKlarnaCheckout extends Controller {
 
 		$this->response->addHeader('Content-Type: application/json');
 		$this->response->setOutput(json_encode($json));
-	}
-
-	protected function validate() {
-		$this->load->model('extension/payment/klarna_checkout');
-		$this->load->model('localisation/geo_zone');
-
-		if (version_compare(phpversion(), '5.4.0', '<')) {
-			$this->error['warning'] = $this->language->get('error_php_version');
-		}
-
-		if (!$this->user->hasPermission('modify', 'extension/payment/klarna_checkout')) {
-			$this->error['warning'] = $this->language->get('error_permission');
-		}
-
-		if (!$this->config->get('config_secure')) {
-			$this->error['warning'] = $this->language->get('error_ssl');
-		}
-
-		if (empty($this->request->post['klarna_checkout_account'])) {
-			$this->error['account_warning'] = $this->language->get('error_account_minimum');
-		} else {
-			$countries = array();
-
-			foreach ($this->request->post['klarna_checkout_account'] as $key => $account) {
-				if (in_array($account['country'], $countries)) {
-					$this->error['account_warning'] = $this->language->get('error_account_countries');
-
-					break;
-				} else {
-					$countries[] = $account['country'];
-				}
-
-				if (!$account['merchant_id']) {
-					$this->error['account'][$key]['merchant_id'] = $this->language->get('error_merchant_id');
-				}
-
-				if (!$account['secret']) {
-					$this->error['account'][$key]['secret'] = $this->language->get('error_secret');
-				}
-
-				if (!$account['locale']) {
-					$this->error['account'][$key]['locale'] = $this->language->get('error_locale');
-				}
-			}
-		}
-
-		if ($this->error && !isset($this->error['warning'])) {
-			$this->error['warning'] = $this->language->get('error_warning');
-		}
-
-		return !$this->error;
 	}
 }

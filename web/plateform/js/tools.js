@@ -53,9 +53,13 @@ tmp_value=tmp_value/f1;else
 tmp_value=tmp_value*f1;return tmp_value;}}
 function autoUrl(name,dest)
 {var loc;var id_list;id_list=document.getElementById(name);loc=id_list.options[id_list.selectedIndex].value;if(loc!=0)
-location.href=dest+loc;return;}
-function autoUrlNoList(name,dest)
-{var loc;loc=document.getElementById(name).checked;location.href=dest+(loc==true?1:0);return;}
+    location.href = dest + loc;
+}
+function autoUrlNoList(name,dest) {
+    var loc;
+    loc = document.getElementById(name).checked;
+    location.href = dest + (loc == true ? 1 : 0);
+}
 function toggle(e,show)
 {e.style.display=show?'':'none';}
 function toggleMultiple(tab)
@@ -129,7 +133,17 @@ function fancyMsgBox(msg,title)
 $.fancybox(msg,{'autoDimensions':false,'autoSize':false,'width':500,'height':'auto','openEffect':'none','closeEffect':'none'});}
 function fancyChooseBox(question,title,buttons,otherParams)
 {var msg,funcName,action;msg='';if(title)
-msg="<h2>"+ title+"</h2><p>"+ question+"</p>";msg+="<br/><p class=\"submit\" style=\"text-align:right; padding-bottom: 0\">";var i=0;for(var caption in buttons){if(!buttons.hasOwnProperty(caption))continue;funcName=buttons[caption];if(typeof otherParams=='undefined')otherParams=0;otherParams=escape(JSON.stringify(otherParams));action=funcName?"$.fancybox.close();window['"+ funcName+"'](JSON.parse(unescape('"+ otherParams+"')), "+ i+")":"$.fancybox.close()";msg+='<button type="submit" class="button btn-default button-medium" style="margin-right: 5px;" value="true" onclick="'+ action+'" >';msg+='<span>'+ caption+'</span></button>'
+    msg = "<h2>" + title + "</h2><p>" + question + "</p>";
+    msg += "<br/><p class=\"submit\" style=\"text-align:right; padding-bottom: 0\">";
+    var i = 0;
+    for (var caption in buttons) {
+        if (!buttons.hasOwnProperty(caption))continue;
+        funcName = buttons[caption];
+        if (typeof otherParams == 'undefined') otherParams = 0;
+        otherParams = escape(JSON.stringify(otherParams));
+        action = funcName ? "$.fancybox.close();window['" + funcName + "'](JSON.parse(unescape('" + otherParams + "')), " + i + ")" : "$.fancybox.close()";
+        msg += '<button type="submit" class="button btn-default button-medium" style="margin-right: 5px;" value="true" onclick="' + action + '" >';
+        msg += '<span>' + caption + '</span></button>';
 i++;}
 msg+="</p>";if(!!$.prototype.fancybox)
 $.fancybox(msg,{'autoDimensions':false,'width':500,'height':'auto','openEffect':'none','closeEffect':'none'});}

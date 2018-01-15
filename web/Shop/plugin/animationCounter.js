@@ -26,9 +26,9 @@
 					step: 1,
 					delay: 1000,
 					txt: ""
-				}
+                };
 
-				var settings = $.extend(defaults, options || {})
+                var settings = $.extend(defaults, options || {});
 
 				var nb_start = settings.start;
 				var nb_end = settings.end;
@@ -44,7 +44,7 @@
 					nb_start = nb_start + settings.step;
 					// display
 					element.text(nb_start + settings.txt);
-				}
+                };
 
 				// Timer
 				// Launches every "settings.delay"

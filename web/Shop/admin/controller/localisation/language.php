@@ -12,104 +12,6 @@ class ControllerLocalisationLanguage extends Controller {
 		$this->getList();
 	}
 
-	public function add() {
-		$this->load->language('localisation/language');
-
-		$this->document->setTitle($this->language->get('heading_title'));
-
-		$this->load->model('localisation/language');
-
-		if (($this->request->server['REQUEST_METHOD'] == 'POST') && $this->validateForm()) {
-			$this->model_localisation_language->addLanguage($this->request->post);
-
-			$this->session->data['success'] = $this->language->get('text_success');
-
-			$url = '';
-
-			if (isset($this->request->get['sort'])) {
-				$url .= '&sort=' . $this->request->get['sort'];
-			}
-
-			if (isset($this->request->get['order'])) {
-				$url .= '&order=' . $this->request->get['order'];
-			}
-
-			if (isset($this->request->get['page'])) {
-				$url .= '&page=' . $this->request->get['page'];
-			}
-
-			$this->response->redirect($this->url->link('localisation/language', 'token=' . $this->session->data['token'] . $url, true));
-		}
-
-		$this->getForm();
-	}
-
-	public function edit() {
-		$this->load->language('localisation/language');
-
-		$this->document->setTitle($this->language->get('heading_title'));
-
-		$this->load->model('localisation/language');
-
-		if (($this->request->server['REQUEST_METHOD'] == 'POST') && $this->validateForm()) {
-			$this->model_localisation_language->editLanguage($this->request->get['language_id'], $this->request->post);
-
-			$this->session->data['success'] = $this->language->get('text_success');
-
-			$url = '';
-
-			if (isset($this->request->get['sort'])) {
-				$url .= '&sort=' . $this->request->get['sort'];
-			}
-
-			if (isset($this->request->get['order'])) {
-				$url .= '&order=' . $this->request->get['order'];
-			}
-
-			if (isset($this->request->get['page'])) {
-				$url .= '&page=' . $this->request->get['page'];
-			}
-
-			$this->response->redirect($this->url->link('localisation/language', 'token=' . $this->session->data['token'] . $url, true));
-		}
-
-		$this->getForm();
-	}
-
-	public function delete() {
-		$this->load->language('localisation/language');
-
-		$this->document->setTitle($this->language->get('heading_title'));
-
-		$this->load->model('localisation/language');
-
-		if (isset($this->request->post['selected']) && $this->validateDelete()) {
-			foreach ($this->request->post['selected'] as $language_id) {
-				$this->model_localisation_language->deleteLanguage($language_id);
-			}
-
-			$this->session->data['success'] = $this->language->get('text_success');
-
-			$url = '';
-
-			if (isset($this->request->get['sort'])) {
-				$url .= '&sort=' . $this->request->get['sort'];
-			}
-
-			if (isset($this->request->get['order'])) {
-				$url .= '&order=' . $this->request->get['order'];
-			}
-
-			if (isset($this->request->get['page'])) {
-				$url .= '&page=' . $this->request->get['page'];
-			}
-
-			$this->response->redirect($this->url->link('localisation/language', 'token=' . $this->session->data['token'] . $url, true));
-		}
-
-		$this->getList();
-	}
-
 	protected function getList() {
 		if (isset($this->request->get['sort'])) {
 			$sort = $this->request->get['sort'];
@@ -260,6 +162,72 @@ class ControllerLocalisationLanguage extends Controller {
 		$this->response->setOutput($this->load->view('localisation/language_list', $data));
 	}
 
+    public function add()
+    {
+        $this->load->language('localisation/language');
+
+        $this->document->setTitle($this->language->get('heading_title'));
+
+        $this->load->model('localisation/language');
+
+        if (($this->request->server['REQUEST_METHOD'] == 'POST') && $this->validateForm()) {
+            $this->model_localisation_language->addLanguage($this->request->post);
+
+            $this->session->data['success'] = $this->language->get('text_success');
+
+            $url = '';
+
+            if (isset($this->request->get['sort'])) {
+                $url .= '&sort=' . $this->request->get['sort'];
+            }
+
+            if (isset($this->request->get['order'])) {
+                $url .= '&order=' . $this->request->get['order'];
+            }
+
+            if (isset($this->request->get['page'])) {
+                $url .= '&page=' . $this->request->get['page'];
+            }
+
+            $this->response->redirect($this->url->link('localisation/language', 'token=' . $this->session->data['token'] . $url, true));
+        }
+
+        $this->getForm();
+    }
+
+    protected function validateForm()
+    {
+        if (!$this->user->hasPermission('modify', 'localisation/language')) {
+            $this->error['warning'] = $this->language->get('error_permission');
+        }
+
+        if ((utf8_strlen($this->request->post['name']) < 3) || (utf8_strlen($this->request->post['name']) > 32)) {
+            $this->error['name'] = $this->language->get('error_name');
+        }
+
+        if (utf8_strlen($this->request->post['code']) < 2) {
+            $this->error['code'] = $this->language->get('error_code');
+        }
+
+        if (!$this->request->post['locale']) {
+            $this->error['locale'] = $this->language->get('error_locale');
+        }
+
+        $language_info = $this->model_localisation_language->getLanguageByCode($this->request->post['code']);
+
+        if (!isset($this->request->get['language_id'])) {
+            if ($language_info) {
+                $this->error['warning'] = $this->language->get('error_exists');
+            }
+        } else {
+            if ($language_info && ($this->request->get['language_id'] != $language_info['language_id'])) {
+                $this->error['warning'] = $this->language->get('error_exists');
+            }
+        }
+
+        return !$this->error;
+    }
+
 	protected function getForm() {
 		$data['heading_title'] = $this->language->get('heading_title');
 
@@ -296,13 +264,13 @@ class ControllerLocalisationLanguage extends Controller {
 		} else {
 			$data['error_code'] = '';
 		}
-		
+
 		if (isset($this->error['locale'])) {
 			$data['error_locale'] = $this->error['locale'];
 		} else {
 			$data['error_locale'] = '';
 		}
-		
+
 		$url = '';
 
 		if (isset($this->request->get['sort'])) {
@@ -356,9 +324,9 @@ class ControllerLocalisationLanguage extends Controller {
 		} else {
 			$data['code'] = '';
 		}
-		
+
 		$data['languages'] = array();
-		
+
 		$folders = glob(DIR_LANGUAGE . '*', GLOB_ONLYDIR);
 
 		foreach ($folders as $folder) {
@@ -372,7 +340,7 @@ class ControllerLocalisationLanguage extends Controller {
 		} else {
 			$data['locale'] = '';
 		}
-		
+
 		if (isset($this->request->post['sort_order'])) {
 			$data['sort_order'] = $this->request->post['sort_order'];
 		} elseif (!empty($language_info)) {
@@ -396,36 +364,72 @@ class ControllerLocalisationLanguage extends Controller {
 		$this->response->setOutput($this->load->view('localisation/language_form', $data));
 	}
 
-	protected function validateForm() {
-		if (!$this->user->hasPermission('modify', 'localisation/language')) {
-			$this->error['warning'] = $this->language->get('error_permission');
+    public function edit()
+    {
+        $this->load->language('localisation/language');
+
+        $this->document->setTitle($this->language->get('heading_title'));
+
+        $this->load->model('localisation/language');
+
+        if (($this->request->server['REQUEST_METHOD'] == 'POST') && $this->validateForm()) {
+            $this->model_localisation_language->editLanguage($this->request->get['language_id'], $this->request->post);
+
+            $this->session->data['success'] = $this->language->get('text_success');
+
+            $url = '';
+
+            if (isset($this->request->get['sort'])) {
+                $url .= '&sort=' . $this->request->get['sort'];
+            }
+
+            if (isset($this->request->get['order'])) {
+                $url .= '&order=' . $this->request->get['order'];
+            }
+
+            if (isset($this->request->get['page'])) {
+                $url .= '&page=' . $this->request->get['page'];
+            }
+
+            $this->response->redirect($this->url->link('localisation/language', 'token=' . $this->session->data['token'] . $url, true));
 		}
 
-		if ((utf8_strlen($this->request->post['name']) < 3) || (utf8_strlen($this->request->post['name']) > 32)) {
-			$this->error['name'] = $this->language->get('error_name');
-		}
+        $this->getForm();
+    }
 
-		if (utf8_strlen($this->request->post['code']) < 2) {
-			$this->error['code'] = $this->language->get('error_code');
-		}
-		
-		if (!$this->request->post['locale']) {
-			$this->error['locale'] = $this->language->get('error_locale');
-		}
-		
-		$language_info = $this->model_localisation_language->getLanguageByCode($this->request->post['code']);
+    public function delete()
+    {
+        $this->load->language('localisation/language');
 
-		if (!isset($this->request->get['language_id'])) {
-			if ($language_info) {
-				$this->error['warning'] = $this->language->get('error_exists');
+        $this->document->setTitle($this->language->get('heading_title'));
+
+        $this->load->model('localisation/language');
+
+        if (isset($this->request->post['selected']) && $this->validateDelete()) {
+            foreach ($this->request->post['selected'] as $language_id) {
+                $this->model_localisation_language->deleteLanguage($language_id);
 			}
-		} else {
-			if ($language_info && ($this->request->get['language_id'] != $language_info['language_id'])) {
-				$this->error['warning'] = $this->language->get('error_exists');
-			}
-		}
 
-		return !$this->error;
+            $this->session->data['success'] = $this->language->get('text_success');
+
+            $url = '';
+
+            if (isset($this->request->get['sort'])) {
+                $url .= '&sort=' . $this->request->get['sort'];
+			}
+
+            if (isset($this->request->get['order'])) {
+                $url .= '&order=' . $this->request->get['order'];
+            }
+
+            if (isset($this->request->get['page'])) {
+                $url .= '&page=' . $this->request->get['page'];
+            }
+
+            $this->response->redirect($this->url->link('localisation/language', 'token=' . $this->session->data['token'] . $url, true));
+        }
+
+        $this->getList();
 	}
 
 	protected function validateDelete() {

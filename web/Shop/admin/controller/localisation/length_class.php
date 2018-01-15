@@ -12,104 +12,6 @@ class ControllerLocalisationLengthClass extends Controller {
 		$this->getList();
 	}
 
-	public function add() {
-		$this->load->language('localisation/length_class');
-
-		$this->document->setTitle($this->language->get('heading_title'));
-
-		$this->load->model('localisation/length_class');
-
-		if (($this->request->server['REQUEST_METHOD'] == 'POST') && $this->validateForm()) {
-			$this->model_localisation_length_class->addLengthClass($this->request->post);
-
-			$this->session->data['success'] = $this->language->get('text_success');
-
-			$url = '';
-
-			if (isset($this->request->get['sort'])) {
-				$url .= '&sort=' . $this->request->get['sort'];
-			}
-
-			if (isset($this->request->get['order'])) {
-				$url .= '&order=' . $this->request->get['order'];
-			}
-
-			if (isset($this->request->get['page'])) {
-				$url .= '&page=' . $this->request->get['page'];
-			}
-
-			$this->response->redirect($this->url->link('localisation/length_class', 'token=' . $this->session->data['token'] . $url, true));
-		}
-
-		$this->getForm();
-	}
-
-	public function edit() {
-		$this->load->language('localisation/length_class');
-
-		$this->document->setTitle($this->language->get('heading_title'));
-
-		$this->load->model('localisation/length_class');
-
-		if (($this->request->server['REQUEST_METHOD'] == 'POST') && $this->validateForm()) {
-			$this->model_localisation_length_class->editLengthClass($this->request->get['length_class_id'], $this->request->post);
-
-			$this->session->data['success'] = $this->language->get('text_success');
-
-			$url = '';
-
-			if (isset($this->request->get['sort'])) {
-				$url .= '&sort=' . $this->request->get['sort'];
-			}
-
-			if (isset($this->request->get['order'])) {
-				$url .= '&order=' . $this->request->get['order'];
-			}
-
-			if (isset($this->request->get['page'])) {
-				$url .= '&page=' . $this->request->get['page'];
-			}
-
-			$this->response->redirect($this->url->link('localisation/length_class', 'token=' . $this->session->data['token'] . $url, true));
-		}
-
-		$this->getForm();
-	}
-
-	public function delete() {
-		$this->load->language('localisation/length_class');
-
-		$this->document->setTitle($this->language->get('heading_title'));
-
-		$this->load->model('localisation/length_class');
-
-		if (isset($this->request->post['selected']) && $this->validateDelete()) {
-			foreach ($this->request->post['selected'] as $length_class_id) {
-				$this->model_localisation_length_class->deleteLengthClass($length_class_id);
-			}
-
-			$this->session->data['success'] = $this->language->get('text_success');
-
-			$url = '';
-
-			if (isset($this->request->get['sort'])) {
-				$url .= '&sort=' . $this->request->get['sort'];
-			}
-
-			if (isset($this->request->get['order'])) {
-				$url .= '&order=' . $this->request->get['order'];
-			}
-
-			if (isset($this->request->get['page'])) {
-				$url .= '&page=' . $this->request->get['page'];
-			}
-
-			$this->response->redirect($this->url->link('localisation/length_class', 'token=' . $this->session->data['token'] . $url, true));
-		}
-
-		$this->getList();
-	}
-
 	protected function getList() {
 		if (isset($this->request->get['sort'])) {
 			$sort = $this->request->get['sort'];
@@ -260,6 +162,58 @@ class ControllerLocalisationLengthClass extends Controller {
 		$this->response->setOutput($this->load->view('localisation/length_class_list', $data));
 	}
 
+    public function add()
+    {
+        $this->load->language('localisation/length_class');
+
+        $this->document->setTitle($this->language->get('heading_title'));
+
+        $this->load->model('localisation/length_class');
+
+        if (($this->request->server['REQUEST_METHOD'] == 'POST') && $this->validateForm()) {
+            $this->model_localisation_length_class->addLengthClass($this->request->post);
+
+            $this->session->data['success'] = $this->language->get('text_success');
+
+            $url = '';
+
+            if (isset($this->request->get['sort'])) {
+                $url .= '&sort=' . $this->request->get['sort'];
+            }
+
+            if (isset($this->request->get['order'])) {
+                $url .= '&order=' . $this->request->get['order'];
+            }
+
+            if (isset($this->request->get['page'])) {
+                $url .= '&page=' . $this->request->get['page'];
+            }
+
+            $this->response->redirect($this->url->link('localisation/length_class', 'token=' . $this->session->data['token'] . $url, true));
+        }
+
+        $this->getForm();
+    }
+
+    protected function validateForm()
+    {
+        if (!$this->user->hasPermission('modify', 'localisation/length_class')) {
+            $this->error['warning'] = $this->language->get('error_permission');
+        }
+
+        foreach ($this->request->post['length_class_description'] as $language_id => $value) {
+            if ((utf8_strlen($value['title']) < 3) || (utf8_strlen($value['title']) > 32)) {
+                $this->error['title'][$language_id] = $this->language->get('error_title');
+            }
+
+            if (!$value['unit'] || (utf8_strlen($value['unit']) > 4)) {
+                $this->error['unit'][$language_id] = $this->language->get('error_unit');
+            }
+        }
+
+        return !$this->error;
+    }
+
 	protected function getForm() {
 		$data['heading_title'] = $this->language->get('heading_title');
 
@@ -357,22 +311,72 @@ class ControllerLocalisationLengthClass extends Controller {
 		$this->response->setOutput($this->load->view('localisation/length_class_form', $data));
 	}
 
-	protected function validateForm() {
-		if (!$this->user->hasPermission('modify', 'localisation/length_class')) {
-			$this->error['warning'] = $this->language->get('error_permission');
-		}
+    public function edit()
+    {
+        $this->load->language('localisation/length_class');
 
-		foreach ($this->request->post['length_class_description'] as $language_id => $value) {
-			if ((utf8_strlen($value['title']) < 3) || (utf8_strlen($value['title']) > 32)) {
-				$this->error['title'][$language_id] = $this->language->get('error_title');
+        $this->document->setTitle($this->language->get('heading_title'));
+
+        $this->load->model('localisation/length_class');
+
+        if (($this->request->server['REQUEST_METHOD'] == 'POST') && $this->validateForm()) {
+            $this->model_localisation_length_class->editLengthClass($this->request->get['length_class_id'], $this->request->post);
+
+            $this->session->data['success'] = $this->language->get('text_success');
+
+            $url = '';
+
+            if (isset($this->request->get['sort'])) {
+                $url .= '&sort=' . $this->request->get['sort'];
+            }
+
+            if (isset($this->request->get['order'])) {
+                $url .= '&order=' . $this->request->get['order'];
 			}
 
-			if (!$value['unit'] || (utf8_strlen($value['unit']) > 4)) {
-				$this->error['unit'][$language_id] = $this->language->get('error_unit');
+            if (isset($this->request->get['page'])) {
+                $url .= '&page=' . $this->request->get['page'];
 			}
+
+            $this->response->redirect($this->url->link('localisation/length_class', 'token=' . $this->session->data['token'] . $url, true));
 		}
 
-		return !$this->error;
+        $this->getForm();
+    }
+
+    public function delete()
+    {
+        $this->load->language('localisation/length_class');
+
+        $this->document->setTitle($this->language->get('heading_title'));
+
+        $this->load->model('localisation/length_class');
+
+        if (isset($this->request->post['selected']) && $this->validateDelete()) {
+            foreach ($this->request->post['selected'] as $length_class_id) {
+                $this->model_localisation_length_class->deleteLengthClass($length_class_id);
+            }
+
+            $this->session->data['success'] = $this->language->get('text_success');
+
+            $url = '';
+
+            if (isset($this->request->get['sort'])) {
+                $url .= '&sort=' . $this->request->get['sort'];
+            }
+
+            if (isset($this->request->get['order'])) {
+                $url .= '&order=' . $this->request->get['order'];
+            }
+
+            if (isset($this->request->get['page'])) {
+                $url .= '&page=' . $this->request->get['page'];
+            }
+
+            $this->response->redirect($this->url->link('localisation/length_class', 'token=' . $this->session->data['token'] . $url, true));
+        }
+
+        $this->getList();
 	}
 
 	protected function validateDelete() {

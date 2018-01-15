@@ -14,7 +14,7 @@ var t_;
 var hide_ = function () {
     $(".hide_loading").hide(1000);
     clearInterval(t_);
-}
+};
 
 $().ready(function () {
     $('[rel="tooltip"]').tooltip();
@@ -41,7 +41,7 @@ function hide_menu() {
 
 $('.carousel').carousel({
     interval: 8000
-})
+});
 
 
 

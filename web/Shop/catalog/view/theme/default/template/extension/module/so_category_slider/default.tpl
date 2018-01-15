@@ -1,6 +1,12 @@
 <script>
 //<![CDATA[
-	var listcategoryslider<?php echo $module;?> = [];
+var listcategoryslider;
+<
+    ? php echo;
+$module;
+    ?;
+>
+= [];
 //]]>
 </script>
 <div id="<?php echo $tag_id; ?>" class="so-category-slider container-slider module <?php echo $direction_class?> <?php echo $class_suffix; ?>">
@@ -114,8 +120,15 @@
 								<div class="item-timer product_time_category_slider<?php echo $product['product_id']?>"></div>
 								<script type="text/javascript">
 									//<![CDATA[
-									listcategoryslider<?php echo $module?>.push('product_time_category_slider<?php echo $product['product_id']?>|<?php echo $product['specialPriceToDate'] ?>');
-									//]]>
+                                    listcategoryslider < ? php echo;
+                                    $module ?;
+                                    >.push('product_time_category_slider<?php echo $product[';
+                                    product_id;
+                                    ']?>|<?php echo $product[';
+                                    specialPriceToDate;
+                                    '] ?>';
+                                    )
+                                    //]]>
 								</script>
 							</div>
 						</div>
@@ -213,14 +226,23 @@
 					</div>
 					<div class="button-group">
 						<?php if($display_addtocart) { ?>
-						<button type="button" onclick="cart.add('<?php echo $product['product_id']; ?>');"><i class="fa fa-shopping-cart"></i> <span class="hidden-xs hidden-sm hidden-md"><?php echo $objlang->get('button_cart'); ?></span></button>
-						<?php } ?>
+                        <button type="button" onclick="cart.add('<?php echo $product[';product_id;']; ?>';)"><i
+                                    class="fa fa-shopping-cart"></i> <span
+                                    class="hidden-xs hidden-sm hidden-md"><?php echo $objlang->
+                                get('button_cart'); ?></span></button>
+                        <?php } ?>
 						<?php if($display_wishlist) { ?>
-						<button type="button" data-toggle="tooltip" title="<?php echo $objlang->get('button_wishlist'); ?>" onclick="wishlist.add('<?php echo $product['product_id']; ?>');"><i class="fa fa-heart"></i></button>
-						<?php } ?>
+                        <button type="button" data-toggle="tooltip"
+                                title="<?php echo $objlang->get('button_wishlist'); ?>"
+                                onclick="wishlist.add('<?php echo $product[';product_id;']; ?>';)"><i
+                                    class="fa fa-heart"></i></button>
+                        <?php } ?>
 						<?php if($display_compare) { ?>
-						<button type="button" data-toggle="tooltip" title="<?php echo $objlang->get('button_compare'); ?>" onclick="compare.add('<?php echo $product['product_id']; ?>');"><i class="fa fa-exchange"></i></button>
-						<?php } ?>
+                        <button type="button" data-toggle="tooltip"
+                                title="<?php echo $objlang->get('button_compare'); ?>"
+                                onclick="compare.add('<?php echo $product[';product_id;']; ?>';)"><i
+                                    class="fa fa-exchange"></i></button>
+                        <?php } ?>
 					</div> 
 				</div> 
 
@@ -261,17 +283,31 @@
 <script type="text/javascript">
 //<![CDATA[
 jQuery(document).ready(function ($) {
-	;(function (element) {
-	var id = $("#<?php echo $tag_id; ?>");
+    (function (element) {
+        var id = $("#<?php echo $tag_id; ?>");
 	var $element = $(element),
 			$extraslider = $(".slider", $element),
 			$featureslider = $('.product-feature', $element),
-			_delay = <?php echo $delay; ?>,
-			_duration = <?php echo $duration; ?>,
+        _delay =;
+        <
+            ? php echo;
+        $delay;
+            ?;
+        >,
+        _duration =;
+        <
+            ? php echo;
+        $duration;
+            ?;
+        >,
 			_effect = '<?php echo $effect; ?>',
-			total_item = <?php echo $count_item ; ?>;
-
-	$extraslider.on("initialized.owl.carousel2", function () {
+                total_item =;
+        <
+            ? php echo;
+        $count_item;
+            ?;
+        >
+        $extraslider.on("initialized.owl.carousel2", function () {
 		var $item_active = $(".slider .owl2-item.active", $element);
 		if ($item_active.length > 1 && _effect != "none") {
 			_getAnimate($item_active);
@@ -286,42 +322,172 @@ jQuery(document).ready(function ($) {
 
 	});
 	$extraslider.owlCarousel2({
-		rtl: <?php echo $direction?>,
-		margin: <?php echo $margin;?>,
-		slideBy: <?php echo $slideBy;?>,
-		autoplay: <?php echo $autoplay;?>,
-		autoplayHoverPause: <?php echo $pausehover ;?>,
-		autoplayTimeout: <?php echo $autoplay_timeout; ?>,
-		autoplaySpeed: <?php echo $autoplaySpeed; ?>,
-		startPosition: <?php echo $startPosition; ?>,
-		mouseDrag: <?php echo $mouseDrag;?>,
-		touchDrag: <?php echo $touchDrag; ?>,
-		autoWidth: false,
-		responsive: {
-			0:{	items: <?php echo $nb_column4;?>,
-				nav: total_item <= <?php echo $nb_column4;?> ? false : ((<?php echo $nav ; ?>) ? true: false),
+        rtl: < ? php echo;
+        $direction ?;
+        >,
+        margin: <
+            ? php echo;
+        $margin;
+            ?;
+        >,
+        slideBy: <
+            ? php echo;
+        $slideBy;
+            ?;
+        >,
+        autoplay: <
+            ? php echo;
+        $autoplay;
+            ?;
+        >,
+        autoplayHoverPause: <
+            ? php echo;
+        $pausehover;
+            ?;
+        >,
+        autoplayTimeout: <
+            ? php echo;
+        $autoplay_timeout;
+            ?;
+        >,
+        autoplaySpeed: <
+            ? php echo;
+        $autoplaySpeed;
+            ?;
+        >,
+        startPosition: <
+            ? php echo;
+        $startPosition;
+            ?;
+        >,
+        mouseDrag: <
+            ? php echo;
+        $mouseDrag;
+            ?;
+        >,
+        touchDrag: <
+            ? php echo;
+        $touchDrag;
+            ?;
+        >,
+        false,
+            responsive;
+        :
+        {
+            0;
+        :
+            {
+                items: <
+                    ? php echo;
+                $nb_column4;
+                    ?;
+            >,
+                total_item <= < ? php echo;
+                $nb_column4;
+                    ?;
+            >
+                    ? false : (( < ? php echo;
+                $nav;
+                    ?;
+            >)
+                    ? true : false;
+            ),
 			},
-			480:{ items: <?php echo $nb_column3;?>,
-				nav: total_item <= <?php echo $nb_column3;?> ? false : ((<?php echo $nav ; ?>) ? true: false),
+            480;
+        :
+            {
+                items: <
+                    ? php echo;
+                $nb_column3;
+                    ?;
+            >,
+                total_item <= < ? php echo;
+                $nb_column3;
+                    ?;
+            >
+                    ? false : (( < ? php echo;
+                $nav;
+                    ?;
+            >)
+                    ? true : false;
+            ),
 			},
-			768:{ items: <?php echo $nb_column2;?>,
-				nav: total_item <= <?php echo $nb_column2;?> ? false : ((<?php echo $nav ; ?>) ? true: false),
+            768;
+        :
+            {
+                items: <
+                    ? php echo;
+                $nb_column2;
+                    ?;
+            >,
+                total_item <= < ? php echo;
+                $nb_column2;
+                    ?;
+            >
+                    ? false : (( < ? php echo;
+                $nav;
+                    ?;
+            >)
+                    ? true : false;
+            ),
 			},
-			992:{ items: <?php echo $nb_column1;?>,
-				nav: total_item <= <?php echo $nb_column1;?> ? false : ((<?php echo $nav ; ?>) ? true: false),
+            992;
+        :
+            {
+                items: <
+                    ? php echo;
+                $nb_column1;
+                    ?;
+            >,
+                total_item <= < ? php echo;
+                $nb_column1;
+                    ?;
+            >
+                    ? false : (( < ? php echo;
+                $nav;
+                    ?;
+            >)
+                    ? true : false;
+            ),
 			},
-			1200:{ items: <?php echo $nb_column0;?>,
-				nav: total_item <= <?php echo $nb_column0;?> ? false : ((<?php echo $nav ; ?>) ? true: false),
+            1200;
+        :
+            {
+                items: <
+                    ? php echo;
+                $nb_column0;
+                    ?;
+            >,
+                total_item <= < ? php echo;
+                $nb_column0;
+                    ?;
+            >
+                    ? false : (( < ? php echo;
+                $nav;
+                    ?;
+            >)
+                    ? true : false;
+            ),
 			}
 		},
-		nav: <?php echo $nav; ?>,
-		loop: true,
-		navSpeed: <?php echo $navSpeed; ?>,
-		navText: ["<?php echo $btn_prev; ?>", "<?php echo $btn_next; ?>"],
-		navClass: ["owl2-prev", "owl2-next"]
-	});
-
-	$extraslider.on("translated.owl.carousel2", function (e) {
+        nav: <
+            ? php echo;
+        $nav;
+            ?;
+        >,
+        true,
+            navSpeed;
+        : <
+            ? php echo;
+        $navSpeed;
+            ?;
+        >,
+        ["<?php echo $btn_prev; ?>", "<?php echo $btn_next; ?>"],
+            navClass;
+        :
+        ["owl2-prev", "owl2-next"]
+    })
+        $extraslider.on("translated.owl.carousel2", function (e) {
 		var $item_active = $(".slider .owl2-item.active", $element);
 		var $item = $(".slider .owl2-item", $element);
 		_UngetAnimate($item);
@@ -335,32 +501,104 @@ jQuery(document).ready(function ($) {
 	
 	/* Product Feature */
 	$featureslider.owlCarousel2({
-		rtl: <?php echo $direction?>,
-		margin: <?php echo $margin;?>,
-		slideBy: <?php echo $slideBy;?>,
-		autoplay: <?php echo $autoplay;?>,
-		autoplayHoverPause: <?php echo $pausehover ;?>,
-		autoplayTimeout: <?php echo $autoplay_timeout; ?>,
-		autoplaySpeed: <?php echo $autoplaySpeed; ?>,
-		startPosition: <?php echo $startPosition; ?>,
-		mouseDrag: <?php echo $mouseDrag;?>,
-		touchDrag: <?php echo $touchDrag; ?>,
-		autoWidth: false,
-		responsive: {
-			0:	{ items: 1	},
-			480:{ items: 1	},
-			768:{ items: 1	},
-			992:{ items: 1	},
-			1200:{ items: 1 }
+        rtl: < ? php echo;
+        $direction ?;
+        >,
+        margin: <
+            ? php echo;
+        $margin;
+            ?;
+        >,
+        slideBy: <
+            ? php echo;
+        $slideBy;
+            ?;
+        >,
+        autoplay: <
+            ? php echo;
+        $autoplay;
+            ?;
+        >,
+        autoplayHoverPause: <
+            ? php echo;
+        $pausehover;
+            ?;
+        >,
+        autoplayTimeout: <
+            ? php echo;
+        $autoplay_timeout;
+            ?;
+        >,
+        autoplaySpeed: <
+            ? php echo;
+        $autoplaySpeed;
+            ?;
+        >,
+        startPosition: <
+            ? php echo;
+        $startPosition;
+            ?;
+        >,
+        mouseDrag: <
+            ? php echo;
+        $mouseDrag;
+            ?;
+        >,
+        touchDrag: <
+            ? php echo;
+        $touchDrag;
+            ?;
+        >,
+        false,
+            responsive;
+        :
+        {
+            0;
+        :
+            {
+                1
+            }
+        ,
+            480;
+        :
+            {
+                1
+            }
+        ,
+            768;
+        :
+            {
+                1
+            }
+        ,
+            992;
+        :
+            {
+                1
+            }
+        ,
+            1200;
+        :
+            {
+                1
+            }
 		},
-		nav: false,
-		loop: true,
-		navSpeed: <?php echo $navSpeed; ?>,
-		navText: ["<?php echo $btn_prev; ?>", "<?php echo $btn_next; ?>"],
-		navClass: ["owl2-prev", "owl2-next"]
-	});
-
-	$featureslider.on("translated.owl.carousel2", function (e) {
+        false,
+            loop;
+        :
+        true,
+            navSpeed;
+        : <
+            ? php echo;
+        $navSpeed;
+            ?;
+        >,
+        ["<?php echo $btn_prev; ?>", "<?php echo $btn_next; ?>"],
+            navClass;
+        :
+        ["owl2-prev", "owl2-next"]
+    })
+        $featureslider.on("translated.owl.carousel2", function (e) {
 		var $item_active = $(".product-feature .owl2-item.active", $element);
 		var $item = $(".product-feature .owl2-item", $element);
 		_UngetAnimate($item);
@@ -469,9 +707,22 @@ jQuery(document).ready(function ($) {
 			}, 1000);
 		}
 	}
-	if (listcategoryslider<?php echo $module?>.length > 0) {
-		for (var i = 0; i < listcategoryslider<?php echo $module?>.length; i++) {
-			var arr = listcategoryslider<?php echo $module?>[i].split("|");
+
+        if (listcategoryslider < ? php echo $module ?;
+        >.
+        length > 0;
+        )
+        {
+            for (var i = 0; i < listcategoryslider < ? php echo $module ?>
+        .
+            length;
+            i++;
+        )
+            {
+                var arr = listcategoryslider < ? php echo;
+                $module ?;
+            >
+                [i].split("|");
 			if (arr[1].length) {
 				var data = new Date(arr[1]);
 				CountDownCategorySlider(data, arr[0]);

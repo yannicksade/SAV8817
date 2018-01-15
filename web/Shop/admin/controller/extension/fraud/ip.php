@@ -92,6 +92,15 @@ class ControllerExtensionFraudIp extends Controller {
 		$this->response->setOutput($this->load->view('extension/fraud/ip', $data));
 	}
 
+    protected function validate()
+    {
+        if (!$this->user->hasPermission('modify', 'extension/fraud/ip')) {
+            $this->error['warning'] = $this->language->get('error_permission');
+        }
+
+        return !$this->error;
+    }
+
 	public function install() {
 		$this->load->model('extension/fraud/ip');
 
@@ -102,14 +111,6 @@ class ControllerExtensionFraudIp extends Controller {
 		$this->load->model('extension/fraud/ip');
 
 		$this->model_extension_fraud_ip->uninstall();
-	}
-
-	protected function validate() {
-		if (!$this->user->hasPermission('modify', 'extension/fraud/ip')) {
-			$this->error['warning'] = $this->language->get('error_permission');
-		}
-
-		return !$this->error;
 	}
 
     public function ip() {

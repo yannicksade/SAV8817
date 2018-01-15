@@ -143,6 +143,60 @@ class ControllerExtensionPaymentCardinity extends Controller {
 		$this->response->setOutput($this->load->view('extension/payment/cardinity', $data));
 	}
 
+    protected function validate()
+    {
+        $this->load->model('extension/payment/cardinity');
+
+        $check_credentials = true;
+
+        if (version_compare(phpversion(), '5.4.0', '<')) {
+            $this->error['warning'] = $this->language->get('error_php_version');
+        }
+
+        if (!$this->user->hasPermission('modify', 'extension/payment/cardinity')) {
+            $this->error['warning'] = $this->language->get('error_permission');
+
+            $check_credentials = false;
+        }
+
+        if (!$this->request->post['cardinity_key']) {
+            $this->error['key'] = $this->language->get('error_key');
+
+            $check_credentials = false;
+        }
+
+        if (!$this->request->post['cardinity_secret']) {
+            $this->error['secret'] = $this->language->get('error_secret');
+
+            $check_credentials = false;
+        }
+
+        if (!class_exists('Cardinity\Client')) {
+            $this->error['warning'] = $this->language->get('error_composer');
+
+            $check_credentials = false;
+        }
+
+        if ($check_credentials) {
+            $client = $this->model_extension_payment_cardinity->createClient(array(
+                'key' => $this->request->post['cardinity_key'],
+                'secret' => $this->request->post['cardinity_secret']
+            ));
+
+            $verify_credentials = $this->model_extension_payment_cardinity->verifyCredentials($client);
+
+            if (!$verify_credentials) {
+                $this->error['warning'] = $this->language->get('error_connection');
+            }
+        }
+
+        if ($this->error && !isset($this->error['warning'])) {
+            $this->error['warning'] = $this->language->get('error_warning');
+        }
+
+        return !$this->error;
+    }
+
 	public function order() {
 		$this->load->language('extension/payment/cardinity');
 
@@ -264,59 +318,6 @@ class ControllerExtensionPaymentCardinity extends Controller {
 
 		$this->response->addHeader('Content-Type: application/json');
 		$this->response->setOutput(json_encode($json));
-	}
-
-	protected function validate() {
-		$this->load->model('extension/payment/cardinity');
-
-		$check_credentials = true;
-
-		if (version_compare(phpversion(), '5.4.0', '<')) {
-			$this->error['warning'] = $this->language->get('error_php_version');
-		}
-
-		if (!$this->user->hasPermission('modify', 'extension/payment/cardinity')) {
-			$this->error['warning'] = $this->language->get('error_permission');
-
-			$check_credentials = false;
-		}
-
-		if (!$this->request->post['cardinity_key']) {
-			$this->error['key'] = $this->language->get('error_key');
-
-			$check_credentials = false;
-		}
-
-		if (!$this->request->post['cardinity_secret']) {
-			$this->error['secret'] = $this->language->get('error_secret');
-
-			$check_credentials = false;
-		}
-
-		if (!class_exists('Cardinity\Client')) {
-			$this->error['warning'] = $this->language->get('error_composer');
-
-			$check_credentials = false;
-		}
-
-		if ($check_credentials) {
-			$client = $this->model_extension_payment_cardinity->createClient(array(
-				'key'    => $this->request->post['cardinity_key'],
-				'secret' => $this->request->post['cardinity_secret']
-			));
-
-			$verify_credentials = $this->model_extension_payment_cardinity->verifyCredentials($client);
-
-			if (!$verify_credentials) {
-				$this->error['warning'] = $this->language->get('error_connection');
-			}
-		}
-
-		if ($this->error && !isset($this->error['warning'])) {
-			$this->error['warning'] = $this->language->get('error_warning');
-		}
-
-		return !$this->error;
 	}
 
 	public function install() {

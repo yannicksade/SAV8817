@@ -14,74 +14,6 @@ class ControllerSettingStore extends Controller {
 		$this->getList();
 	}
 
-	public function add() {
-		$this->load->language('setting/store');
-
-		$this->document->setTitle($this->language->get('heading_title'));
-
-		$this->load->model('setting/store');
-
-		if (($this->request->server['REQUEST_METHOD'] == 'POST') && $this->validateForm()) {
-			$store_id = $this->model_setting_store->addStore($this->request->post);
-
-			$this->load->model('setting/setting');
-
-			$this->model_setting_setting->editSetting('config', $this->request->post, $store_id);
-
-			$this->session->data['success'] = $this->language->get('text_success');
-
-			$this->response->redirect($this->url->link('setting/store', 'token=' . $this->session->data['token'], true));
-		}
-
-		$this->getForm();
-	}
-
-	public function edit() {
-		$this->load->language('setting/store');
-
-		$this->document->setTitle($this->language->get('heading_title'));
-
-		$this->load->model('setting/store');
-
-		if (($this->request->server['REQUEST_METHOD'] == 'POST') && $this->validateForm()) {
-			$this->model_setting_store->editStore($this->request->get['store_id'], $this->request->post);
-
-			$this->load->model('setting/setting');
-
-			$this->model_setting_setting->editSetting('config', $this->request->post, $this->request->get['store_id']);
-
-			$this->session->data['success'] = $this->language->get('text_success');
-
-			$this->response->redirect($this->url->link('setting/store', 'token=' . $this->session->data['token'] . '&store_id=' . $this->request->get['store_id'], true));
-		}
-
-		$this->getForm();
-	}
-
-	public function delete() {
-		$this->load->language('setting/store');
-
-		$this->document->setTitle($this->language->get('heading_title'));
-
-		$this->load->model('setting/store');
-
-		if (isset($this->request->post['selected']) && $this->validateDelete()) {
-			$this->load->model('setting/setting');
-
-			foreach ($this->request->post['selected'] as $store_id) {
-				$this->model_setting_store->deleteStore($store_id);
-
-				$this->model_setting_setting->deleteSetting('config', $store_id);
-			}
-
-			$this->session->data['success'] = $this->language->get('text_success');
-
-			$this->response->redirect($this->url->link('setting/store', 'token=' . $this->session->data['token'], true));
-		}
-
-		$this->getList();
-	}
-
 	protected function getList() {
 		$url = '';
 
@@ -166,6 +98,74 @@ class ControllerSettingStore extends Controller {
 
 		$this->response->setOutput($this->load->view('setting/store_list', $data));
 	}
+
+    public function add()
+    {
+        $this->load->language('setting/store');
+
+        $this->document->setTitle($this->language->get('heading_title'));
+
+        $this->load->model('setting/store');
+
+        if (($this->request->server['REQUEST_METHOD'] == 'POST') && $this->validateForm()) {
+            $store_id = $this->model_setting_store->addStore($this->request->post);
+
+            $this->load->model('setting/setting');
+
+            $this->model_setting_setting->editSetting('config', $this->request->post, $store_id);
+
+            $this->session->data['success'] = $this->language->get('text_success');
+
+            $this->response->redirect($this->url->link('setting/store', 'token=' . $this->session->data['token'], true));
+        }
+
+        $this->getForm();
+    }
+
+    protected function validateForm()
+    {
+        if (!$this->user->hasPermission('modify', 'setting/store')) {
+            $this->error['warning'] = $this->language->get('error_permission');
+        }
+
+        if (!$this->request->post['config_url']) {
+            $this->error['url'] = $this->language->get('error_url');
+        }
+
+        if (!$this->request->post['config_meta_title']) {
+            $this->error['meta_title'] = $this->language->get('error_meta_title');
+        }
+
+        if (!$this->request->post['config_name']) {
+            $this->error['name'] = $this->language->get('error_name');
+        }
+
+        if ((utf8_strlen($this->request->post['config_owner']) < 3) || (utf8_strlen($this->request->post['config_owner']) > 64)) {
+            $this->error['owner'] = $this->language->get('error_owner');
+        }
+
+        if ((utf8_strlen($this->request->post['config_address']) < 3) || (utf8_strlen($this->request->post['config_address']) > 256)) {
+            $this->error['address'] = $this->language->get('error_address');
+        }
+
+        if ((utf8_strlen($this->request->post['config_email']) > 96) || !filter_var($this->request->post['config_email'], FILTER_VALIDATE_EMAIL)) {
+            $this->error['email'] = $this->language->get('error_email');
+        }
+
+        if ((utf8_strlen($this->request->post['config_telephone']) < 3) || (utf8_strlen($this->request->post['config_telephone']) > 32)) {
+            $this->error['telephone'] = $this->language->get('error_telephone');
+        }
+
+        if (!empty($this->request->post['config_customer_group_display']) && !in_array($this->request->post['config_customer_group_id'], $this->request->post['config_customer_group_display'])) {
+            $this->error['customer_group_display'] = $this->language->get('error_customer_group_display');
+        }
+
+        if ($this->error && !isset($this->error['warning'])) {
+            $this->error['warning'] = $this->language->get('error_warning');
+        }
+
+        return !$this->error;
+    }
 
 	protected function getForm() {
 		$data['heading_title'] = $this->language->get('heading_title');
@@ -743,48 +743,52 @@ class ControllerSettingStore extends Controller {
 		$this->response->setOutput($this->load->view('setting/store_form', $data));
 	}
 
-	protected function validateForm() {
-		if (!$this->user->hasPermission('modify', 'setting/store')) {
-			$this->error['warning'] = $this->language->get('error_permission');
+    public function edit()
+    {
+        $this->load->language('setting/store');
+
+        $this->document->setTitle($this->language->get('heading_title'));
+
+        $this->load->model('setting/store');
+
+        if (($this->request->server['REQUEST_METHOD'] == 'POST') && $this->validateForm()) {
+            $this->model_setting_store->editStore($this->request->get['store_id'], $this->request->post);
+
+            $this->load->model('setting/setting');
+
+            $this->model_setting_setting->editSetting('config', $this->request->post, $this->request->get['store_id']);
+
+            $this->session->data['success'] = $this->language->get('text_success');
+
+            $this->response->redirect($this->url->link('setting/store', 'token=' . $this->session->data['token'] . '&store_id=' . $this->request->get['store_id'], true));
 		}
 
-		if (!$this->request->post['config_url']) {
-			$this->error['url'] = $this->language->get('error_url');
+        $this->getForm();
+    }
+
+    public function delete()
+    {
+        $this->load->language('setting/store');
+
+        $this->document->setTitle($this->language->get('heading_title'));
+
+        $this->load->model('setting/store');
+
+        if (isset($this->request->post['selected']) && $this->validateDelete()) {
+            $this->load->model('setting/setting');
+
+            foreach ($this->request->post['selected'] as $store_id) {
+                $this->model_setting_store->deleteStore($store_id);
+
+                $this->model_setting_setting->deleteSetting('config', $store_id);
+            }
+
+            $this->session->data['success'] = $this->language->get('text_success');
+
+            $this->response->redirect($this->url->link('setting/store', 'token=' . $this->session->data['token'], true));
 		}
 
-		if (!$this->request->post['config_meta_title']) {
-			$this->error['meta_title'] = $this->language->get('error_meta_title');
-		}
-
-		if (!$this->request->post['config_name']) {
-			$this->error['name'] = $this->language->get('error_name');
-		}
-
-		if ((utf8_strlen($this->request->post['config_owner']) < 3) || (utf8_strlen($this->request->post['config_owner']) > 64)) {
-			$this->error['owner'] = $this->language->get('error_owner');
-		}
-
-		if ((utf8_strlen($this->request->post['config_address']) < 3) || (utf8_strlen($this->request->post['config_address']) > 256)) {
-			$this->error['address'] = $this->language->get('error_address');
-		}
-
-		if ((utf8_strlen($this->request->post['config_email']) > 96) || !filter_var($this->request->post['config_email'], FILTER_VALIDATE_EMAIL)) {
-			$this->error['email'] = $this->language->get('error_email');
-		}
-
-		if ((utf8_strlen($this->request->post['config_telephone']) < 3) || (utf8_strlen($this->request->post['config_telephone']) > 32)) {
-			$this->error['telephone'] = $this->language->get('error_telephone');
-		}
-
-		if (!empty($this->request->post['config_customer_group_display']) && !in_array($this->request->post['config_customer_group_id'], $this->request->post['config_customer_group_display'])) {
-			$this->error['customer_group_display'] = $this->language->get('error_customer_group_display');
-		}
-
-		if ($this->error && !isset($this->error['warning'])) {
-			$this->error['warning'] = $this->language->get('error_warning');
-		}
-
-		return !$this->error;
+        $this->getList();
 	}
 
 	protected function validateDelete() {

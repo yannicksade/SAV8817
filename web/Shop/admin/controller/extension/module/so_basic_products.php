@@ -229,28 +229,33 @@ class ControllerExtensionModuleSoBasicProducts extends Controller {
 
 
 	}
-	
-	public function remove_cache(){
-		/*$this->url->link('extension/module', 'token=' . $this->session->data['token'], 'SSL');*/
-		$folder_cache = DIR_CACHE.'so/';
-		if(file_exists($folder_cache))
-		{
-			self::mageDelTree($folder_cache);
-		}
-	}
-	
-	function mageDelTree($path) {
-		if (is_dir($path)) {
-			$entries = scandir($path);
-			foreach ($entries as $entry) {
-				if ($entry != '.' && $entry != '..') {
-					self::mageDelTree($path.'/'.$entry);
-				}
-			}
-			@rmdir($path);
+
+    public function _breadcrumbs()
+    {
+        $this->data['breadcrumbs'] = array();
+
+        $this->data['breadcrumbs'][] = array(
+            'text' => $this->language->get('text_home'),
+            'href' => $this->url->link('common/dashboard', 'token=' . $this->session->data['token'], 'SSL')
+        );
+
+        $this->data['breadcrumbs'][] = array(
+            'text' => $this->language->get('text_module'),
+            'href' => $this->url->link('extension/extension', 'token=' . $this->session->data['token'], 'SSL')
+        );
+
+        if (!isset($this->request->get['module_id'])) {
+            $this->data['breadcrumbs'][] = array(
+                'text' => $this->language->get('heading_title'),
+                'href' => $this->url->link('extension/module/so_basic_products', 'token=' . $this->session->data['token'], 'SSL')
+            );
 		} else {
-			@unlink($path);
+            $this->data['breadcrumbs'][] = array(
+                'text' => $this->language->get('heading_title'),
+                'href' => $this->url->link('extension/module/so_basic_products', 'token=' . $this->session->data['token'] . '&module_id=' . $this->request->get['module_id'], 'SSL')
+            );
 		}
+        return $this->data['breadcrumbs'];
 	}
 	
 	protected function validate() {
@@ -271,23 +276,23 @@ class ControllerExtensionModuleSoBasicProducts extends Controller {
 				$this->error['head_name'] = $this->language->get('error_head_name');
 			}
 		}
-		
+
 		if ($this->request->post['category'] == null) {
 			$this->error['category'] = $this->language->get('error_category');
 		}
-		
+
 		if (!filter_var($this->request->post['category_depth'],FILTER_VALIDATE_FLOAT) || $this->request->post['category_depth'] < 0) {
 			$this->error['category_depth'] = $this->language->get('error_category_depth');
 		}
 		if ($this->request->post['limitation'] != '0' && !filter_var($this->request->post['limitation'],FILTER_VALIDATE_FLOAT) || $this->request->post['limitation'] < 0) {
 			$this->error['limitation'] = $this->language->get('error_limitation');
 		}
-		
+
 		if ($this->request->post['title_maxlength'] != '0' && !filter_var($this->request->post['title_maxlength'],FILTER_VALIDATE_FLOAT) || $this->request->post['title_maxlength'] < 0) {
-			
+
 			$this->error['title_maxlength'] = $this->language->get('error_title_maxlength');
 		}
-		
+
 		if ($this->request->post['description_maxlength'] != '0' && !filter_var($this->request->post['description_maxlength'],FILTER_VALIDATE_FLOAT) || $this->request->post['description_maxlength'] < 0) {
 			$this->error['description_maxlength'] = $this->language->get('error_description_maxlength');
 		}
@@ -300,58 +305,56 @@ class ControllerExtensionModuleSoBasicProducts extends Controller {
 		if ($this->request->post['product_placeholder_path'] == null ) {
 			$this->error['product_placeholder_path'] = $this->language->get('error_product_placeholder_path');
 		}
-		
-		if (!filter_var($this->request->post['date_day'],FILTER_VALIDATE_INT) || $this->request->post['date_day'] <= 0) {
+
+        if (!filter_var($this->request->post['date_day'], FILTER_VALIDATE_INT) || $this->request->post['date_day'] <= 0) {
 			$this->error['date_day'] = $this->language->get('error_date_day');
 		}
-		
-		if ($this->error && !isset($this->error['warning'])) {
+
+        if ($this->error && !isset($this->error['warning'])) {
 			$this->error['warning'] = $this->language->get('error_warning');
 		}
 		return !$this->error;
 	}
 	
-	//=== Theme Custom Code====
 	public function getLayoutMod($name=null){
 		$log_directory  = DIR_CATALOG.'view/theme/'.$this->config->get('theme_default_directory').'/template/extension/module/'.$name;
 		if (is_dir($log_directory)) {
 			$files = scandir($log_directory);
 			foreach ($files as  $value) {
 				if (strpos($value, '.tpl') == true) {
-					list($fileName) = explode('.tpl',$value); 
+                    list($fileName) = explode('.tpl', $value);
 					$fileNames[] = ucfirst($fileName);
 				}
 			}
-		} 
+        }
 		$fileNames = isset($fileNames) ? $fileNames : '';
 		return $fileNames;
 	}
-	
-	public function _breadcrumbs(){
-		$this->data['breadcrumbs'] = array();
 
-		$this->data['breadcrumbs'][] = array(
-			'text' => $this->language->get('text_home'),
-			'href' => $this->url->link('common/dashboard', 'token=' . $this->session->data['token'], 'SSL')
-		);
+    //=== Theme Custom Code====
 
-		$this->data['breadcrumbs'][] = array(
-			'text' => $this->language->get('text_module'),
-			'href' => $this->url->link('extension/extension', 'token=' . $this->session->data['token'], 'SSL')
-		);
+    public function remove_cache()
+    {
+        /*$this->url->link('extension/module', 'token=' . $this->session->data['token'], 'SSL');*/
+        $folder_cache = DIR_CACHE . 'so/';
+        if (file_exists($folder_cache)) {
+            self::mageDelTree($folder_cache);
+        }
+    }
 
-		if (!isset($this->request->get['module_id'])) {
-			$this->data['breadcrumbs'][] = array(
-				'text' => $this->language->get('heading_title'),
-				'href' => $this->url->link('extension/module/so_basic_products', 'token=' . $this->session->data['token'], 'SSL')
-			);
+    function mageDelTree($path)
+    {
+        if (is_dir($path)) {
+            $entries = scandir($path);
+            foreach ($entries as $entry) {
+                if ($entry != '.' && $entry != '..') {
+                    self::mageDelTree($path . '/' . $entry);
+                }
+            }
+            @rmdir($path);
 		} else {
-			$this->data['breadcrumbs'][] = array(
-				'text' => $this->language->get('heading_title'),
-				'href' => $this->url->link('extension/module/so_basic_products', 'token=' . $this->session->data['token'] . '&module_id=' . $this->request->get['module_id'], 'SSL')
-			);
+            @unlink($path);
 		}
-		return $this->data['breadcrumbs'];
 	}
 	
 	public function autocomplete() {

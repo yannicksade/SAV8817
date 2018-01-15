@@ -1,7 +1,8 @@
 <?php
 class ControllerExtensionModuleSosupercategory extends Controller {
-	private $error = array();
 	public $data = array();
+    private $error = array();
+
 	public function index() {
 	// Load language
 		$this->load->language('extension/module/so_super_category');
@@ -319,27 +320,7 @@ class ControllerExtensionModuleSosupercategory extends Controller {
 		}
 		$this->response->setOutput($this->load->view('extension/module/so_super_category.tpl', $data));
 	}
-	public function remove_cache()
-	{
-		$folder_cache = DIR_CACHE.'so/';
-		if(file_exists($folder_cache))
-		{
-			self::mageDelTree($folder_cache);
-		}
-	}
-	function mageDelTree($path) {
-		if (is_dir($path)) {
-			$entries = scandir($path);
-			foreach ($entries as $entry) {
-				if ($entry != '.' && $entry != '..') {
-					self::mageDelTree($path.'/'.$entry);
-				}
-			}
-			@rmdir($path);
-		} else {
-			@unlink($path);
-		}
-	}
+
 	public function _breadcrumbs(){
 		$this->data['breadcrumbs'] = array();
 
@@ -366,6 +347,7 @@ class ControllerExtensionModuleSosupercategory extends Controller {
 		}
 		return $this->data['breadcrumbs'];
 	}
+
 	protected function validate() {
 		if (!$this->user->hasPermission('modify', 'extension/module/so_super_category')) {
 			$this->error['warning'] = $this->language->get('error_permission');
@@ -388,8 +370,8 @@ class ControllerExtensionModuleSosupercategory extends Controller {
 		if (!filter_var($this->request->post['category_depth'],FILTER_VALIDATE_FLOAT) || $this->request->post['category_depth'] < 0){
 			$this->error['category_depth'] = $this->language->get('error_category_depth');
 		}
-	
-	// validate field_product_tab	
+
+        // validate field_product_tab
 		if ($this->request->post['field_product_tab'] == null) {
 			$this->error['field_product_tab'] = $this->language->get('error_field_product_tab');
 		}
@@ -397,48 +379,48 @@ class ControllerExtensionModuleSosupercategory extends Controller {
 		if ($this->request->post['limitation'] != '0' && !filter_var($this->request->post['limitation'],FILTER_VALIDATE_FLOAT) || $this->request->post['limitation'] < 0) {
 			$this->error['limitation'] = $this->language->get('error_limitation');
 		}
-	// validate category title maxlength	
+        // validate category title maxlength
 		if ($this->request->post['category_title_maxlength'] != '0' && !filter_var($this->request->post['category_title_maxlength'],FILTER_VALIDATE_FLOAT) || $this->request->post['category_title_maxlength'] < 0) {
 			$this->error['category_title_maxlength'] = $this->language->get('error_category_title_maxlength');
 		}
-	// validate sub category title maxlength	
+        // validate sub category title maxlength
 		if ($this->request->post['sub_category_title_maxlength'] != '0' && !filter_var($this->request->post['sub_category_title_maxlength'],FILTER_VALIDATE_FLOAT) || $this->request->post['sub_category_title_maxlength'] < 0) {
 			$this->error['sub_category_title_maxlength'] = $this->language->get('error_sub_category_title_maxlength');
-		}	
-	// validate category width		
+        }
+        // validate category width
 		if (!filter_var($this->request->post['category_width'],FILTER_VALIDATE_FLOAT) || $this->request->post['category_width'] < 0){
 			$this->error['category_width'] = $this->language->get('error_category_width');
 		}
-	// validate category height		
+        // validate category height
 		if (!filter_var($this->request->post['category_height'],FILTER_VALIDATE_FLOAT) || $this->request->post['category_height'] < 0) {
 			$this->error['category_height'] = $this->language->get('error_category_height');
 		}
-	// validate product title_maxlength		
+        // validate product title_maxlength
 		if ($this->request->post['product_title_maxlength'] != '0' && !filter_var($this->request->post['product_title_maxlength'],FILTER_VALIDATE_FLOAT) || $this->request->post['product_title_maxlength'] < 0) {
-			
+
 			$this->error['product_title_maxlength'] = $this->language->get('error_product_title_maxlength');
 		}
-	// validate product description_maxlength			
+        // validate product description_maxlength
 		if ($this->request->post['product_description_maxlength'] != '0' && !filter_var($this->request->post['product_description_maxlength'],FILTER_VALIDATE_FLOAT) || $this->request->post['product_description_maxlength'] < 0) {
 			$this->error['product_description_maxlength'] = $this->language->get('error_product_description_maxlength');
-		}	
-	// validate product width		
+        }
+        // validate product width
 		if (!filter_var($this->request->post['product_width'],FILTER_VALIDATE_FLOAT) || $this->request->post['product_width'] < 0){
 			$this->error['product_width'] = $this->language->get('error_product_width');
 		}
-	// validate product height		
+        // validate product height
 		if (!filter_var($this->request->post['product_height'],FILTER_VALIDATE_FLOAT) || $this->request->post['product_height'] < 0) {
 			$this->error['product_height'] = $this->language->get('error_product_height');
-		}	
-	// validate product duration		
+        }
+        // validate product duration
 		if (!filter_var($this->request->post['product_duration'],FILTER_VALIDATE_FLOAT) || $this->request->post['product_duration'] < 0) {
 			$this->error['product_duration'] = $this->language->get('error_product_duration');
-		}	
-	// validate product delay		
+        }
+        // validate product delay
 		if (!filter_var($this->request->post['product_delay'],FILTER_VALIDATE_FLOAT) || $this->request->post['product_delay'] < 0) {
 			$this->error['product_delay'] = $this->language->get('error_product_delay');
-		}	
-	// validate subcategory margin right		
+        }
+        // validate subcategory margin right
 		if (!filter_var($this->request->post['subcategory_margin_right'],FILTER_VALIDATE_INT) && $this->request->post['subcategory_margin_right'] != '0'  || $this->request->post['subcategory_margin_right'] < 0) {
 			$this->error['subcategory_margin_right'] = $this->language->get('error_subcategory_margin_right');
 		}
@@ -450,26 +432,26 @@ class ControllerExtensionModuleSosupercategory extends Controller {
 		if ((utf8_strlen($this->request->post['category_placeholder_path']) < 1)) {
 			$this->error['category_placeholder_path'] = $this->language->get('error_category_placeholder_path');
 		}
-	
-	// validate subcategory auto interval timeout		
+
+        // validate subcategory auto interval timeout
 		if (!filter_var($this->request->post['subcategory_auto_interval_timeout'],FILTER_VALIDATE_FLOAT) || $this->request->post['subcategory_auto_interval_timeout'] < 0) {
 			$this->error['subcategory_auto_interval_timeout'] = $this->language->get('error_subcategory_auto_interval_timeout');
 		}
-	// validate subcategory auto play speed	
+        // validate subcategory auto play speed
 		if (!filter_var($this->request->post['subcategory_auto_play_speed'],FILTER_VALIDATE_FLOAT) || $this->request->post['subcategory_auto_play_speed'] < 0) {
 			$this->error['subcategory_auto_play_speed'] = $this->language->get('error_subcategory_auto_play_speed');
 		}
-	// validate subcategory navigation speed	
+        // validate subcategory navigation speed
 		if (!filter_var($this->request->post['subcategory_navigation_speed'],FILTER_VALIDATE_FLOAT) || $this->request->post['subcategory_navigation_speed'] < 0) {
 			$this->error['subcategory_navigation_speed'] = $this->language->get('error_subcategory_navigation_speed');
 		}
-	
-	
-	// validate slider auto interval timeout		
+
+
+        // validate slider auto interval timeout
 		if (!filter_var($this->request->post['slider_auto_interval_timeout'],FILTER_VALIDATE_FLOAT) || $this->request->post['slider_auto_interval_timeout'] < 0) {
 			$this->error['slider_auto_interval_timeout'] = $this->language->get('error_slider_auto_interval_timeout');
 		}
-	// validate slider auto play speed	
+        // validate slider auto play speed
 		if (!filter_var($this->request->post['slider_auto_play_speed'],FILTER_VALIDATE_FLOAT) || $this->request->post['slider_auto_play_speed'] < 0) {
 			$this->error['slider_auto_play_speed'] = $this->language->get('error_slider_auto_play_speed');
 		}
@@ -487,6 +469,30 @@ class ControllerExtensionModuleSosupercategory extends Controller {
 		}
 		return !$this->error;
 	}
+
+    public function remove_cache()
+    {
+        $folder_cache = DIR_CACHE . 'so/';
+        if (file_exists($folder_cache)) {
+            self::mageDelTree($folder_cache);
+        }
+    }
+
+    function mageDelTree($path)
+    {
+        if (is_dir($path)) {
+            $entries = scandir($path);
+            foreach ($entries as $entry) {
+                if ($entry != '.' && $entry != '..') {
+                    self::mageDelTree($path . '/' . $entry);
+                }
+            }
+            @rmdir($path);
+        } else {
+            @unlink($path);
+        }
+    }
+
 	public function autocomplete() {
 		$json = array();
 		$this->load->language('extension/module/so_super_category');

@@ -264,6 +264,35 @@ class ControllerExtensionPaymentCardConnect extends Controller {
 		$this->response->setOutput($this->load->view('extension/payment/cardconnect', $data));
 	}
 
+    protected function validate()
+    {
+        if (!$this->user->hasPermission('modify', 'extension/payment/cardconnect')) {
+            $this->error['warning'] = $this->language->get('error_permission');
+        }
+
+        if (!$this->request->post['cardconnect_merchant_id']) {
+            $this->error['cardconnect_merchant_id'] = $this->language->get('error_merchant_id');
+        }
+
+        if (!$this->request->post['cardconnect_api_username']) {
+            $this->error['cardconnect_api_username'] = $this->language->get('error_api_username');
+        }
+
+        if (!$this->request->post['cardconnect_api_password']) {
+            $this->error['cardconnect_api_password'] = $this->language->get('error_api_password');
+        }
+
+        if (!$this->request->post['cardconnect_token']) {
+            $this->error['cardconnect_token'] = $this->language->get('error_token');
+        }
+
+        if (!$this->request->post['cardconnect_site']) {
+            $this->error['cardconnect_site'] = $this->language->get('error_site');
+        }
+
+        return !$this->error;
+    }
+
 	public function install() {
 		if ($this->user->hasPermission('modify', 'extension/extension')) {
 			$this->load->model('extension/payment/cardconnect');
@@ -550,33 +579,5 @@ class ControllerExtensionPaymentCardConnect extends Controller {
 
 		$this->response->addHeader('Content-Type: application/json');
 		$this->response->setOutput(json_encode($json));
-	}
-
-	protected function validate() {
-		if (!$this->user->hasPermission('modify', 'extension/payment/cardconnect')) {
-			$this->error['warning'] = $this->language->get('error_permission');
-		}
-
-		if (!$this->request->post['cardconnect_merchant_id']) {
-			$this->error['cardconnect_merchant_id'] = $this->language->get('error_merchant_id');
-		}
-
-		if (!$this->request->post['cardconnect_api_username']) {
-			$this->error['cardconnect_api_username'] = $this->language->get('error_api_username');
-		}
-
-		if (!$this->request->post['cardconnect_api_password']) {
-			$this->error['cardconnect_api_password'] = $this->language->get('error_api_password');
-		}
-
-		if (!$this->request->post['cardconnect_token']) {
-			$this->error['cardconnect_token'] = $this->language->get('error_token');
-		}
-
-		if (!$this->request->post['cardconnect_site']) {
-			$this->error['cardconnect_site'] = $this->language->get('error_site');
-		}
-
-		return !$this->error;
 	}
 }

@@ -194,6 +194,14 @@ class ControllerExtensionPaymentDivido extends Controller {
 		$this->response->setOutput($this->load->view('extension/payment/divido', $data));
 	}
 
+    protected function validate()
+    {
+        if (!$this->user->hasPermission('modify', 'extension/payment/divido')) {
+            $this->error['warning'] = $this->language->get('error_permission');
+        }
+
+        return !$this->error;
+    }
 
 	public function order() {
 		if (!$this->config->get('divido_status')) {
@@ -236,13 +244,5 @@ class ControllerExtensionPaymentDivido extends Controller {
 	public function uninstall() {
 		$this->load->model('extension/payment/divido');
 		$this->model_extension_payment_divido->uninstall();
-	}
-
-	protected function validate() {
-		if (!$this->user->hasPermission('modify', 'extension/payment/divido')) {
-			$this->error['warning'] = $this->language->get('error_permission');
-		}
-
-		return !$this->error;
 	}
 }

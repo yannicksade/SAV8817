@@ -130,13 +130,30 @@ $(' . stored_card').bind('change', function () {
 });
 
 $(document).ready(function(){
-  <?php if ($card_storage == 0) { ?>
+    <
+        ? php;
+    if ($card_storage == 0) {
+            ?;
+    >
     $('#card_info').show();
-  <?php } else { ?>
-    var stored_cards = <?php echo count($stored_cards); ?>;
-    if (stored_cards == 0) {
+    <
+            ? php
+    } else {
+            ?;
+    >
+        var stored_cards =;
+    <
+            ? php echo;
+        count($stored_cards);
+            ?;
+    >
+        if (stored_cards == 0) {
       $('#card_info').show();
     }
-  <?php } ?>
+    <
+            ? php
+    }
+        ?;
+    >
 });
 //--></script>

@@ -60,7 +60,7 @@
 			if($disp_reset_all && $products_arr_id != ""){
 		?>
 			<div class="clear_filter">
-				<a href="javascript:;" class="btn btn-default inverse" id="btn_resetAll">
+                <a href="javascript:" class="btn btn-default inverse" id="btn_resetAll">
 					<?php echo $obj_lang->get('text_reset_all');?>
 				</a>
 			</div>
@@ -74,17 +74,38 @@
 //<![CDATA[
 jQuery(window).load(function($){
 	$ = typeof($ !== 'funtion') ? jQuery : $;
-	<?php //Init Value Default ?>
+    <
+        ? php; //Init Value Default ?>
 	var obj_class 			= $('<?php echo $in_class;?>').find('.product-layout').parent(),
 		product_arr_all 	= $(".so_filter_wrap .modcontent ul").attr("data-product_id"),
 		opt_value_id		= "<?php if(isset($_GET['opt_id'])) echo $_GET['opt_id'];?>",
 		att_value_id		= "<?php if(isset($_GET['att_id'])) echo $_GET['att_id']; ?>",
 		manu_value_id		= "<?php if(isset($_GET['manu_id'])) echo $_GET['manu_id']; ?>",
 		subcate_value_id	= "<?php if(isset($_GET['subcate_id'])) echo $_GET['subcate_id']; ?>",
-		$minPrice			= <?php echo $minPrice;?>,
-		$maxPrice 			= <?php echo $maxPrice;?>,
-		$minPrice_new 		= <?php echo $minPrice_new;?>,
-		$maxPrice_new 		= <?php echo $maxPrice_new;?>,
+        $minPrice =;
+    <
+        ? php echo;
+    $minPrice;
+        ?;
+    >,
+    $maxPrice =;
+    <
+        ? php echo;
+    $maxPrice;
+        ?;
+    >,
+    $minPrice_new =;
+    <
+        ? php echo;
+    $minPrice_new;
+        ?;
+    >,
+    $maxPrice_new =;
+    <
+        ? php echo;
+    $maxPrice_new;
+        ?;
+    >,
 		url 				= '<?php echo $url?>';
 		text_search			= "<?php echo $text_search;?>";
 	<?php //Init ?>
@@ -316,7 +337,8 @@ jQuery(window).load(function($){
 		}
 	}
 
-	<?php if($disp_pro_price &&($minPrice_new != 0 || $maxPrice_new != 0) && ($minPrice != $maxPrice)){?>
+    < ? php;
+    if ($disp_pro_price && ($minPrice_new != 0 || $maxPrice_new != 0) && ($minPrice != $maxPrice)){?>
 	<?php //Init Slider for Price ?>
 	var range = document.getElementById('slider-range');
 	noUiSlider.create(range, {
@@ -404,17 +426,33 @@ jQuery(window).load(function($){
 		var valueMin = $(this).val();
 		var maxPrice__ = getUrlVars()["maxPrice"];
 		if(typeof maxPrice__ === 'undefined'){
-			$maxPrice_new = <?php echo $maxPrice?>;
-		}else{
+            $maxPrice_new =;
+        <
+                ? php echo;
+            $maxPrice ?;
+        >
+        } else {
 			$maxPrice_new = maxPrice__;
 		}
-		if(valueMin < <?php echo $minPrice?>){
-			valueMin = <?php echo $minPrice?>;
-			$(this).val(valueMin);
+        if (valueMin < < ? php echo $minPrice ?;
+        >)
+        {
+            valueMin =;
+        <
+                ? php echo;
+            $minPrice ?;
+        >
+            $(this).val(valueMin);
 		}
-		if(valueMin > <?php echo $maxPrice?>){
-			valueMin = <?php echo $maxPrice?>;
-			$(this).val(valueMin);
+        if (valueMin > < ? php echo $maxPrice ?;
+        >)
+        {
+            valueMin =;
+        <
+                ? php echo;
+            $maxPrice ?;
+        >
+            $(this).val(valueMin);
 		}
 		range.noUiSlider.set([valueMin,null]);
 		if(url.indexOf("minPrice") != -1){
@@ -436,17 +474,33 @@ jQuery(window).load(function($){
 		var valueMax = $(this).val();
 		var minPrice__ = getUrlVars()["minPrice"];
 		if(typeof minPrice__ === 'undefined'){
-			$minPrice_new = <?php echo $minPrice?>;
-		}else{
+            $minPrice_new =;
+        <
+                ? php echo;
+            $minPrice ?;
+        >
+        } else {
 			$minPrice_new = minPrice__;
 		}
-		if(valueMax > <?php echo $maxPrice?>){
-			valueMax = <?php echo $maxPrice?>;
-			$(this).val(valueMax);
+        if (valueMax > < ? php echo $maxPrice ?;
+        >)
+        {
+            valueMax =;
+        <
+                ? php echo;
+            $maxPrice ?;
+        >
+            $(this).val(valueMax);
 		}
-		if(valueMax < <?php echo $minPrice?>){
-			valueMax = <?php echo $maxPrice?>;
-			$(this).val(valueMax);
+        if (valueMax < < ? php echo $minPrice ?;
+        >)
+        {
+            valueMax =;
+        <
+                ? php echo;
+            $maxPrice ?;
+        >
+            $(this).val(valueMax);
 		}
 		range.noUiSlider.set([null, valueMax]);
 		if(url.indexOf("maxPrice") != -1){
@@ -464,8 +518,14 @@ jQuery(window).load(function($){
 		$maxPrice_new = valueMax;
 		requestAjax();
 	});
-	<?php }?>
-	<?php if($disp_search_text){?>
+<
+    ? php
+}
+    ?;
+>
+<
+    ? php;
+if ($disp_search_text){?>
 	<?php //Search ?>
 	$('#text_search').keyup(function(){
 		var character = <?php echo $character_search;?>;
@@ -485,8 +545,8 @@ jQuery(window).load(function($){
 			updateURL();
 			requestAjax();
 		}
-	});
-	$('#submit_text_search').on("click",function(){
+})
+$('#submit_text_search').on("click", function () {
 		text_search = $("#text_search").val();
 		if(url.indexOf("search") != -1){
 			if(text_search != ""){
@@ -502,8 +562,14 @@ jQuery(window).load(function($){
 		updateURL();
 		requestAjax();
 	});
-	<?php }?>
-	<?php if($disp_reset_all){?>
+<
+    ? php
+}
+    ?;
+>
+<
+    ? php;
+if ($disp_reset_all){?>
 	<?php //Click Reset All ?>
 	$('#btn_resetAll').on("click",function(){
 		opt_value_id 		= "";
@@ -538,8 +604,12 @@ jQuery(window).load(function($){
 
 		$("#text_search").val('');
 		location.href= url;
-	});
-	<?php }?>
+})
+<
+    ? php
+}
+    ?;
+>
 	<?php //Request Ajax  ?>
 	function requestAjax(){
 		var page = (getUrlVars()["page"] === "undefined" ? "1" : getUrlVars()["page"]);
@@ -584,8 +654,8 @@ jQuery(window).load(function($){
 			},
 			dataType: 'json'
 		});
-	}
+    };
 
-});
+})
 //]]>
 </script>

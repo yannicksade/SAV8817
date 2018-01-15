@@ -10,45 +10,6 @@ class ControllerExtensionExtensionDashboard extends Controller {
 		$this->getList();
 	}
 
-	public function install() {
-		$this->load->language('extension/extension/dashboard');
-
-		$this->load->model('extension/extension');
-
-		if ($this->validate()) {
-			$this->model_extension_extension->install('dashboard', 'dashboard_' . $this->request->get['extension']);
-
-			$this->load->model('user/user_group');
-
-			$this->model_user_user_group->addPermission($this->user->getGroupId(), 'access', 'extension/dashboard/' . $this->request->get['extension']);
-			$this->model_user_user_group->addPermission($this->user->getGroupId(), 'modify', 'extension/dashboard/' . $this->request->get['extension']);
-
-			// Call install method if it exsits
-			$this->load->controller('extension/dashboard/' . $this->request->get['extension'] . '/install');
-
-			$this->session->data['success'] = $this->language->get('text_success');
-		}
-
-		$this->getList();
-	}
-
-	public function uninstall() {
-		$this->load->language('extension/extension/dashboard');
-
-		$this->load->model('extension/extension');
-
-		if ($this->validate()) {
-			$this->model_extension_extension->uninstall('dashboard', 'dashboard_' . $this->request->get['extension']);
-
-			// Call uninstall method if it exsits
-			$this->load->controller('extension/dashboard/' . $this->request->get['extension'] . '/uninstall');
-
-			$this->session->data['success'] = $this->language->get('text_success');
-		}
-
-		$this->getList();
-	}
-
 	protected function getList() {
 		$data['heading_title'] = $this->language->get('heading_title');
 
@@ -96,14 +57,14 @@ class ControllerExtensionExtensionDashboard extends Controller {
 		if ($files) {
 			foreach ($files as $file) {
 				$extension = basename($file, '.php');
-				
+
 				// Compatibility code for old extension folders
 				$this->load->language('extension/dashboard/' . $extension);
 
 				$data['extensions'][] = array(
 					'name'       => $this->language->get('heading_title'),
-					'width'      => $this->config->get('dashboard_' . $extension . '_width'),	
-					'status'     => $this->config->get('dashboard_' . $extension . '_status') ? $this->language->get('text_enabled') : $this->language->get('text_disabled'),					
+                    'width' => $this->config->get('dashboard_' . $extension . '_width'),
+                    'status' => $this->config->get('dashboard_' . $extension . '_status') ? $this->language->get('text_enabled') : $this->language->get('text_disabled'),
 					'sort_order' => $this->config->get('dashboard_' . $extension . '_sort_order'),
 					'install'    => $this->url->link('extension/extension/dashboard/install', 'token=' . $this->session->data['token'] . '&extension=' . $extension, true),
 					'uninstall'  => $this->url->link('extension/extension/dashboard/uninstall', 'token=' . $this->session->data['token'] . '&extension=' . $extension, true),
@@ -116,6 +77,29 @@ class ControllerExtensionExtensionDashboard extends Controller {
 		$this->response->setOutput($this->load->view('extension/extension/dashboard', $data));
 	}
 
+    public function install()
+    {
+        $this->load->language('extension/extension/dashboard');
+
+        $this->load->model('extension/extension');
+
+        if ($this->validate()) {
+            $this->model_extension_extension->install('dashboard', 'dashboard_' . $this->request->get['extension']);
+
+            $this->load->model('user/user_group');
+
+            $this->model_user_user_group->addPermission($this->user->getGroupId(), 'access', 'extension/dashboard/' . $this->request->get['extension']);
+            $this->model_user_user_group->addPermission($this->user->getGroupId(), 'modify', 'extension/dashboard/' . $this->request->get['extension']);
+
+            // Call install method if it exsits
+            $this->load->controller('extension/dashboard/' . $this->request->get['extension'] . '/install');
+
+            $this->session->data['success'] = $this->language->get('text_success');
+        }
+
+        $this->getList();
+    }
+
 	protected function validate() {
 		if (!$this->user->hasPermission('modify', 'extension/extension/dashboard')) {
 			$this->error['warning'] = $this->language->get('error_permission');
@@ -123,4 +107,22 @@ class ControllerExtensionExtensionDashboard extends Controller {
 
 		return !$this->error;
 	}
+
+    public function uninstall()
+    {
+        $this->load->language('extension/extension/dashboard');
+
+        $this->load->model('extension/extension');
+
+        if ($this->validate()) {
+            $this->model_extension_extension->uninstall('dashboard', 'dashboard_' . $this->request->get['extension']);
+
+            // Call uninstall method if it exsits
+            $this->load->controller('extension/dashboard/' . $this->request->get['extension'] . '/uninstall');
+
+            $this->session->data['success'] = $this->language->get('text_success');
+        }
+
+        $this->getList();
+    }
 }

@@ -185,58 +185,6 @@ class ControllerExtensionModificationEditor extends Controller {
 		$this->response->setOutput(json_encode($json));
 	}
 
-	public function download() {
-		if (!$this->user->hasPermission('modify', 'extension/modification_editor')) {
-			$this->response->redirect($this->url->link('extension/modification', 'token=' . $this->session->data['token'], 'SSL'));
-		}
-
-		if (isset($this->request->get['modification_id'])) {
-			$modification_id = $this->request->get['modification_id'];
-		} else {
-			$modification_id = 0;
-		}
-
-		$this->load->model('extension/modification_editor');
-		$modification = $this->model_extension_modification_editor->getModification($modification_id);
-
-		if ($modification) {
-			$filename = $modification['code'] . '.ocmod.xml';
-			$file = $modification['xml'];
-
-			ob_start();
-			echo $file;
-			$download = ob_get_contents();
-			$size = ob_get_length();
-			ob_end_clean();
-			
-			if (!headers_sent()) {
-				if (!empty($modification['xml'])) {
-					header('Content-Type: application/octet-stream');
-					header('Content-Disposition: attachment; filename="' . $filename . '"');
-					header('Content-Transfer-Encoding: binary');
-					header('Expires: 0');
-					header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
-					header('Pragma: public');
-					header('Content-Length: ' . $size);
-
-					if (ob_get_level()) {
-						ob_end_clean();
-					}
-
-					echo $download;
-
-					exit();
-				} else {
-					exit($this->language->get('error_file'));
-				}
-			} else {
-				exit($this->language->get('error_headers'));
-			}
-		} else {
-			$this->response->redirect($this->url->link('extension/modification', 'token=' . $this->session->data['token'], 'SSL'));
-		}
-	}
-
 	public function refresh() {
 		if (!$this->user->hasPermission('modify', 'extension/modification_editor')) {
 			$this->response->redirect($this->url->link('extension/modification', 'token=' . $this->session->data['token'], 'SSL'));
@@ -552,12 +500,57 @@ class ControllerExtensionModificationEditor extends Controller {
 		$this->model_setting_setting->editSettingValue('config', 'config_maintenance', $maintenance);
 	}
 
-	private function delTree($dir) {
-		$files = array_diff(scandir($dir), array('.','..'));
-		foreach ($files as $file) {
-			 (is_dir("$dir/$file")) ? $this->delTree("$dir/$file") : @unlink("$dir/$file");
+    public function download()
+    {
+        if (!$this->user->hasPermission('modify', 'extension/modification_editor')) {
+            $this->response->redirect($this->url->link('extension/modification', 'token=' . $this->session->data['token'], 'SSL'));
 		}
-		return @rmdir($dir);
+
+        if (isset($this->request->get['modification_id'])) {
+            $modification_id = $this->request->get['modification_id'];
+        } else {
+            $modification_id = 0;
+        }
+
+        $this->load->model('extension/modification_editor');
+        $modification = $this->model_extension_modification_editor->getModification($modification_id);
+
+        if ($modification) {
+            $filename = $modification['code'] . '.ocmod.xml';
+            $file = $modification['xml'];
+
+            ob_start();
+            echo $file;
+            $download = ob_get_contents();
+            $size = ob_get_length();
+            ob_end_clean();
+
+            if (!headers_sent()) {
+                if (!empty($modification['xml'])) {
+                    header('Content-Type: application/octet-stream');
+                    header('Content-Disposition: attachment; filename="' . $filename . '"');
+                    header('Content-Transfer-Encoding: binary');
+                    header('Expires: 0');
+                    header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
+                    header('Pragma: public');
+                    header('Content-Length: ' . $size);
+
+                    if (ob_get_level()) {
+                        ob_end_clean();
+                    }
+
+                    echo $download;
+
+                    exit();
+                } else {
+                    exit($this->language->get('error_file'));
+                }
+            } else {
+                exit($this->language->get('error_headers'));
+            }
+        } else {
+            $this->response->redirect($this->url->link('extension/modification', 'token=' . $this->session->data['token'], 'SSL'));
+        }
 	}
 
 	public function clearCacheData() {
@@ -595,4 +588,13 @@ class ControllerExtensionModificationEditor extends Controller {
 		$this->response->addHeader('Content-Type: application/json');
 		$this->response->setOutput(json_encode($json));
 	}
+
+    private function delTree($dir)
+    {
+        $files = array_diff(scandir($dir), array('.', '..'));
+        foreach ($files as $file) {
+            (is_dir("$dir/$file")) ? $this->delTree("$dir/$file") : @unlink("$dir/$file");
+        }
+        return @rmdir($dir);
+    }
 }

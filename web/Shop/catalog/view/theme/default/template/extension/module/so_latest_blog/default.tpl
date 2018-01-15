@@ -63,11 +63,21 @@
 	<script type="text/javascript">
 		//<![CDATA[
 		jQuery(document).ready(function ($) {
-			;(function (element) {
-				var $element = $(element),
+            (function (element) {
+                var $element = $(element),
 						$extraslider = $(".blog-external", $element),
-						_delay = <?php echo $delay; ?>,
-				_duration = <?php echo $duration; ?>,
+                    _delay =;
+                <
+                    ? php echo;
+                $delay;
+                    ?;
+                >,
+                _duration =;
+                <
+                    ? php echo;
+                $duration;
+                    ?;
+                >,
 				_effect = '<?php echo $effect; ?>';
 
 				this_item = $extraslider.find('div.media');
@@ -84,63 +94,189 @@
 						var $item = $(".owl2-item", $element);
 						$item.css({"opacity": 1, "filter": "alpha(opacity = 100)"});
 					}
-					<?php if($dots == "true") { ?>
+                    <
+                        ? php;
+                    if ($dots == "true") {
+                            ?;
+                    >
 						if ($(".owl2-dot", $element).length < 2) {
 							$(".owl2-prev", $element).css("display", "none");
 							$(".owl2-next", $element).css("display", "none");
 							$(".owl2-dot", $element).css("display", "none");
 						}
-					<?php }?>
+                    <
+                            ? php
+                    }
+                        ?;
+                    >
 
-					<?php if ($button_page == "top"){ ?>
+                    <
+                        ? php;
+                    if ($button_page == "top") {
+                            ?;
+                    >
 						$(".owl2-controls", $element).insertBefore($extraslider);
 						$(".owl2-dots", $element).insertAfter($(".owl2-prev", $element));
-					<?php }else{ ?>
+                    <
+                            ? php
+                    } else {
+                            ?;
+                    >
 						$(".owl2-nav", $element).insertBefore($extraslider);
 						$(".owl2-controls", $element).insertAfter($extraslider);
-					<?php }?>
+                    <
+                            ? php
+                    }
+                        ?;
+                    >
 
 				});
 
 				$extraslider.owlCarousel2({
-				margin: <?php echo $margin;?>,
-				slideBy: <?php echo $slideBy;?>,
-				autoplay: <?php echo $autoplay;?>,
-				autoplayHoverPause: <?php echo $pausehover ;?>,
-				autoplayTimeout: <?php echo $autoplay_timeout; ?>,
-				autoplaySpeed: <?php echo $autoplaySpeed; ?>,
+                    margin: < ? php echo;
+                $margin;
+                    ?;
+                >,
+                slideBy: <
+                    ? php echo;
+                $slideBy;
+                    ?;
+                >,
+                autoplay: <
+                    ? php echo;
+                $autoplay;
+                    ?;
+                >,
+                autoplayHoverPause: <
+                    ? php echo;
+                $pausehover;
+                    ?;
+                >,
+                autoplayTimeout: <
+                    ? php echo;
+                $autoplay_timeout;
+                    ?;
+                >,
+                autoplaySpeed: <
+                    ? php echo;
+                $autoplaySpeed;
+                    ?;
+                >,
 
-				startPosition: <?php echo $startPosition; ?>,
-				mouseDrag: <?php echo $mouseDrag;?>,
-				touchDrag: <?php echo $touchDrag; ?>,
-				autoWidth: false,
-						responsive: {
-					0: 	{ items: <?php echo $nb_column4;?> } ,
-					480: { items: <?php echo $nb_column3;?> },
-					768: { items: <?php echo $nb_column2;?> },
-					992: { items: <?php echo $nb_column1;?> },
-					1200: {items: <?php echo $nb_column0;?>}
+                startPosition: <
+                    ? php echo;
+                $startPosition;
+                    ?;
+                >,
+                mouseDrag: <
+                    ? php echo;
+                $mouseDrag;
+                    ?;
+                >,
+                touchDrag: <
+                    ? php echo;
+                $touchDrag;
+                    ?;
+                >,
+                false,
+                    responsive;
+                :
+                {
+                    0;
+                :
+                    {
+                        items: <
+                            ? php echo;
+                        $nb_column4;
+                            ?;
+                    >
+                    }
+                ,
+                    480;
+                :
+                    {
+                        items: <
+                            ? php echo;
+                        $nb_column3;
+                            ?;
+                    >
+                    }
+                ,
+                    768;
+                :
+                    {
+                        items: <
+                            ? php echo;
+                        $nb_column2;
+                            ?;
+                    >
+                    }
+                ,
+                    992;
+                :
+                    {
+                        items: <
+                            ? php echo;
+                        $nb_column1;
+                            ?;
+                    >
+                    }
+                ,
+                    1200;
+                : {items: <?php echo $nb_column0;?>}
 				},
-				dotClass: "owl2-dot",
-				dotsClass: "owl2-dots",
-				dots: <?php echo $dots; ?>,
-				dotsSpeed:<?php echo $dotsSpeed; ?>,
-				nav: <?php echo $nav; ?>,
-				loop: <?php echo $loop; ?>,
-				navSpeed: <?php echo $navSpeed; ?>,
-				navText: ["<?php echo $btn_prev; ?>", "<?php echo $btn_next; ?>"],
-				navClass: ["owl2-prev", "owl2-next"]
+                "owl2-dot",
+                    dotsClass;
+                :
+                "owl2-dots",
+                    dots;
+                : <
+                    ? php echo;
+                $dots;
+                    ?;
+                >,
+                dotsSpeed:<
+                    ? php echo;
+                $dotsSpeed;
+                    ?;
+                >,
+                nav: <
+                    ? php echo;
+                $nav;
+                    ?;
+                >,
+                loop: <
+                    ? php echo;
+                $loop;
+                    ?;
+                >,
+                navSpeed: <
+                    ? php echo;
+                $navSpeed;
+                    ?;
+                >,
+                ["<?php echo $btn_prev; ?>", "<?php echo $btn_next; ?>"],
+                    navClass;
+                :
+                ["owl2-prev", "owl2-next"]
 
-			});
-
-			$extraslider.on("translate.owl.carousel2", function (e) {
-				<?php if($dots == "true") { ?>
+            })
+                $extraslider.on("translate.owl.carousel2", function (e) {
+                    <
+                        ? php;
+                    if ($dots == "true") {
+                            ?;
+                    >
 					if ($(".owl2-dot", $element).length < 2) {
 						$(".owl2-prev", $element).css("display", "none");
 						$(".owl2-next", $element).css("display", "none");
 						$(".owl2-dot", $element).css("display", "none");
 					}
-				<?php } ?>
+                    <
+                            ? php
+                    }
+                        ?;
+                    >
 
 				//var $item_active = $(".owl2-item.active", $element);
 				//_UngetAnimate($item_active);
@@ -149,13 +285,21 @@
 
 			$extraslider.on("translated.owl.carousel2", function (e) {
 
-				<?php if($dots == "true") { ?>
+                <
+                    ? php;
+                if ($dots == "true") {
+                        ?;
+                >
 					if ($(".owl2-dot", $element).length < 2) {
 						$(".owl2-prev", $element).css("display", "none");
 						$(".owl2-next", $element).css("display", "none");
 						$(".owl2-dot", $element).css("display", "none");
 					}
-				<?php } ?>
+                <
+                        ? php
+                }
+                    ?;
+                >
 
 				var $item_active = $(".owl2-item.active", $element);
 				var $item = $(".owl2-item", $element);

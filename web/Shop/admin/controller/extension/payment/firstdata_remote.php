@@ -315,6 +315,43 @@ class ControllerExtensionPaymentFirstdataRemote extends Controller {
 		$this->response->setOutput($this->load->view('extension/payment/firstdata_remote', $data));
 	}
 
+    protected function validate()
+    {
+        if (!$this->user->hasPermission('modify', 'extension/payment/firstdata_remote')) {
+            $this->error['warning'] = $this->language->get('error_permission');
+        }
+
+        if (!$this->request->post['firstdata_remote_merchant_id']) {
+            $this->error['error_merchant_id'] = $this->language->get('error_merchant_id');
+        }
+
+        if (!$this->request->post['firstdata_remote_user_id']) {
+            $this->error['error_user_id'] = $this->language->get('error_user_id');
+        }
+
+        if (!$this->request->post['firstdata_remote_password']) {
+            $this->error['error_password'] = $this->language->get('error_password');
+        }
+
+        if (!$this->request->post['firstdata_remote_certificate']) {
+            $this->error['error_certificate'] = $this->language->get('error_certificate');
+        }
+
+        if (!$this->request->post['firstdata_remote_key']) {
+            $this->error['error_key'] = $this->language->get('error_key');
+        }
+
+        if (!$this->request->post['firstdata_remote_key_pw']) {
+            $this->error['error_key_pw'] = $this->language->get('error_key_pw');
+        }
+
+        if (!$this->request->post['firstdata_remote_ca']) {
+            $this->error['error_ca'] = $this->language->get('error_ca');
+        }
+
+        return !$this->error;
+    }
+
 	public function install() {
 		$this->load->model('extension/payment/firstdata_remote');
 		$this->model_extension_payment_firstdata_remote->install();
@@ -494,41 +531,5 @@ class ControllerExtensionPaymentFirstdataRemote extends Controller {
 
 		$this->response->addHeader('Content-Type: application/json');
 		$this->response->setOutput(json_encode($json));
-	}
-
-	protected function validate() {
-		if (!$this->user->hasPermission('modify', 'extension/payment/firstdata_remote')) {
-			$this->error['warning'] = $this->language->get('error_permission');
-		}
-
-		if (!$this->request->post['firstdata_remote_merchant_id']) {
-			$this->error['error_merchant_id'] = $this->language->get('error_merchant_id');
-		}
-
-		if (!$this->request->post['firstdata_remote_user_id']) {
-			$this->error['error_user_id'] = $this->language->get('error_user_id');
-		}
-
-		if (!$this->request->post['firstdata_remote_password']) {
-			$this->error['error_password'] = $this->language->get('error_password');
-		}
-
-		if (!$this->request->post['firstdata_remote_certificate']) {
-			$this->error['error_certificate'] = $this->language->get('error_certificate');
-		}
-
-		if (!$this->request->post['firstdata_remote_key']) {
-			$this->error['error_key'] = $this->language->get('error_key');
-		}
-
-		if (!$this->request->post['firstdata_remote_key_pw']) {
-			$this->error['error_key_pw'] = $this->language->get('error_key_pw');
-		}
-
-		if (!$this->request->post['firstdata_remote_ca']) {
-			$this->error['error_ca'] = $this->language->get('error_ca');
-		}
-
-		return !$this->error;
 	}
 }

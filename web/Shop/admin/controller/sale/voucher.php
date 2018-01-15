@@ -12,104 +12,6 @@ class ControllerSaleVoucher extends Controller {
 		$this->getList();
 	}
 
-	public function add() {
-		$this->load->language('sale/voucher');
-
-		$this->document->setTitle($this->language->get('heading_title'));
-
-		$this->load->model('sale/voucher');
-
-		if (($this->request->server['REQUEST_METHOD'] == 'POST') && $this->validateForm()) {
-			$this->model_sale_voucher->addVoucher($this->request->post);
-
-			$this->session->data['success'] = $this->language->get('text_success');
-
-			$url = '';
-
-			if (isset($this->request->get['sort'])) {
-				$url .= '&sort=' . $this->request->get['sort'];
-			}
-
-			if (isset($this->request->get['order'])) {
-				$url .= '&order=' . $this->request->get['order'];
-			}
-
-			if (isset($this->request->get['page'])) {
-				$url .= '&page=' . $this->request->get['page'];
-			}
-
-			$this->response->redirect($this->url->link('sale/voucher', 'token=' . $this->session->data['token'] . $url, true));
-		}
-
-		$this->getForm();
-	}
-
-	public function edit() {
-		$this->load->language('sale/voucher');
-
-		$this->document->setTitle($this->language->get('heading_title'));
-
-		$this->load->model('sale/voucher');
-
-		if (($this->request->server['REQUEST_METHOD'] == 'POST') && $this->validateForm()) {
-			$this->model_sale_voucher->editVoucher($this->request->get['voucher_id'], $this->request->post);
-
-			$this->session->data['success'] = $this->language->get('text_success');
-
-			$url = '';
-
-			if (isset($this->request->get['sort'])) {
-				$url .= '&sort=' . $this->request->get['sort'];
-			}
-
-			if (isset($this->request->get['order'])) {
-				$url .= '&order=' . $this->request->get['order'];
-			}
-
-			if (isset($this->request->get['page'])) {
-				$url .= '&page=' . $this->request->get['page'];
-			}
-
-			$this->response->redirect($this->url->link('sale/voucher', 'token=' . $this->session->data['token'] . $url, true));
-		}
-
-		$this->getForm();
-	}
-
-	public function delete() {
-		$this->load->language('sale/voucher');
-
-		$this->document->setTitle($this->language->get('heading_title'));
-
-		$this->load->model('sale/voucher');
-
-		if (isset($this->request->post['selected']) && $this->validateDelete()) {
-			foreach ($this->request->post['selected'] as $voucher_id) {
-				$this->model_sale_voucher->deleteVoucher($voucher_id);
-			}
-
-			$this->session->data['success'] = $this->language->get('text_success');
-
-			$url = '';
-
-			if (isset($this->request->get['sort'])) {
-				$url .= '&sort=' . $this->request->get['sort'];
-			}
-
-			if (isset($this->request->get['order'])) {
-				$url .= '&order=' . $this->request->get['order'];
-			}
-
-			if (isset($this->request->get['page'])) {
-				$url .= '&page=' . $this->request->get['page'];
-			}
-
-			$this->response->redirect($this->url->link('sale/voucher', 'token=' . $this->session->data['token'] . $url, true));
-		}
-
-		$this->getList();
-	}
-
 	protected function getList() {
 		if (isset($this->request->get['sort'])) {
 			$sort = $this->request->get['sort'];
@@ -172,12 +74,12 @@ class ControllerSaleVoucher extends Controller {
 		$results = $this->model_sale_voucher->getVouchers($filter_data);
 
 		foreach ($results as $result) {
-			if ($result['order_id']) {	
+            if ($result['order_id']) {
 				$order_href = $this->url->link('sale/order/info', 'token=' . $this->session->data['token'] . '&order_id=' . $result['order_id'] . $url, true);
 			} else {
 				$order_href = '';
 			}
-			
+
 			$data['vouchers'][] = array(
 				'voucher_id' => $result['voucher_id'],
 				'code'       => $result['code'],
@@ -284,6 +186,82 @@ class ControllerSaleVoucher extends Controller {
 
 		$this->response->setOutput($this->load->view('sale/voucher_list', $data));
 	}
+
+    public function add()
+    {
+        $this->load->language('sale/voucher');
+
+        $this->document->setTitle($this->language->get('heading_title'));
+
+        $this->load->model('sale/voucher');
+
+        if (($this->request->server['REQUEST_METHOD'] == 'POST') && $this->validateForm()) {
+            $this->model_sale_voucher->addVoucher($this->request->post);
+
+            $this->session->data['success'] = $this->language->get('text_success');
+
+            $url = '';
+
+            if (isset($this->request->get['sort'])) {
+                $url .= '&sort=' . $this->request->get['sort'];
+            }
+
+            if (isset($this->request->get['order'])) {
+                $url .= '&order=' . $this->request->get['order'];
+            }
+
+            if (isset($this->request->get['page'])) {
+                $url .= '&page=' . $this->request->get['page'];
+            }
+
+            $this->response->redirect($this->url->link('sale/voucher', 'token=' . $this->session->data['token'] . $url, true));
+        }
+
+        $this->getForm();
+    }
+
+    protected function validateForm()
+    {
+        if (!$this->user->hasPermission('modify', 'sale/voucher')) {
+            $this->error['warning'] = $this->language->get('error_permission');
+        }
+
+        if ((utf8_strlen($this->request->post['code']) < 3) || (utf8_strlen($this->request->post['code']) > 10)) {
+            $this->error['code'] = $this->language->get('error_code');
+        }
+
+        $voucher_info = $this->model_sale_voucher->getVoucherByCode($this->request->post['code']);
+
+        if ($voucher_info) {
+            if (!isset($this->request->get['voucher_id'])) {
+                $this->error['warning'] = $this->language->get('error_exists');
+            } elseif ($voucher_info['voucher_id'] != $this->request->get['voucher_id']) {
+                $this->error['warning'] = $this->language->get('error_exists');
+            }
+        }
+
+        if ((utf8_strlen($this->request->post['to_name']) < 1) || (utf8_strlen($this->request->post['to_name']) > 64)) {
+            $this->error['to_name'] = $this->language->get('error_to_name');
+        }
+
+        if ((utf8_strlen($this->request->post['to_email']) > 96) || !filter_var($this->request->post['to_email'], FILTER_VALIDATE_EMAIL)) {
+            $this->error['to_email'] = $this->language->get('error_email');
+        }
+
+        if ((utf8_strlen($this->request->post['from_name']) < 1) || (utf8_strlen($this->request->post['from_name']) > 64)) {
+            $this->error['from_name'] = $this->language->get('error_from_name');
+        }
+
+        if ((utf8_strlen($this->request->post['from_email']) > 96) || !filter_var($this->request->post['from_email'], FILTER_VALIDATE_EMAIL)) {
+            $this->error['from_email'] = $this->language->get('error_email');
+        }
+
+        if ($this->request->post['amount'] < 1) {
+            $this->error['amount'] = $this->language->get('error_amount');
+        }
+
+        return !$this->error;
+    }
 
 	protected function getForm() {
 		$data['heading_title'] = $this->language->get('heading_title');
@@ -482,46 +460,72 @@ class ControllerSaleVoucher extends Controller {
 		$this->response->setOutput($this->load->view('sale/voucher_form', $data));
 	}
 
-	protected function validateForm() {
-		if (!$this->user->hasPermission('modify', 'sale/voucher')) {
-			$this->error['warning'] = $this->language->get('error_permission');
+    public function edit()
+    {
+        $this->load->language('sale/voucher');
+
+        $this->document->setTitle($this->language->get('heading_title'));
+
+        $this->load->model('sale/voucher');
+
+        if (($this->request->server['REQUEST_METHOD'] == 'POST') && $this->validateForm()) {
+            $this->model_sale_voucher->editVoucher($this->request->get['voucher_id'], $this->request->post);
+
+            $this->session->data['success'] = $this->language->get('text_success');
+
+            $url = '';
+
+            if (isset($this->request->get['sort'])) {
+                $url .= '&sort=' . $this->request->get['sort'];
+            }
+
+            if (isset($this->request->get['order'])) {
+                $url .= '&order=' . $this->request->get['order'];
+            }
+
+            if (isset($this->request->get['page'])) {
+                $url .= '&page=' . $this->request->get['page'];
+            }
+
+            $this->response->redirect($this->url->link('sale/voucher', 'token=' . $this->session->data['token'] . $url, true));
+        }
+
+        $this->getForm();
+    }
+
+    public function delete()
+    {
+        $this->load->language('sale/voucher');
+
+        $this->document->setTitle($this->language->get('heading_title'));
+
+        $this->load->model('sale/voucher');
+
+        if (isset($this->request->post['selected']) && $this->validateDelete()) {
+            foreach ($this->request->post['selected'] as $voucher_id) {
+                $this->model_sale_voucher->deleteVoucher($voucher_id);
+            }
+
+            $this->session->data['success'] = $this->language->get('text_success');
+
+            $url = '';
+
+            if (isset($this->request->get['sort'])) {
+                $url .= '&sort=' . $this->request->get['sort'];
+            }
+
+            if (isset($this->request->get['order'])) {
+                $url .= '&order=' . $this->request->get['order'];
+            }
+
+            if (isset($this->request->get['page'])) {
+                $url .= '&page=' . $this->request->get['page'];
+            }
+
+            $this->response->redirect($this->url->link('sale/voucher', 'token=' . $this->session->data['token'] . $url, true));
 		}
 
-		if ((utf8_strlen($this->request->post['code']) < 3) || (utf8_strlen($this->request->post['code']) > 10)) {
-			$this->error['code'] = $this->language->get('error_code');
-		}
-
-		$voucher_info = $this->model_sale_voucher->getVoucherByCode($this->request->post['code']);
-
-		if ($voucher_info) {
-			if (!isset($this->request->get['voucher_id'])) {
-				$this->error['warning'] = $this->language->get('error_exists');
-			} elseif ($voucher_info['voucher_id'] != $this->request->get['voucher_id'])  {
-				$this->error['warning'] = $this->language->get('error_exists');
-			}
-		}
-
-		if ((utf8_strlen($this->request->post['to_name']) < 1) || (utf8_strlen($this->request->post['to_name']) > 64)) {
-			$this->error['to_name'] = $this->language->get('error_to_name');
-		}
-
-		if ((utf8_strlen($this->request->post['to_email']) > 96) || !filter_var($this->request->post['to_email'], FILTER_VALIDATE_EMAIL)) {
-			$this->error['to_email'] = $this->language->get('error_email');
-		}
-
-		if ((utf8_strlen($this->request->post['from_name']) < 1) || (utf8_strlen($this->request->post['from_name']) > 64)) {
-			$this->error['from_name'] = $this->language->get('error_from_name');
-		}
-
-		if ((utf8_strlen($this->request->post['from_email']) > 96) || !filter_var($this->request->post['from_email'], FILTER_VALIDATE_EMAIL)) {
-			$this->error['from_email'] = $this->language->get('error_email');
-		}
-
-		if ($this->request->post['amount'] < 1) {
-			$this->error['amount'] = $this->language->get('error_amount');
-		}
-
-		return !$this->error;
+        $this->getList();
 	}
 
 	protected function validateDelete() {

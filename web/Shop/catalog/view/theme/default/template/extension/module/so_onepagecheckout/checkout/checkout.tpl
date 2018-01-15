@@ -169,8 +169,12 @@
     </div>
 </div>
 <script>
-    window['journal_account_status'] = <?php echo (int)$is_logged_in; ?>;
-
+    window['journal_account_status'] =;
+    <
+        ? php echo(int);
+    $is_logged_in;
+        ?;
+    >
     $(document).delegate('input[name="shipping_method"]', 'change', function() {
         $(document).trigger('journal_checkout_shipping_changed', this.value);
     });
@@ -305,7 +309,11 @@
                 $('#account').html($html.find('#account'));
                 $('#address').html($html.find('#address'));
                 $('#password').html($html.find('#password'));
-                <?php if (Front::$IS_OC2): ?>
+                <
+                    ? php;
+                if (Front::$IS_OC2):
+                    ?;
+                >
                 $('#account .form-group[data-sort]').detach().each(function() {
                     if ($(this).attr('data-sort') >= 0 && $(this).attr('data-sort') <= $('#account .form-group').length) {
                         $('#account .form-group').eq($(this).attr('data-sort')).before(this);
@@ -319,7 +327,10 @@
                         $('#account .form-group:first').before(this);
                     }
                 });
-                <?php endif; ?>
+                <
+                    ? php endif;
+                    ?;
+                >
                 $(document).trigger('journal_checkout_reload_payment');
                 if ($('input[name="shipping_address"]').is(':checked')) {
                     $(document).trigger('journal_checkout_reload_shipping');
@@ -339,13 +350,20 @@
             data[type + '_country_id'] = $('select[name="' + type + '_country_id"]').val();
             data[type + '_postcode'] = $('input[name="' + type + '_postcode"]').val();
             data[type + '_zone_id'] = $('select[name="' + type + '_zone_id"]').val();
-            <?php if (!$is_logged_in): ?>
+        <
+                ? php;
+            if (!$is_logged_in):
+                ?;
+        >
             if (type === 'payment' && $('input[name="shipping_address"]').is(":checked")) {
                 data['shipping_country_id'] = $('select[name="' + type + '_country_id"]').val();
                 data['shipping_postcode'] = $('input[name="' + type + '_postcode"]').val();
                 data['shipping_zone_id'] = $('select[name="' + type + '_zone_id"]').val();
             }
-            <?php endif; ?>
+        <
+                ? php endif;
+                ?;
+        >
         }
         $.ajax({
             url: 'index.php?route=journal2/checkout/save',
@@ -354,11 +372,18 @@
             dataType: 'json',
             success: function(json) {
                 $(document).trigger('journal_checkout_reload_' + type);
-                <?php if (!$is_logged_in): ?>
+                <
+                    ? php;
+                if (!$is_logged_in):
+                    ?;
+                >
                 if (type === 'payment' && $('input[name="shipping_address"]').is(':checked')) {
                     $(document).trigger('journal_checkout_reload_shipping');
                 }
-                <?php endif; ?>
+                <
+                    ? php endif;
+                    ?;
+                >
             },
             error: function(xhr, ajaxOptions, thrownError) {
                 alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
@@ -547,17 +572,37 @@
 
     $(document).delegate('#button-voucher', 'click', function() {
         $.ajax({
-            <?php if (version_compare(VERSION, '2.1', '>=')): ?>
-            url: 'index.php?route=total/voucher/voucher',
-            <?php elseif (version_compare(VERSION, '2', '>=')): ?>
-            url: 'index.php?route=checkout/voucher/voucher',
-            <?php else: ?>
-            url: 'index.php?route=journal2/checkout/voucher',
-            <?php endif; ?>
-            type: 'post',
-            data: 'voucher=' + encodeURIComponent($('input[name=\'voucher\']').val()),
-            dataType: 'json',
-            beforeSend: function() {
+        < ? php;
+        if (version_compare(VERSION, '2.1', '>=')):
+            ?;
+        >
+        'index.php?route=total/voucher/voucher',;
+        <
+            ? php elseif(version_compare(VERSION, '2', '>='));
+        :
+            ?;
+        >
+        'index.php?route=checkout/voucher/voucher',;
+        <
+            ? php;
+        else:
+            ?;
+        >
+        'index.php?route=journal2/checkout/voucher',;
+        <
+            ? php endif;
+            ?;
+        >
+        'post',
+            data;
+        :
+        'voucher=' + encodeURIComponent($('input[name=\'voucher\']').val()),
+            dataType;
+        :
+        'json',
+            beforeSend;
+        :
+        function () {
                 triggerLoadingOn();
                 $('#button-voucher').button('loading');
             },
@@ -575,22 +620,42 @@
                     $(document).trigger('journal_checkout_reload_shipping');
                 }
             }
-        });
+    })
     });
 
     $(document).delegate('#button-coupon', 'click', function() {
         $.ajax({
-            <?php if (version_compare(VERSION, '2.1', '>=')): ?>
-            url: 'index.php?route=total/coupon/coupon',
-            <?php elseif (version_compare(VERSION, '2', '>=')): ?>
-            url: 'index.php?route=checkout/coupon/coupon',
-            <?php else: ?>
-            url: 'index.php?route=journal2/checkout/coupon',
-            <?php endif; ?>
-            type: 'post',
-            data: 'coupon=' + encodeURIComponent($('input[name=\'coupon\']').val()),
-            dataType: 'json',
-            beforeSend: function() {
+        < ? php;
+        if (version_compare(VERSION, '2.1', '>=')):
+            ?;
+        >
+        'index.php?route=total/coupon/coupon',;
+        <
+            ? php elseif(version_compare(VERSION, '2', '>='));
+        :
+            ?;
+        >
+        'index.php?route=checkout/coupon/coupon',;
+        <
+            ? php;
+        else:
+            ?;
+        >
+        'index.php?route=journal2/checkout/coupon',;
+        <
+            ? php endif;
+            ?;
+        >
+        'post',
+            data;
+        :
+        'coupon=' + encodeURIComponent($('input[name=\'coupon\']').val()),
+            dataType;
+        :
+        'json',
+            beforeSend;
+        :
+        function () {
                 triggerLoadingOn();
                 $('#button-coupon').button('loading');
             },
@@ -608,22 +673,42 @@
                     $(document).trigger('journal_checkout_reload_shipping');
                 }
             }
-        });
+    })
     });
 
     $(document).delegate('#button-reward', 'click', function() {
         $.ajax({
-            <?php if (version_compare(VERSION, '2.1', '>=')): ?>
-            url: 'index.php?route=total/reward/reward',
-            <?php elseif (version_compare(VERSION, '2', '>=')): ?>
-            url: 'index.php?route=checkout/reward/reward',
-            <?php else: ?>
-            url: 'index.php?route=journal2/checkout/reward',
-            <?php endif; ?>
-            type: 'post',
-            data: 'reward=' + encodeURIComponent($('input[name=\'reward\']').val()),
-            dataType: 'json',
-            beforeSend: function() {
+        < ? php;
+        if (version_compare(VERSION, '2.1', '>=')):
+            ?;
+        >
+        'index.php?route=total/reward/reward',;
+        <
+            ? php elseif(version_compare(VERSION, '2', '>='));
+        :
+            ?;
+        >
+        'index.php?route=checkout/reward/reward',;
+        <
+            ? php;
+        else:
+            ?;
+        >
+        'index.php?route=journal2/checkout/reward',;
+        <
+            ? php endif;
+            ?;
+        >
+        'post',
+            data;
+        :
+        'reward=' + encodeURIComponent($('input[name=\'reward\']').val()),
+            dataType;
+        :
+        'json',
+            beforeSend;
+        :
+        function () {
                 triggerLoadingOn();
                 $('#button-reward').button('loading');
             },
@@ -641,7 +726,7 @@
                     $(document).trigger('journal_checkout_reload_shipping');
                 }
             }
-        });
+    })
     });
 
     var ajax_calls = 0;
@@ -662,15 +747,30 @@
         }
     }
 
-    <?php if ($is_logged_in): ?>
+    <
+        ? php;
+    if ($is_logged_in):
+        ?;
+    >
     $('.journal-checkout [value="existing"]').trigger('change');
-    <?php else: ?>
+    <
+        ? php;
+    else:
+        ?;
+    >
     $('input[name="account"]:checked').trigger('change');
-    <?php endif; ?>
+    <
+        ? php endif;
+        ?;
+    >
 
     $(document).trigger('journal_checkout_reload_cart', true);
 
-    <?php if ($this->journal2->settings->get('one_page_auto_save', '0') == '1'): ?>
+    <
+        ? php;
+    if ($this - > journal2 - > settings - > get('one_page_auto_save', '0') == '1'):
+        ?;
+    >
     $('.journal-checkout input').on('blur', function() {
         var data = { };
 
@@ -691,6 +791,9 @@
             }
         });
     });
-    <?php endif; ?>
+    <
+        ? php endif;
+        ?;
+    >
 </script>
 <?php echo $footer; ?>

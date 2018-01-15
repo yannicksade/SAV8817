@@ -105,11 +105,11 @@
                                 $.prettyPhoto.close();
                             e.preventDefault();
                             break;
-                        };
-                    };
-                };
+                        }
+                    }
+                }
             });
-        };
+        }
         $.prettyPhoto.initialize = function () {
             settings = pp_settings;
             if (settings.theme == 'pp_default') settings.horizontal_padding = 16;
@@ -136,7 +136,7 @@
                 });
             $.prettyPhoto.open();
             return false;
-        }
+        };
         $.prettyPhoto.open = function (event) {
             if (typeof settings == "undefined") {
                 settings = pp_settings;
@@ -271,11 +271,11 @@
                     $(myClone).remove();
                     toInject = settings.inline_markup.replace(/{content}/g, $(pp_images[set_position]).html());
                     break;
-                };
+                }
                 if (!imgPreloader && !skipInjection) {
                     $pp_pic_holder.find('#pp_full_res')[0].innerHTML = toInject;
                     _showContent();
-                };
+                }
             });
             return false;
         };
@@ -289,7 +289,7 @@
                 if (set_position > $(pp_images).size() - 1) set_position = 0;
             } else {
                 set_position = direction;
-            };
+            }
             rel_index = set_position;
             if (!doresize) doresize = true;
             if (settings.allow_expand) {
@@ -308,7 +308,7 @@
                 if (currentGalleryPage < 0) currentGalleryPage = totalPage;
             } else {
                 currentGalleryPage = direction;
-            };
+            }
             slide_speed = (direction == 'next' || direction == 'previous') ? settings.animation_speed : 0;
             slide_to = currentGalleryPage * (itemsPerPage * itemWidth);
             $pp_gallery.find('ul').animate({
@@ -324,8 +324,8 @@
                 pp_slideshow = setInterval($.prettyPhoto.startSlideshow, settings.slideshow);
             } else {
                 $.prettyPhoto.changePage('next');
-            };
-        }
+            }
+        };
         $.prettyPhoto.stopSlideshow = function () {
             $pp_pic_holder.find('.pp_pause').unbind('click').removeClass('pp_pause').addClass('pp_play').click(function () {
                 $.prettyPhoto.startSlideshow();
@@ -333,7 +333,7 @@
             });
             clearInterval(pp_slideshow);
             pp_slideshow = undefined;
-        }
+        };
         $.prettyPhoto.close = function () {
             if ($pp_overlay.is(":animated")) return;
             $.prettyPhoto.stopSlideshow();
@@ -388,20 +388,17 @@
             });
             _insert_gallery();
             pp_settings.ajaxcallback();
-        };
-
+        }
         function _hideContent(callback) {
             $pp_pic_holder.find('#pp_full_res object,#pp_full_res embed').css('visibility', 'hidden');
             $pp_pic_holder.find('.pp_fade').fadeOut(settings.animation_speed, function () {
                 $('.pp_loaderIcon').show();
                 callback();
             });
-        };
-
+        }
         function _checkPosition(setCount) {
             (setCount > 1) ? $('.pp_nav').show() : $('.pp_nav').hide();
-        };
-
+        }
         function _fitToViewport(width, height) {
             resized = false;
             _getDimensions(width, height);
@@ -417,14 +414,14 @@
                         imageWidth = (width / height) * imageHeight;
                     } else {
                         fitting = true;
-                    };
+                    }
                     pp_containerHeight = imageHeight, pp_containerWidth = imageWidth;
-                };
+                }
                 _getDimensions(imageWidth, imageHeight);
                 if ((pp_containerWidth > windowWidth) || (pp_containerHeight > windowHeight)) {
                     _fitToViewport(pp_containerWidth, pp_containerHeight)
-                };
-            };
+                }
+            }
             return {
                 width: Math.floor(imageWidth),
                 height: Math.floor(imageHeight),
@@ -434,8 +431,7 @@
                 contentWidth: Math.floor(pp_contentWidth),
                 resized: resized
             };
-        };
-
+        }
         function _getDimensions(width, height) {
             width = parseFloat(width);
             height = parseFloat(height);
@@ -484,9 +480,8 @@
                 return 'inline';
             } else {
                 return 'image';
-            };
-        };
-
+            }
+        }
         function _center_overlay() {
             if (doresize && typeof $pp_pic_holder != 'undefined') {
                 scroll_pos = _get_scroll();
@@ -499,9 +494,8 @@
                     'top': projectedTop,
                     'left': (windowWidth / 2) + scroll_pos['scrollLeft'] - (contentwidth / 2)
                 });
-            };
-        };
-
+            }
+        }
         function _get_scroll() {
             if (self.pageYOffset) {
                 return {
@@ -518,14 +512,12 @@
                     scrollTop: document.body.scrollTop,
                     scrollLeft: document.body.scrollLeft
                 };
-            };
-        };
-
+            }
+        }
         function _resize_overlay() {
             windowHeight = $(window).height(), windowWidth = $(window).width();
             if (typeof $pp_overlay != "undefined") $pp_overlay.height($(document).height()).width(windowWidth);
-        };
-
+        }
         function _insert_gallery() {
             if (isSet && settings.overlay_gallery && _getFileType(pp_images[set_position]) == "image" && (settings.ie6_fallback)) {
                 itemWidth = 52 + 5;
@@ -538,7 +530,7 @@
                     $pp_gallery.find('.pp_arrow_next,.pp_arrow_previous').hide();
                 } else {
                     $pp_gallery.find('.pp_arrow_next,.pp_arrow_previous').show();
-                };
+                }
                 galleryWidth = itemsPerPage * itemWidth;
                 fullGalleryWidth = pp_images.length * itemWidth;
                 $pp_gallery.css('margin-left', -((galleryWidth / 2) + (navWidth / 2))).find('div:first').width(galleryWidth + 5).find('ul').width(fullGalleryWidth).find('li.selected').removeClass('selected');
@@ -568,7 +560,7 @@
                         img_src = pp_images[i];
                     }
                     toInject += "<li class='" + classname + "'><a href='#'><img src='" + img_src + "' width='50' alt='' /></a></li>";
-                };
+                }
                 toInject = settings.gallery_markup.replace(/{gallery}/g, toInject);
                 $pp_pic_holder.find('#pp_full_res').after(toInject);
                 $pp_gallery = $('.pp_pic_holder .pp_gallery'), $pp_gallery_li = $pp_gallery.find('li');
@@ -595,9 +587,9 @@
                         return false;
                     });
                 });
-            };
+            }
             if (settings.slideshow) {
-                $pp_pic_holder.find('.pp_nav').prepend('<a href="#" class="pp_play">Play</a>')
+                $pp_pic_holder.find('.pp_nav').prepend('<a href="#" class="pp_play">Play</a>');
                 $pp_pic_holder.find('.pp_nav .pp_play').click(function () {
                     $.prettyPhoto.startSlideshow();
                     return false;
@@ -623,7 +615,7 @@
                     } else {
                         $(this).removeClass('pp_contract').addClass('pp_expand');
                         doresize = true;
-                    };
+                    }
                     _hideContent(function () {
                         $.prettyPhoto.open();
                     });
@@ -641,7 +633,7 @@
                 return false;
             });
             _center_overlay();
-        };
+        }
         if (!pp_alreadyInitialized && getHashtag()) {
             pp_alreadyInitialized = true;
             hashIndex = getHashtag();
@@ -659,13 +651,11 @@
         url = location.href;
         hashtag = (url.indexOf('#prettyPhoto') !== -1) ? decodeURI(url.substring(url.indexOf('#prettyPhoto') + 1, url.length)) : false;
         return hashtag;
-    };
-
+    }
     function setHashtag() {
         if (typeof theRel == 'undefined') return;
         location.hash = theRel + '/' + rel_index + '/';
-    };
-
+    }
     function clearHashtag() {
         if (location.href.indexOf('#prettyPhoto') !== -1) location.hash = "prettyPhoto";
     }

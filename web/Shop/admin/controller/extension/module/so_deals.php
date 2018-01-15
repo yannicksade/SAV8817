@@ -340,27 +340,7 @@ class ControllerExtensionModuleSodeals extends Controller {
 		}
 		$this->response->setOutput($this->load->view('extension/module/so_deals.tpl', $data));
 	}
-	public function remove_cache()	{
-		$folder_cache = DIR_CACHE.'so/';
-		if(file_exists($folder_cache))
-		{
-			self::mageDelTree($folder_cache);
-		}
-	}
-	function mageDelTree($path) {
-		if (is_dir($path)) {
-			$entries = scandir($path);
-			foreach ($entries as $entry) {
-				if ($entry != '.' && $entry != '..') {
-					self::mageDelTree($path.'/'.$entry);
-				}
-			}
-			@rmdir($path);
-		} else {
-			@unlink($path);
-		}
-	}
-	
+
 	public function _breadcrumbs(){
 		$this->data['breadcrumbs'] = array();
 
@@ -387,8 +367,9 @@ class ControllerExtensionModuleSodeals extends Controller {
 		}
 		return $this->data['breadcrumbs'];
 	}
-	
-	protected function validate() {
+
+    protected function validate()
+    {
 		if (!$this->user->hasPermission('modify', 'extension/module/so_deals')) {
 			$this->error['warning'] = $this->language->get('error_permission');
 		}
@@ -410,60 +391,60 @@ class ControllerExtensionModuleSodeals extends Controller {
 		if ($this->request->post['category'] == null) {
 			$this->error['category'] = $this->language->get('error_category');
 		}
-		
-		if (!filter_var($this->request->post['category_depth'],FILTER_VALIDATE_INT) || $this->request->post['category_depth'] < 0) {
+
+        if (!filter_var($this->request->post['category_depth'], FILTER_VALIDATE_INT) || $this->request->post['category_depth'] < 0) {
 			$this->error['category_depth'] = $this->language->get('error_category_depth');
 		}
 		if ($this->request->post['source_limit'] != '0' && !filter_var($this->request->post['source_limit'],FILTER_VALIDATE_INT) || $this->request->post['source_limit'] < 0) {
 			$this->error['source_limit'] = $this->language->get('error_source_limit');
 		}
-		
-		if ($this->request->post['display_feature'] == 1 && $this->request->post['product_feature'] == null) {
+
+        if ($this->request->post['display_feature'] == 1 && $this->request->post['product_feature'] == null) {
 			$this->error['product_feature'] = $this->language->get('error_product_feature');
 		}
-		
-		if ($this->request->post['title_maxlength'] != '0' && !filter_var($this->request->post['title_maxlength'],FILTER_VALIDATE_INT) || $this->request->post['title_maxlength'] < 0) {
-			
-			$this->error['title_maxlength'] = $this->language->get('error_title_maxlength');
+
+        if ($this->request->post['title_maxlength'] != '0' && !filter_var($this->request->post['title_maxlength'], FILTER_VALIDATE_INT) || $this->request->post['title_maxlength'] < 0) {
+
+            $this->error['title_maxlength'] = $this->language->get('error_title_maxlength');
 		}
-		
-		if ($this->request->post['description_maxlength'] != '0' && !filter_var($this->request->post['description_maxlength'],FILTER_VALIDATE_INT) || $this->request->post['description_maxlength'] < 0) {
+
+        if ($this->request->post['description_maxlength'] != '0' && !filter_var($this->request->post['description_maxlength'], FILTER_VALIDATE_INT) || $this->request->post['description_maxlength'] < 0) {
 			$this->error['description_maxlength'] = $this->language->get('error_description_maxlength');
 		}
-		
-		if (!filter_var($this->request->post['margin'],FILTER_VALIDATE_INT) && $this->request->post['title_maxlength'] != '0'  || $this->request->post['margin'] < 0) {
+
+        if (!filter_var($this->request->post['margin'], FILTER_VALIDATE_INT) && $this->request->post['title_maxlength'] != '0' || $this->request->post['margin'] < 0) {
 			$this->error['margin'] = $this->language->get('error_margin');
 		}
-		
-		if (!filter_var($this->request->post['slideBy'],FILTER_VALIDATE_INT) || $this->request->post['slideBy'] < 0) {
+
+        if (!filter_var($this->request->post['slideBy'], FILTER_VALIDATE_INT) || $this->request->post['slideBy'] < 0) {
 			$this->error['slideBy'] = $this->language->get('error_slideBy');
 		}
-		
-		if (!filter_var($this->request->post['autoplayTimeout'],FILTER_VALIDATE_INT) || $this->request->post['autoplayTimeout'] < 0) {
+
+        if (!filter_var($this->request->post['autoplayTimeout'], FILTER_VALIDATE_INT) || $this->request->post['autoplayTimeout'] < 0) {
 			$this->error['autoplayTimeout'] = $this->language->get('error_autoplayTimeout');
 		}
-		
-		if (!filter_var($this->request->post['autoplaySpeed'],FILTER_VALIDATE_INT) || $this->request->post['autoplaySpeed'] < 0) {
+
+        if (!filter_var($this->request->post['autoplaySpeed'], FILTER_VALIDATE_INT) || $this->request->post['autoplaySpeed'] < 0) {
 			$this->error['autoplaySpeed'] = $this->language->get('error_autoplaySpeed');
 		}
 
 		if ($this->request->post['startPosition'] != '0' && !filter_var($this->request->post['startPosition'],FILTER_VALIDATE_INT) || $this->request->post['startPosition'] < 0) {
 			$this->error['startPosition'] = $this->language->get('error_startPosition');
 		}
-		
-		if (!filter_var($this->request->post['dotsSpeed'],FILTER_VALIDATE_INT) || $this->request->post['dotsSpeed'] < 0) {
+
+        if (!filter_var($this->request->post['dotsSpeed'], FILTER_VALIDATE_INT) || $this->request->post['dotsSpeed'] < 0) {
 			$this->error['dotsSpeed'] = $this->language->get('error_dotsSpeed');
 		}
-		
-		if (!filter_var($this->request->post['navSpeed'],FILTER_VALIDATE_INT) || $this->request->post['navSpeed'] < 0) {
+
+        if (!filter_var($this->request->post['navSpeed'], FILTER_VALIDATE_INT) || $this->request->post['navSpeed'] < 0) {
 			$this->error['navSpeed'] = $this->language->get('error_navSpeed');
 		}
-		
-		if (!filter_var($this->request->post['duration'],FILTER_VALIDATE_INT) || $this->request->post['duration'] < 0) {
+
+        if (!filter_var($this->request->post['duration'], FILTER_VALIDATE_INT) || $this->request->post['duration'] < 0) {
 			$this->error['duration'] = $this->language->get('error_duration');
 		}
-		
-		if (!filter_var($this->request->post['delay'],FILTER_VALIDATE_INT) || $this->request->post['delay'] < 0) {
+
+        if (!filter_var($this->request->post['delay'], FILTER_VALIDATE_INT) || $this->request->post['delay'] < 0) {
 			$this->error['delay'] = $this->language->get('error_delay');
 		}
 		if (!filter_var($this->request->post['width'],FILTER_VALIDATE_FLOAT) || $this->request->post['width'] < 0 || $this->request->post['width'] > 5000) {
@@ -475,16 +456,39 @@ class ControllerExtensionModuleSodeals extends Controller {
 		if ((utf8_strlen($this->request->post['placeholder_path']) < 5) || (utf8_strlen($this->request->post['placeholder_path']) > 64)) {
 			$this->error['placeholder_path'] = $this->language->get('error_placeholder_path');
 		}
-		
-		if (!filter_var($this->request->post['date_day'],FILTER_VALIDATE_INT) || $this->request->post['date_day'] <= 0) {
+
+        if (!filter_var($this->request->post['date_day'], FILTER_VALIDATE_INT) || $this->request->post['date_day'] <= 0) {
 			$this->error['date_day'] = $this->language->get('error_date_day');
 		}
-		
-		if ($this->error && !isset($this->error['warning'])) {
+
+        if ($this->error && !isset($this->error['warning'])) {
 			$this->error['warning'] = $this->language->get('error_warning');
 		}
 		return !$this->error;
 	}
+
+    public function remove_cache()
+    {
+        $folder_cache = DIR_CACHE . 'so/';
+        if (file_exists($folder_cache)) {
+            self::mageDelTree($folder_cache);
+        }
+    }
+
+    function mageDelTree($path)
+    {
+        if (is_dir($path)) {
+            $entries = scandir($path);
+            foreach ($entries as $entry) {
+                if ($entry != '.' && $entry != '..') {
+                    self::mageDelTree($path . '/' . $entry);
+                }
+            }
+            @rmdir($path);
+        } else {
+            @unlink($path);
+        }
+    }
 	
 	public function autocomplete_category() {
 		$json = array();	

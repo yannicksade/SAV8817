@@ -219,6 +219,31 @@ class ControllerExtensionPaymentPilibaba extends Controller {
 		$this->response->setOutput($this->load->view('extension/payment/pilibaba', $data));
 	}
 
+    protected function validate()
+    {
+        if (!$this->user->hasPermission('modify', 'extension/payment/pilibaba')) {
+            $this->error['warning'] = $this->language->get('error_permission');
+        }
+
+        if (!$this->request->post['pilibaba_merchant_number']) {
+            $this->error['pilibaba_merchant_number'] = $this->language->get('error_merchant_number');
+        }
+
+        if (!$this->request->post['pilibaba_secret_key']) {
+            $this->error['pilibaba_secret_key'] = $this->language->get('error_secret_key');
+        }
+
+        if ($this->request->post['pilibaba_shipping_fee'] != '' && strpos($this->request->post['pilibaba_shipping_fee'], '.') === false) {
+            $this->error['pilibaba_shipping_fee'] = $this->language->get('error_shipping_fee');
+        }
+
+        if ($this->error && !isset($this->error['warning'])) {
+            $this->error['warning'] = $this->language->get('error_warning');
+        }
+
+        return !$this->error;
+    }
+
 	public function install() {
 		if ($this->user->hasPermission('modify', 'extension/extension')) {
 			$this->load->model('extension/payment/pilibaba');
@@ -370,29 +395,5 @@ class ControllerExtensionPaymentPilibaba extends Controller {
 				echo '<img src="' . $url . '?orderNo=' . $this->request->get['order_id'] . '&merchantNo=' . $this->config->get('pilibaba_merchant_number') . '">';
 			}
 		}
-	}
-
-	protected function validate() {
-		if (!$this->user->hasPermission('modify', 'extension/payment/pilibaba')) {
-			$this->error['warning'] = $this->language->get('error_permission');
-		}
-
-		if (!$this->request->post['pilibaba_merchant_number']) {
-			$this->error['pilibaba_merchant_number'] = $this->language->get('error_merchant_number');
-		}
-
-		if (!$this->request->post['pilibaba_secret_key']) {
-			$this->error['pilibaba_secret_key'] = $this->language->get('error_secret_key');
-		}
-
-		if ($this->request->post['pilibaba_shipping_fee'] != '' && strpos($this->request->post['pilibaba_shipping_fee'], '.') === false) {
-			$this->error['pilibaba_shipping_fee'] = $this->language->get('error_shipping_fee');
-		}
-
-		if ($this->error && !isset($this->error['warning'])) {
-			$this->error['warning'] = $this->language->get('error_warning');
-		}
-
-		return !$this->error;
 	}
 }

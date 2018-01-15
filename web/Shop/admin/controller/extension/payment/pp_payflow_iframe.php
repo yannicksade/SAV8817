@@ -213,6 +213,31 @@ class ControllerExtensionPaymentPPPayflowIframe extends Controller {
 		$this->response->setOutput($this->load->view('extension/payment/pp_payflow_iframe', $data));
 	}
 
+    protected function validate()
+    {
+        if (!$this->user->hasPermission('modify', 'extension/payment/pp_payflow_iframe')) {
+            $this->error['warning'] = $this->language->get('error_permission');
+        }
+
+        if (!$this->request->post['pp_payflow_iframe_vendor']) {
+            $this->error['vendor'] = $this->language->get('error_vendor');
+        }
+
+        if (!$this->request->post['pp_payflow_iframe_user']) {
+            $this->error['user'] = $this->language->get('error_user');
+        }
+
+        if (!$this->request->post['pp_payflow_iframe_password']) {
+            $this->error['password'] = $this->language->get('error_password');
+        }
+
+        if (!$this->request->post['pp_payflow_iframe_partner']) {
+            $this->error['partner'] = $this->language->get('error_partner');
+        }
+
+        return !$this->error;
+    }
+
 	public function install() {
 		$this->load->model('extension/payment/pp_payflow_iframe');
 
@@ -530,29 +555,5 @@ class ControllerExtensionPaymentPPPayflowIframe extends Controller {
 
 			return $this->load->view('extension/payment/pp_payflow_iframe_order', $data);
 		}
-	}
-
-	protected function validate() {
-		if (!$this->user->hasPermission('modify', 'extension/payment/pp_payflow_iframe')) {
-			$this->error['warning'] = $this->language->get('error_permission');
-		}
-
-		if (!$this->request->post['pp_payflow_iframe_vendor']) {
-			$this->error['vendor'] = $this->language->get('error_vendor');
-		}
-
-		if (!$this->request->post['pp_payflow_iframe_user']) {
-			$this->error['user'] = $this->language->get('error_user');
-		}
-
-		if (!$this->request->post['pp_payflow_iframe_password']) {
-			$this->error['password'] = $this->language->get('error_password');
-		}
-
-		if (!$this->request->post['pp_payflow_iframe_partner']) {
-			$this->error['partner'] = $this->language->get('error_partner');
-		}
-
-		return !$this->error;
 	}
 }

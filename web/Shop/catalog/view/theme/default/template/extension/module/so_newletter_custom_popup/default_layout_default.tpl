@@ -70,7 +70,7 @@
             if(!emailpattern.test(email))
             {
                 $('.show-error').remove();
-                $('.send-mail').after('<span class="show-error" style="color: red;margin-left: 10px"> Invalid Email </span>')
+                $('.send-mail').after('<span class="show-error" style="color: red;margin-left: 10px"> Invalid Email </span>');
                 return false;
             }
             else

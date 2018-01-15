@@ -10,49 +10,6 @@ class ControllerExtensionExtensionAnalytics extends Controller {
 		$this->getList();
 	}
 
-	public function install() {
-		$this->load->language('extension/extension/analytics');
-
-		$this->load->model('extension/extension');
-
-		if ($this->validate()) {
-			$this->model_extension_extension->install('analytics', $this->request->get['extension']);
-
-			$this->load->model('user/user_group');
-
-			$this->model_user_user_group->addPermission($this->user->getGroupId(), 'access', 'extension/analytics/' . $this->request->get['extension']);
-			$this->model_user_user_group->addPermission($this->user->getGroupId(), 'modify', 'extension/analytics/' . $this->request->get['extension']);
-			
-			// Compatibility
-			$this->model_user_user_group->addPermission($this->user->getGroupId(), 'access', 'analytics/' . $this->request->get['extension']);
-			$this->model_user_user_group->addPermission($this->user->getGroupId(), 'modify', 'analytics/' . $this->request->get['extension']);
-
-			// Call install method if it exsits
-			$this->load->controller('extension/analytics/' . $this->request->get['extension'] . '/install');
-
-			$this->session->data['success'] = $this->language->get('text_success');
-		}
-
-		$this->getList();
-	}
-
-	public function uninstall() {
-		$this->load->language('extension/extension/analytics');
-
-		$this->load->model('extension/extension');
-
-		if ($this->validate()) {
-			$this->model_extension_extension->uninstall('analytics', $this->request->get['extension']);
-
-			// Call uninstall method if it exsits
-			$this->load->controller('extension/analytics/' . $this->request->get['extension'] . '/uninstall');
-
-			$this->session->data['success'] = $this->language->get('text_success');
-		}
-
-		$this->getList();
-	}
-
 	protected function getList() {
 		$data['heading_title'] = $this->language->get('heading_title');
 
@@ -103,10 +60,10 @@ class ControllerExtensionExtensionAnalytics extends Controller {
 		if ($files) {
 			foreach ($files as $file) {
 				$extension = basename($file, '.php');
-				
+
 				// Compatibility code for old extension folders
 				$this->load->language('extension/analytics/' . $extension);
-				
+
 				$store_data = array();
 
 				$store_data[] = array(
@@ -114,8 +71,8 @@ class ControllerExtensionExtensionAnalytics extends Controller {
 					'edit'   => $this->url->link('extension/analytics/' . $extension, 'token=' . $this->session->data['token'] . '&store_id=0', true),
 					'status' => $this->config->get($extension . '_status') ? $this->language->get('text_enabled') : $this->language->get('text_disabled')
 				);
-				
-				foreach ($stores as $store) {
+
+                foreach ($stores as $store) {
 					$store_data[] = array(
 						'name'   => $store['name'],
 						'edit'   => $this->url->link('extension/analytics/' . $extension, 'token=' . $this->session->data['token'] . '&store_id=' . $store['store_id'], true),
@@ -136,6 +93,33 @@ class ControllerExtensionExtensionAnalytics extends Controller {
 		$this->response->setOutput($this->load->view('extension/extension/analytics', $data));
 	}
 
+    public function install()
+    {
+        $this->load->language('extension/extension/analytics');
+
+        $this->load->model('extension/extension');
+
+        if ($this->validate()) {
+            $this->model_extension_extension->install('analytics', $this->request->get['extension']);
+
+            $this->load->model('user/user_group');
+
+            $this->model_user_user_group->addPermission($this->user->getGroupId(), 'access', 'extension/analytics/' . $this->request->get['extension']);
+            $this->model_user_user_group->addPermission($this->user->getGroupId(), 'modify', 'extension/analytics/' . $this->request->get['extension']);
+
+            // Compatibility
+            $this->model_user_user_group->addPermission($this->user->getGroupId(), 'access', 'analytics/' . $this->request->get['extension']);
+            $this->model_user_user_group->addPermission($this->user->getGroupId(), 'modify', 'analytics/' . $this->request->get['extension']);
+
+            // Call install method if it exsits
+            $this->load->controller('extension/analytics/' . $this->request->get['extension'] . '/install');
+
+            $this->session->data['success'] = $this->language->get('text_success');
+        }
+
+        $this->getList();
+    }
+
 	protected function validate() {
 		if (!$this->user->hasPermission('modify', 'extension/extension/analytics')) {
 			$this->error['warning'] = $this->language->get('error_permission');
@@ -143,4 +127,22 @@ class ControllerExtensionExtensionAnalytics extends Controller {
 
 		return !$this->error;
 	}
+
+    public function uninstall()
+    {
+        $this->load->language('extension/extension/analytics');
+
+        $this->load->model('extension/extension');
+
+        if ($this->validate()) {
+            $this->model_extension_extension->uninstall('analytics', $this->request->get['extension']);
+
+            // Call uninstall method if it exsits
+            $this->load->controller('extension/analytics/' . $this->request->get['extension'] . '/uninstall');
+
+            $this->session->data['success'] = $this->language->get('text_success');
+        }
+
+        $this->getList();
+    }
 }

@@ -108,11 +108,23 @@ $('#button-quote').on('click', function() {
 				html += '      <div class="modal-footer">';
 				html += '        <button type="button" class="btn btn-default" data-dismiss="modal"><?php echo $button_cancel; ?></button>';
 
-				<?php if ($shipping_method) { ?>
+            <
+                    ? php;
+                if ($shipping_method) {
+                        ?;
+                >
 				html += '        <input type="button" value="<?php echo $button_shipping; ?>" id="button-shipping" data-loading-text="<?php echo $text_loading; ?>" class="btn btn-primary" />';
-				<?php } else { ?>
+                <
+                        ? php
+                } else {
+                        ?;
+                >
 				html += '        <input type="button" value="<?php echo $button_shipping; ?>" id="button-shipping" data-loading-text="<?php echo $text_loading; ?>" class="btn btn-primary" disabled="disabled" />';
-				<?php } ?>
+                <
+                        ? php
+                }
+                    ?;
+            >
 
 				html += '      </div>';
 				html += '    </div>';

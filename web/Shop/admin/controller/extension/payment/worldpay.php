@@ -245,6 +245,23 @@ class ControllerExtensionPaymentWorldpay extends Controller {
 		$this->response->setOutput($this->load->view('extension/payment/worldpay', $data));
 	}
 
+    protected function validate()
+    {
+        if (!$this->user->hasPermission('modify', 'extension/payment/worldpay')) {
+            $this->error['warning'] = $this->language->get('error_permission');
+        }
+
+        if (!$this->request->post['worldpay_service_key']) {
+            $this->error['error_service_key'] = $this->language->get('error_service_key');
+        }
+
+        if (!$this->request->post['worldpay_client_key']) {
+            $this->error['error_client_key'] = $this->language->get('error_client_key');
+        }
+
+        return !$this->error;
+    }
+
 	public function install() {
 		$this->load->model('extension/payment/worldpay');
 		$this->model_extension_payment_worldpay->install();
@@ -340,21 +357,5 @@ class ControllerExtensionPaymentWorldpay extends Controller {
 		}
 
 		$this->response->setOutput(json_encode($json));
-	}
-
-	protected function validate() {
-		if (!$this->user->hasPermission('modify', 'extension/payment/worldpay')) {
-			$this->error['warning'] = $this->language->get('error_permission');
-		}
-
-		if (!$this->request->post['worldpay_service_key']) {
-			$this->error['error_service_key'] = $this->language->get('error_service_key');
-		}
-
-		if (!$this->request->post['worldpay_client_key']) {
-			$this->error['error_client_key'] = $this->language->get('error_client_key');
-		}
-
-		return !$this->error;
 	}
 }

@@ -103,7 +103,11 @@ $(document).on('change', 'input[name=\'account\']', function() {
 	}
 });
 
-<?php if (!$logged) { ?>
+    <
+        ? php;
+    if (!$logged) {
+            ?;
+    >
 $(document).ready(function() {
     $.ajax({
         url: 'index.php?route=checkout/login',
@@ -120,7 +124,11 @@ $(document).ready(function() {
         }
     });
 });
-<?php } else { ?>
+    <
+            ? php
+    } else {
+            ?;
+    >
 $(document).ready(function() {
     $.ajax({
         url: 'index.php?route=checkout/payment_address',
@@ -137,7 +145,11 @@ $(document).ready(function() {
         }
     });
 });
-<?php } ?>
+    <
+            ? php
+    }
+        ?;
+    >
 
 // Checkout
 $(document).delegate('#button-account', 'click', function() {
@@ -238,7 +250,11 @@ $(document).delegate('#button-register', 'click', function() {
 				// Highlight any found errors
 				$('.text-danger').parent().addClass('has-error');
             } else {
-                <?php if ($shipping_required) { ?>
+            <
+                    ? php;
+                if ($shipping_required) {
+                        ?;
+                >
                 var shipping_address = $('#payment-address input[name=\'shipping_address\']:checked').prop('value');
 
                 if (shipping_address) {
@@ -294,7 +310,11 @@ $(document).delegate('#button-register', 'click', function() {
                         }
                     });
                 }
-                <?php } else { ?>
+                <
+                        ? php
+                } else {
+                        ?;
+                >
                 $.ajax({
                     url: 'index.php?route=checkout/payment_method',
                     dataType: 'html',
@@ -311,7 +331,11 @@ $(document).delegate('#button-register', 'click', function() {
                         alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
                     }
                 });
-                <?php } ?>
+                <
+                        ? php
+                }
+                    ?;
+            >
 
                 $.ajax({
                     url: 'index.php?route=checkout/payment_address',
@@ -372,7 +396,11 @@ $(document).delegate('#button-payment-address', 'click', function() {
 				// Highlight any found errors
 				$('.text-danger').parent().parent().addClass('has-error');
             } else {
-                <?php if ($shipping_required) { ?>
+            <
+                    ? php;
+                if ($shipping_required) {
+                        ?;
+                >
                 $.ajax({
                     url: 'index.php?route=checkout/shipping_address',
                     dataType: 'html',
@@ -391,7 +419,11 @@ $(document).delegate('#button-payment-address', 'click', function() {
                         alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
                     }
                 });
-                <?php } else { ?>
+                <
+                        ? php
+                } else {
+                        ?;
+                >
                 $.ajax({
                     url: 'index.php?route=checkout/payment_method',
                     dataType: 'html',
@@ -408,7 +440,11 @@ $(document).delegate('#button-payment-address', 'click', function() {
                         alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
                     }
                 });
-                <?php } ?>
+                <
+                        ? php
+                }
+                    ?;
+            >
 
                 $.ajax({
                     url: 'index.php?route=checkout/payment_address',
@@ -548,7 +584,11 @@ $(document).delegate('#button-guest', 'click', function() {
 				// Highlight any found errors
 				$('.text-danger').parent().addClass('has-error');
             } else {
-                <?php if ($shipping_required) { ?>
+            <
+                    ? php;
+                if ($shipping_required) {
+                        ?;
+                >
                 var shipping_address = $('#collapse-payment-address input[name=\'shipping_address\']:checked').prop('value');
 
                 if (shipping_address) {
@@ -609,7 +649,11 @@ $(document).delegate('#button-guest', 'click', function() {
                         }
                     });
                 }
-                <?php } else { ?>
+                <
+                        ? php
+                } else {
+                        ?;
+                >
                 $.ajax({
                     url: 'index.php?route=checkout/payment_method',
                     dataType: 'html',
@@ -629,7 +673,11 @@ $(document).delegate('#button-guest', 'click', function() {
                         alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
                     }
                 });
-                <?php } ?>
+                <
+                        ? php
+                }
+                    ?;
+            >
             }
         },
         error: function(xhr, ajaxOptions, thrownError) {

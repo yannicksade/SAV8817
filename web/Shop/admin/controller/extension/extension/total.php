@@ -10,43 +10,6 @@ class ControllerExtensionExtensionTotal extends Controller {
 		$this->getList();
 	}
 
-	public function install() {
-		$this->load->language('extension/extension/total');
-
-		$this->load->model('extension/extension');
-
-		if ($this->validate()) {
-			$this->model_extension_extension->install('total', $this->request->get['extension']);
-
-			$this->load->model('user/user_group');
-
-			$this->model_user_user_group->addPermission($this->user->getGroupId(), 'access', 'extension/total/' . $this->request->get['extension']);
-			$this->model_user_user_group->addPermission($this->user->getGroupId(), 'modify', 'extension/total/' . $this->request->get['extension']);
-
-			$this->load->controller('extension/total/' . $this->request->get['extension'] . '/install');
-
-			$this->session->data['success'] = $this->language->get('text_success');
-		}
-
-		$this->getList();
-	}
-
-	public function uninstall() {
-		$this->load->language('extension/extension/total');
-
-		$this->load->model('extension/extension');
-
-		if ($this->validate()) {
-			$this->model_extension_extension->uninstall('total', $this->request->get['extension']);
-
-			$this->load->controller('extension/total/' . $this->request->get['extension'] . '/uninstall');
-
-			$this->session->data['success'] = $this->language->get('text_success');
-		}
-
-		$this->getList();
-	}
-
 	protected function getList() {
 		$data['heading_title'] = $this->language->get('heading_title');
 
@@ -113,6 +76,28 @@ class ControllerExtensionExtensionTotal extends Controller {
 		$this->response->setOutput($this->load->view('extension/extension/total', $data));
 	}
 
+    public function install()
+    {
+        $this->load->language('extension/extension/total');
+
+        $this->load->model('extension/extension');
+
+        if ($this->validate()) {
+            $this->model_extension_extension->install('total', $this->request->get['extension']);
+
+            $this->load->model('user/user_group');
+
+            $this->model_user_user_group->addPermission($this->user->getGroupId(), 'access', 'extension/total/' . $this->request->get['extension']);
+            $this->model_user_user_group->addPermission($this->user->getGroupId(), 'modify', 'extension/total/' . $this->request->get['extension']);
+
+            $this->load->controller('extension/total/' . $this->request->get['extension'] . '/install');
+
+            $this->session->data['success'] = $this->language->get('text_success');
+        }
+
+        $this->getList();
+    }
+
 	protected function validate() {
 		if (!$this->user->hasPermission('modify', 'extension/extension/total')) {
 			$this->error['warning'] = $this->language->get('error_permission');
@@ -120,4 +105,21 @@ class ControllerExtensionExtensionTotal extends Controller {
 
 		return !$this->error;
 	}
+
+    public function uninstall()
+    {
+        $this->load->language('extension/extension/total');
+
+        $this->load->model('extension/extension');
+
+        if ($this->validate()) {
+            $this->model_extension_extension->uninstall('total', $this->request->get['extension']);
+
+            $this->load->controller('extension/total/' . $this->request->get['extension'] . '/uninstall');
+
+            $this->session->data['success'] = $this->language->get('text_success');
+        }
+
+        $this->getList();
+    }
 }

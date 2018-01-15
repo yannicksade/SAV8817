@@ -288,6 +288,31 @@ class ControllerExtensionPaymentRealex extends Controller {
 		$this->response->setOutput($this->load->view('extension/payment/realex', $data));
 	}
 
+    protected function validate()
+    {
+        if (!$this->user->hasPermission('modify', 'extension/payment/realex')) {
+            $this->error['warning'] = $this->language->get('error_permission');
+        }
+
+        if (!$this->request->post['realex_merchant_id']) {
+            $this->error['error_merchant_id'] = $this->language->get('error_merchant_id');
+        }
+
+        if (!$this->request->post['realex_secret']) {
+            $this->error['error_secret'] = $this->language->get('error_secret');
+        }
+
+        if (!$this->request->post['realex_live_url']) {
+            $this->error['error_live_url'] = $this->language->get('error_live_url');
+        }
+
+        if (!$this->request->post['realex_demo_url']) {
+            $this->error['error_demo_url'] = $this->language->get('error_demo_url');
+        }
+
+        return !$this->error;
+    }
+
 	public function install() {
 		$this->load->model('extension/payment/realex');
 
@@ -468,29 +493,5 @@ class ControllerExtensionPaymentRealex extends Controller {
 
 		$this->response->addHeader('Content-Type: application/json');
 		$this->response->setOutput(json_encode($json));
-	}
-
-	protected function validate() {
-		if (!$this->user->hasPermission('modify', 'extension/payment/realex')) {
-			$this->error['warning'] = $this->language->get('error_permission');
-		}
-
-		if (!$this->request->post['realex_merchant_id']) {
-			$this->error['error_merchant_id'] = $this->language->get('error_merchant_id');
-		}
-
-		if (!$this->request->post['realex_secret']) {
-			$this->error['error_secret'] = $this->language->get('error_secret');
-		}
-
-		if (!$this->request->post['realex_live_url']) {
-			$this->error['error_live_url'] = $this->language->get('error_live_url');
-		}
-
-		if (!$this->request->post['realex_demo_url']) {
-			$this->error['error_demo_url'] = $this->language->get('error_demo_url');
-		}
-
-		return !$this->error;
 	}
 }

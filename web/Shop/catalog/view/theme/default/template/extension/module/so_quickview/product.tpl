@@ -346,7 +346,7 @@ var wishlist = {
 	'remove': function() {
 
 	}
-}
+};
 
 var compare = {
 	'add': function(product_id) {

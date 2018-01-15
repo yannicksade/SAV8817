@@ -372,6 +372,19 @@ class ControllerExtensionOpenbayAmazon extends Controller {
 		$this->response->setOutput($this->load->view('extension/openbay/amazon_settings', $data));
 	}
 
+    protected function validate()
+    {
+        if (!$this->user->hasPermission('modify', 'extension/openbay/amazon')) {
+            $this->error = $this->language->get('error_permission');
+        }
+
+        if (empty($this->error)) {
+            return true;
+        }
+
+        return false;
+    }
+
 	public function itemLinks() {
 		$this->load->language('extension/openbay/amazon_links');
 
@@ -472,18 +485,6 @@ class ControllerExtensionOpenbayAmazon extends Controller {
 		$data['footer'] = $this->load->controller('common/footer');
 
 		$this->response->setOutput($this->load->view('extension/openbay/amazon_saved_listings', $data));
-	}
-
-	protected function validate() {
-		if (!$this->user->hasPermission('modify', 'extension/openbay/amazon')) {
-			$this->error = $this->language->get('error_permission');
-		}
-
-		if (empty($this->error)) {
-			return true;
-		}
-
-		return false;
 	}
 
 	public function getVariants() {

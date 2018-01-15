@@ -223,60 +223,8 @@ Class AddElementShortcodes{
 		}/* file_exists Shortcode ITem*/
 		$html .= '</div>';/* .yt_shortcodes_son_form_element */
 		$html .= '</div>';/* .yt_shortcodes_wrap_form_element */
-		$html .= '<script>
-		jQuery(document).ready(function($){
-			$(".yt_shortcodes_son_wrap").first().find("#yt-generator-attr-content").attr("id","yt-generator-attr-content-0");
-			function updateNameElement(){
-				var itemElement = $(".yt_shortcodes_son_button").length;
-				var strShortcode = $(".yt_shortcodes_son_button").first().text();
-				strShortcode = strShortcode.replace(/[0-9]/g, "");
-				var i =1;
-				$(".yt_shortcodes_son_button").each(function (){
-					$(this).text(strShortcode+" "+i);
-					i++;
-				});
-			}
-			function deleteElement($this){
-				$(".element-delete",$this).click( function(){
-					if( confirm("Are you sure to delete ?") ){
-						$(this).parent().parent(".yt_shortcodes_son_wrap").remove();
-						if($(".yt_shortcodes_son_button").length == 1)
-						{
-							$(".element-delete.element-icon,.element-sort.element-icon").css("display","none");
-						}
-						updateNameElement();
-					}
-				});
-			}
-			
-			var activeInput = $(".yt_shortcodes_son_button").length;
-			if(activeInput > 1)
-			{
-				$("#yt-generator-attr-item_active").html("");
-				for(var mi=1; mi<=activeInput;mi++)
-				{
-					$("#yt-generator-attr-item_active").append("<option value="+(mi)+">"+(mi)+"</option>");
-				}	$(".yt_shortcodes_son_form_element").children().children(".yt_shortcodes_wrap_form").slideUp();
-				$(".yt_shortcodes_son_form_element .yt_shortcodes_son_wrap:last-child .yt_shortcodes_son_button").attr("data-active","active");
-				$(".yt_shortcodes_son_form_element .yt_shortcodes_son_wrap:last-child .yt_shortcodes_wrap_form").slideDown();
-				$(".yt_shortcodes_son_form_element").sortable({
-					handle:".element-sort",
-				});
-				$(".element-delete.element-icon,.element-sort.element-icon").css("display","block");
-				$(".yt_shortcodes_son_wrap").each(function(){
-					deleteElement($(this));
-				});
-			}else{
-				$(".element-delete.element-icon,.element-sort.element-icon").css("display","none");
-			}
-			$(".yt_shortcodes_add_element").click(function(){
-				$(".slider").html("");
-				$(".slider").remove();
-				var dem = $(".yt_shortcodes_son_button").length;
-				$(".yt_shortcodes_son_button").attr("data-active","");
-				$(".yt_shortcodes_son_button").parent().find(".yt_shortcodes_wrap_form").slideUp();
-				$(".yt_shortcodes_son_form_element").append("<div class=\'yt_shortcodes_son_wrap\'></div>");
-				$(".yt_shortcodes_son_form_element .yt_shortcodes_son_wrap").last().append("<h3 class=\"yt_shortcodes_son_button\" data-active=\"active\" \">'.ucfirst($name).' '.$database['language']->get('shortcode_item').' "+(dem+1)+"</h3><div class=\"element-tool\"><div data-icontitle=\"'.$database['language']->get('text_java_sortItem').'\" data-placement=\"top\"  class=\"element-sort element-icon\"><i class=\"fa fa-arrows\"></i></div><div data-icontitle=\"'.$database['language']->get('text_java_deleteItem').'\" data-placement=\"top\"  class=\"element-delete element-icon\"><i class=\"fa fa-remove\"></i></div></div> ");
+        $html .= '></div>");
+				$(".yt_shortcodes_son_form_element .yt_shortcodes_son_wrap").last().append("<h3 class=\"yt_shortcodes_son_button\" data-active=\";active\" \">' . ucfirst($name) . ' ' . $database['language']->get('shortcode_item') . ' "+(dem+1)+"</h3><div class=\"element-tool\"><div data-icontitle=\"' . $database['language']->get('text_java_sortItem') . '\" data-placement=\"top\"  class=\"element-sort element-icon\"><i class=\"fa fa-arrows\"></i></div><div data-icontitle=\"' . $database['language']->get('text_java_deleteItem') . '\" data-placement=\"top\"  class=\"element-delete element-icon\"><i class=\"fa fa-remove\"></i></div></div> ");
 				var html = $(".yt_shortcodes_wrap_form").html();
 				$(".yt_shortcodes_son_form_element .yt_shortcodes_son_wrap").last().append("<div class=\'yt_shortcodes_wrap_form\'>"+html+"</div>");
 				$(".yt_shortcodes_wrap_form").last().find("#yt-generator-attr-icon_size-slider").attr("id","yt-generator-attr-icon_size-"+(dem+1)+"-slider");

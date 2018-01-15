@@ -392,7 +392,6 @@
                   offsets[obj.objId] = content_length;
                   out(obj.objId + ' 0 obj');
                   out(obj.content);
-                  ;
                   out('endobj');
               }
               objectNumber += additionalObjects.length;
@@ -2973,7 +2972,7 @@ Q\n";
               if (_Kids.length > 0) {
                   return _Kids;
               } else {
-                  return;
+
               }
           }
       });
@@ -3577,7 +3576,7 @@ Q\n";
               lineCount++;
 
               lastLine = "";
-              continue Line;
+
           }
           break;
       }
@@ -3835,21 +3834,8 @@ Q\n";
   	};
   })(jsPDF.API);
 
-  /** @preserve
-   * jsPDF addImage plugin
-   * Copyright (c) 2012 Jason Siefken, https://github.com/siefkenj/
-   *               2013 Chris Dowling, https://github.com/gingerchris
-   *               2013 Trinh Ho, https://github.com/ineedfat
-   *               2013 Edwin Alejandro Perez, https://github.com/eaparango
-   *               2013 Norah Smith, https://github.com/burnburnrocket
-   *               2014 Diego Casorran, https://github.com/diegocr
-   *               2014 James Robb, https://github.com/jamesbrobb
-   *
-   * 
-   */
-
-  ;(function (jsPDFAPI) {
-  	'use strict';
+    (function (jsPDFAPI) {
+        'use strict';
 
   	var namespace = 'addImage_',
   	    supported_image_types = ['jpeg', 'jpg', 'png'];
@@ -7815,10 +7801,9 @@ Q\n";
    * http://opensource.org/licenses/mit-license
    */
 
-  /**
-   * Generates a PDF Outline
-   */
-  ;
+
+
+
   (function (jsPDFAPI) {
   	'use strict';
 
@@ -8585,13 +8570,10 @@ Q\n";
    * Copyright (c) 2012 Willow Systems Corporation, willow-systems.com
    *               2014 Diego Casorran, https://github.com/diegocr
    */
-  /**
-   * 
-   * ====================================================================
-   */
 
-  ;(function (API) {
-  	'use strict';
+
+  (function (API) {
+      'use strict';
 
   	/**
    Returns an array of length matching length of the 'word' string, with each
@@ -8637,8 +8619,8 @@ Q\n";
   		var i = array.length,
   		    output = 0;
   		while (i) {
-  			;i--;
-  			output += array[i];
+            i--;
+            output += array[i];
   		}
   		return output;
   	};
@@ -8889,13 +8871,10 @@ Q\n";
   Copyright (c) 2012 Willow Systems Corporation, willow-systems.com
   MIT license.
   */
-  /**
-   * 
-   * ====================================================================
-   */
 
-  ;(function (API) {
-  	'use strict';
+
+  (function (API) {
+      'use strict';
 
   	/*
    # reference (Python) versions of 'compress' and 'uncompress'
@@ -9245,13 +9224,10 @@ Q\n";
   jsPDF SVG plugin
   Copyright (c) 2012 Willow Systems Corporation, willow-systems.com
   */
-  /**
-   * 
-   * ====================================================================
-   */
 
-  ;(function (jsPDFAPI) {
-  	'use strict';
+
+  (function (jsPDFAPI) {
+      'use strict';
 
   	/**
    Parses SVG XML and converts only some of the SVG elements into
@@ -12380,9 +12356,8 @@ Q\n";
   !function(e){if("object"==typeof exports&&"undefined"!=typeof module)module.exports=e();else if("function"==typeof define&&define.amd)define([],e);else{var f;"undefined"!=typeof window?f=window:"undefined"!=typeof global?f=global:"undefined"!=typeof self&&(f=self),f.html2canvas=e()}}(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(_dereq_,module,exports){
   (function (global){
   /*! http://mths.be/punycode v1.2.4 by @mathias */
-  ;(function(root) {
-
-  	/** Detect free variables */
+      (function (root) {
+          /** Detect free variables */
   	var freeExports = typeof exports == 'object' && exports;
   	var freeModule = typeof module == 'object' && module &&
   		module.exports == freeExports && module;
@@ -16075,7 +16050,7 @@ Q\n";
             throw new Error("Incomplete or corrupt PNG file");
           }
         }
-        return;
+
       }
 
       PNG.prototype.read = function(bytes) {

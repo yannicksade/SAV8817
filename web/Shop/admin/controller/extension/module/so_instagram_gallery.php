@@ -236,27 +236,35 @@ class ControllerExtensionModuleSoinstagramgallery extends Controller {
 		}
 		$this->response->setOutput($this->load->view('extension/module/so_instagram_gallery.tpl', $data));
 	}
-	public function remove_cache()
-	{
-		$folder_cache = DIR_CACHE.'so/';
-		if(file_exists($folder_cache))
-		{
-			self::mageDelTree($folder_cache);
-		}
-	}
-	function mageDelTree($path) {
-		if (is_dir($path)) {
-			$entries = scandir($path);
-			foreach ($entries as $entry) {
-				if ($entry != '.' && $entry != '..') {
-					self::mageDelTree($path.'/'.$entry);
-				}
-			}
-			@rmdir($path);
+
+    public function _breadcrumbs()
+    {
+        $this->data['breadcrumbs'] = array();
+
+        $this->data['breadcrumbs'][] = array(
+            'text' => $this->language->get('text_home'),
+            'href' => $this->url->link('common/dashboard', 'token=' . $this->session->data['token'], 'SSL')
+        );
+
+        $this->data['breadcrumbs'][] = array(
+            'text' => $this->language->get('text_module'),
+            'href' => $this->url->link('extension/extension', 'token=' . $this->session->data['token'], 'SSL')
+        );
+
+        if (!isset($this->request->get['module_id'])) {
+            $this->data['breadcrumbs'][] = array(
+                'text' => $this->language->get('heading_title'),
+                'href' => $this->url->link('extension/module/so_instagram_gallery', 'token=' . $this->session->data['token'], 'SSL')
+            );
 		} else {
-			@unlink($path);
+            $this->data['breadcrumbs'][] = array(
+                'text' => $this->language->get('heading_title'),
+                'href' => $this->url->link('extension/module/so_instagram_gallery', 'token=' . $this->session->data['token'] . '&module_id=' . $this->request->get['module_id'], 'SSL')
+            );
 		}
+        return $this->data['breadcrumbs'];
 	}
+
 	protected function validate() {
 		if (!$this->user->hasPermission('modify', 'extension/module/so_instagram_gallery')) {
 			$this->error['warning'] = $this->language->get('error_permission');
@@ -275,11 +283,11 @@ class ControllerExtensionModuleSoinstagramgallery extends Controller {
 				$this->error['head_name'] = $this->language->get('error_head_name');
 			}
 		}
-		
+
 		// if (!filter_var($this->request->post['users_id'],FILTER_VALIDATE_INT) || $this->request->post['users_id'] < 0) {
 			// $this->error['users_id'] = $this->language->get('error_users_id');
 		// }
-		
+
 		if ($this->request->post['users_id'] == ''){
 			$this->error['users_id'] = $this->language->get('error_users_id');
 		}
@@ -291,13 +299,13 @@ class ControllerExtensionModuleSoinstagramgallery extends Controller {
 		if (!filter_var($this->request->post['limit_image'],FILTER_VALIDATE_INT) || $this->request->post['limit_image'] <= 0) {
 			$this->error['limit_image'] = $this->language->get('error_limit_image');
 		}
-		
 
-		if (!filter_var($this->request->post['navSpeed'],FILTER_VALIDATE_INT) || $this->request->post['navSpeed'] < 0) {
+
+        if (!filter_var($this->request->post['navSpeed'], FILTER_VALIDATE_INT) || $this->request->post['navSpeed'] < 0) {
 			$this->error['navSpeed'] = $this->language->get('error_navSpeed');
 		}
- 
-		if ($this->request->post['autoplay_timeout'] != '0' && !filter_var($this->request->post['autoplay_timeout'],FILTER_VALIDATE_INT) || $this->request->post['autoplay_timeout'] < 0) {
+
+        if ($this->request->post['autoplay_timeout'] != '0' && !filter_var($this->request->post['autoplay_timeout'], FILTER_VALIDATE_INT) || $this->request->post['autoplay_timeout'] < 0) {
 			$this->error['autoplay_timeout'] = $this->language->get('error_autoplay_timeout');
 		}
 		if ($this->request->post['duration'] != '0' && !filter_var($this->request->post['duration'],FILTER_VALIDATE_INT) || $this->request->post['duration'] < 0) {
@@ -325,37 +333,33 @@ class ControllerExtensionModuleSoinstagramgallery extends Controller {
 		if ($this->request->post['dotsSpeed'] != '0' && !filter_var($this->request->post['dotsSpeed'],FILTER_VALIDATE_INT) || $this->request->post['dotsSpeed'] < 0) {
 			$this->error['dotsSpeed'] = $this->language->get('error_dotsSpeed');
 		}
-		
-		if ($this->error && !isset($this->error['warning'])) {
+
+        if ($this->error && !isset($this->error['warning'])) {
 			$this->error['warning'] = $this->language->get('error_warning');
 		}
 		return !$this->error;
 	}
 
-	public function _breadcrumbs(){
-		$this->data['breadcrumbs'] = array();
+    public function remove_cache()
+    {
+        $folder_cache = DIR_CACHE . 'so/';
+        if (file_exists($folder_cache)) {
+            self::mageDelTree($folder_cache);
+        }
+    }
 
-		$this->data['breadcrumbs'][] = array(
-			'text' => $this->language->get('text_home'),
-			'href' => $this->url->link('common/dashboard', 'token=' . $this->session->data['token'], 'SSL')
-		);
-
-		$this->data['breadcrumbs'][] = array(
-			'text' => $this->language->get('text_module'),
-			'href' => $this->url->link('extension/extension', 'token=' . $this->session->data['token'], 'SSL')
-		);
-
-		if (!isset($this->request->get['module_id'])) {
-			$this->data['breadcrumbs'][] = array(
-				'text' => $this->language->get('heading_title'),
-				'href' => $this->url->link('extension/module/so_instagram_gallery', 'token=' . $this->session->data['token'], 'SSL')
-			);
+    function mageDelTree($path)
+    {
+        if (is_dir($path)) {
+            $entries = scandir($path);
+            foreach ($entries as $entry) {
+                if ($entry != '.' && $entry != '..') {
+                    self::mageDelTree($path . '/' . $entry);
+                }
+            }
+            @rmdir($path);
 		} else {
-			$this->data['breadcrumbs'][] = array(
-				'text' => $this->language->get('heading_title'),
-				'href' => $this->url->link('extension/module/so_instagram_gallery', 'token=' . $this->session->data['token'] . '&module_id=' . $this->request->get['module_id'], 'SSL')
-			);
+            @unlink($path);
 		}
-		return $this->data['breadcrumbs'];
 	}
 }

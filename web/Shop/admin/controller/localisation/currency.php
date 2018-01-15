@@ -12,136 +12,6 @@ class ControllerLocalisationCurrency extends Controller {
 		$this->getList();
 	}
 
-	public function add() {
-		$this->load->language('localisation/currency');
-
-		$this->document->setTitle($this->language->get('heading_title'));
-
-		$this->load->model('localisation/currency');
-
-		if (($this->request->server['REQUEST_METHOD'] == 'POST') && $this->validateForm()) {
-			$this->model_localisation_currency->addCurrency($this->request->post);
-
-			$this->session->data['success'] = $this->language->get('text_success');
-
-			$url = '';
-
-			if (isset($this->request->get['sort'])) {
-				$url .= '&sort=' . $this->request->get['sort'];
-			}
-
-			if (isset($this->request->get['order'])) {
-				$url .= '&order=' . $this->request->get['order'];
-			}
-
-			if (isset($this->request->get['page'])) {
-				$url .= '&page=' . $this->request->get['page'];
-			}
-
-			$this->response->redirect($this->url->link('localisation/currency', 'token=' . $this->session->data['token'] . $url, true));
-		}
-
-		$this->getForm();
-	}
-
-	public function edit() {
-		$this->load->language('localisation/currency');
-
-		$this->document->setTitle($this->language->get('heading_title'));
-
-		$this->load->model('localisation/currency');
-
-		if (($this->request->server['REQUEST_METHOD'] == 'POST') && $this->validateForm()) {
-			$this->model_localisation_currency->editCurrency($this->request->get['currency_id'], $this->request->post);
-
-			$this->session->data['success'] = $this->language->get('text_success');
-
-			$url = '';
-
-			if (isset($this->request->get['sort'])) {
-				$url .= '&sort=' . $this->request->get['sort'];
-			}
-
-			if (isset($this->request->get['order'])) {
-				$url .= '&order=' . $this->request->get['order'];
-			}
-
-			if (isset($this->request->get['page'])) {
-				$url .= '&page=' . $this->request->get['page'];
-			}
-
-			$this->response->redirect($this->url->link('localisation/currency', 'token=' . $this->session->data['token'] . $url, true));
-		}
-
-		$this->getForm();
-	}
-
-	public function delete() {
-		$this->load->language('localisation/currency');
-
-		$this->document->setTitle($this->language->get('heading_title'));
-
-		$this->load->model('localisation/currency');
-
-		if (isset($this->request->post['selected']) && $this->validateDelete()) {
-			foreach ($this->request->post['selected'] as $currency_id) {
-				$this->model_localisation_currency->deleteCurrency($currency_id);
-			}
-
-			$this->session->data['success'] = $this->language->get('text_success');
-
-			$url = '';
-
-			if (isset($this->request->get['sort'])) {
-				$url .= '&sort=' . $this->request->get['sort'];
-			}
-
-			if (isset($this->request->get['order'])) {
-				$url .= '&order=' . $this->request->get['order'];
-			}
-
-			if (isset($this->request->get['page'])) {
-				$url .= '&page=' . $this->request->get['page'];
-			}
-
-			$this->response->redirect($this->url->link('localisation/currency', 'token=' . $this->session->data['token'] . $url, true));
-		}
-
-		$this->getList();
-	}
-
-	public function refresh() {
-		$this->load->language('localisation/currency');
-
-		$this->document->setTitle($this->language->get('heading_title'));
-
-		$this->load->model('localisation/currency');
-
-		if ($this->validateRefresh()) {
-			$this->model_localisation_currency->refresh(true);
-
-			$this->session->data['success'] = $this->language->get('text_success');
-
-			$url = '';
-
-			if (isset($this->request->get['sort'])) {
-				$url .= '&sort=' . $this->request->get['sort'];
-			}
-
-			if (isset($this->request->get['order'])) {
-				$url .= '&order=' . $this->request->get['order'];
-			}
-
-			if (isset($this->request->get['page'])) {
-				$url .= '&page=' . $this->request->get['page'];
-			}
-
-			$this->response->redirect($this->url->link('localisation/currency', 'token=' . $this->session->data['token'] . $url, true));
-		}
-
-		$this->getList();
-	}
-
 	protected function getList() {
 		if (isset($this->request->get['sort'])) {
 			$sort = $this->request->get['sort'];
@@ -299,6 +169,56 @@ class ControllerLocalisationCurrency extends Controller {
 		$this->response->setOutput($this->load->view('localisation/currency_list', $data));
 	}
 
+    public function add()
+    {
+        $this->load->language('localisation/currency');
+
+        $this->document->setTitle($this->language->get('heading_title'));
+
+        $this->load->model('localisation/currency');
+
+        if (($this->request->server['REQUEST_METHOD'] == 'POST') && $this->validateForm()) {
+            $this->model_localisation_currency->addCurrency($this->request->post);
+
+            $this->session->data['success'] = $this->language->get('text_success');
+
+            $url = '';
+
+            if (isset($this->request->get['sort'])) {
+                $url .= '&sort=' . $this->request->get['sort'];
+            }
+
+            if (isset($this->request->get['order'])) {
+                $url .= '&order=' . $this->request->get['order'];
+            }
+
+            if (isset($this->request->get['page'])) {
+                $url .= '&page=' . $this->request->get['page'];
+            }
+
+            $this->response->redirect($this->url->link('localisation/currency', 'token=' . $this->session->data['token'] . $url, true));
+        }
+
+        $this->getForm();
+    }
+
+    protected function validateForm()
+    {
+        if (!$this->user->hasPermission('modify', 'localisation/currency')) {
+            $this->error['warning'] = $this->language->get('error_permission');
+        }
+
+        if ((utf8_strlen($this->request->post['title']) < 3) || (utf8_strlen($this->request->post['title']) > 32)) {
+            $this->error['title'] = $this->language->get('error_title');
+        }
+
+        if (utf8_strlen($this->request->post['code']) != 3) {
+            $this->error['code'] = $this->language->get('error_code');
+        }
+
+        return !$this->error;
+    }
+
 	protected function getForm() {
 		$data['heading_title'] = $this->language->get('heading_title');
 
@@ -306,7 +226,7 @@ class ControllerLocalisationCurrency extends Controller {
 		$data['text_enabled'] = $this->language->get('text_enabled');
 		$data['text_disabled'] = $this->language->get('text_disabled');
 		$data['text_iso'] = $this->language->get('text_iso');
-		
+
 		$data['entry_title'] = $this->language->get('entry_title');
 		$data['entry_code'] = $this->language->get('entry_code');
 		$data['entry_value'] = $this->language->get('entry_value');
@@ -314,7 +234,7 @@ class ControllerLocalisationCurrency extends Controller {
 		$data['entry_symbol_right'] = $this->language->get('entry_symbol_right');
 		$data['entry_decimal_place'] = $this->language->get('entry_decimal_place');
 		$data['entry_status'] = $this->language->get('entry_status');
-		
+
 		$data['help_code'] = $this->language->get('help_code');
 		$data['help_value'] = $this->language->get('help_value');
 
@@ -442,20 +362,72 @@ class ControllerLocalisationCurrency extends Controller {
 		$this->response->setOutput($this->load->view('localisation/currency_form', $data));
 	}
 
-	protected function validateForm() {
-		if (!$this->user->hasPermission('modify', 'localisation/currency')) {
-			$this->error['warning'] = $this->language->get('error_permission');
-		}
+    public function edit()
+    {
+        $this->load->language('localisation/currency');
 
-		if ((utf8_strlen($this->request->post['title']) < 3) || (utf8_strlen($this->request->post['title']) > 32)) {
-			$this->error['title'] = $this->language->get('error_title');
-		}
+        $this->document->setTitle($this->language->get('heading_title'));
 
-		if (utf8_strlen($this->request->post['code']) != 3) {
-			$this->error['code'] = $this->language->get('error_code');
-		}
+        $this->load->model('localisation/currency');
 
-		return !$this->error;
+        if (($this->request->server['REQUEST_METHOD'] == 'POST') && $this->validateForm()) {
+            $this->model_localisation_currency->editCurrency($this->request->get['currency_id'], $this->request->post);
+
+            $this->session->data['success'] = $this->language->get('text_success');
+
+            $url = '';
+
+            if (isset($this->request->get['sort'])) {
+                $url .= '&sort=' . $this->request->get['sort'];
+            }
+
+            if (isset($this->request->get['order'])) {
+                $url .= '&order=' . $this->request->get['order'];
+            }
+
+            if (isset($this->request->get['page'])) {
+                $url .= '&page=' . $this->request->get['page'];
+            }
+
+            $this->response->redirect($this->url->link('localisation/currency', 'token=' . $this->session->data['token'] . $url, true));
+        }
+
+        $this->getForm();
+    }
+
+    public function delete()
+    {
+        $this->load->language('localisation/currency');
+
+        $this->document->setTitle($this->language->get('heading_title'));
+
+        $this->load->model('localisation/currency');
+
+        if (isset($this->request->post['selected']) && $this->validateDelete()) {
+            foreach ($this->request->post['selected'] as $currency_id) {
+                $this->model_localisation_currency->deleteCurrency($currency_id);
+            }
+
+            $this->session->data['success'] = $this->language->get('text_success');
+
+            $url = '';
+
+            if (isset($this->request->get['sort'])) {
+                $url .= '&sort=' . $this->request->get['sort'];
+            }
+
+            if (isset($this->request->get['order'])) {
+                $url .= '&order=' . $this->request->get['order'];
+            }
+
+            if (isset($this->request->get['page'])) {
+                $url .= '&page=' . $this->request->get['page'];
+            }
+
+            $this->response->redirect($this->url->link('localisation/currency', 'token=' . $this->session->data['token'] . $url, true));
+        }
+
+        $this->getList();
 	}
 
 	protected function validateDelete() {
@@ -490,6 +462,39 @@ class ControllerLocalisationCurrency extends Controller {
 
 		return !$this->error;
 	}
+
+    public function refresh()
+    {
+        $this->load->language('localisation/currency');
+
+        $this->document->setTitle($this->language->get('heading_title'));
+
+        $this->load->model('localisation/currency');
+
+        if ($this->validateRefresh()) {
+            $this->model_localisation_currency->refresh(true);
+
+            $this->session->data['success'] = $this->language->get('text_success');
+
+            $url = '';
+
+            if (isset($this->request->get['sort'])) {
+                $url .= '&sort=' . $this->request->get['sort'];
+            }
+
+            if (isset($this->request->get['order'])) {
+                $url .= '&order=' . $this->request->get['order'];
+            }
+
+            if (isset($this->request->get['page'])) {
+                $url .= '&page=' . $this->request->get['page'];
+            }
+
+            $this->response->redirect($this->url->link('localisation/currency', 'token=' . $this->session->data['token'] . $url, true));
+        }
+
+        $this->getList();
+    }
 
 	protected function validateRefresh() {
 		if (!$this->user->hasPermission('modify', 'localisation/currency')) {

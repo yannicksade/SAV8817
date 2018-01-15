@@ -167,43 +167,7 @@ class ControllerExtensionModuleSonewlettercustompopup extends Controller {
 		$this->response->setOutput($this->load->view('extension/module/so_newletter_custom_popup/so_newletter_custom_popup.tpl', $data));
 	}
 	//=== Theme Custom Code====
-	public function getFooter(){
-		$footer_directory  = DIR_CATALOG.'view/theme/'.$this->config->get('theme_default_directory').'/template/footer/';
-		if (is_dir($footer_directory)) {
-			$file_footer = scandir($footer_directory);
-			
-			foreach ($file_footer as  $item_footer) {
-				if (strpos($item_footer, '.tpl') == true) {
-					
-					list($fileName_footer) = explode('.tpl',$item_footer); 
-					$fileNames_footer[] = ucfirst($fileName_footer);
-					
-				}
-			}
-		} 
-		return isset($fileNames_footer) ? $fileNames_footer : '';
-	}
-	public function remove_cache()
-	{
-		$folder_cache = DIR_CACHE.'so/';
-		if(file_exists($folder_cache))
-		{
-			self::mageDelTree($folder_cache);
-		}
-	}
-	function mageDelTree($path) {
-		if (is_dir($path)) {
-			$entries = scandir($path);
-			foreach ($entries as $entry) {
-				if ($entry != '.' && $entry != '..') {
-					self::mageDelTree($path.'/'.$entry);
-				}
-			}
-			@rmdir($path);
-		} else {
-			@unlink($path);
-		}
-	}
+
 	public function _breadcrumbs(){
 		$this->data['breadcrumbs'] = array();
 
@@ -230,6 +194,7 @@ class ControllerExtensionModuleSonewlettercustompopup extends Controller {
 		}
 		return $this->data['breadcrumbs'];
 	}
+
 	protected function validate() {
 		if (!$this->user->hasPermission('modify', 'extension/module/so_newletter_custom_popup')) {
 			$this->error['warning'] = $this->language->get('error_permission');
@@ -266,6 +231,48 @@ class ControllerExtensionModuleSonewlettercustompopup extends Controller {
 		}
 		return !$this->error;
 	}
+
+    public function getFooter()
+    {
+        $footer_directory = DIR_CATALOG . 'view/theme/' . $this->config->get('theme_default_directory') . '/template/footer/';
+        if (is_dir($footer_directory)) {
+            $file_footer = scandir($footer_directory);
+
+            foreach ($file_footer as $item_footer) {
+                if (strpos($item_footer, '.tpl') == true) {
+
+                    list($fileName_footer) = explode('.tpl', $item_footer);
+                    $fileNames_footer[] = ucfirst($fileName_footer);
+
+                }
+            }
+        }
+        return isset($fileNames_footer) ? $fileNames_footer : '';
+    }
+
+    public function remove_cache()
+    {
+        $folder_cache = DIR_CACHE . 'so/';
+        if (file_exists($folder_cache)) {
+            self::mageDelTree($folder_cache);
+        }
+    }
+
+    function mageDelTree($path)
+    {
+        if (is_dir($path)) {
+            $entries = scandir($path);
+            foreach ($entries as $entry) {
+                if ($entry != '.' && $entry != '..') {
+                    self::mageDelTree($path . '/' . $entry);
+                }
+            }
+            @rmdir($path);
+        } else {
+            @unlink($path);
+        }
+    }
+
 	public function history()
 	{
 		$this->load->language('extension/module/so_newletter_custom_popup');
@@ -399,6 +406,37 @@ class ControllerExtensionModuleSonewlettercustompopup extends Controller {
 		$this->response->addHeader('Content-Type: application/json');
 		$this->response->setOutput(json_encode($json));
 	}
+
+    public function sendmail($emails, $title, $content)
+    {
+        $message = '<html dir="ltr" lang="en">' . "\n";
+        $message .= '  <head>' . "\n";
+        $message .= '    <title>' . $title . '</title>' . "\n";
+        $message .= '    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">' . "\n";
+        $message .= '  </head>' . "\n";
+        $message .= '  <body>' . html_entity_decode($content, ENT_QUOTES, 'UTF-8') . '</body>' . "\n";
+        $message .= '</html>' . "\n";
+        foreach ($emails as $email) {
+            if (preg_match('/^[^\@]+@.*.[a-z]{2,15}$/i', $email)) {
+                $mail = new Mail();
+                $mail->protocol = $this->config->get('config_mail_protocol');
+                $mail->parameter = $this->config->get('config_mail_parameter');
+                $mail->smtp_hostname = $this->config->get('config_mail_smtp_hostname');
+                $mail->smtp_username = $this->config->get('config_mail_smtp_username');
+                $mail->smtp_password = html_entity_decode($this->config->get('config_mail_smtp_password'), ENT_QUOTES, 'UTF-8');
+                $mail->smtp_port = $this->config->get('config_mail_smtp_port');
+                $mail->smtp_timeout = $this->config->get('config_mail_smtp_timeout');
+
+                $mail->setTo($email);
+                $mail->setFrom($this->config->get('config_email'));
+                $mail->setSender(html_entity_decode($this->config->get('config_name'), ENT_QUOTES, 'UTF-8'));
+                $mail->setSubject(html_entity_decode($title, ENT_QUOTES, 'UTF-8'));
+                $mail->setHtml($message);
+                $mail->send();
+            }
+        }
+    }
+
 	public function mailing_selected()
 	{
 		$json = array();
@@ -428,7 +466,8 @@ class ControllerExtensionModuleSonewlettercustompopup extends Controller {
 		$this->response->addHeader('Content-Type: application/json');
 		$this->response->setOutput(json_encode($json));
 	}
-	public function mailing_all_selected()
+
+    public function mailing_all_selected()
 	{
 		if(!$this->request->post){
 			$json['error'] =  "Send mail Fail! plese check item";
@@ -464,7 +503,8 @@ class ControllerExtensionModuleSonewlettercustompopup extends Controller {
 			$this->response->setOutput(json_encode($json));
 		}
 	}
-	public function mailing_all_not_notified()
+
+    public function mailing_all_not_notified()
 	{
 		$json = array();
 		$this->load->model('extension/module');
@@ -497,7 +537,8 @@ class ControllerExtensionModuleSonewlettercustompopup extends Controller {
 		$this->response->addHeader('Content-Type: application/json');
 		$this->response->setOutput(json_encode($json));
 	}
-	public function mailing_all_approved()
+
+    public function mailing_all_approved()
 	{
 		$json = array();
 		$this->load->model('extension/module');
@@ -529,34 +570,5 @@ class ControllerExtensionModuleSonewlettercustompopup extends Controller {
 		}
 		$this->response->addHeader('Content-Type: application/json');
 		$this->response->setOutput(json_encode($json));
-	}
-
-	public function sendmail($emails, $title, $content){
-		$message  = '<html dir="ltr" lang="en">' . "\n";
-		$message .= '  <head>' . "\n";
-		$message .= '    <title>' . $title . '</title>' . "\n";
-		$message .= '    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">' . "\n";
-		$message .= '  </head>' . "\n";
-		$message .= '  <body>' . html_entity_decode($content, ENT_QUOTES, 'UTF-8') . '</body>' . "\n";
-		$message .= '</html>' . "\n";
-		foreach ($emails as $email) {
-			if (preg_match('/^[^\@]+@.*.[a-z]{2,15}$/i', $email)) {
-				$mail = new Mail();
-				$mail->protocol = $this->config->get('config_mail_protocol');
-				$mail->parameter = $this->config->get('config_mail_parameter');
-				$mail->smtp_hostname = $this->config->get('config_mail_smtp_hostname');
-				$mail->smtp_username = $this->config->get('config_mail_smtp_username');
-				$mail->smtp_password = html_entity_decode($this->config->get('config_mail_smtp_password'), ENT_QUOTES, 'UTF-8');
-				$mail->smtp_port = $this->config->get('config_mail_smtp_port');
-				$mail->smtp_timeout = $this->config->get('config_mail_smtp_timeout');
-
-				$mail->setTo($email);
-				$mail->setFrom($this->config->get('config_email'));
-				$mail->setSender(html_entity_decode($this->config->get('config_name'), ENT_QUOTES, 'UTF-8'));
-				$mail->setSubject(html_entity_decode($title, ENT_QUOTES, 'UTF-8'));
-				$mail->setHtml($message);
-				$mail->send();
-			}
-		}
 	}
 }

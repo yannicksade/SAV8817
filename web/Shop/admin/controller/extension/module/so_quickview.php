@@ -119,31 +119,7 @@ class ControllerExtensionModuleSoquickview extends Controller {
 
 
 	}
-	protected function validate() {
-		if (!$this->user->hasPermission('modify', 'extension/module/so_quickview')) {
-			$this->error['warning'] = $this->language->get('error_permission');
-		}
 
-		if ((utf8_strlen($this->request->post['name']) < 3) || (utf8_strlen($this->request->post['name']) > 64)) {
-			$this->error['name'] = $this->language->get('error_name');
-		}
-		
-		$this->load->model('localisation/language');
-		$languages = $this->model_localisation_language->getLanguages();
-
-		foreach($languages as $language){
-			$label_button = $this->request->post['label_button'];
-			if ((utf8_strlen($label_button[$language['language_id']]['label_text']) < 3) || (utf8_strlen($label_button[$language['language_id']]['label_text']) > 13)) {
-				$this->error['label_text'] = $this->language->get('error_label_text');
-			}
-		}
-		
-		if ($this->error && !isset($this->error['warning'])) {
-			$this->error['warning'] = $this->language->get('error_warning');
-		}
-		return !$this->error;
-	}
-	
 	public function _breadcrumbs(){
 		$this->data['breadcrumbs'] = array();
 
@@ -170,5 +146,31 @@ class ControllerExtensionModuleSoquickview extends Controller {
 		}
 		return $this->data['breadcrumbs'];
 	}
+
+    protected function validate()
+    {
+        if (!$this->user->hasPermission('modify', 'extension/module/so_quickview')) {
+            $this->error['warning'] = $this->language->get('error_permission');
+        }
+
+        if ((utf8_strlen($this->request->post['name']) < 3) || (utf8_strlen($this->request->post['name']) > 64)) {
+            $this->error['name'] = $this->language->get('error_name');
+        }
+
+        $this->load->model('localisation/language');
+        $languages = $this->model_localisation_language->getLanguages();
+
+        foreach ($languages as $language) {
+            $label_button = $this->request->post['label_button'];
+            if ((utf8_strlen($label_button[$language['language_id']]['label_text']) < 3) || (utf8_strlen($label_button[$language['language_id']]['label_text']) > 13)) {
+                $this->error['label_text'] = $this->language->get('error_label_text');
+            }
+        }
+
+        if ($this->error && !isset($this->error['warning'])) {
+            $this->error['warning'] = $this->language->get('error_warning');
+        }
+        return !$this->error;
+    }
 }
 ?>

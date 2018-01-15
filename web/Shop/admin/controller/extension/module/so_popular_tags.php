@@ -1,7 +1,8 @@
 <?php
 class ControllerExtensionModuleSopopulartags extends Controller {
-	private $error = array();
 	public $data = array();
+    private $error = array();
+
 	public function index() {
 	// Load language
 		$this->load->language('extension/module/so_popular_tags');
@@ -131,28 +132,35 @@ class ControllerExtensionModuleSopopulartags extends Controller {
 		}
 		$this->response->setOutput($this->load->view('extension/module/so_popular_tags.tpl', $data));
 	}
-	public function remove_cache()
-	{
-		/*$this->url->link('extension/module', 'token=' . $this->session->data['token'], 'SSL');*/
-		$folder_cache = DIR_CACHE.'so/';
-		if(file_exists($folder_cache))
-		{
-			self::mageDelTree($folder_cache);
-		}
-	}
-	function mageDelTree($path) {
-		if (is_dir($path)) {
-			$entries = scandir($path);
-			foreach ($entries as $entry) {
-				if ($entry != '.' && $entry != '..') {
-					self::mageDelTree($path.'/'.$entry);
-				}
-			}
-			@rmdir($path);
+
+    public function _breadcrumbs()
+    {
+        $this->data['breadcrumbs'] = array();
+
+        $this->data['breadcrumbs'][] = array(
+            'text' => $this->language->get('text_home'),
+            'href' => $this->url->link('common/dashboard', 'token=' . $this->session->data['token'], 'SSL')
+        );
+
+        $this->data['breadcrumbs'][] = array(
+            'text' => $this->language->get('text_module'),
+            'href' => $this->url->link('extension/extension', 'token=' . $this->session->data['token'], 'SSL')
+        );
+
+        if (!isset($this->request->get['module_id'])) {
+            $this->data['breadcrumbs'][] = array(
+                'text' => $this->language->get('heading_title'),
+                'href' => $this->url->link('extension/module/so_popular_tags', 'token=' . $this->session->data['token'], 'SSL')
+            );
 		} else {
-			@unlink($path);
+            $this->data['breadcrumbs'][] = array(
+                'text' => $this->language->get('heading_title'),
+                'href' => $this->url->link('extension/module/so_popular_tags', 'token=' . $this->session->data['token'] . '&module_id=' . $this->request->get['module_id'], 'SSL')
+            );
 		}
+        return $this->data['breadcrumbs'];
 	}
+
 	protected function validate() {
 		if (!$this->user->hasPermission('modify', 'extension/module/so_popular_tags')) {
 			$this->error['warning'] = $this->language->get('error_permission');
@@ -174,11 +182,11 @@ class ControllerExtensionModuleSopopulartags extends Controller {
 		if ($this->request->post['limit_tags'] != '0' && !filter_var($this->request->post['limit_tags'],FILTER_VALIDATE_FLOAT) || $this->request->post['limit_tags'] < 0) {
 			$this->error['limit_tags'] = $this->language->get('error_limit_tags');
 		}
-	// min font-size	
+        // min font-size
 		if ($this->request->post['min_font_size'] != '0' && !filter_var($this->request->post['min_font_size'],FILTER_VALIDATE_FLOAT) || $this->request->post['min_font_size'] < 9) {
 			$this->error['min_font_size'] = $this->language->get('error_min_font_size');
 		}
-	// max font-size	
+        // max font-size
 		if ($this->request->post['max_font_size'] != '0' && !filter_var($this->request->post['max_font_size'],FILTER_VALIDATE_FLOAT) || $this->request->post['max_font_size'] < 0 || $this->request->post['max_font_size'] > 25) {
 			$this->error['max_font_size'] = $this->language->get('error_max_font_size');
 		}
@@ -188,31 +196,28 @@ class ControllerExtensionModuleSopopulartags extends Controller {
 		}
 		return !$this->error;
 	}
-	
-	public function _breadcrumbs(){
-		$this->data['breadcrumbs'] = array();
 
-		$this->data['breadcrumbs'][] = array(
-			'text' => $this->language->get('text_home'),
-			'href' => $this->url->link('common/dashboard', 'token=' . $this->session->data['token'], 'SSL')
-		);
+    public function remove_cache()
+    {
+        /*$this->url->link('extension/module', 'token=' . $this->session->data['token'], 'SSL');*/
+        $folder_cache = DIR_CACHE . 'so/';
+        if (file_exists($folder_cache)) {
+            self::mageDelTree($folder_cache);
+        }
+    }
 
-		$this->data['breadcrumbs'][] = array(
-			'text' => $this->language->get('text_module'),
-			'href' => $this->url->link('extension/extension', 'token=' . $this->session->data['token'], 'SSL')
-		);
-
-		if (!isset($this->request->get['module_id'])) {
-			$this->data['breadcrumbs'][] = array(
-				'text' => $this->language->get('heading_title'),
-				'href' => $this->url->link('extension/module/so_popular_tags', 'token=' . $this->session->data['token'], 'SSL')
-			);
+    function mageDelTree($path)
+    {
+        if (is_dir($path)) {
+            $entries = scandir($path);
+            foreach ($entries as $entry) {
+                if ($entry != '.' && $entry != '..') {
+                    self::mageDelTree($path . '/' . $entry);
+                }
+            }
+            @rmdir($path);
 		} else {
-			$this->data['breadcrumbs'][] = array(
-				'text' => $this->language->get('heading_title'),
-				'href' => $this->url->link('extension/module/so_popular_tags', 'token=' . $this->session->data['token'] . '&module_id=' . $this->request->get['module_id'], 'SSL')
-			);
+            @unlink($path);
 		}
-		return $this->data['breadcrumbs'];
 	}
 }

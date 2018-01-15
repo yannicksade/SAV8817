@@ -352,27 +352,7 @@ class ControllerExtensionModuleSohomeslider extends Controller {
 		}
 		$this->response->setOutput($this->load->view('extension/module/so_home_slider.tpl', $data));
 	}
-	public function remove_cache()
-	{
-		$folder_cache = DIR_CACHE.'so/';
-		if(file_exists($folder_cache))
-		{
-			self::mageDelTree($folder_cache);
-		}
-	}
-	function mageDelTree($path) {
-		if (is_dir($path)) {
-			$entries = scandir($path);
-			foreach ($entries as $entry) {
-				if ($entry != '.' && $entry != '..') {
-					self::mageDelTree($path.'/'.$entry);
-				}
-			}
-			@rmdir($path);
-		} else {
-			@unlink($path);
-		}
-	}
+
 	public function _breadcrumbs(){
 		$this->data['breadcrumbs'] = array();
 
@@ -399,7 +379,9 @@ class ControllerExtensionModuleSohomeslider extends Controller {
 		}
 		return $this->data['breadcrumbs'];
 	}
-	protected function validate() {
+
+    protected function validate()
+    {
 		if (!$this->user->hasPermission('modify', 'extension/module/so_home_slider')) {
 			$this->error['warning'] = $this->language->get('error_permission');
 		}
@@ -427,39 +409,61 @@ class ControllerExtensionModuleSohomeslider extends Controller {
 				}
 			}
 		}
-		
-		if (isset($this->request->post['image']) && $this->request->post['tab_module'] == 'add-slide' && (utf8_strlen($this->request->post['image']) < 1) || isset($this->request->post['image']) && isset($this->request->get['tab']) && ($this->request->get['tab'] == "slide") && (utf8_strlen($this->request->post['image']) < 1) && isset($this->request->post['image']) && $this->request->post['tab_module'] == '') {
-			
-			$this->error['image'] = $this->language->get('error_image');
+
+        if (isset($this->request->post['image']) && $this->request->post['tab_module'] == 'add-slide' && (utf8_strlen($this->request->post['image']) < 1) || isset($this->request->post['image']) && isset($this->request->get['tab']) && ($this->request->get['tab'] == "slide") && (utf8_strlen($this->request->post['image']) < 1) && isset($this->request->post['image']) && $this->request->post['tab_module'] == '') {
+
+            $this->error['image'] = $this->language->get('error_image');
 		}
 
-		
-		if (!filter_var($this->request->post['autoplayTimeout'],FILTER_VALIDATE_INT) || $this->request->post['autoplayTimeout'] < 0) {
+
+        if (!filter_var($this->request->post['autoplayTimeout'], FILTER_VALIDATE_INT) || $this->request->post['autoplayTimeout'] < 0) {
 			$this->error['autoplayTimeout'] = $this->language->get('error_autoplayTimeout');
 		}
-		
-		if (!filter_var($this->request->post['width'],FILTER_VALIDATE_INT) || $this->request->post['width'] < 0) {
+
+        if (!filter_var($this->request->post['width'], FILTER_VALIDATE_INT) || $this->request->post['width'] < 0) {
 			$this->error['width'] = $this->language->get('error_width');
 		}
-		
-		if (!filter_var($this->request->post['height'],FILTER_VALIDATE_INT) || $this->request->post['height'] < 0) {
+
+        if (!filter_var($this->request->post['height'], FILTER_VALIDATE_INT) || $this->request->post['height'] < 0) {
 			$this->error['height'] = $this->language->get('error_height');
 		}
-		
-		if (!filter_var($this->request->post['autoplaySpeed'],FILTER_VALIDATE_INT) || $this->request->post['autoplaySpeed'] < 0) {
+
+        if (!filter_var($this->request->post['autoplaySpeed'], FILTER_VALIDATE_INT) || $this->request->post['autoplaySpeed'] < 0) {
 			$this->error['autoplaySpeed'] = $this->language->get('error_autoplaySpeed');
 		}
 
 		if ($this->request->post['startPosition'] != '0' && !filter_var($this->request->post['startPosition'],FILTER_VALIDATE_INT) || $this->request->post['startPosition'] < 0) {
 			$this->error['startPosition'] = $this->language->get('error_startPosition');
 		}
-		
-		if ($this->error && !isset($this->error['warning'])) {
+
+        if ($this->error && !isset($this->error['warning'])) {
 			$this->error['warning'] = $this->language->get('error_warning');
 		}
 		return !$this->error;
 	}
-	
+
+    public function remove_cache()
+    {
+        $folder_cache = DIR_CACHE . 'so/';
+        if (file_exists($folder_cache)) {
+            self::mageDelTree($folder_cache);
+        }
+    }
+
+    function mageDelTree($path)
+    {
+        if (is_dir($path)) {
+            $entries = scandir($path);
+            foreach ($entries as $entry) {
+                if ($entry != '.' && $entry != '..') {
+                    self::mageDelTree($path . '/' . $entry);
+                }
+            }
+            @rmdir($path);
+        } else {
+            @unlink($path);
+        }
+    }
 	
 	public function sortposition() {
 		$json = array();

@@ -183,6 +183,19 @@ class ControllerExtensionPaymentSagepayDirect extends Controller {
 		$this->response->setOutput($this->load->view('extension/payment/sagepay_direct', $data));
 	}
 
+    protected function validate()
+    {
+        if (!$this->user->hasPermission('modify', 'extension/payment/sagepay_direct')) {
+            $this->error['warning'] = $this->language->get('error_permission');
+        }
+
+        if (!$this->request->post['sagepay_direct_vendor']) {
+            $this->error['vendor'] = $this->language->get('error_vendor');
+        }
+
+        return !$this->error;
+    }
+
 	public function install() {
 		$this->load->model('extension/payment/sagepay_direct');
 		$this->model_extension_payment_sagepay_direct->install();
@@ -368,17 +381,5 @@ class ControllerExtensionPaymentSagepayDirect extends Controller {
 
 		$this->response->addHeader('Content-Type: application/json');
 		$this->response->setOutput(json_encode($json));
-	}
-
-	protected function validate() {
-		if (!$this->user->hasPermission('modify', 'extension/payment/sagepay_direct')) {
-			$this->error['warning'] = $this->language->get('error_permission');
-		}
-
-		if (!$this->request->post['sagepay_direct_vendor']) {
-			$this->error['vendor'] = $this->language->get('error_vendor');
-		}
-
-		return !$this->error;
 	}
 }

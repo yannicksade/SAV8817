@@ -73,7 +73,7 @@ $.ajax({
             var somme=0,num=0;
             var PANIER=[];
             for(var i=1;i<nextId;i++){
-                var data = localStorage.getItem("evm_card_product"+i)
+                var data = localStorage.getItem("evm_card_product" + i);
                 if(data!=null){
                     data = data.split(",");
                     var code=data[0],prix=data[1],nom=data[2],photo=data[3];
@@ -102,7 +102,7 @@ $.ajax({
                 content.append("<li><center>"+num+" produits dans le panier</center></li>");
             $("font.somme_card").html(somme+" cfa");
             $(".num_prod.panier").html(num);
-        }
+        };
         function isCarding(code_){
             var nextId = localStorage.getItem("evm_card_number");
             var content = $("ul.menu_panier");
@@ -113,7 +113,7 @@ $.ajax({
                
             }
             for(var i=1;i<nextId;i++){
-                var data = localStorage.getItem("evm_card_product"+i)
+                var data = localStorage.getItem("evm_card_product" + i);
                 if(data!=null){
                     data = data.split(",");
                     var code=data[0];
@@ -187,7 +187,7 @@ function openNotif(title,body){
     return;
     var lesNotifs = $("#zone-notif").attr('data').split(" ");
     var elt;
-    var inter = []
+    var inter = [];
     var continu = true;
     var items = $("div#zone-notif .item.display");
     if(items.length == lesNotifs.length){

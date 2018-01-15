@@ -379,6 +379,32 @@ class ControllerExtensionModuleSoconfig extends Controller {
 		
 		$this->response->setOutput($this->load->view('extension/soconfig/soconfig.tpl', $data));
 	}
+
+    protected function validate()
+    {
+        if (!$this->user->hasPermission('modify', 'extension/module/soconfig')) {
+            $this->error['warning'] = $this->language->get('error_permission');
+        }
+        return !$this->error;
+    }
+
+    public function install_demo_data($stores, $store_id, $install_layout, $home_layout)
+    {
+        if ($home_layout == 0) return false;
+
+        $install_layout_exists = false;
+        foreach ($this->demos as $demo) {
+            if ($demo['key'] == $install_layout)
+                $install_layout_exists = true;
+        }
+
+        if (!$install_layout_exists) return false;
+        $main_sql = DIR_SYSTEM . 'soconfig/demo/' . $install_layout . '/install.php';
+        if (!file_exists($main_sql)) return false;
+
+        include($main_sql);
+        return true;
+    }
 	
 	public function uninstall() {
         $this->load->model('soconfig/setting');
@@ -389,7 +415,7 @@ class ControllerExtensionModuleSoconfig extends Controller {
         $this->load->model('soconfig/mproduct');
 		$this->load->model('setting/setting');
 		$this->load->model('soconfig/setting');
-		
+
 		/* stores adding */
         $this->load->model('setting/store');
         $stores = $this->model_setting_store->getStores();
@@ -399,19 +425,20 @@ class ControllerExtensionModuleSoconfig extends Controller {
 		));
 		$data['stores'] = $stores;
         /* end stores adding */
-		
+
         $this->model_soconfig_mproduct->createColumnsInProducts();
 		$this->model_soconfig_setting->createTableSoconfig();
-		
-		//Import sample data current theme
-		$install_layout='default'; $store_id = 0;$home_layout =1; 
+
+        //Import sample data current theme
+        $install_layout = 'default';
+        $store_id = 0;
+        $home_layout = 1;
 		$main_sql = DIR_SYSTEM.'soconfig/demo/'.$install_layout.'/install.php';
-		if (!file_exists($main_sql)) return false;   
+        if (!file_exists($main_sql)) return false;
 		include($main_sql);
-		
-		$this->session->data['success'] = $this->language->get('text_success');
+
+        $this->session->data['success'] = $this->language->get('text_success');
     }
-	
 	
 	public function clearcache(){
       $this->soconfig->cache->clear();
@@ -423,24 +450,7 @@ class ControllerExtensionModuleSoconfig extends Controller {
       $this->soconfig->cache->clear_css();
       $this->session->data['success'] = 'Cache cleared';
       $this->response->redirect($this->url->link('extension/module/soconfig', 'token=' . $this->session->data['token'], 'SSL'));
-	 
-    }
-	
-	public function install_demo_data($stores, $store_id,$install_layout,$home_layout){
-		if ($home_layout == 0) return false;
-		
-		$install_layout_exists = false;
-		foreach($this->demos as $demo){
-		if ($demo['key'] == $install_layout)
-		  $install_layout_exists = true;
-		}
 
-		if (!$install_layout_exists) return false;
-		$main_sql = DIR_SYSTEM.'soconfig/demo/'.$install_layout.'/install.php';
-		if (!file_exists($main_sql)) return false;   
-		
-		include($main_sql);
-		return true;  
     }
 	
 	public function getColorScheme() {
@@ -448,8 +458,8 @@ class ControllerExtensionModuleSoconfig extends Controller {
 		if (isset($this->request->get['filter_name'])) {
 			$filter_data = $this->request->get['filter_name'];
 			$results = $this->soconfig->getColorScheme($filter_data);
-			
-			if(!empty($results)){
+
+            if (!empty($results)) {
 				foreach ($results as $result) {
 					$json[] = array(
 						'name'        => html_entity_decode($result, ENT_QUOTES, 'UTF-8')
@@ -460,16 +470,9 @@ class ControllerExtensionModuleSoconfig extends Controller {
 					'name'        => 'No Value'
 				);
 			}
-			
-		}
+
+        }
 		$this->response->addHeader('Content-Type: application/json');
 		$this->response->setOutput(json_encode($json));
-	}
-	
-    protected function validate() {
-		if (!$this->user->hasPermission('modify', 'extension/module/soconfig')) {
-			$this->error['warning'] = $this->language->get('error_permission');
-		}
-		return !$this->error;
 	}
 }

@@ -48,7 +48,7 @@ jQuery(document).ready(function($){
                 setTimeout(function(){ headline.find('.yt-ft-wrap').addClass('is-loading') }, barWaiting);
             }else if (headline.hasClass('yt-fteffect8')){
                 var spanWrapper = headline.find('.yt-ft-wrap'),
-                    newWidth = spanWrapper.width() + 10
+                    newWidth = spanWrapper.width() + 10;
                 spanWrapper.css('width', newWidth);
             } else if (!headline.hasClass('yt-fteffect1') ) {
                 //assign to .yt-ft-wrap the width of its longest word
@@ -59,8 +59,7 @@ jQuery(document).ready(function($){
                     if (wordWidth > width) width = wordWidth;
                 });
                 headline.find('.yt-ft-wrap').css('width', width);
-            };
-
+            }
             //trigger animation
             setTimeout(function(){ hideWord( headline.find('.is-visible').eq(0) ) }, duration);
         });

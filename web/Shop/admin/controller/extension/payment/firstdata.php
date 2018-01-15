@@ -244,6 +244,31 @@ class ControllerExtensionPaymentFirstdata extends Controller {
 		$this->response->setOutput($this->load->view('extension/payment/firstdata', $data));
 	}
 
+    protected function validate()
+    {
+        if (!$this->user->hasPermission('modify', 'extension/payment/firstdata')) {
+            $this->error['warning'] = $this->language->get('error_permission');
+        }
+
+        if (!$this->request->post['firstdata_merchant_id']) {
+            $this->error['error_merchant_id'] = $this->language->get('error_merchant_id');
+        }
+
+        if (!$this->request->post['firstdata_secret']) {
+            $this->error['error_secret'] = $this->language->get('error_secret');
+        }
+
+        if (!$this->request->post['firstdata_live_url']) {
+            $this->error['error_live_url'] = $this->language->get('error_live_url');
+        }
+
+        if (!$this->request->post['firstdata_demo_url']) {
+            $this->error['error_demo_url'] = $this->language->get('error_demo_url');
+        }
+
+        return !$this->error;
+    }
+
 	public function install() {
 		$this->load->model('extension/payment/firstdata');
 		$this->model_extension_payment_firstdata->install();
@@ -377,29 +402,5 @@ class ControllerExtensionPaymentFirstdata extends Controller {
 		}
 
 		$this->response->redirect($this->url->link('sale/order/info', 'order_id=' . $this->request->post['order_id'] . '&token=' . $this->session->data['token'], true));
-	}
-
-	protected function validate() {
-		if (!$this->user->hasPermission('modify', 'extension/payment/firstdata')) {
-			$this->error['warning'] = $this->language->get('error_permission');
-		}
-
-		if (!$this->request->post['firstdata_merchant_id']) {
-			$this->error['error_merchant_id'] = $this->language->get('error_merchant_id');
-		}
-
-		if (!$this->request->post['firstdata_secret']) {
-			$this->error['error_secret'] = $this->language->get('error_secret');
-		}
-
-		if (!$this->request->post['firstdata_live_url']) {
-			$this->error['error_live_url'] = $this->language->get('error_live_url');
-		}
-
-		if (!$this->request->post['firstdata_demo_url']) {
-			$this->error['error_demo_url'] = $this->language->get('error_demo_url');
-		}
-
-		return !$this->error;
 	}
 }

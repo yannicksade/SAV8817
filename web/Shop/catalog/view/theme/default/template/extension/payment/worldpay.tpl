@@ -80,15 +80,31 @@
         Worldpay.setClientKey("<?php echo $worldpay_client_key; ?>");
 
         // disable new card form if existing cards
-<?php if (!empty($existing_cards)) { ?>
+          <
+              ? php;
+          if (!empty($existing_cards)) {
+                  ?;
+          >
 	        $('#payment-new-form :input').prop('disabled', true);
-<?php } ?>
+          <
+                  ? php
+          }
+              ?;
+          >
 
         // Set if token is reusable, remove first value when Worldpay update
         Worldpay.reusable = true;
-<?php if (isset($recurring_products)) { ?>
+          <
+              ? php;
+          if (isset($recurring_products)) {
+                  ?;
+          >
 	        Worldpay.reusable = true;
-<?php } else { ?>
+          <
+                  ? php
+          } else {
+                  ?;
+          >
 	        $('input[name=\'save-card\']').on('change', function () {
 	          if ($(this).is(':checked')) {
 	            Worldpay.reusable = true;
@@ -96,7 +112,11 @@
 	            Worldpay.reusable = false;
 	          }
 	        });
-<?php } ?>
+          <
+                  ? php
+          }
+              ?;
+          >
 
         Worldpay.templateSaveButton = false;
         Worldpay.useTemplate('payment-new-form', 'paymentDetailsHere', 'inline', function (obj) {

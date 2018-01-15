@@ -15,17 +15,12 @@ use APM\VenteBundle\Entity\Offre;
 use APM\VenteBundle\Entity\Remise;
 use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\Controller\Annotations\View;
-//use FOS\RestBundle\View\View;
-use JMS\Serializer\DeserializationContext;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Security;
 use FOS\RestBundle\Controller\Annotations\Get;
 use FOS\RestBundle\Controller\Annotations\Post;
-use FOS\RestBundle\Controller\Annotations\Lock;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Input\ArrayInput;
@@ -33,8 +28,6 @@ use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\HttpKernel\KernelInterface;
 use JMS\Serializer\SerializationContext;
 use JMS\Serializer\SerializerBuilder;
-
-use Lexik\Bundle\JWTAuthenticationBundle\Security\Guard\JWTTokenAuthenticator;
 
 class SecurityController extends FOSRestController
 {
@@ -195,6 +188,6 @@ class SecurityController extends FOSRestController
         $content = $output->fetch();
 
         // return new Response(""), if you used NullOutput()
-        return new JsonResponse($content);
+        return new JsonResponse($content, Response::HTTP_OK);
     }
 }

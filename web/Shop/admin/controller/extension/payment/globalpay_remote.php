@@ -254,6 +254,23 @@ class ControllerExtensionPaymentGlobalpayRemote extends Controller {
 		$this->response->setOutput($this->load->view('extension/payment/globalpay_remote', $data));
 	}
 
+    protected function validate()
+    {
+        if (!$this->user->hasPermission('modify', 'extension/payment/globalpay_remote')) {
+            $this->error['warning'] = $this->language->get('error_permission');
+        }
+
+        if (!$this->request->post['globalpay_remote_merchant_id']) {
+            $this->error['error_merchant_id'] = $this->language->get('error_merchant_id');
+        }
+
+        if (!$this->request->post['globalpay_remote_secret']) {
+            $this->error['error_secret'] = $this->language->get('error_secret');
+        }
+
+        return !$this->error;
+    }
+
 	public function install() {
 		$this->load->model('extension/payment/globalpay_remote');
 		$this->model_extension_payment_globalpay_remote->install();
@@ -434,21 +451,5 @@ class ControllerExtensionPaymentGlobalpayRemote extends Controller {
 
 		$this->response->addHeader('Content-Type: application/json');
 		$this->response->setOutput(json_encode($json));
-	}
-
-	protected function validate() {
-		if (!$this->user->hasPermission('modify', 'extension/payment/globalpay_remote')) {
-			$this->error['warning'] = $this->language->get('error_permission');
-		}
-
-		if (!$this->request->post['globalpay_remote_merchant_id']) {
-			$this->error['error_merchant_id'] = $this->language->get('error_merchant_id');
-		}
-
-		if (!$this->request->post['globalpay_remote_secret']) {
-			$this->error['error_secret'] = $this->language->get('error_secret');
-		}
-
-		return !$this->error;
 	}
 }

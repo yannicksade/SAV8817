@@ -12,104 +12,6 @@ class ControllerCustomerCustomField extends Controller {
 		$this->getList();
 	}
 
-	public function add() {
-		$this->load->language('customer/custom_field');
-
-		$this->document->setTitle($this->language->get('heading_title'));
-
-		$this->load->model('customer/custom_field');
-
-		if (($this->request->server['REQUEST_METHOD'] == 'POST') && $this->validateForm()) {
-			$this->model_customer_custom_field->addCustomField($this->request->post);
-
-			$this->session->data['success'] = $this->language->get('text_success');
-
-			$url = '';
-
-			if (isset($this->request->get['sort'])) {
-				$url .= '&sort=' . $this->request->get['sort'];
-			}
-
-			if (isset($this->request->get['order'])) {
-				$url .= '&order=' . $this->request->get['order'];
-			}
-
-			if (isset($this->request->get['page'])) {
-				$url .= '&page=' . $this->request->get['page'];
-			}
-
-			$this->response->redirect($this->url->link('customer/custom_field', 'token=' . $this->session->data['token'] . $url, true));
-		}
-
-		$this->getForm();
-	}
-
-	public function edit() {
-		$this->load->language('customer/custom_field');
-
-		$this->document->setTitle($this->language->get('heading_title'));
-
-		$this->load->model('customer/custom_field');
-
-		if (($this->request->server['REQUEST_METHOD'] == 'POST') && $this->validateForm()) {
-			$this->model_customer_custom_field->editCustomField($this->request->get['custom_field_id'], $this->request->post);
-
-			$this->session->data['success'] = $this->language->get('text_success');
-
-			$url = '';
-
-			if (isset($this->request->get['sort'])) {
-				$url .= '&sort=' . $this->request->get['sort'];
-			}
-
-			if (isset($this->request->get['order'])) {
-				$url .= '&order=' . $this->request->get['order'];
-			}
-
-			if (isset($this->request->get['page'])) {
-				$url .= '&page=' . $this->request->get['page'];
-			}
-
-			$this->response->redirect($this->url->link('customer/custom_field', 'token=' . $this->session->data['token'] . $url, true));
-		}
-
-		$this->getForm();
-	}
-
-	public function delete() {
-		$this->load->language('customer/custom_field');
-
-		$this->document->setTitle($this->language->get('heading_title'));
-
-		$this->load->model('customer/custom_field');
-
-		if (isset($this->request->post['selected']) && $this->validateDelete()) {
-			foreach ($this->request->post['selected'] as $custom_field_id) {
-				$this->model_customer_custom_field->deleteCustomField($custom_field_id);
-			}
-
-			$this->session->data['success'] = $this->language->get('text_success');
-
-			$url = '';
-
-			if (isset($this->request->get['sort'])) {
-				$url .= '&sort=' . $this->request->get['sort'];
-			}
-
-			if (isset($this->request->get['order'])) {
-				$url .= '&order=' . $this->request->get['order'];
-			}
-
-			if (isset($this->request->get['page'])) {
-				$url .= '&page=' . $this->request->get['page'];
-			}
-
-			$this->response->redirect($this->url->link('customer/custom_field', 'token=' . $this->session->data['token'] . $url, true));
-		}
-
-		$this->getList();
-	}
-
 	protected function getList() {
 		if (isset($this->request->get['sort'])) {
 			$sort = $this->request->get['sort'];
@@ -302,6 +204,70 @@ class ControllerCustomerCustomField extends Controller {
 
 		$this->response->setOutput($this->load->view('customer/custom_field_list', $data));
 	}
+
+    public function add()
+    {
+        $this->load->language('customer/custom_field');
+
+        $this->document->setTitle($this->language->get('heading_title'));
+
+        $this->load->model('customer/custom_field');
+
+        if (($this->request->server['REQUEST_METHOD'] == 'POST') && $this->validateForm()) {
+            $this->model_customer_custom_field->addCustomField($this->request->post);
+
+            $this->session->data['success'] = $this->language->get('text_success');
+
+            $url = '';
+
+            if (isset($this->request->get['sort'])) {
+                $url .= '&sort=' . $this->request->get['sort'];
+            }
+
+            if (isset($this->request->get['order'])) {
+                $url .= '&order=' . $this->request->get['order'];
+            }
+
+            if (isset($this->request->get['page'])) {
+                $url .= '&page=' . $this->request->get['page'];
+            }
+
+            $this->response->redirect($this->url->link('customer/custom_field', 'token=' . $this->session->data['token'] . $url, true));
+        }
+
+        $this->getForm();
+    }
+
+    protected function validateForm()
+    {
+        if (!$this->user->hasPermission('modify', 'customer/custom_field')) {
+            $this->error['warning'] = $this->language->get('error_permission');
+        }
+
+        foreach ($this->request->post['custom_field_description'] as $language_id => $value) {
+            if ((utf8_strlen($value['name']) < 1) || (utf8_strlen($value['name']) > 128)) {
+                $this->error['name'][$language_id] = $this->language->get('error_name');
+            }
+        }
+
+        if (($this->request->post['type'] == 'select' || $this->request->post['type'] == 'radio' || $this->request->post['type'] == 'checkbox')) {
+            if (!isset($this->request->post['custom_field_value'])) {
+                $this->error['warning'] = $this->language->get('error_type');
+            }
+
+            if (isset($this->request->post['custom_field_value'])) {
+                foreach ($this->request->post['custom_field_value'] as $custom_field_value_id => $custom_field_value) {
+                    foreach ($custom_field_value['custom_field_value_description'] as $language_id => $custom_field_value_description) {
+                        if ((utf8_strlen($custom_field_value_description['name']) < 1) || (utf8_strlen($custom_field_value_description['name']) > 128)) {
+                            $this->error['custom_field_value'][$custom_field_value_id][$language_id] = $this->language->get('error_custom_value');
+                        }
+                    }
+                }
+            }
+        }
+
+        return !$this->error;
+    }
 
 	protected function getForm() {
 		$data['heading_title'] = $this->language->get('heading_title');
@@ -512,34 +478,72 @@ class ControllerCustomerCustomField extends Controller {
 		$this->response->setOutput($this->load->view('customer/custom_field_form', $data));
 	}
 
-	protected function validateForm() {
-		if (!$this->user->hasPermission('modify', 'customer/custom_field')) {
-			$this->error['warning'] = $this->language->get('error_permission');
-		}
+    public function edit()
+    {
+        $this->load->language('customer/custom_field');
 
-		foreach ($this->request->post['custom_field_description'] as $language_id => $value) {
-			if ((utf8_strlen($value['name']) < 1) || (utf8_strlen($value['name']) > 128)) {
-				$this->error['name'][$language_id] = $this->language->get('error_name');
+        $this->document->setTitle($this->language->get('heading_title'));
+
+        $this->load->model('customer/custom_field');
+
+        if (($this->request->server['REQUEST_METHOD'] == 'POST') && $this->validateForm()) {
+            $this->model_customer_custom_field->editCustomField($this->request->get['custom_field_id'], $this->request->post);
+
+            $this->session->data['success'] = $this->language->get('text_success');
+
+            $url = '';
+
+            if (isset($this->request->get['sort'])) {
+                $url .= '&sort=' . $this->request->get['sort'];
+            }
+
+            if (isset($this->request->get['order'])) {
+                $url .= '&order=' . $this->request->get['order'];
 			}
-		}
 
-		if (($this->request->post['type'] == 'select' || $this->request->post['type'] == 'radio' || $this->request->post['type'] == 'checkbox')) {
-			if (!isset($this->request->post['custom_field_value'])) {
-				$this->error['warning'] = $this->language->get('error_type');
+            if (isset($this->request->get['page'])) {
+                $url .= '&page=' . $this->request->get['page'];
+            }
+
+            $this->response->redirect($this->url->link('customer/custom_field', 'token=' . $this->session->data['token'] . $url, true));
+        }
+
+        $this->getForm();
+    }
+
+    public function delete()
+    {
+        $this->load->language('customer/custom_field');
+
+        $this->document->setTitle($this->language->get('heading_title'));
+
+        $this->load->model('customer/custom_field');
+
+        if (isset($this->request->post['selected']) && $this->validateDelete()) {
+            foreach ($this->request->post['selected'] as $custom_field_id) {
+                $this->model_customer_custom_field->deleteCustomField($custom_field_id);
+            }
+
+            $this->session->data['success'] = $this->language->get('text_success');
+
+            $url = '';
+
+            if (isset($this->request->get['sort'])) {
+                $url .= '&sort=' . $this->request->get['sort'];
+            }
+
+            if (isset($this->request->get['order'])) {
+                $url .= '&order=' . $this->request->get['order'];
 			}
 
-			if (isset($this->request->post['custom_field_value'])) {
-				foreach ($this->request->post['custom_field_value'] as $custom_field_value_id => $custom_field_value) {
-					foreach ($custom_field_value['custom_field_value_description'] as $language_id => $custom_field_value_description) {
-						if ((utf8_strlen($custom_field_value_description['name']) < 1) || (utf8_strlen($custom_field_value_description['name']) > 128)) {
-							$this->error['custom_field_value'][$custom_field_value_id][$language_id] = $this->language->get('error_custom_value');
-						}
-					}
-				}
-			}
-		}
+            if (isset($this->request->get['page'])) {
+                $url .= '&page=' . $this->request->get['page'];
+            }
 
-		return !$this->error;
+            $this->response->redirect($this->url->link('customer/custom_field', 'token=' . $this->session->data['token'] . $url, true));
+        }
+
+        $this->getList();
 	}
 
 	protected function validateDelete() {

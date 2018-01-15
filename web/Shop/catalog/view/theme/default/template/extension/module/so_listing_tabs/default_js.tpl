@@ -1,8 +1,7 @@
 <script type="text/javascript">
 //<![CDATA[
 jQuery(document).ready(function ($) {
-	;
-	(function (element) {
+    (function (element) {
 		var $element = $(element),
 			$tab = $('.ltabs-tab', $element),
 			$tab_label = $('.ltabs-tab-label', $tab),
@@ -19,7 +18,7 @@ jQuery(document).ready(function ($) {
 			$btn_loadmore = $('.ltabs-loadmore-btn', $load_more),
 			$select_box = $('.ltabs-selectbox', $element),
 			$tab_label_select = $('.ltabs-tab-selected', $element),
-			setting = '<?php echo $setting; ?>'
+            setting = '<?php echo $setting; ?>';
 			type_show = '<?php echo $type_show; ?>';
 			
 		enableSelectBoxes();
@@ -115,7 +114,9 @@ jQuery(document).ready(function ($) {
 						ajax_reslisting_start: 0,
 						categoryid: category_id,
 						setting : setting,
-						lbmoduleid: <?php echo $moduleid; ?>
+                        lbmoduleid: < ? php echo $moduleid;
+                    ?;
+            >
 					},
 					success: function (data) {
 						if (data.items_markup != '') {
@@ -132,10 +133,9 @@ jQuery(document).ready(function ($) {
 						}
 							
 					},
-					dataType: 'json'
-				});
-
-			} else {
+                'json'
+            })
+            } else {
 				if (type_show == 'loadmore') {
 					$('.ltabs-item', $items_content).removeAttr('style').addClass('new-ltabs-item');
 					showAnimateItems(_items_active);
@@ -189,7 +189,9 @@ jQuery(document).ready(function ($) {
 						ajax_reslisting_start: rl_start,
 						categoryid: category_id,
 						setting: setting,
-						lbmoduleid: <?php echo $moduleid; ?>
+                        lbmoduleid: < ? php echo $moduleid;
+                    ?;
+            >
 					},
 					success: function (data) {
 						if (data.items_markup != '') {
@@ -201,9 +203,11 @@ jQuery(document).ready(function ($) {
 						if(typeof(_SoQuickView) != 'undefined'){
 							_SoQuickView();
 						}
-					}, dataType: 'json'
-				});
-			}
+                    }
+            ,
+                'json'
+            })
+            }
 			return false;
 		});
 	})('#<?php echo $tag_id; ?>');

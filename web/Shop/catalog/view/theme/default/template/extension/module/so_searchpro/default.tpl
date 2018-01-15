@@ -50,7 +50,7 @@
 	$.fn.Soautocomplete = function(option) {
 		return this.each(function() {
 			this.timer = null;
-			this.items = new Array();
+            this.items = [];
 
 			$.extend(this, option);
 
@@ -89,7 +89,7 @@
 				if (value && this.items[value]) {
 					this.select(this.items[value]);
 				}
-			}
+            };
 
 			// Show
 			this.show = function() {
@@ -101,12 +101,12 @@
 				});
 
 				$(this).siblings('ul.dropdown-menu').show();
-			}
+            };
 
 			// Hide
 			this.hide = function() {
 				$(this).siblings('ul.dropdown-menu').hide();
-			}
+            };
 
 			// Request
 			this.request = function() {
@@ -115,7 +115,7 @@
 				this.timer = setTimeout(function(object) {
 					object.source($(object).val(), $.proxy(object.response, object));
 				}, 200, this);
-			}
+            };
 
 			// Response
 			this.response = function(json) {
@@ -138,8 +138,8 @@
 						if(json[i]['price'] && json[i]['show_price'] && json[i]['show_price'] == 1){
 							html += '	<div class="box-price">';
 							if (!json[i]['special']) {
-								html += '<span class="price"><?php echo $text_price;?> : '+json[i]['price']+'</span>';;
-							} else {
+                                html += '<span class="price"><?php echo $text_price;?> : ' + json[i]['price'] + '</span>';
+                            } else {
 								html += '<span class="price-old" style="text-decoration:line-through;">' + json[i]['price'] + '</span><span class="price-new">' + json[i]['special'] + '</span>';
 							}
 							if (json[i]['tax']) {
@@ -153,14 +153,14 @@
 					}
 
 					// Get all the ones with a categories
-					var category = new Array();
+                    var category = [];
 
 					for (i = 0; i < json.length; i++) {
 						if (json[i]['category']) {
 							if (!category[json[i]['category']]) {
-								category[json[i]['category']] = new Array();
+                                category[json[i]['category']] = [];
 								category[json[i]['category']]['name'] = json[i]['category'];
-								category[json[i]['category']]['item'] = new Array();
+                                category[json[i]['category']]['item'] = [];
 							}
 
 							category[json[i]['category']]['item'].push(json[i]);
@@ -183,7 +183,7 @@
 				}
 
 				$(this).siblings('ul.dropdown-menu').html(html);
-			}
+            };
 
 			$(this).after('<ul class="dropdown-menu"></ul>');
 
@@ -194,20 +194,44 @@
 $(document).ready(function() {
 	var selector = '#search<?php echo $module ?>';
 	var total = 0;
-	var showimage = <?php echo ($showimage);?>;
-	var showprice = <?php echo ($showprice);?>;
-	var character = <?php echo ($character);?>;
-	var height = <?php echo ($height);?>;
-	var width = <?php echo ($width);?>;
-
-	$(selector).find('input[name=\'search\']').Soautocomplete({
+    var showimage =;
+    <
+        ? php echo($showimage);
+        ?;
+    >
+    var showprice =;
+    <
+        ? php echo($showprice);
+        ?;
+    >
+    var character =;
+    <
+        ? php echo($character);
+        ?;
+    >
+    var height =;
+    <
+        ? php echo($height);
+        ?;
+    >
+    var width =;
+    <
+        ? php echo($width);
+        ?;
+    >
+    $(selector).find('input[name=\'search\']').Soautocomplete({
 		delay: 500,
 		source: function(request, response) {
 			var category_id = $(".select_category select[name=\"category_id\"]").first().val();
 			if(typeof(category_id) == 'undefined')
 				category_id = 0;
-			var limit = <?php echo $limit;?>;
-			if(request.length >= character){
+            var limit =;
+            <
+                ? php echo;
+            $limit;
+                ?;
+            >
+            if (request.length >= character) {
 				$.ajax({
 					url: 'index.php?route=extension/module/so_searchpro/autocomplete&filter_category_id='+category_id+'&limit='+limit+'&width='+width+'&height='+height+'&filter_name='+encodeURIComponent(request),
 					dataType: 'json',

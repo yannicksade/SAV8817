@@ -1045,7 +1045,7 @@
      */
     Owl2.prototype.invalidate = function(part) {
         this._invalidated[part] = true;
-    }
+    };
 
     /**
      * Resets the absolute position of the current item.
@@ -1656,7 +1656,7 @@
         $.each(events, $.proxy(function(index, event) {
             this._supress[event] = true;
         }, this));
-    }
+    };
 
     /**
      * Releases suppressed events.
@@ -1667,7 +1667,7 @@
         $.each(events, $.proxy(function(index, event) {
             delete this._supress[event];
         }, this));
-    }
+    };
 
     /**
      * Checks the availability of some browser features.
@@ -1807,14 +1807,7 @@
 
 })(window.Zepto || window.jQuery, window, document);
 
-/**
- * Lazy Plugin
- * @version 2.0.0
- * @author Bartosz Wojciechowski
- * @license The MIT License (MIT)
- */
-;(function($, window, document, undefined) {
-
+(function ($, window, document, undefined) {
     /**
      * Creates the lazy plugin.
      * @class The Lazy Plugin
@@ -1872,7 +1865,7 @@
 
         // register event handler
         this._core.$element.on(this._handlers);
-    }
+    };
 
     /**
      * Default options.
@@ -1880,7 +1873,7 @@
      */
     Lazy.Defaults = {
         lazyLoad: false
-    }
+    };
 
     /**
      * Loads all resources of an item at the specified position.
@@ -1920,7 +1913,7 @@
         }, this));
 
         this._loaded.push($item.get(0));
-    }
+    };
 
     /**
      * Destroys the plugin.
@@ -1935,20 +1928,13 @@
         for (property in Object.getOwnPropertyNames(this)) {
             typeof this[property] != 'function' && (this[property] = null);
         }
-    }
+    };
 
     $.fn.owlCarousel2.Constructor.Plugins.Lazy = Lazy;
 
 })(window.Zepto || window.jQuery, window, document);
 
-/**
- * AutoHeight Plugin
- * @version 2.0.0
- * @author Bartosz Wojciechowski
- * @license The MIT License (MIT)
- */
-;(function($, window, document, undefined) {
-
+(function ($, window, document, undefined) {
     /**
      * Creates the auto height plugin.
      * @class The Auto Height Plugin
@@ -2026,14 +2012,7 @@
 
 })(window.Zepto || window.jQuery, window, document);
 
-/**
- * Video Plugin
- * @version 2.0.0
- * @author Bartosz Wojciechowski
- * @license The MIT License (MIT)
- */
-;(function($, window, document, undefined) {
-
+(function ($, window, document, undefined) {
     /**
      * Creates the video plugin.
      * @class The Video Plugin
@@ -2321,14 +2300,7 @@
 
 })(window.Zepto || window.jQuery, window, document);
 
-/**
- * Animate Plugin
- * @version 2.0.0
- * @author Bartosz Wojciechowski
- * @license The MIT License (MIT)
- */
-;(function($, window, document, undefined) {
-
+(function ($, window, document, undefined) {
     /**
      * Creates the animate plugin.
      * @class The Navigation Plugin
@@ -2415,7 +2387,7 @@
             .removeClass(this.core.settings.animateIn)
             .removeClass(this.core.settings.animateOut);
         this.core.transitionEnd();
-    }
+    };
 
     /**
      * Destroys the plugin.
@@ -2436,14 +2408,7 @@
 
 })(window.Zepto || window.jQuery, window, document);
 
-/**
- * Autoplay Plugin
- * @version 2.0.0
- * @author Bartosz Wojciechowski
- * @license The MIT License (MIT)
- */
-;(function($, window, document, undefined) {
-
+(function ($, window, document, undefined) {
     /**
      * Creates the autoplay plugin.
      * @class The Autoplay Plugin
@@ -2582,13 +2547,7 @@
 
 })(window.Zepto || window.jQuery, window, document);
 
-/**
- * Navigation Plugin
- * @version 2.0.0
- * @author Artus Kolanowski
- * @license The MIT License (MIT)
- */
-;(function($, window, document, undefined) {
+(function ($, window, document, undefined) {
     'use strict';
 
     /**
@@ -2704,7 +2663,7 @@
 
         // register event handlers
         this.$element.on(this._handlers);
-    }
+    };
 
     /**
      * Default options.
@@ -2729,7 +2688,7 @@
         dotsSpeed: false,
         dotsContainer: false,
         controlsClass: 'owl2-controls'
-    }
+    };
 
     /**
      * Initializes the layout of the plugin and extends the carousel2.
@@ -2795,7 +2754,7 @@
         for (override in this._overrides) {
             this._core[override] = $.proxy(this[override], this);
         }
-    }
+    };
 
     /**
      * Destroys the plugin.
@@ -2816,7 +2775,7 @@
         for (property in Object.getOwnPropertyNames(this)) {
             typeof this[property] != 'function' && (this[property] = null);
         }
-    }
+    };
 
     /**
      * Updates the internal state.
@@ -2848,7 +2807,7 @@
                 j += this._core.mergers(this._core.relative(i));
             }
         }
-    }
+    };
 
     /**
      * Draws the user interface.
@@ -2889,7 +2848,7 @@
         }
 
         this._controls.$indicators.toggle(options.dots);
-    }
+    };
 
     /**
      * Extends event data.
@@ -2905,7 +2864,7 @@
             size: settings && (settings.center || settings.autoWidth || settings.dotData
                 ? 1 : settings.dotsEach || settings.items)
         };
-    }
+    };
 
     /**
      * Gets the current page position of the carousel2.
@@ -2917,7 +2876,7 @@
         return $.grep(this._pages, function(o) {
             return o.start <= index && o.end >= index;
         }).pop();
-    }
+    };
 
     /**
      * Gets the current succesor/predecessor position.
@@ -2939,7 +2898,7 @@
             successor ? position += options.slideBy : position -= options.slideBy;
         }
         return position;
-    }
+    };
 
     /**
      * Slides to the next item or page.
@@ -2948,7 +2907,7 @@
      */
     Navigation.prototype.next = function(speed) {
         $.proxy(this._overrides.to, this._core)(this.getPosition(true), speed);
-    }
+    };
 
     /**
      * Slides to the previous item or page.
@@ -2957,7 +2916,7 @@
      */
     Navigation.prototype.prev = function(speed) {
         $.proxy(this._overrides.to, this._core)(this.getPosition(false), speed);
-    }
+    };
 
     /**
      * Slides to the specified item or page.
@@ -2975,19 +2934,13 @@
         } else {
             $.proxy(this._overrides.to, this._core)(position, speed);
         }
-    }
+    };
 
     $.fn.owlCarousel2.Constructor.Plugins.Navigation = Navigation;
 
 })(window.Zepto || window.jQuery, window, document);
 
-/**
- * Hash Plugin
- * @version 2.0.0
- * @author Artus Kolanowski
- * @license The MIT License (MIT)
- */
-;(function($, window, document, undefined) {
+(function ($, window, document, undefined) {
     'use strict';
 
     /**
@@ -3051,7 +3004,7 @@
 
             this._core.to(position, false, true);
         }, this));
-    }
+    };
 
     /**
      * Default options.
@@ -3059,7 +3012,7 @@
      */
     Hash.Defaults = {
         URLhashListener: false
-    }
+    };
 
     /**
      * Destroys the plugin.
@@ -3076,7 +3029,7 @@
         for (property in Object.getOwnPropertyNames(this)) {
             typeof this[property] != 'function' && (this[property] = null);
         }
-    }
+    };
 
     $.fn.owlCarousel2.Constructor.Plugins.Hash = Hash;
 

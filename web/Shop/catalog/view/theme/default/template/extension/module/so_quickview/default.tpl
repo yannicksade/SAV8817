@@ -27,11 +27,22 @@
 					var producturlpath = $($item_class[i]).find('a', $(this)).attr('href');
 					if(typeof producturlpath !== 'undefined' && producturlpath.length > 0 ){
 						$product_id = producturlpath.split("=").pop();
-						<?php if($quick_status =='1'):?>
+                    <
+                            ? php;
+                        if ($quick_status == '1'):
+                            ?;
+                    >
 						var _quickviewbutton = "<a class='quickview iframe-link visible-lg btn-button' href='<?php echo $our_url->link('extension/soconfig/quickview','product_id=');?>"+$product_id+"' title=\"<?php echo $label_text?>\" data-toggle=\"tooltip\" data-title =\"<?php echo $label_text?>\" data-fancybox-type=\"iframe\" ><i class=\"fa fa-search\"></i></a>";
-						<?php else:?>
+                    <
+                            ? php;
+                    else:
+                            ?;
+                    >
 						var _quickviewbutton = "";
-						<?php endif;?>
+                    <
+                            ? php endif;
+                            ?;
+                    >
 						$($item_class[i]).append(_quickviewbutton);
 					}
 				}

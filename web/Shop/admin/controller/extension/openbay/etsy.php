@@ -205,6 +205,15 @@ class ControllerExtensionOpenbayEtsy extends Controller {
 		$this->response->setOutput($this->load->view('extension/openbay/etsy_settings', $data));
 	}
 
+    protected function validate()
+    {
+        if (!$this->user->hasPermission('modify', 'extension/openbay/etsy')) {
+            $this->error['warning'] = $this->language->get('error_permission');
+        }
+
+        return !$this->error;
+    }
+
 	public function settingsUpdate() {
 		$this->openbay->etsy->settingsUpdate();
 
@@ -219,13 +228,5 @@ class ControllerExtensionOpenbayEtsy extends Controller {
 
 		$this->response->addHeader('Content-Type: application/json');
 		$this->response->setOutput(json_encode($response));
-	}
-
-	protected function validate() {
-		if (!$this->user->hasPermission('modify', 'extension/openbay/etsy')) {
-			$this->error['warning'] = $this->language->get('error_permission');
-		}
-
-		return !$this->error;
 	}
 }

@@ -12,104 +12,6 @@ class ControllerUserUser extends Controller {
 		$this->getList();
 	}
 
-	public function add() {
-		$this->load->language('user/user');
-
-		$this->document->setTitle($this->language->get('heading_title'));
-
-		$this->load->model('user/user');
-
-		if (($this->request->server['REQUEST_METHOD'] == 'POST') && $this->validateForm()) {
-			$this->model_user_user->addUser($this->request->post);
-
-			$this->session->data['success'] = $this->language->get('text_success');
-
-			$url = '';
-
-			if (isset($this->request->get['sort'])) {
-				$url .= '&sort=' . $this->request->get['sort'];
-			}
-
-			if (isset($this->request->get['order'])) {
-				$url .= '&order=' . $this->request->get['order'];
-			}
-
-			if (isset($this->request->get['page'])) {
-				$url .= '&page=' . $this->request->get['page'];
-			}
-
-			$this->response->redirect($this->url->link('user/user', 'token=' . $this->session->data['token'] . $url, true));
-		}
-
-		$this->getForm();
-	}
-
-	public function edit() {
-		$this->load->language('user/user');
-
-		$this->document->setTitle($this->language->get('heading_title'));
-
-		$this->load->model('user/user');
-
-		if (($this->request->server['REQUEST_METHOD'] == 'POST') && $this->validateForm()) {
-			$this->model_user_user->editUser($this->request->get['user_id'], $this->request->post);
-
-			$this->session->data['success'] = $this->language->get('text_success');
-
-			$url = '';
-
-			if (isset($this->request->get['sort'])) {
-				$url .= '&sort=' . $this->request->get['sort'];
-			}
-
-			if (isset($this->request->get['order'])) {
-				$url .= '&order=' . $this->request->get['order'];
-			}
-
-			if (isset($this->request->get['page'])) {
-				$url .= '&page=' . $this->request->get['page'];
-			}
-
-			$this->response->redirect($this->url->link('user/user', 'token=' . $this->session->data['token'] . $url, true));
-		}
-
-		$this->getForm();
-	}
-
-	public function delete() {
-		$this->load->language('user/user');
-
-		$this->document->setTitle($this->language->get('heading_title'));
-
-		$this->load->model('user/user');
-
-		if (isset($this->request->post['selected']) && $this->validateDelete()) {
-			foreach ($this->request->post['selected'] as $user_id) {
-				$this->model_user_user->deleteUser($user_id);
-			}
-
-			$this->session->data['success'] = $this->language->get('text_success');
-
-			$url = '';
-
-			if (isset($this->request->get['sort'])) {
-				$url .= '&sort=' . $this->request->get['sort'];
-			}
-
-			if (isset($this->request->get['order'])) {
-				$url .= '&order=' . $this->request->get['order'];
-			}
-
-			if (isset($this->request->get['page'])) {
-				$url .= '&page=' . $this->request->get['page'];
-			}
-
-			$this->response->redirect($this->url->link('user/user', 'token=' . $this->session->data['token'] . $url, true));
-		}
-
-		$this->getList();
-	}
-
 	protected function getList() {
 		if (isset($this->request->get['sort'])) {
 			$sort = $this->request->get['sort'];
@@ -182,7 +84,7 @@ class ControllerUserUser extends Controller {
 		}
 
 		$data['heading_title'] = $this->language->get('heading_title');
-		
+
 		$data['text_list'] = $this->language->get('text_list');
 		$data['text_no_results'] = $this->language->get('text_no_results');
 		$data['text_confirm'] = $this->language->get('text_confirm');
@@ -262,9 +164,101 @@ class ControllerUserUser extends Controller {
 		$this->response->setOutput($this->load->view('user/user_list', $data));
 	}
 
+    public function add()
+    {
+        $this->load->language('user/user');
+
+        $this->document->setTitle($this->language->get('heading_title'));
+
+        $this->load->model('user/user');
+
+        if (($this->request->server['REQUEST_METHOD'] == 'POST') && $this->validateForm()) {
+            $this->model_user_user->addUser($this->request->post);
+
+            $this->session->data['success'] = $this->language->get('text_success');
+
+            $url = '';
+
+            if (isset($this->request->get['sort'])) {
+                $url .= '&sort=' . $this->request->get['sort'];
+            }
+
+            if (isset($this->request->get['order'])) {
+                $url .= '&order=' . $this->request->get['order'];
+            }
+
+            if (isset($this->request->get['page'])) {
+                $url .= '&page=' . $this->request->get['page'];
+            }
+
+            $this->response->redirect($this->url->link('user/user', 'token=' . $this->session->data['token'] . $url, true));
+        }
+
+        $this->getForm();
+    }
+
+    protected function validateForm()
+    {
+        if (!$this->user->hasPermission('modify', 'user/user')) {
+            $this->error['warning'] = $this->language->get('error_permission');
+        }
+
+        if ((utf8_strlen($this->request->post['username']) < 3) || (utf8_strlen($this->request->post['username']) > 20)) {
+            $this->error['username'] = $this->language->get('error_username');
+        }
+
+        $user_info = $this->model_user_user->getUserByUsername($this->request->post['username']);
+
+        if (!isset($this->request->get['user_id'])) {
+            if ($user_info) {
+                $this->error['warning'] = $this->language->get('error_exists_username');
+            }
+        } else {
+            if ($user_info && ($this->request->get['user_id'] != $user_info['user_id'])) {
+                $this->error['warning'] = $this->language->get('error_exists_username');
+            }
+        }
+
+        if ((utf8_strlen(trim($this->request->post['firstname'])) < 1) || (utf8_strlen(trim($this->request->post['firstname'])) > 32)) {
+            $this->error['firstname'] = $this->language->get('error_firstname');
+        }
+
+        if ((utf8_strlen(trim($this->request->post['lastname'])) < 1) || (utf8_strlen(trim($this->request->post['lastname'])) > 32)) {
+            $this->error['lastname'] = $this->language->get('error_lastname');
+        }
+
+        if ((utf8_strlen($this->request->post['email']) > 96) || !filter_var($this->request->post['email'], FILTER_VALIDATE_EMAIL)) {
+            $this->error['email'] = $this->language->get('error_email');
+        }
+
+        $user_info = $this->model_user_user->getUserByEmail($this->request->post['email']);
+
+        if (!isset($this->request->get['user_id'])) {
+            if ($user_info) {
+                $this->error['warning'] = $this->language->get('error_exists_email');
+            }
+        } else {
+            if ($user_info && ($this->request->get['user_id'] != $user_info['user_id'])) {
+                $this->error['warning'] = $this->language->get('error_exists_email');
+            }
+        }
+
+        if ($this->request->post['password'] || (!isset($this->request->get['user_id']))) {
+            if ((utf8_strlen($this->request->post['password']) < 4) || (utf8_strlen($this->request->post['password']) > 20)) {
+                $this->error['password'] = $this->language->get('error_password');
+            }
+
+            if ($this->request->post['password'] != $this->request->post['confirm']) {
+                $this->error['confirm'] = $this->language->get('error_confirm');
+            }
+        }
+
+        return !$this->error;
+    }
+
 	protected function getForm() {
 		$data['heading_title'] = $this->language->get('heading_title');
-		
+
 		$data['text_form'] = !isset($this->request->get['user_id']) ? $this->language->get('text_add') : $this->language->get('text_edit');
 		$data['text_enabled'] = $this->language->get('text_enabled');
 		$data['text_disabled'] = $this->language->get('text_disabled');
@@ -435,7 +429,7 @@ class ControllerUserUser extends Controller {
 		} else {
 			$data['thumb'] = $this->model_tool_image->resize('no_image.png', 100, 100);
 		}
-		
+
 		$data['placeholder'] = $this->model_tool_image->resize('no_image.png', 100, 100);
 
 		if (isset($this->request->post['status'])) {
@@ -453,62 +447,72 @@ class ControllerUserUser extends Controller {
 		$this->response->setOutput($this->load->view('user/user_form', $data));
 	}
 
-	protected function validateForm() {
-		if (!$this->user->hasPermission('modify', 'user/user')) {
-			$this->error['warning'] = $this->language->get('error_permission');
-		}
+    public function edit()
+    {
+        $this->load->language('user/user');
 
-		if ((utf8_strlen($this->request->post['username']) < 3) || (utf8_strlen($this->request->post['username']) > 20)) {
-			$this->error['username'] = $this->language->get('error_username');
-		}
+        $this->document->setTitle($this->language->get('heading_title'));
 
-		$user_info = $this->model_user_user->getUserByUsername($this->request->post['username']);
+        $this->load->model('user/user');
 
-		if (!isset($this->request->get['user_id'])) {
-			if ($user_info) {
-				$this->error['warning'] = $this->language->get('error_exists_username');
-			}
-		} else {
-			if ($user_info && ($this->request->get['user_id'] != $user_info['user_id'])) {
-				$this->error['warning'] = $this->language->get('error_exists_username');
-			}
-		}
+        if (($this->request->server['REQUEST_METHOD'] == 'POST') && $this->validateForm()) {
+            $this->model_user_user->editUser($this->request->get['user_id'], $this->request->post);
 
-		if ((utf8_strlen(trim($this->request->post['firstname'])) < 1) || (utf8_strlen(trim($this->request->post['firstname'])) > 32)) {
-			$this->error['firstname'] = $this->language->get('error_firstname');
-		}
+            $this->session->data['success'] = $this->language->get('text_success');
 
-		if ((utf8_strlen(trim($this->request->post['lastname'])) < 1) || (utf8_strlen(trim($this->request->post['lastname'])) > 32)) {
-			$this->error['lastname'] = $this->language->get('error_lastname');
-		}
+            $url = '';
 
-		if ((utf8_strlen($this->request->post['email']) > 96) || !filter_var($this->request->post['email'], FILTER_VALIDATE_EMAIL)) {
-			$this->error['email'] = $this->language->get('error_email');
-		}
-
-		$user_info = $this->model_user_user->getUserByEmail($this->request->post['email']);
-
-		if (!isset($this->request->get['user_id'])) {
-			if ($user_info) {
-				$this->error['warning'] = $this->language->get('error_exists_email');
-			}
-		} else {
-			if ($user_info && ($this->request->get['user_id'] != $user_info['user_id'])) {
-				$this->error['warning'] = $this->language->get('error_exists_email');
-			}
-		}
-
-		if ($this->request->post['password'] || (!isset($this->request->get['user_id']))) {
-			if ((utf8_strlen($this->request->post['password']) < 4) || (utf8_strlen($this->request->post['password']) > 20)) {
-				$this->error['password'] = $this->language->get('error_password');
+            if (isset($this->request->get['sort'])) {
+                $url .= '&sort=' . $this->request->get['sort'];
 			}
 
-			if ($this->request->post['password'] != $this->request->post['confirm']) {
-				$this->error['confirm'] = $this->language->get('error_confirm');
+            if (isset($this->request->get['order'])) {
+                $url .= '&order=' . $this->request->get['order'];
 			}
+
+            if (isset($this->request->get['page'])) {
+                $url .= '&page=' . $this->request->get['page'];
+            }
+
+            $this->response->redirect($this->url->link('user/user', 'token=' . $this->session->data['token'] . $url, true));
 		}
 
-		return !$this->error;
+        $this->getForm();
+    }
+
+    public function delete()
+    {
+        $this->load->language('user/user');
+
+        $this->document->setTitle($this->language->get('heading_title'));
+
+        $this->load->model('user/user');
+
+        if (isset($this->request->post['selected']) && $this->validateDelete()) {
+            foreach ($this->request->post['selected'] as $user_id) {
+                $this->model_user_user->deleteUser($user_id);
+            }
+
+            $this->session->data['success'] = $this->language->get('text_success');
+
+            $url = '';
+
+            if (isset($this->request->get['sort'])) {
+                $url .= '&sort=' . $this->request->get['sort'];
+			}
+
+            if (isset($this->request->get['order'])) {
+                $url .= '&order=' . $this->request->get['order'];
+			}
+
+            if (isset($this->request->get['page'])) {
+                $url .= '&page=' . $this->request->get['page'];
+			}
+
+            $this->response->redirect($this->url->link('user/user', 'token=' . $this->session->data['token'] . $url, true));
+		}
+
+        $this->getList();
 	}
 
 	protected function validateDelete() {

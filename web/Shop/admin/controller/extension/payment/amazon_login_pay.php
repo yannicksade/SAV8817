@@ -377,6 +377,61 @@ class ControllerExtensionPaymentAmazonLoginPay extends Controller {
 		$this->response->setOutput($this->load->view('extension/payment/amazon_login_pay', $data));
 	}
 
+    protected function validate()
+    {
+        $this->load->model('localisation/currency');
+
+        if (!$this->user->hasPermission('modify', 'extension/payment/amazon_login_pay')) {
+            $this->error['warning'] = $this->language->get('error_permission');
+        }
+
+        if (!$this->request->post['amazon_login_pay_merchant_id']) {
+            $this->error['error_merchant_id'] = $this->language->get('error_merchant_id');
+        }
+
+        if (!$this->request->post['amazon_login_pay_access_key']) {
+            $this->error['error_access_key'] = $this->language->get('error_access_key');
+        }
+
+        if (empty($this->error)) {
+            $this->load->model('extension/payment/amazon_login_pay');
+            $errors = $this->model_extension_payment_amazon_login_pay->validateDetails($this->request->post);
+            if (isset($errors['error_code']) && $errors['error_code'] == 'InvalidParameterValue') {
+                $this->error['error_merchant_id'] = $errors['status_detail'];
+            } elseif (isset($errors['error_code']) && $errors['error_code'] == 'InvalidAccessKeyId') {
+                $this->error['error_access_key'] = $errors['status_detail'];
+            }
+        }
+
+        if (!$this->request->post['amazon_login_pay_access_secret']) {
+            $this->error['error_access_secret'] = $this->language->get('error_access_secret');
+        }
+
+        if (!$this->request->post['amazon_login_pay_client_id']) {
+            $this->error['error_client_id'] = $this->language->get('error_client_id');
+        }
+
+        if (!$this->request->post['amazon_login_pay_client_secret']) {
+            $this->error['error_client_secret'] = $this->language->get('error_client_secret');
+        }
+
+        if ($this->request->post['amazon_login_pay_minimum_total'] <= 0) {
+            $this->error['error_minimum_total'] = $this->language->get('error_minimum_total');
+        }
+
+        if (isset($this->request->post['amazon_login_pay_region'])) {
+            $currency_code = $this->request->post['amazon_login_pay_region'];
+
+            $currency = $this->model_localisation_currency->getCurrency($this->currency->getId($currency_code));
+
+            if (empty($currency) || $currency['status'] != '1') {
+                $this->error['error_curreny'] = sprintf($this->language->get('error_curreny'), $currency_code);
+            }
+        }
+
+        return !$this->error;
+    }
+
 	public function install() {
 		$this->load->model('extension/payment/amazon_login_pay');
 		$this->load->model('extension/event');
@@ -584,60 +639,6 @@ class ControllerExtensionPaymentAmazonLoginPay extends Controller {
 			$json['error_msg'][] = $this->language->get('error_data_missing');
 		}
 		$this->response->setOutput(json_encode($json));
-	}
-
-	protected function validate() {
-		$this->load->model('localisation/currency');
-
-		if (!$this->user->hasPermission('modify', 'extension/payment/amazon_login_pay')) {
-			$this->error['warning'] = $this->language->get('error_permission');
-		}
-
-		if (!$this->request->post['amazon_login_pay_merchant_id']) {
-			$this->error['error_merchant_id'] = $this->language->get('error_merchant_id');
-		}
-
-		if (!$this->request->post['amazon_login_pay_access_key']) {
-			$this->error['error_access_key'] = $this->language->get('error_access_key');
-		}
-
-		if (empty($this->error)) {
-			$this->load->model('extension/payment/amazon_login_pay');
-			$errors = $this->model_extension_payment_amazon_login_pay->validateDetails($this->request->post);
-			if (isset($errors['error_code']) && $errors['error_code'] == 'InvalidParameterValue') {
-				$this->error['error_merchant_id'] = $errors['status_detail'];
-			} elseif (isset($errors['error_code']) && $errors['error_code'] == 'InvalidAccessKeyId') {
-				$this->error['error_access_key'] = $errors['status_detail'];
-			}
-		}
-
-		if (!$this->request->post['amazon_login_pay_access_secret']) {
-			$this->error['error_access_secret'] = $this->language->get('error_access_secret');
-		}
-
-		if (!$this->request->post['amazon_login_pay_client_id']) {
-			$this->error['error_client_id'] = $this->language->get('error_client_id');
-		}
-
-		if (!$this->request->post['amazon_login_pay_client_secret']) {
-			$this->error['error_client_secret'] = $this->language->get('error_client_secret');
-		}
-
-		if ($this->request->post['amazon_login_pay_minimum_total'] <= 0) {
-			$this->error['error_minimum_total'] = $this->language->get('error_minimum_total');
-		}
-
-		if (isset($this->request->post['amazon_login_pay_region'])) {
-			$currency_code = $this->request->post['amazon_login_pay_region'];
-
-			$currency = $this->model_localisation_currency->getCurrency($this->currency->getId($currency_code));
-
-			if (empty($currency) || $currency['status'] != '1') {
-				$this->error['error_curreny'] = sprintf($this->language->get('error_curreny'), $currency_code);
-			}
-		}
-
-		return !$this->error;
 	}
 
 }

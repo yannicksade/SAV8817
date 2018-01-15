@@ -151,8 +151,16 @@
 
 												if(is_array($submenu['product'])) {
 												echo '<div class="product '.$submenu['class_menu'].'">';
-													echo '<div class="image"><a href="'.$submenu['product']['link'].'" onclick="window.location = \''.$submenu['product']['link'].'\';"><img src="'.$submenu['product']['image'].'" alt=""></a></div>';
-													echo '<div class="name"><a href="'.$submenu['product']['link'].'" onclick="window.location = \''.$submenu['product']['link'].'\';">'.$submenu['product']['name'].'</a></div>';
+                                                echo '
+                                                <div class="image"><a href="'.$submenu['product']['link'].'"
+                                                                      onclick="window.location =; \''.$submenu['product']['link'].;'\';"><img
+                                                                src="'.$submenu['product']['image'].'" alt=""></a></div>
+                                                ';
+                                                echo '
+                                                <div class="name"><a href="'.$submenu['product']['link'].'"
+                                                                     onclick="window.location =; \''.$submenu['product']['link'].;'\';">'.$submenu['product']['name'].'</a>
+                                                </div>
+                                                ';
 													echo '<div class="price">';
 													if (!$submenu['product']['special'])
 														echo $submenu['product']['price'];
@@ -296,8 +304,16 @@
 
 													if(is_array($submenu['product'])) {
 													echo '<div class="product '.$submenu['class_menu'].'">';
-														echo '<div class="image"><a href="'.$submenu['product']['link'].'" onclick="window.location = \''.$submenu['product']['link'].'\';"><img src="'.$submenu['product']['image'].'" alt=""></a></div>';
-														echo '<div class="name"><a href="'.$submenu['product']['link'].'" onclick="window.location = \''.$submenu['product']['link'].'\';">'.$submenu['product']['name'].'</a></div>';
+                                                echo '
+                                                <div class="image"><a href="'.$submenu['product']['link'].'"
+                                                                      onclick="window.location =; \''.$submenu['product']['link'].;'\';"><img
+                                                                src="'.$submenu['product']['image'].'" alt=""></a></div>
+                                                ';
+                                                echo '
+                                                <div class="name"><a href="'.$submenu['product']['link'].'"
+                                                                     onclick="window.location =; \''.$submenu['product']['link'].;'\';">'.$submenu['product']['name'].'</a>
+                                                </div>
+                                                ';
 														echo '<div class="price">';
 															if (!$submenu['product']['special'])
 																echo $submenu['product']['price'];
@@ -415,8 +431,13 @@
 <?php if($ustawienia['orientation'] == 1) { ?>
 <script type="text/javascript">
 	$(document).ready(function() {
-		var itemver =  <?php echo $ustawienia['show_itemver'];?> ;
-		if(itemver <= $( ".vertical ul.megamenu >li" ).length)
+        var itemver =;
+        <
+            ? php echo;
+        $ustawienia['show_itemver'];
+            ?;
+        >
+        if (itemver <= $(".vertical ul.megamenu >li").length)
 			$('.vertical ul.megamenu').append('<li class="loadmore"><i class="fa fa-plus-square-o"></i><span class="more-view"> More Categories</span></li>');
 		$('.horizontal ul.megamenu li.loadmore').remove();
 

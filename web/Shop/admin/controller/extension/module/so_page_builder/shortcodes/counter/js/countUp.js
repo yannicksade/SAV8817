@@ -14,7 +14,7 @@ jQuery(document).ready(function($) {
                 speed     = parseInt(data.speed),
                 prefix    = data.prefix,
                 suffix    = data.suffix,
-                sep       = data.separator
+                sep = data.separator;
                 dec_count = Num.split(".");
 
             if(dec_count[1]){
@@ -39,7 +39,7 @@ jQuery(document).ready(function($) {
                 decimal : dec,
                 prefix : (prefix) ? prefix : '',
                 suffix : (suffix) ? suffix : ''
-            }
+            };
             var ytCounter = new countUp($counter, startNum, endNum, dec_count, speed, settings);
             ytCounter.start();
         });

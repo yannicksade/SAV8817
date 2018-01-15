@@ -22,7 +22,7 @@ jQuery(document).ready(function($) {
                         var self = this;
                         self.wrap.removeClass('mfp-image-loaded');
                         setTimeout(function() { $.magnificPopup.proto.next.call(self); }, 120);
-                    }
+                    };
                     $.magnificPopup.instance.prev = function() {
                         var self = this;
                         self.wrap.removeClass('mfp-image-loaded');

@@ -230,8 +230,14 @@
 	});
 		//]]>
 	</script>
-	<?php }?>
-	<script type="text/javascript">
+        <
+            ? php
+        }
+            ?;
+        >
+        <
+        script;
+        type = "text/javascript" >
 		$(document).ready(function(){
 			$(".gallery_image_<?php echo $moduleid ;?>").attr('rel', 'gallery').fancybox({
 		        prevMethod : false,
@@ -246,8 +252,9 @@
 		            }
 		            <?php }else{?>
 		            title : null
-		            <?php }?>
+                    <?php }?;
+            >
 				},
 			});
-		});
-	</script>
+        })
+        </script>

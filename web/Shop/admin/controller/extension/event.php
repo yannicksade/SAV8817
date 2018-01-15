@@ -12,70 +12,6 @@ class ControllerExtensionEvent extends Controller {
 		$this->getList();
 	}
 
-	public function enable() {
-		$this->load->language('extension/event');
-
-		$this->document->setTitle($this->language->get('heading_title'));
-
-		$this->load->model('extension/event');
-
-		if (isset($this->request->get['event_id']) && $this->validate()) {
-			$this->model_extension_event->enableEvent($this->request->get['event_id']);
-
-			$this->session->data['success'] = $this->language->get('text_success');
-
-			$url = '';
-
-			if (isset($this->request->get['sort'])) {
-				$url .= '&sort=' . $this->request->get['sort'];
-			}
-
-			if (isset($this->request->get['order'])) {
-				$url .= '&order=' . $this->request->get['order'];
-			}
-
-			if (isset($this->request->get['page'])) {
-				$url .= '&page=' . $this->request->get['page'];
-			}
-
-			$this->response->redirect($this->url->link('extension/event', 'token=' . $this->session->data['token'] . $url, true));
-		}
-
-		$this->getList();
-	}
-
-	public function disable() {
-		$this->load->language('extension/event');
-
-		$this->document->setTitle($this->language->get('heading_title'));
-
-		$this->load->model('extension/event');
-
-		if (isset($this->request->get['event_id']) && $this->validate()) {
-			$this->model_extension_event->disableEvent($this->request->get['event_id']);
-
-			$this->session->data['success'] = $this->language->get('text_success');
-
-			$url = '';
-
-			if (isset($this->request->get['sort'])) {
-				$url .= '&sort=' . $this->request->get['sort'];
-			}
-
-			if (isset($this->request->get['order'])) {
-				$url .= '&order=' . $this->request->get['order'];
-			}
-
-			if (isset($this->request->get['page'])) {
-				$url .= '&page=' . $this->request->get['page'];
-			}
-
-			$this->response->redirect($this->url->link('extension/event', 'token=' . $this->session->data['token'] . $url, true));
-		}
-
-		$this->getList();
-	}
-	
 	public function getList() {
 		if (isset($this->request->get['sort'])) {
 			$sort = $this->request->get['sort'];
@@ -232,6 +168,39 @@ class ControllerExtensionEvent extends Controller {
 		$this->response->setOutput($this->load->view('extension/event', $data));
 	}
 
+    public function enable()
+    {
+        $this->load->language('extension/event');
+
+        $this->document->setTitle($this->language->get('heading_title'));
+
+        $this->load->model('extension/event');
+
+        if (isset($this->request->get['event_id']) && $this->validate()) {
+            $this->model_extension_event->enableEvent($this->request->get['event_id']);
+
+            $this->session->data['success'] = $this->language->get('text_success');
+
+            $url = '';
+
+            if (isset($this->request->get['sort'])) {
+                $url .= '&sort=' . $this->request->get['sort'];
+            }
+
+            if (isset($this->request->get['order'])) {
+                $url .= '&order=' . $this->request->get['order'];
+            }
+
+            if (isset($this->request->get['page'])) {
+                $url .= '&page=' . $this->request->get['page'];
+            }
+
+            $this->response->redirect($this->url->link('extension/event', 'token=' . $this->session->data['token'] . $url, true));
+        }
+
+        $this->getList();
+    }
+	
 	protected function validate() {
 		if (!$this->user->hasPermission('modify', 'extension/event')) {
 			$this->error['warning'] = $this->language->get('error_permission');
@@ -239,4 +208,37 @@ class ControllerExtensionEvent extends Controller {
 
 		return !$this->error;
 	}
+
+    public function disable()
+    {
+        $this->load->language('extension/event');
+
+        $this->document->setTitle($this->language->get('heading_title'));
+
+        $this->load->model('extension/event');
+
+        if (isset($this->request->get['event_id']) && $this->validate()) {
+            $this->model_extension_event->disableEvent($this->request->get['event_id']);
+
+            $this->session->data['success'] = $this->language->get('text_success');
+
+            $url = '';
+
+            if (isset($this->request->get['sort'])) {
+                $url .= '&sort=' . $this->request->get['sort'];
+            }
+
+            if (isset($this->request->get['order'])) {
+                $url .= '&order=' . $this->request->get['order'];
+            }
+
+            if (isset($this->request->get['page'])) {
+                $url .= '&page=' . $this->request->get['page'];
+            }
+
+            $this->response->redirect($this->url->link('extension/event', 'token=' . $this->session->data['token'] . $url, true));
+        }
+
+        $this->getList();
+    }
 }

@@ -1,6 +1,12 @@
 <script>
 //<![CDATA[
-	var listdeal<?php echo $module;?> = [];
+var listdeal;
+<
+    ? php echo;
+$module;
+    ?;
+>
+= [];
 //]]>
 </script>
 <div class="module <?php echo $direction_class?> <?php echo $class_suffix; ?>">
@@ -96,8 +102,15 @@
 							<div class="item-timer product_time_<?php echo $product['product_id']?>"></div>
 							<script type="text/javascript">
 								//<![CDATA[
-								listdeal<?php echo $module?>.push('product_time_<?php echo $product['product_id']?>|<?php echo $product['specialPriceToDate'] ?>');
-								//]]>
+                                listdeal < ? php echo;
+                                $module ?;
+                                >.push('product_time_<?php echo $product[';
+                                product_id;
+                                ']?>|<?php echo $product[';
+                                specialPriceToDate;
+                                '] ?>';
+                                )
+                                //]]>
 							</script>
 						</div>
 					</div>
@@ -166,7 +179,14 @@
                                 <div class="item-timer product_time_<?php echo $product['product_id']?>"></div>
                                 <script type="text/javascript">
                                     //<![CDATA[
-                                    listdeal<?php echo $module?>.push('product_time_<?php echo $product['product_id']?>|<?php echo $product['specialPriceToDate'] ?>');
+                                    listdeal < ? php echo;
+                                    $module ?;
+                                    >.push('product_time_<?php echo $product[';
+                                    product_id;
+                                    ']?>|<?php echo $product[';
+                                    specialPriceToDate;
+                                    '] ?>';
+                                    )
                                     //]]>
                                 </script>
                             </div>
@@ -203,13 +223,23 @@
     </div>
 <script type="text/javascript">
 //<![CDATA[
-jQuery(document).ready(function ($) {  ;
-(function (element) {
+jQuery(document).ready(function ($) {
+    (function (element) {
 	var $element = $(element),
 			$extraslider = $('.extraslider-inner', $element),
 			$featureslider = $('.product-feature', $element),
-			_delay = <?php echo $delay; ?>,
-			_duration = <?php echo $duration; ?>,
+        _delay =;
+        <
+            ? php echo;
+        $delay;
+            ?;
+        >,
+        _duration =;
+        <
+            ? php echo;
+        $duration;
+            ?;
+        >,
 			_effect = '<?php echo $effect; ?>';
 
 	$extraslider.on('initialized.owl.carousel2', function () {
@@ -221,47 +251,159 @@ jQuery(document).ready(function ($) {  ;
 			var $item = $('.extraslider-inner .owl2-item', $element);
 			$item.css({'opacity': 1, 'filter': 'alpha(opacity = 100)'});
 		}
-		<?php if ($button_page == "top"){ ?>
+        <
+            ? php;
+        if ($button_page == "top") {
+                ?;
+        >
 			$('.extraslider-inner .owl2-dots', $element).insertAfter($('.extraslider-inner .owl2-prev', $element));
 			$('.extraslider-inner .owl2-controls', $element).insertBefore($extraslider).addClass('extraslider');
-			
-		<?php }else{ ?>
+
+        <
+                ? php
+        } else {
+                ?;
+        >
 			$('.extraslider-inner .owl2-nav', $element).insertBefore($extraslider);
 			$('.extraslider-inner .owl2-controls', $element).insertAfter($extraslider).addClass('extraslider');
-		<?php }?>
+        <
+                ? php
+        }
+            ?;
+        >
 	});
 
 	$extraslider.owlCarousel2({
-		rtl: <?php echo $direction?>,
-		margin: <?php echo $margin;?>,
-		slideBy: <?php echo $slideBy;?>,
-		autoplay: <?php echo $autoplay;?>,
-		autoplayHoverPause: <?php echo $autoplayHoverPause ;?>,
-		autoplayTimeout: <?php echo $autoplayTimeout; ?>,
-		autoplaySpeed: <?php echo $autoplaySpeed; ?>,
-		startPosition: <?php echo $startPosition; ?>,
-		mouseDrag: <?php echo $mouseDrag;?>,
-		touchDrag: <?php echo $touchDrag; ?>,
-		autoWidth: false,
-		responsive: {
-			0: 	{ items: <?php echo $nb_column4;?> } ,
-			480: { items: <?php echo $nb_column3;?> },
-			768: { items: <?php echo $nb_column2;?> },
-			992: { items: <?php echo $nb_column1;?> },
-			1200: {items: <?php echo $nb_column0;?>}
+        rtl: < ? php echo;
+        $direction ?;
+        >,
+        margin: <
+            ? php echo;
+        $margin;
+            ?;
+        >,
+        slideBy: <
+            ? php echo;
+        $slideBy;
+            ?;
+        >,
+        autoplay: <
+            ? php echo;
+        $autoplay;
+            ?;
+        >,
+        autoplayHoverPause: <
+            ? php echo;
+        $autoplayHoverPause;
+            ?;
+        >,
+        autoplayTimeout: <
+            ? php echo;
+        $autoplayTimeout;
+            ?;
+        >,
+        autoplaySpeed: <
+            ? php echo;
+        $autoplaySpeed;
+            ?;
+        >,
+        startPosition: <
+            ? php echo;
+        $startPosition;
+            ?;
+        >,
+        mouseDrag: <
+            ? php echo;
+        $mouseDrag;
+            ?;
+        >,
+        touchDrag: <
+            ? php echo;
+        $touchDrag;
+            ?;
+        >,
+        false,
+            responsive;
+        :
+        {
+            0;
+        :
+            {
+                items: <
+                    ? php echo;
+                $nb_column4;
+                    ?;
+            >
+            }
+        ,
+            480;
+        :
+            {
+                items: <
+                    ? php echo;
+                $nb_column3;
+                    ?;
+            >
+            }
+        ,
+            768;
+        :
+            {
+                items: <
+                    ? php echo;
+                $nb_column2;
+                    ?;
+            >
+            }
+        ,
+            992;
+        :
+            {
+                items: <
+                    ? php echo;
+                $nb_column1;
+                    ?;
+            >
+            }
+        ,
+            1200;
+        : {items: <?php echo $nb_column0;?>}
 		},
-		dotClass: 'owl2-dot',
-		dotsClass: 'owl2-dots',
-		dots: <?php echo $dots; ?>,
-		dotsSpeed: <?php echo $dotsSpeed; ?>,
-		nav: <?php echo $navs?>,
-		loop: <?php echo $loop; ?>,
-		navSpeed: <?php echo $navSpeed; ?>,
-		navText: ['&#171;', '&#187;'],
-		navClass: ['owl2-prev', 'owl2-next']
-	});
-
-	$extraslider.on('translated.owl.carousel2', function (e) {
+        'owl2-dot',
+            dotsClass;
+        :
+        'owl2-dots',
+            dots;
+        : <
+            ? php echo;
+        $dots;
+            ?;
+        >,
+        dotsSpeed: <
+            ? php echo;
+        $dotsSpeed;
+            ?;
+        >,
+        nav: <
+            ? php echo;
+        $navs ?;
+        >,
+        loop: <
+            ? php echo;
+        $loop;
+            ?;
+        >,
+        navSpeed: <
+            ? php echo;
+        $navSpeed;
+            ?;
+        >,
+        ['&#171;', '&#187;'],
+            navClass;
+        :
+        ['owl2-prev', 'owl2-next']
+    })
+        $extraslider.on('translated.owl.carousel2', function (e) {
 		var $item_active = $('.extraslider-inner .owl2-item.active', $element);
 		var $item = $('.extraslider-inner .owl2-item', $element);
 
@@ -283,46 +425,142 @@ jQuery(document).ready(function ($) {  ;
 			var $item = $('.owl2-item', $element);
 			$item.css({'opacity': 1, 'filter': 'alpha(opacity = 100)'});
 		}
-		<?php if ($button_page == "top"){ ?>
+        <
+            ? php;
+        if ($button_page == "top") {
+                ?;
+        >
 			$('.product-feature .owl2-dots', $element).insertAfter($('.product-feature .owl2-prev', $element));
-			$('.product-feature .owl2-controls', $element).insertBefore($featureslider).addClass('featureslider');	
-		<?php }else{ ?>
+			$('.product-feature .owl2-controls', $element).insertBefore($featureslider).addClass('featureslider');
+        <
+                ? php
+        } else {
+                ?;
+        >
 			$('.product-feature .owl2-nav', $element).insertBefore($featureslider);
-			$('.product-feature .owl2-controls', $element).insertAfter($featureslider).addClass('featureslider');;
-		<?php }?>
+            $('.product-feature .owl2-controls', $element).insertAfter($featureslider).addClass('featureslider');
+        <
+                ? php
+        }
+            ?;
+        >
 	});
 
 	$featureslider.owlCarousel2({
-		rtl: <?php echo $direction?>,
-		margin: <?php echo $margin;?>,
-		slideBy: <?php echo $slideBy;?>,
-		autoplay: <?php echo $autoplay;?>,
-		autoplayHoverPause: <?php echo $autoplayHoverPause ;?>,
-		autoplayTimeout: <?php echo $autoplayTimeout; ?>,
-		autoplaySpeed: <?php echo $autoplaySpeed; ?>,
-		startPosition: <?php echo $startPosition; ?>,
-		mouseDrag: <?php echo $mouseDrag;?>,
-		touchDrag: <?php echo $touchDrag; ?>,
-		autoWidth: false,
-		responsive: {
-			0: 	{ items: 1 } ,
-			480: { items: 1 },
-			768: { items: 1 },
-			992: { items: 1 },
-			1200: {items: 1}
+        rtl: < ? php echo;
+        $direction ?;
+        >,
+        margin: <
+            ? php echo;
+        $margin;
+            ?;
+        >,
+        slideBy: <
+            ? php echo;
+        $slideBy;
+            ?;
+        >,
+        autoplay: <
+            ? php echo;
+        $autoplay;
+            ?;
+        >,
+        autoplayHoverPause: <
+            ? php echo;
+        $autoplayHoverPause;
+            ?;
+        >,
+        autoplayTimeout: <
+            ? php echo;
+        $autoplayTimeout;
+            ?;
+        >,
+        autoplaySpeed: <
+            ? php echo;
+        $autoplaySpeed;
+            ?;
+        >,
+        startPosition: <
+            ? php echo;
+        $startPosition;
+            ?;
+        >,
+        mouseDrag: <
+            ? php echo;
+        $mouseDrag;
+            ?;
+        >,
+        touchDrag: <
+            ? php echo;
+        $touchDrag;
+            ?;
+        >,
+        false,
+            responsive;
+        :
+        {
+            0;
+        :
+            {
+                1
+            }
+        ,
+            480;
+        :
+            {
+                1
+            }
+        ,
+            768;
+        :
+            {
+                1
+            }
+        ,
+            992;
+        :
+            {
+                1
+            }
+        ,
+            1200;
+        : {items: 1}
 		},
-		dotClass: 'owl2-dot',
-			dotsClass: 'owl2-dots',
-		dots: <?php echo $dots; ?>,
-		dotsSpeed: <?php echo $dotsSpeed; ?>,
-		nav: <?php echo $navs?>,
-		loop: <?php echo $loop; ?>,
-		navSpeed: <?php echo $navSpeed; ?>,
-		navText: ['&#171;', '&#187;'],
-		navClass: ['owl2-prev', 'owl2-next']
-	});
-
-	$featureslider.on('translated.owl.carousel2', function (e) {
+        'owl2-dot',
+            dotsClass;
+        :
+        'owl2-dots',
+            dots;
+        : <
+            ? php echo;
+        $dots;
+            ?;
+        >,
+        dotsSpeed: <
+            ? php echo;
+        $dotsSpeed;
+            ?;
+        >,
+        nav: <
+            ? php echo;
+        $navs ?;
+        >,
+        loop: <
+            ? php echo;
+        $loop;
+            ?;
+        >,
+        navSpeed: <
+            ? php echo;
+        $navSpeed;
+            ?;
+        >,
+        ['&#171;', '&#187;'],
+            navClass;
+        :
+        ['owl2-prev', 'owl2-next']
+    })
+        $featureslider.on('translated.owl.carousel2', function (e) {
 		var $item_active = $('.product-feature .owl2-item.active', $element);
 		var $item = $('.product-feature .owl2-item', $element);
 
@@ -423,9 +661,22 @@ jQuery(document).ready(function ($) {  ;
 			}, 1000);
 		}
 	}
-	if (listdeal<?php echo $module?>.length > 0) {
-		for (var i = 0; i < listdeal<?php echo $module?>.length; i++) {
-			var arr = listdeal<?php echo $module?>[i].split("|");
+
+        if (listdeal < ? php echo $module ?;
+        >.
+        length > 0;
+        )
+        {
+            for (var i = 0; i < listdeal < ? php echo $module ?>
+        .
+            length;
+            i++;
+        )
+            {
+                var arr = listdeal < ? php echo;
+                $module ?;
+            >
+                [i].split("|");
 			if (arr[1].length) {
 				var data = new Date(arr[1]);
 				CountDown(data, arr[0]);

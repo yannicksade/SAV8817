@@ -283,6 +283,27 @@ class ControllerExtensionPaymentSecureTradingPp extends Controller {
 		$this->response->setOutput($this->load->view('extension/payment/securetrading_pp', $data));
 	}
 
+    protected function validate()
+    {
+        if (!$this->user->hasPermission('modify', 'extension/payment/securetrading_pp')) {
+            $this->error['warning'] = $this->language->get('error_permission');
+        }
+
+        if (!$this->request->post['securetrading_pp_site_reference']) {
+            $this->error['site_reference'] = $this->language->get('error_site_reference');
+        }
+
+        if (empty($this->request->post['securetrading_pp_cards_accepted'])) {
+            $this->error['cards_accepted'] = $this->language->get('error_cards_accepted');
+        }
+
+        if (!$this->request->post['securetrading_pp_notification_password']) {
+            $this->error['notification_password'] = $this->language->get('error_notification_password');
+        }
+
+        return !$this->error;
+    }
+
 	public function install() {
 		$this->load->model('extension/payment/securetrading_pp');
 		$this->model_extension_payment_securetrading_pp->install();
@@ -522,25 +543,5 @@ class ControllerExtensionPaymentSecureTradingPp extends Controller {
 		}
 
 		$this->response->setOutput(json_encode($json));
-	}
-
-	protected function validate() {
-		if (!$this->user->hasPermission('modify', 'extension/payment/securetrading_pp')) {
-			$this->error['warning'] = $this->language->get('error_permission');
-		}
-
-		if (!$this->request->post['securetrading_pp_site_reference']) {
-			$this->error['site_reference'] = $this->language->get('error_site_reference');
-		}
-
-		if (empty($this->request->post['securetrading_pp_cards_accepted'])) {
-			$this->error['cards_accepted'] = $this->language->get('error_cards_accepted');
-		}
-
-		if (!$this->request->post['securetrading_pp_notification_password']) {
-			$this->error['notification_password'] = $this->language->get('error_notification_password');
-		}
-
-		return !$this->error;
 	}
 }

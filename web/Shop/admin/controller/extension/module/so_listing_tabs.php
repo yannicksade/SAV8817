@@ -375,29 +375,6 @@ class ControllerExtensionModuleSolistingtabs extends Controller {
 		$this->response->setOutput($this->load->view('extension/module/so_listing_tabs.tpl', $data));
 	}
 	
-	public function remove_cache(){
-		$this->url->link('extension/extension', 'token=' . $this->session->data['token'], 'SSL');
-		$folder_cache = DIR_CACHE.'So/';
-		if(file_exists($folder_cache))
-		{
-			self::mageDelTree($folder_cache);
-		}
-	}
-	
-	function mageDelTree($path) {
-		if (is_dir($path)) {
-			$entries = scandir($path);
-			foreach ($entries as $entry) {
-				if ($entry != '.' && $entry != '..') {
-					self::mageDelTree($path.'/'.$entry);
-				}
-			}
-			@rmdir($path);
-		} else {
-			@unlink($path);
-		}
-	}
-	
 	public function _breadcrumbs(){
 		$this->data['breadcrumbs'] = array();
 
@@ -487,7 +464,7 @@ class ControllerExtensionModuleSolistingtabs extends Controller {
 		if ($this->request->post['height'] != '0' && !filter_var($this->request->post['height'],FILTER_VALIDATE_INT) || $this->request->post['height'] < 0) {
 			$this->error['height'] = $this->language->get('error_height');
 		}
-		
+
 		if ($this->request->post['banner_width'] != '0' && !filter_var($this->request->post['banner_width'],FILTER_VALIDATE_INT) || $this->request->post['banner_width'] < 0) {
 			$this->error['banner_width'] = $this->language->get('error_width');
 		}
@@ -495,16 +472,16 @@ class ControllerExtensionModuleSolistingtabs extends Controller {
 		if ($this->request->post['banner_height'] != '0' && !filter_var($this->request->post['banner_height'],FILTER_VALIDATE_INT) || $this->request->post['banner_height'] < 0) {
 			$this->error['banner_height'] = $this->language->get('error_height');
 		}
-		
+
 		if (utf8_strlen($this->request->post['banner_image']) < 1) {
 			$this->error['banner_image'] = $this->language->get('error_banner_image');
 		}
-		
+
 		if ( !is_numeric($this->request->post['margin']) || $this->request->post['margin'] < 0) {
 			$this->error['margin'] = $this->language->get('error_margin');
 		}
-		
-		if ($this->request->post['duration'] != '0' && !filter_var($this->request->post['duration'],FILTER_VALIDATE_INT) || $this->request->post['duration'] < 0) {
+
+        if ($this->request->post['duration'] != '0' && !filter_var($this->request->post['duration'], FILTER_VALIDATE_INT) || $this->request->post['duration'] < 0) {
 			$this->error['duration'] = $this->language->get('error_duration');
 		}
 
@@ -519,36 +496,61 @@ class ControllerExtensionModuleSolistingtabs extends Controller {
 		if ($this->request->post['autoplaySpeed'] != '0' && !filter_var($this->request->post['autoplaySpeed'],FILTER_VALIDATE_INT) || $this->request->post['autoplaySpeed'] < 0) {
 			$this->error['autoplaySpeed'] = $this->language->get('error_autoplaySpeed');
 		}
-		
-		if ($this->request->post['product_placeholder_path'] == null ) {
+
+        if ($this->request->post['product_placeholder_path'] == null) {
 			$this->error['product_placeholder_path'] = $this->language->get('error_product_placeholder_path');
 		}
-		
-		if (!filter_var($this->request->post['date_day'],FILTER_VALIDATE_INT) || $this->request->post['date_day'] <= 0) {
+
+        if (!filter_var($this->request->post['date_day'], FILTER_VALIDATE_INT) || $this->request->post['date_day'] <= 0) {
 			$this->error['date_day'] = $this->language->get('error_date_day');
 		}
-		
-		if ($this->error && !isset($this->error['warning'])) {
+
+        if ($this->error && !isset($this->error['warning'])) {
 			$this->error['warning'] = $this->language->get('error_warning');
 		}
 		return !$this->error;
 	}
 	
-	//=== Theme Custom Code====
 	public function getLayoutMod($name=null){
 		$log_directory  = DIR_CATALOG.'view/theme/'.$this->config->get('theme_default_directory').'/template/extension/module/'.$name;
 		if (is_dir($log_directory)) {
 			$files = scandir($log_directory);
 			foreach ($files as  $value) {
 				if (strpos($value, '.tpl') == true && strpos($value, '_') === false) {
-					list($fileName) = explode('.tpl',$value); 
+                    list($fileName) = explode('.tpl', $value);
 					$fileNames[] = ucfirst($fileName);
 				}
 			}
-		} 
+        }
 		$fileNames = isset($fileNames) ? $fileNames : '';
 		return $fileNames;
 	}
+
+    public function remove_cache()
+    {
+        $this->url->link('extension/extension', 'token=' . $this->session->data['token'], 'SSL');
+        $folder_cache = DIR_CACHE . 'So/';
+        if (file_exists($folder_cache)) {
+            self::mageDelTree($folder_cache);
+        }
+    }
+
+    //=== Theme Custom Code====
+
+    function mageDelTree($path)
+    {
+        if (is_dir($path)) {
+            $entries = scandir($path);
+            foreach ($entries as $entry) {
+                if ($entry != '.' && $entry != '..') {
+                    self::mageDelTree($path . '/' . $entry);
+                }
+            }
+            @rmdir($path);
+        } else {
+            @unlink($path);
+        }
+    }
 	
 	public function autocomplete() {
 		$json = array();

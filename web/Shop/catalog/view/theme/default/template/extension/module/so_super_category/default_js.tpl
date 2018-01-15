@@ -133,49 +133,180 @@ jQuery(document).ready(function ($) {
 									parent_active = 	$('.spcat-items-selected', $tag_id),
 									total_product = parent_active.data('total'),
 									tab_active = $('.ltabs-items-inner',parent_active),
-									nb_column0 = <?php echo $product_column0; ?>,
-									nb_column1 = <?php echo $product_column1; ?>,
-									nb_column2 = <?php echo $product_column2; ?>,
-									nb_column3 = <?php echo $product_column3; ?>,
-									nb_column4 = <?php echo $product_column4; ?>;
-									tab_active.owlCarousel2({
-									rtl: <?php echo $direction?>,
-									nav: <?php echo $slider_display_navigation ; ?>,
-									dots: false,
-									margin: 0,
-									loop:  <?php echo $slider_display_loop ; ?>,
-									autoplay: <?php echo $slider_auto_play; ?>,
-									autoplayHoverPause: <?php echo $slider_auto_hover_pause ; ?>,
-									autoplayTimeout: <?php echo $slider_auto_interval_timeout ; ?>,
-									autoplaySpeed: <?php echo $slider_auto_play_speed ; ?>,
-									mouseDrag: <?php echo  $slider_mouse_drag; ?>,
-									touchDrag: <?php echo $slider_touch_drag; ?>,
-									navRewind: true,
-									navText: [ '', '' ],
-									responsive: {
-										0: {
-											items: nb_column4,
-											nav: (total_product/<?php echo $rows?>) >= nb_column4  ? <?php echo $slider_display_navigation ; ?> : false,
+                                    nb_column0 =;
+                            <
+                                    ? php echo;
+                                $product_column0;
+                                    ?;
+                            >,
+                                nb_column1 =;
+                            <
+                                    ? php echo;
+                                $product_column1;
+                                    ?;
+                            >,
+                                nb_column2 =;
+                            <
+                                    ? php echo;
+                                $product_column2;
+                                    ?;
+                            >,
+                                nb_column3 =;
+                            <
+                                    ? php echo;
+                                $product_column3;
+                                    ?;
+                            >,
+                                nb_column4 =;
+                            <
+                                    ? php echo;
+                                $product_column4;
+                                    ?;
+                            >
+                                tab_active.owlCarousel2({
+                                    rtl: < ? php echo;
+                                $direction ?;
+                            >,
+                                nav: <
+                                    ? php echo;
+                                $slider_display_navigation;
+                                    ?;
+                            >,
+                                false,
+                                    margin;
+                            :
+                                0,
+                                    loop;
+                            :  <
+                                    ? php echo;
+                                $slider_display_loop;
+                                    ?;
+                            >,
+                                autoplay: <
+                                    ? php echo;
+                                $slider_auto_play;
+                                    ?;
+                            >,
+                                autoplayHoverPause: <
+                                    ? php echo;
+                                $slider_auto_hover_pause;
+                                    ?;
+                            >,
+                                autoplayTimeout: <
+                                    ? php echo;
+                                $slider_auto_interval_timeout;
+                                    ?;
+                            >,
+                                autoplaySpeed: <
+                                    ? php echo;
+                                $slider_auto_play_speed;
+                                    ?;
+                            >,
+                                mouseDrag: <
+                                    ? php echo;
+                                $slider_mouse_drag;
+                                    ?;
+                            >,
+                                touchDrag: <
+                                    ? php echo;
+                                $slider_touch_drag;
+                                    ?;
+                            >,
+                                true,
+                                    navText;
+                            :
+                                ['', ''],
+                                    responsive;
+                            :
+                                {
+                                    0;
+                                :
+                                    {
+                                        nb_column4,
+                                            nav;
+                                    :
+                                        (total_product / < ? php echo;
+                                        $rows ?;
+                                    >) >=
+                                        nb_column4 ?;
+                                    <
+                                            ? php echo;
+                                        $slider_display_navigation;
+                                            ?;
+                                    > :
+                                        false,
 										},
-										480: {
-											items: nb_column3,
-											nav: (total_product/<?php echo $rows?>) >= nb_column3 ? <?php echo $slider_display_navigation ; ?> : false,
+                                    480;
+                                :
+                                    {
+                                        nb_column3,
+                                            nav;
+                                    :
+                                        (total_product / < ? php echo;
+                                        $rows ?;
+                                    >) >=
+                                        nb_column3 ?;
+                                    <
+                                            ? php echo;
+                                        $slider_display_navigation;
+                                            ?;
+                                    > :
+                                        false,
 										},
-										768: {
-											items: nb_column2,
-											nav: (total_product/<?php echo $rows?>) >= nb_column2 ? <?php echo $slider_display_navigation ; ?> : false,
+                                    768;
+                                :
+                                    {
+                                        nb_column2,
+                                            nav;
+                                    :
+                                        (total_product / < ? php echo;
+                                        $rows ?;
+                                    >) >=
+                                        nb_column2 ?;
+                                    <
+                                            ? php echo;
+                                        $slider_display_navigation;
+                                            ?;
+                                    > :
+                                        false,
 										},
-										992: { 
-											items: nb_column1,
-											nav: (total_product/<?php echo $rows?>) >= nb_column1 ? <?php echo $slider_display_navigation ; ?> : false,
+                                    992;
+                                :
+                                    {
+                                        nb_column1,
+                                            nav;
+                                    :
+                                        (total_product / < ? php echo;
+                                        $rows ?;
+                                    >) >=
+                                        nb_column1 ?;
+                                    <
+                                            ? php echo;
+                                        $slider_display_navigation;
+                                            ?;
+                                    > :
+                                        false,
 											},
-										1200: {
-											items: nb_column0,
-											nav: (total_product/<?php echo $rows?>) >= nb_column0  ? <?php echo $slider_display_navigation ; ?> : false,
+                                    1200;
+                                :
+                                    {
+                                        nb_column0,
+                                            nav;
+                                    :
+                                        (total_product / < ? php echo;
+                                        $rows ?;
+                                    >) >=
+                                        nb_column0 ?;
+                                    <
+                                            ? php echo;
+                                        $slider_display_navigation;
+                                            ?;
+                                    > :
+                                        false,
 										},
 									}
-								});
-                             }
+                            })
+                            }
 							if(typeof(_SoQuickView) != 'undefined'){
 								_SoQuickView();
 							}
@@ -249,7 +380,9 @@ jQuery(document).ready(function ($) {
 			}
 			return false;
 		});
-		<?php if($show_category_type == 1 && $display_slide_category == 1){?>
+        <
+            ? php;
+        if ($show_category_type == 1 && $display_slide_category == 1){?>
 		var $cat_slider_inner = $('.cat_slider_inner',element);
 		$cat_slider_inner.owlCarousel2({
 			rtl: <?php echo $direction?>,
@@ -275,25 +408,106 @@ jQuery(document).ready(function ($) {
 					items:<?php echo $category_column4;?> ,
 					nav: (<?php echo count($category_tree) ?> -1 > <?php echo $category_column4;?>) ? <?php echo $subcategory_display_navigation; ?> : false
 					},
-				480: {
-					items:<?php echo $category_column3;?> ,
-					nav: (<?php echo count($category_tree) ?> -1 > <?php echo $category_column3;?>) ? <?php echo $subcategory_display_navigation; ?> : false
+        480;
+        :
+        {
+            items:<
+                ? php echo;
+            $category_column3;
+                ?;
+        > ,
+            ( < ? php echo;
+            count($category_tree) ?;
+        >
+            -1 > < ? php echo;
+            $category_column3;
+                ?;
+        >)
+                ?;
+        <
+                ? php echo;
+            $subcategory_display_navigation;
+                ?;
+        > :
+            false
 					},
-				768: {
-					items:<?php echo $category_column2;?> ,
-					nav: (<?php echo count($category_tree) ?> -1 > <?php echo $category_column2;?>) ? <?php echo $subcategory_display_navigation; ?> : false
+        768;
+        :
+        {
+            items:<
+                ? php echo;
+            $category_column2;
+                ?;
+        > ,
+            ( < ? php echo;
+            count($category_tree) ?;
+        >
+            -1 > < ? php echo;
+            $category_column2;
+                ?;
+        >)
+                ?;
+        <
+                ? php echo;
+            $subcategory_display_navigation;
+                ?;
+        > :
+            false
 					},
-				992: { items: <?php echo $nb_column1;?> ,
-					nav: (<?php echo count($category_tree) ?> -1 > <?php echo $category_column1;?>) ? <?php echo $subcategory_display_navigation; ?> : false
+        992;
+        :
+        {
+            items: <
+                ? php echo;
+            $nb_column1;
+                ?;
+        > ,
+            ( < ? php echo;
+            count($category_tree) ?;
+        >
+            -1 > < ? php echo;
+            $category_column1;
+                ?;
+        >)
+                ?;
+        <
+                ? php echo;
+            $subcategory_display_navigation;
+                ?;
+        > :
+            false
 					},
-				1200: {
-					items:<?php echo $category_column0;?> ,
-					nav: (<?php echo count($category_tree) ?> -1 > <?php echo $category_column0;?>) ? <?php echo $subcategory_display_navigation; ?> : false
+        1200;
+        :
+        {
+            items:<
+                ? php echo;
+            $category_column0;
+                ?;
+        > ,
+            ( < ? php echo;
+            count($category_tree) ?;
+        >
+            -1 > < ? php echo;
+            $category_column0;
+                ?;
+        >)
+                ?;
+        <
+                ? php echo;
+            $subcategory_display_navigation;
+                ?;
+        > :
+            false
 					}
 			}
 		});
-		<?php }?>
+<
+    ? php
+}
+    ?;
+>
 	})('#<?php echo $tag_id; ?>');
-});
+})
 //]]>
 </script>

@@ -37,14 +37,6 @@ class ControllerExtensionFeedOpenbaypro extends Controller {
 		$this->response->setOutput($this->load->view('extension/feed/openbaypro', $data));
 	}
 
-	protected function validate() {
-		if (!$this->user->hasPermission('modify', 'extension/module/openbaypro')) {
-			$this->error['warning'] = $this->language->get('error_permission');
-		}
-
-		return !$this->error;
-	}
-
 	public function install() {
 		$this->load->model('setting/setting');
 		$this->load->model('extension/event');
@@ -75,4 +67,13 @@ class ControllerExtensionFeedOpenbaypro extends Controller {
 		$this->model_extension_event->deleteEvent('openbay_product_edit_after');
 		$this->model_extension_event->deleteEvent('openbay_menu');
 	}
+
+    protected function validate()
+    {
+        if (!$this->user->hasPermission('modify', 'extension/module/openbaypro')) {
+            $this->error['warning'] = $this->language->get('error_permission');
+        }
+
+        return !$this->error;
+    }
 }

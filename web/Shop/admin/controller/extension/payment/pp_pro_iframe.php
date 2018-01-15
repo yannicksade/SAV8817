@@ -236,18 +236,6 @@ class ControllerExtensionPaymentPPProIframe extends Controller {
 		$this->response->setOutput($this->load->view('extension/payment/pp_pro_iframe', $data));
 	}
 
-	public function install() {
-		$this->load->model('extension/payment/pp_pro_iframe');
-
-		$this->model_extension_payment_pp_pro_iframe->install();
-	}
-
-	public function uninstall() {
-		$this->load->model('extension/payment/pp_pro_iframe');
-
-		$this->model_extension_payment_pp_pro_iframe->uninstall();
-	}
-
 	protected function validate() {
 		if (!$this->user->hasPermission('modify', 'extension/payment/pp_pro_iframe')) {
 			$this->error['warning'] = $this->language->get('error_permission');
@@ -267,6 +255,20 @@ class ControllerExtensionPaymentPPProIframe extends Controller {
 
 		return !$this->error;
 	}
+
+    public function install()
+    {
+        $this->load->model('extension/payment/pp_pro_iframe');
+
+        $this->model_extension_payment_pp_pro_iframe->install();
+    }
+
+    public function uninstall()
+    {
+        $this->load->model('extension/payment/pp_pro_iframe');
+
+        $this->model_extension_payment_pp_pro_iframe->uninstall();
+    }
 
 	public function order() {
 		$this->load->model('extension/payment/pp_pro_iframe');

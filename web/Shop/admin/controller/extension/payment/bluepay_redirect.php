@@ -171,6 +171,23 @@ class ControllerExtensionPaymentBluepayredirect extends Controller {
 		$this->response->setOutput($this->load->view('extension/payment/bluepay_redirect', $data));
 	}
 
+    protected function validate()
+    {
+        if (!$this->user->hasPermission('modify', 'extension/payment/bluepay_redirect')) {
+            $this->error['warning'] = $this->language->get('error_permission');
+        }
+
+        if (!$this->request->post['bluepay_redirect_account_id']) {
+            $this->error['account_id'] = $this->language->get('error_account_id');
+        }
+
+        if (!$this->request->post['bluepay_redirect_secret_key']) {
+            $this->error['secret_key'] = $this->language->get('error_secret_key');
+        }
+
+        return !$this->error;
+    }
+
 	public function install() {
 		$this->load->model('extension/payment/bluepay_redirect');
 
@@ -356,22 +373,6 @@ class ControllerExtensionPaymentBluepayredirect extends Controller {
 
 		$this->response->addHeader('Content-Type: application/json');
 		$this->response->setOutput(json_encode($json));
-	}
-
-	protected function validate() {
-		if (!$this->user->hasPermission('modify', 'extension/payment/bluepay_redirect')) {
-			$this->error['warning'] = $this->language->get('error_permission');
-		}
-
-		if (!$this->request->post['bluepay_redirect_account_id']) {
-			$this->error['account_id'] = $this->language->get('error_account_id');
-		}
-
-		if (!$this->request->post['bluepay_redirect_secret_key']) {
-			$this->error['secret_key'] = $this->language->get('error_secret_key');
-		}
-
-		return !$this->error;
 	}
 
 	public function callback() {

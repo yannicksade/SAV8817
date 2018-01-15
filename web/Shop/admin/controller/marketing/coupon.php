@@ -12,104 +12,6 @@ class ControllerMarketingCoupon extends Controller {
 		$this->getList();
 	}
 
-	public function add() {
-		$this->load->language('marketing/coupon');
-
-		$this->document->setTitle($this->language->get('heading_title'));
-
-		$this->load->model('marketing/coupon');
-
-		if (($this->request->server['REQUEST_METHOD'] == 'POST') && $this->validateForm()) {
-			$this->model_marketing_coupon->addCoupon($this->request->post);
-
-			$this->session->data['success'] = $this->language->get('text_success');
-
-			$url = '';
-
-			if (isset($this->request->get['sort'])) {
-				$url .= '&sort=' . $this->request->get['sort'];
-			}
-
-			if (isset($this->request->get['order'])) {
-				$url .= '&order=' . $this->request->get['order'];
-			}
-
-			if (isset($this->request->get['page'])) {
-				$url .= '&page=' . $this->request->get['page'];
-			}
-
-			$this->response->redirect($this->url->link('marketing/coupon', 'token=' . $this->session->data['token'] . $url, true));
-		}
-
-		$this->getForm();
-	}
-
-	public function edit() {
-		$this->load->language('marketing/coupon');
-
-		$this->document->setTitle($this->language->get('heading_title'));
-
-		$this->load->model('marketing/coupon');
-
-		if (($this->request->server['REQUEST_METHOD'] == 'POST') && $this->validateForm()) {
-			$this->model_marketing_coupon->editCoupon($this->request->get['coupon_id'], $this->request->post);
-
-			$this->session->data['success'] = $this->language->get('text_success');
-
-			$url = '';
-
-			if (isset($this->request->get['sort'])) {
-				$url .= '&sort=' . $this->request->get['sort'];
-			}
-
-			if (isset($this->request->get['order'])) {
-				$url .= '&order=' . $this->request->get['order'];
-			}
-
-			if (isset($this->request->get['page'])) {
-				$url .= '&page=' . $this->request->get['page'];
-			}
-
-			$this->response->redirect($this->url->link('marketing/coupon', 'token=' . $this->session->data['token'] . $url, true));
-		}
-
-		$this->getForm();
-	}
-
-	public function delete() {
-		$this->load->language('marketing/coupon');
-
-		$this->document->setTitle($this->language->get('heading_title'));
-
-		$this->load->model('marketing/coupon');
-
-		if (isset($this->request->post['selected']) && $this->validateDelete()) {
-			foreach ($this->request->post['selected'] as $coupon_id) {
-				$this->model_marketing_coupon->deleteCoupon($coupon_id);
-			}
-
-			$this->session->data['success'] = $this->language->get('text_success');
-
-			$url = '';
-
-			if (isset($this->request->get['sort'])) {
-				$url .= '&sort=' . $this->request->get['sort'];
-			}
-
-			if (isset($this->request->get['order'])) {
-				$url .= '&order=' . $this->request->get['order'];
-			}
-
-			if (isset($this->request->get['page'])) {
-				$url .= '&page=' . $this->request->get['page'];
-			}
-
-			$this->response->redirect($this->url->link('marketing/coupon', 'token=' . $this->session->data['token'] . $url, true));
-		}
-
-		$this->getList();
-	}
-
 	protected function getList() {
 		if (isset($this->request->get['sort'])) {
 			$sort = $this->request->get['sort'];
@@ -270,6 +172,66 @@ class ControllerMarketingCoupon extends Controller {
 
 		$this->response->setOutput($this->load->view('marketing/coupon_list', $data));
 	}
+
+    public function add()
+    {
+        $this->load->language('marketing/coupon');
+
+        $this->document->setTitle($this->language->get('heading_title'));
+
+        $this->load->model('marketing/coupon');
+
+        if (($this->request->server['REQUEST_METHOD'] == 'POST') && $this->validateForm()) {
+            $this->model_marketing_coupon->addCoupon($this->request->post);
+
+            $this->session->data['success'] = $this->language->get('text_success');
+
+            $url = '';
+
+            if (isset($this->request->get['sort'])) {
+                $url .= '&sort=' . $this->request->get['sort'];
+            }
+
+            if (isset($this->request->get['order'])) {
+                $url .= '&order=' . $this->request->get['order'];
+            }
+
+            if (isset($this->request->get['page'])) {
+                $url .= '&page=' . $this->request->get['page'];
+            }
+
+            $this->response->redirect($this->url->link('marketing/coupon', 'token=' . $this->session->data['token'] . $url, true));
+        }
+
+        $this->getForm();
+    }
+
+    protected function validateForm()
+    {
+        if (!$this->user->hasPermission('modify', 'marketing/coupon')) {
+            $this->error['warning'] = $this->language->get('error_permission');
+        }
+
+        if ((utf8_strlen($this->request->post['name']) < 3) || (utf8_strlen($this->request->post['name']) > 128)) {
+            $this->error['name'] = $this->language->get('error_name');
+        }
+
+        if ((utf8_strlen($this->request->post['code']) < 3) || (utf8_strlen($this->request->post['code']) > 10)) {
+            $this->error['code'] = $this->language->get('error_code');
+        }
+
+        $coupon_info = $this->model_marketing_coupon->getCouponByCode($this->request->post['code']);
+
+        if ($coupon_info) {
+            if (!isset($this->request->get['coupon_id'])) {
+                $this->error['warning'] = $this->language->get('error_exists');
+            } elseif ($coupon_info['coupon_id'] != $this->request->get['coupon_id']) {
+                $this->error['warning'] = $this->language->get('error_exists');
+            }
+        }
+
+        return !$this->error;
+    }
 
 	protected function getForm() {
 		$data['heading_title'] = $this->language->get('heading_title');
@@ -538,30 +500,72 @@ class ControllerMarketingCoupon extends Controller {
 		$this->response->setOutput($this->load->view('marketing/coupon_form', $data));
 	}
 
-	protected function validateForm() {
-		if (!$this->user->hasPermission('modify', 'marketing/coupon')) {
-			$this->error['warning'] = $this->language->get('error_permission');
-		}
+    public function edit()
+    {
+        $this->load->language('marketing/coupon');
 
-		if ((utf8_strlen($this->request->post['name']) < 3) || (utf8_strlen($this->request->post['name']) > 128)) {
-			$this->error['name'] = $this->language->get('error_name');
-		}
+        $this->document->setTitle($this->language->get('heading_title'));
 
-		if ((utf8_strlen($this->request->post['code']) < 3) || (utf8_strlen($this->request->post['code']) > 10)) {
-			$this->error['code'] = $this->language->get('error_code');
-		}
+        $this->load->model('marketing/coupon');
 
-		$coupon_info = $this->model_marketing_coupon->getCouponByCode($this->request->post['code']);
+        if (($this->request->server['REQUEST_METHOD'] == 'POST') && $this->validateForm()) {
+            $this->model_marketing_coupon->editCoupon($this->request->get['coupon_id'], $this->request->post);
 
-		if ($coupon_info) {
-			if (!isset($this->request->get['coupon_id'])) {
-				$this->error['warning'] = $this->language->get('error_exists');
-			} elseif ($coupon_info['coupon_id'] != $this->request->get['coupon_id']) {
-				$this->error['warning'] = $this->language->get('error_exists');
-			}
-		}
+            $this->session->data['success'] = $this->language->get('text_success');
 
-		return !$this->error;
+            $url = '';
+
+            if (isset($this->request->get['sort'])) {
+                $url .= '&sort=' . $this->request->get['sort'];
+            }
+
+            if (isset($this->request->get['order'])) {
+                $url .= '&order=' . $this->request->get['order'];
+            }
+
+            if (isset($this->request->get['page'])) {
+                $url .= '&page=' . $this->request->get['page'];
+            }
+
+            $this->response->redirect($this->url->link('marketing/coupon', 'token=' . $this->session->data['token'] . $url, true));
+        }
+
+        $this->getForm();
+    }
+
+    public function delete()
+    {
+        $this->load->language('marketing/coupon');
+
+        $this->document->setTitle($this->language->get('heading_title'));
+
+        $this->load->model('marketing/coupon');
+
+        if (isset($this->request->post['selected']) && $this->validateDelete()) {
+            foreach ($this->request->post['selected'] as $coupon_id) {
+                $this->model_marketing_coupon->deleteCoupon($coupon_id);
+            }
+
+            $this->session->data['success'] = $this->language->get('text_success');
+
+            $url = '';
+
+            if (isset($this->request->get['sort'])) {
+                $url .= '&sort=' . $this->request->get['sort'];
+            }
+
+            if (isset($this->request->get['order'])) {
+                $url .= '&order=' . $this->request->get['order'];
+            }
+
+            if (isset($this->request->get['page'])) {
+                $url .= '&page=' . $this->request->get['page'];
+            }
+
+            $this->response->redirect($this->url->link('marketing/coupon', 'token=' . $this->session->data['token'] . $url, true));
+        }
+
+        $this->getList();
 	}
 
 	protected function validateDelete() {

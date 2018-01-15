@@ -199,56 +199,6 @@ class ControllerExtensionModuleSofiltershopby extends Controller {
 		}
 		$this->response->setOutput($this->load->view('extension/module/so_filter_shop_by.tpl', $data));
 	}
-	public function remove_cache(){
-		$folder_cache = DIR_CACHE.'so/';
-		if(file_exists($folder_cache))
-		{
-			self::mageDelTree($folder_cache);
-		}
-	}
-	
-	function mageDelTree($path) {
-		if (is_dir($path)) {
-			$entries = scandir($path);
-			foreach ($entries as $entry) {
-				if ($entry != '.' && $entry != '..') {
-					self::mageDelTree($path.'/'.$entry);
-				}
-			}
-			@rmdir($path);
-		} else {
-			@unlink($path);
-		}
-	}
-	
-	protected function validate() {
-		if (!$this->user->hasPermission('modify', 'extension/module/so_filter_shop_by')) {
-			$this->error['warning'] = $this->language->get('error_permission');
-		}
-
-		if ((utf8_strlen($this->request->post['name']) < 3) || (utf8_strlen($this->request->post['name']) > 64)) {
-			$this->error['name'] = $this->language->get('error_name');
-		}
-
-		$this->load->model('localisation/language');
-		$languages = $this->model_localisation_language->getLanguages();
-
-		foreach($languages as $language){
-			$module_description = $this->request->post['module_description'];
-			if ((utf8_strlen($module_description[$language['language_id']]['head_name']) < 3) || (utf8_strlen($module_description[$language['language_id']]['head_name']) > 64)) {
-				$this->error['head_name'] = $this->language->get('error_head_name');
-			}
-		}
-		
-		if (!filter_var($this->request->post['character_search'],FILTER_VALIDATE_INT) || $this->request->post['character_search'] <= 0) {
-			$this->error['character_search'] = $this->language->get('error_character_search');
-		}
-		
-		if ($this->error && !isset($this->error['warning'])) {
-			$this->error['warning'] = $this->language->get('error_warning');
-		}
-		return !$this->error;
-	}
 
 	public function _breadcrumbs(){
 		$this->data['breadcrumbs'] = array();
@@ -277,6 +227,36 @@ class ControllerExtensionModuleSofiltershopby extends Controller {
 		return $this->data['breadcrumbs'];
 	}
 
+    protected function validate()
+    {
+        if (!$this->user->hasPermission('modify', 'extension/module/so_filter_shop_by')) {
+            $this->error['warning'] = $this->language->get('error_permission');
+        }
+
+        if ((utf8_strlen($this->request->post['name']) < 3) || (utf8_strlen($this->request->post['name']) > 64)) {
+            $this->error['name'] = $this->language->get('error_name');
+        }
+
+        $this->load->model('localisation/language');
+        $languages = $this->model_localisation_language->getLanguages();
+
+        foreach ($languages as $language) {
+            $module_description = $this->request->post['module_description'];
+            if ((utf8_strlen($module_description[$language['language_id']]['head_name']) < 3) || (utf8_strlen($module_description[$language['language_id']]['head_name']) > 64)) {
+                $this->error['head_name'] = $this->language->get('error_head_name');
+            }
+        }
+
+        if (!filter_var($this->request->post['character_search'], FILTER_VALIDATE_INT) || $this->request->post['character_search'] <= 0) {
+            $this->error['character_search'] = $this->language->get('error_character_search');
+        }
+
+        if ($this->error && !isset($this->error['warning'])) {
+            $this->error['warning'] = $this->language->get('error_warning');
+        }
+        return !$this->error;
+    }
+	
 	public function convertNameToParam($string) {
 		//Lower case everything
 		$string = strtolower($string);
@@ -288,4 +268,27 @@ class ControllerExtensionModuleSofiltershopby extends Controller {
 		$string = preg_replace("/[\s_]/", "-", $string);
 		return $string;
 	}
+
+    public function remove_cache()
+    {
+        $folder_cache = DIR_CACHE . 'so/';
+        if (file_exists($folder_cache)) {
+            self::mageDelTree($folder_cache);
+        }
+    }
+
+    function mageDelTree($path)
+    {
+        if (is_dir($path)) {
+            $entries = scandir($path);
+            foreach ($entries as $entry) {
+                if ($entry != '.' && $entry != '..') {
+                    self::mageDelTree($path . '/' . $entry);
+                }
+            }
+            @rmdir($path);
+        } else {
+            @unlink($path);
+        }
+    }
 }

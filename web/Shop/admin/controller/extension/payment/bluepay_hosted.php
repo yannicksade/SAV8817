@@ -194,6 +194,27 @@ class ControllerExtensionPaymentBluePayHosted extends Controller {
 		$this->response->setOutput($this->load->view('extension/payment/bluepay_hosted', $data));
 	}
 
+    protected function validate()
+    {
+        if (!$this->user->hasPermission('modify', 'extension/payment/bluepay_hosted')) {
+            $this->error['warning'] = $this->language->get('error_permission');
+        }
+
+        if (!$this->request->post['bluepay_hosted_account_name']) {
+            $this->error['account_name'] = $this->language->get('error_account_name');
+        }
+
+        if (!$this->request->post['bluepay_hosted_account_id']) {
+            $this->error['account_id'] = $this->language->get('error_account_id');
+        }
+
+        if (!$this->request->post['bluepay_hosted_secret_key']) {
+            $this->error['secret_key'] = $this->language->get('error_secret_key');
+        }
+
+        return !$this->error;
+    }
+
 	public function install() {
 		$this->load->model('extension/payment/bluepay_hosted');
 
@@ -379,26 +400,6 @@ class ControllerExtensionPaymentBluePayHosted extends Controller {
 
 		$this->response->addHeader('Content-Type: application/json');
 		$this->response->setOutput(json_encode($json));
-	}
-
-	protected function validate() {
-		if (!$this->user->hasPermission('modify', 'extension/payment/bluepay_hosted')) {
-			$this->error['warning'] = $this->language->get('error_permission');
-		}
-
-		if (!$this->request->post['bluepay_hosted_account_name']) {
-			$this->error['account_name'] = $this->language->get('error_account_name');
-		}
-
-		if (!$this->request->post['bluepay_hosted_account_id']) {
-			$this->error['account_id'] = $this->language->get('error_account_id');
-		}
-
-		if (!$this->request->post['bluepay_hosted_secret_key']) {
-			$this->error['secret_key'] = $this->language->get('error_secret_key');
-		}
-
-		return !$this->error;
 	}
 
 	public function callback() {

@@ -319,27 +319,7 @@ class ControllerExtensionModuleSocategoryslider extends Controller {
 		}
 		$this->response->setOutput($this->load->view('extension/module/so_category_slider.tpl', $data));
 	}
-	public function remove_cache()
-	{
-		$folder_cache = DIR_CACHE.'so/';
-		if(file_exists($folder_cache))
-		{
-			self::mageDelTree($folder_cache);
-		}
-	}
-	function mageDelTree($path) {
-		if (is_dir($path)) {
-			$entries = scandir($path);
-			foreach ($entries as $entry) {
-				if ($entry != '.' && $entry != '..') {
-					self::mageDelTree($path.'/'.$entry);
-				}
-			}
-			@rmdir($path);
-		} else {
-			@unlink($path);
-		}
-	}
+
 	public function _breadcrumbs(){
 		$this->data['breadcrumbs'] = array();
 
@@ -366,7 +346,9 @@ class ControllerExtensionModuleSocategoryslider extends Controller {
 		}
 		return $this->data['breadcrumbs'];
 	}
-	protected function validate() {
+
+    protected function validate()
+    {
 		if (!$this->user->hasPermission('modify', 'extension/module/so_category_slider')) {
 			$this->error['warning'] = $this->language->get('error_permission');
 		}
@@ -400,8 +382,8 @@ class ControllerExtensionModuleSocategoryslider extends Controller {
 		if ($this->request->post['source_limit_cat'] != '0' && !filter_var($this->request->post['source_limit_cat'],FILTER_VALIDATE_INT) || $this->request->post['source_limit_cat'] < 0) {
 			$this->error['source_limit_cat'] = $this->language->get('error_source_limit_cat');
 		}
-		
-		if ($this->request->post['display_feature'] == 1 && $this->request->post['product_feature'] == null) {
+
+        if ($this->request->post['display_feature'] == 1 && $this->request->post['product_feature'] == null) {
 			$this->error['product_feature'] = $this->language->get('error_product_feature');
 		}
 
@@ -430,12 +412,12 @@ class ControllerExtensionModuleSocategoryslider extends Controller {
 		if ($this->request->post['height'] != '0' && !filter_var($this->request->post['height'],FILTER_VALIDATE_INT) || $this->request->post['height'] <= 0) {
 			$this->error['height'] = $this->language->get('error_height');
 		}
-		
-		if (!filter_var($this->request->post['date_day'],FILTER_VALIDATE_INT) || $this->request->post['date_day'] <= 0) {
+
+        if (!filter_var($this->request->post['date_day'], FILTER_VALIDATE_INT) || $this->request->post['date_day'] <= 0) {
 			$this->error['date_day'] = $this->language->get('error_date_day');
 		}
-		
-		if ($this->request->post['width_cat'] != '0' && !filter_var($this->request->post['width_cat'],FILTER_VALIDATE_INT) || $this->request->post['width_cat'] <= 0) {
+
+        if ($this->request->post['width_cat'] != '0' && !filter_var($this->request->post['width_cat'], FILTER_VALIDATE_INT) || $this->request->post['width_cat'] <= 0) {
 			$this->error['width_cat'] = $this->language->get('error_width_cat');
 		}
 
@@ -481,6 +463,30 @@ class ControllerExtensionModuleSocategoryslider extends Controller {
 
 		return !$this->error;
 	}
+
+    public function remove_cache()
+    {
+        $folder_cache = DIR_CACHE . 'so/';
+        if (file_exists($folder_cache)) {
+            self::mageDelTree($folder_cache);
+        }
+    }
+
+    function mageDelTree($path)
+    {
+        if (is_dir($path)) {
+            $entries = scandir($path);
+            foreach ($entries as $entry) {
+                if ($entry != '.' && $entry != '..') {
+                    self::mageDelTree($path . '/' . $entry);
+                }
+            }
+            @rmdir($path);
+        } else {
+            @unlink($path);
+        }
+    }
+
 	public function autocomplete_product_feature() {
 		$json = array();	
 		$this->load->model('extension/module/so_category_slider');

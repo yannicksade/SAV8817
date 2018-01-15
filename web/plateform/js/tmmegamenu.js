@@ -92,7 +92,7 @@ function setColumnClean() {
     $.fn.tmStickUp = function(options) {
         var getOptions = {
             correctionSelector: $('.correctionSelector')
-        }
+        };
         $.extend(getOptions, options);
         var
             _this = $(this),

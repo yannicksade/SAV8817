@@ -125,22 +125,67 @@ class ControllerExtensionModuleSohtmlcontent extends Controller {
 	}
 	
 	//=== Theme Custom Code====
+
+    public function _breadcrumbs()
+    {
+        $this->data['breadcrumbs'] = array();
+
+        $this->data['breadcrumbs'][] = array(
+            'text' => $this->language->get('text_home'),
+            'href' => $this->url->link('common/dashboard', 'token=' . $this->session->data['token'], 'SSL')
+        );
+
+        $this->data['breadcrumbs'][] = array(
+            'text' => $this->language->get('text_module'),
+            'href' => $this->url->link('extension/extension', 'token=' . $this->session->data['token'], 'SSL')
+        );
+
+        if (!isset($this->request->get['module_id'])) {
+            $this->data['breadcrumbs'][] = array(
+                'text' => $this->language->get('heading_title'),
+                'href' => $this->url->link('extension/module/so_html_content', 'token=' . $this->session->data['token'], 'SSL')
+            );
+        } else {
+            $this->data['breadcrumbs'][] = array(
+                'text' => $this->language->get('heading_title'),
+                'href' => $this->url->link('extension/module/so_html_content', 'token=' . $this->session->data['token'] . '&module_id=' . $this->request->get['module_id'], 'SSL')
+            );
+        }
+        return $this->data['breadcrumbs'];
+    }
+
+    protected function validate()
+    {
+        if (!$this->user->hasPermission('modify', 'extension/module/so_html_content')) {
+            $this->error['warning'] = $this->language->get('error_permission');
+        }
+
+        if ((utf8_strlen($this->request->post['name']) < 3) || (utf8_strlen($this->request->post['name']) > 64)) {
+            $this->error['name'] = $this->language->get('error_name');
+        }
+
+        if ($this->error && !isset($this->error['warning'])) {
+            $this->error['warning'] = $this->language->get('error_warning');
+        }
+        return !$this->error;
+    }
+
 	public function getLayoutMod($name=null){
 		$log_directory  = DIR_CATALOG.'view/theme/'.$this->config->get('theme_default_directory').'/template/extension/module/'.$name;
 		if (is_dir($log_directory)) {
 			$files = scandir($log_directory);
 			foreach ($files as  $value) {
 				if (strpos($value, '.tpl') == true) {
-					list($fileName) = explode('.tpl',$value); 
+                    list($fileName) = explode('.tpl', $value);
 					$fileNames[] = ucfirst($fileName);
 				}
 			}
-		} 
+        }
 		$fileNames = isset($fileNames) ? $fileNames : '';
 		return $fileNames;
 	}
-	
-	public function remove_cache()
+
+    public function remove_cache()
 	{
 		$folder_cache = DIR_CACHE.'so/';
 		if(file_exists($folder_cache))
@@ -148,7 +193,9 @@ class ControllerExtensionModuleSohtmlcontent extends Controller {
 			self::mageDelTree($folder_cache);
 		}
 	}
-	function mageDelTree($path) {
+
+    function mageDelTree($path)
+    {
 		if (is_dir($path)) {
 			$entries = scandir($path);
 			foreach ($entries as $entry) {
@@ -160,46 +207,5 @@ class ControllerExtensionModuleSohtmlcontent extends Controller {
 		} else {
 			@unlink($path);
 		}
-	}
-	protected function validate() {
-		if (!$this->user->hasPermission('modify', 'extension/module/so_html_content')) {
-			$this->error['warning'] = $this->language->get('error_permission');
-		}
-
-		if ((utf8_strlen($this->request->post['name']) < 3) || (utf8_strlen($this->request->post['name']) > 64)) {
-			$this->error['name'] = $this->language->get('error_name');
-		}
-		
-		if ($this->error && !isset($this->error['warning'])) {
-			$this->error['warning'] = $this->language->get('error_warning');
-		}
-		return !$this->error;
-	}
-
-	public function _breadcrumbs(){
-		$this->data['breadcrumbs'] = array();
-
-		$this->data['breadcrumbs'][] = array(
-			'text' => $this->language->get('text_home'),
-			'href' => $this->url->link('common/dashboard', 'token=' . $this->session->data['token'], 'SSL')
-		);
-
-		$this->data['breadcrumbs'][] = array(
-			'text' => $this->language->get('text_module'),
-			'href' => $this->url->link('extension/extension', 'token=' . $this->session->data['token'], 'SSL')
-		);
-
-		if (!isset($this->request->get['module_id'])) {
-			$this->data['breadcrumbs'][] = array(
-				'text' => $this->language->get('heading_title'),
-				'href' => $this->url->link('extension/module/so_html_content', 'token=' . $this->session->data['token'], 'SSL')
-			);
-		} else {
-			$this->data['breadcrumbs'][] = array(
-				'text' => $this->language->get('heading_title'),
-				'href' => $this->url->link('extension/module/so_html_content', 'token=' . $this->session->data['token'] . '&module_id=' . $this->request->get['module_id'], 'SSL')
-			);
-		}
-		return $this->data['breadcrumbs'];
 	}
 }

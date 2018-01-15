@@ -1200,6 +1200,24 @@ class ControllerExtensionPaymentPPExpress extends Controller {
 		$this->response->setOutput($this->load->view('extension/payment/pp_express_view', $data));
 	}
 
+    private function formatRows($data)
+    {
+        $return = array();
+
+        foreach ($data as $k => $v) {
+            $elements = preg_split("/(\d+)/", $k, -1, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
+            if (isset($elements[1]) && isset($elements[0])) {
+                if ($elements[0] == 'L_TIMESTAMP') {
+                    $v = str_replace('T', ' ', $v);
+                    $v = str_replace('Z', '', $v);
+                }
+                $return[$elements[1]][$elements[0]] = $v;
+            }
+        }
+
+        return $return;
+    }
+
 	public function doSearch() {
 		/**
 		 * used to search for transactions from a user account
@@ -1348,23 +1366,6 @@ class ControllerExtensionPaymentPPExpress extends Controller {
 			}
 		}
 		$this->response->redirect($this->url->link('extension/payment/pp_express', 'token=' . $this->session->data['token'], true));
-	}
-
-	private function formatRows($data) {
-		$return = array();
-
-		foreach ($data as $k => $v) {
-			$elements = preg_split("/(\d+)/", $k, -1, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
-			if (isset($elements[1]) && isset($elements[0])) {
-				if ($elements[0] == 'L_TIMESTAMP') {
-					$v = str_replace('T', ' ', $v);
-					$v = str_replace('Z', '', $v);
-				}
-				$return[$elements[1]][$elements[0]] = $v;
-			}
-		}
-
-		return $return;
 	}
 
 	public function recurringButtons() {

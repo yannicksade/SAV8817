@@ -174,6 +174,21 @@ class ControllerExtensionPaymentKlarnaInvoice extends Controller {
 		return !$this->error;
 	}
 
+    public function clear()
+    {
+        $this->load->language('extension/payment/klarna_invoice');
+
+        $file = DIR_LOGS . 'klarna_invoice.log';
+
+        $handle = fopen($file, 'w+');
+
+        fclose($handle);
+
+        $this->session->data['success'] = $this->language->get('text_success');
+
+        $this->response->redirect($this->url->link('extension/payment/klarna_invoice', 'token=' . $this->session->data['token'], true));
+    }
+
 	private function parseResponse($node, $document) {
 		$child = $node;
 
@@ -219,19 +234,5 @@ class ControllerExtensionPaymentKlarnaInvoice extends Controller {
 		}
 
 		return $value;
-	}
-
-	public function clear() {
-		$this->load->language('extension/payment/klarna_invoice');
-
-		$file = DIR_LOGS . 'klarna_invoice.log';
-
-		$handle = fopen($file, 'w+');
-
-		fclose($handle);
-
-		$this->session->data['success'] = $this->language->get('text_success');
-
-		$this->response->redirect($this->url->link('extension/payment/klarna_invoice', 'token=' . $this->session->data['token'], true));
 	}
 }

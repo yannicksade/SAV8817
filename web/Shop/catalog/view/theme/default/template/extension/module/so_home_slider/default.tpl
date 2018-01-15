@@ -33,44 +33,165 @@ $count_item = count($list);
 			<?php }?>
 		</div>
 		<script type="text/javascript">
-			var total_item = <?php echo $count_item ; ?>;
-			$(".sohomeslider-inner-<?php echo $module?>").owlCarousel2({
+            var total_item =;
+            <
+                ? php echo;
+            $count_item;
+                ?;
+            >
+            $(".sohomeslider-inner-<?php echo $module?>").owlCarousel2({
 					animateOut: '<?php echo $animateOut?>',
 					animateIn: '<?php echo $animateIn?>',
-					autoplay: <?php echo $autoplay?>,
-					autoplayTimeout: <?php echo $autoplayTimeout?>,
-					autoplaySpeed:  <?php echo $autoplaySpeed?>,
-					smartSpeed: 500,
-					autoplayHoverPause: <?php echo $autoplayHoverPause?>,
-					startPosition: <?php echo $startPosition?>,
-					mouseDrag:  <?php echo $mouseDrag?>,
-					touchDrag: <?php echo $touchDrag?>,
-					dots: <?php echo $dots?>,
-					autoWidth: false,
-					dotClass: "owl2-dot",
-					dotsClass: "owl2-dots",
-					loop: <?php echo $loop?>,
-					navText: ["Next", "Prev"],
-					navClass: ["owl2-prev", "owl2-next"],
-					responsive: {
-					0:{	items: <?php echo $nb_column4;?>,
-						nav: total_item <= <?php echo $nb_column4;?> ? false : ((<?php echo $nav ; ?>) ? true: false),
+                autoplay: < ? php echo;
+            $autoplay ?;
+            >,
+            autoplayTimeout: <
+                ? php echo;
+            $autoplayTimeout ?;
+            >,
+            autoplaySpeed:  <
+                ? php echo;
+            $autoplaySpeed ?;
+            >,
+            500,
+                autoplayHoverPause;
+            : <
+                ? php echo;
+            $autoplayHoverPause ?;
+            >,
+            startPosition: <
+                ? php echo;
+            $startPosition ?;
+            >,
+            mouseDrag:  <
+                ? php echo;
+            $mouseDrag ?;
+            >,
+            touchDrag: <
+                ? php echo;
+            $touchDrag ?;
+            >,
+            dots: <
+                ? php echo;
+            $dots ?;
+            >,
+            false,
+                dotClass;
+            :
+            "owl2-dot",
+                dotsClass;
+            :
+            "owl2-dots",
+                loop;
+            : <
+                ? php echo;
+            $loop ?;
+            >,
+            ["Next", "Prev"],
+                navClass;
+            :
+            ["owl2-prev", "owl2-next"],
+                responsive;
+            :
+            {
+                0;
+            :
+                {
+                    items: <
+                        ? php echo;
+                    $nb_column4;
+                        ?;
+                >,
+                    total_item <= < ? php echo;
+                    $nb_column4;
+                        ?;
+                >
+                        ? false : (( < ? php echo;
+                    $nav;
+                        ?;
+                >)
+                        ? true : false;
+                ),
 					},
-					480:{ items: <?php echo $nb_column3;?>,
-						nav: total_item <= <?php echo $nb_column3;?> ? false : ((<?php echo $nav ; ?>) ? true: false),
+                480;
+            :
+                {
+                    items: <
+                        ? php echo;
+                    $nb_column3;
+                        ?;
+                >,
+                    total_item <= < ? php echo;
+                    $nb_column3;
+                        ?;
+                >
+                        ? false : (( < ? php echo;
+                    $nav;
+                        ?;
+                >)
+                        ? true : false;
+                ),
 					},
-					768:{ items: <?php echo $nb_column2;?>,
-						nav: total_item <= <?php echo $nb_column2;?> ? false : ((<?php echo $nav ; ?>) ? true: false),
+                768;
+            :
+                {
+                    items: <
+                        ? php echo;
+                    $nb_column2;
+                        ?;
+                >,
+                    total_item <= < ? php echo;
+                    $nb_column2;
+                        ?;
+                >
+                        ? false : (( < ? php echo;
+                    $nav;
+                        ?;
+                >)
+                        ? true : false;
+                ),
 					},
-					992:{ items: <?php echo $nb_column1;?>,
-						nav: total_item <= <?php echo $nb_column1;?> ? false : ((<?php echo $nav ; ?>) ? true: false),
+                992;
+            :
+                {
+                    items: <
+                        ? php echo;
+                    $nb_column1;
+                        ?;
+                >,
+                    total_item <= < ? php echo;
+                    $nb_column1;
+                        ?;
+                >
+                        ? false : (( < ? php echo;
+                    $nav;
+                        ?;
+                >)
+                        ? true : false;
+                ),
 					},
-					1200:{ items: <?php echo $nb_column0;?>,
-						nav: total_item <= <?php echo $nb_column0;?> ? false : ((<?php echo $nav ; ?>) ? true: false),
+                1200;
+            :
+                {
+                    items: <
+                        ? php echo;
+                    $nb_column0;
+                        ?;
+                >,
+                    total_item <= < ? php echo;
+                    $nb_column0;
+                        ?;
+                >
+                        ? false : (( < ? php echo;
+                    $nav;
+                        ?;
+                >)
+                        ? true : false;
+                ),
 					}
 				},
-			});
-	</script>
+            })
+        </script>
 	</div>
 	<?php } else{ ?>
 		<?php echo $objlang->get('text_noitem');?>

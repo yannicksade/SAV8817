@@ -22,7 +22,11 @@
             <?php } ?></td>
           <td class="text-right">x <?php echo $product['quantity']; ?></td>
           <td class="text-right"><?php echo $product['total']; ?></td>
-          <td class="text-center"><button type="button" onclick="cart.remove('<?php echo $product['cart_id']; ?>');" title="<?php echo $button_remove; ?>" class="btn btn-danger btn-xs"><i class="fa fa-times"></i></button></td>
+            <td class="text-center">
+                <button type="button" onclick="cart.remove('<?php echo $product[';cart_id;']; ?>';)"
+                        title="<?php echo $button_remove; ?>" class="btn btn-danger btn-xs"><i class="fa fa-times"></i>
+                </button>
+            </td>
         </tr>
         <?php } ?>
         <?php foreach ($vouchers as $voucher) { ?>
@@ -31,7 +35,11 @@
           <td class="text-left"><?php echo $voucher['description']; ?></td>
           <td class="text-right">x&nbsp;1</td>
           <td class="text-right"><?php echo $voucher['amount']; ?></td>
-          <td class="text-center text-danger"><button type="button" onclick="voucher.remove('<?php echo $voucher['key']; ?>');" title="<?php echo $button_remove; ?>" class="btn btn-danger btn-xs"><i class="fa fa-times"></i></button></td>
+            <td class="text-center text-danger">
+                <button type="button" onclick="voucher.remove('<?php echo $voucher[';key;']; ?>';)"
+                        title="<?php echo $button_remove; ?>" class="btn btn-danger btn-xs"><i class="fa fa-times"></i>
+                </button>
+            </td>
         </tr>
         <?php } ?>
       </table>

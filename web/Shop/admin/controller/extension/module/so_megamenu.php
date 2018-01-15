@@ -602,6 +602,15 @@ class ControllerExtensionModuleSoMegaMenu extends Controller {
         }
         $this->response->setOutput($this->load->view('extension/module/so_megamenu.tpl', $data));
     }
+
+    protected function validate()
+    {
+        if (!$this->user->hasPermission('modify', 'extension/module/so_megamenu')) {
+            $this->error['warning'] = $this->language->get('error_permission');
+        }
+        return !$this->error;
+    }
+
     public function remove_cache()
     {
         $folder_cache = DIR_CACHE.'so/';
@@ -610,6 +619,7 @@ class ControllerExtensionModuleSoMegaMenu extends Controller {
             self::mageDelTree($folder_cache);
         }
     }
+
     function mageDelTree($path) {
         if (is_dir($path)) {
             $entries = scandir($path);
@@ -623,6 +633,7 @@ class ControllerExtensionModuleSoMegaMenu extends Controller {
             @unlink($path);
         }
     }
+
     public function uninstall() {
         $this->load->model('setting/setting');
         $this->load->model('extension/module/so_megamenu');
@@ -653,19 +664,15 @@ class ControllerExtensionModuleSoMegaMenu extends Controller {
         );
         $this->model_extension_module->addModule('so_megamenu',$data);
 		$new_module = $this->getModulesByCode('so_megamenu');
-		if(is_array($new_module))		
+        if (is_array($new_module))
 			$this->model_extension_module_so_megamenu->install($new_module['module_id']);
     }
-	public function getModulesByCode($code) {
+
+    public function getModulesByCode($code)
+    {
 		$query = $this->db->query("SELECT * FROM `" . DB_PREFIX . "module` WHERE `code` = '" . $this->db->escape($code) . "' ORDER BY `name`");
 
 		return $query->row;
-	}	
-    protected function validate() {
-        if (!$this->user->hasPermission('modify', 'extension/module/so_megamenu')) {
-            $this->error['warning'] = $this->language->get('error_permission');
-        }		
-		return !$this->error;
     }
 
 }

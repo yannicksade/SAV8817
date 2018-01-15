@@ -354,44 +354,7 @@ class ControllerExtensionModuleSoextraslider extends Controller {
 		}
 		$this->response->setOutput($this->load->view('extension/module/so_extra_slider.tpl', $data));
 	}
-	public function remove_cache()
-	{
-		/*$this->url->link('extension/module', 'token=' . $this->session->data['token'], 'SSL');*/
-		$folder_cache = DIR_CACHE.'so/';
-		if(file_exists($folder_cache))
-		{
-			self::mageDelTree($folder_cache);
-		}
-	}
-	function mageDelTree($path) {
-		if (is_dir($path)) {
-			$entries = scandir($path);
-			foreach ($entries as $entry) {
-				if ($entry != '.' && $entry != '..') {
-					self::mageDelTree($path.'/'.$entry);
-				}
-			}
-			@rmdir($path);
-		} else {
-			@unlink($path);
-		}
-	}
-	//=== Theme Custom Code====
-	public function getLayoutMod($name=null){
-		$log_directory  = DIR_CATALOG.'view/theme/'.$this->config->get('theme_default_directory').'/template/extension/module/'.$name;
-		if (is_dir($log_directory)) {
-			$files = scandir($log_directory);
-			foreach ($files as  $value) {
-				if (strpos($value, '.tpl') == true) {
-					list($fileName) = explode('.tpl',$value); 
-					$fileNames[] = ucfirst($fileName);
-				}
-			}
-		} 
-		$fileNames = isset($fileNames) ? $fileNames : '';
-		return $fileNames;
-	}
-	
+
 	public function _breadcrumbs()
 	{
 		$data['breadcrumbs'] = array();
@@ -419,7 +382,9 @@ class ControllerExtensionModuleSoextraslider extends Controller {
 		}
 		return $data['breadcrumbs'];
 	}
-	protected function validate() {
+
+    protected function validate()
+    {
 		if (!$this->user->hasPermission('modify', 'extension/module/so_extra_slider')) {
 			$this->error['warning'] = $this->language->get('error_permission');
 		}
@@ -449,11 +414,11 @@ class ControllerExtensionModuleSoextraslider extends Controller {
 		}
 
 		if ($this->request->post['title_maxlength'] != '0' && !filter_var($this->request->post['title_maxlength'],FILTER_VALIDATE_FLOAT) || $this->request->post['title_maxlength'] < 0) {
-			
-			$this->error['title_maxlength'] = $this->language->get('error_title_maxlength');
+
+            $this->error['title_maxlength'] = $this->language->get('error_title_maxlength');
 		}
-		
-		if ($this->request->post['description_maxlength'] != '0' && !filter_var($this->request->post['description_maxlength'],FILTER_VALIDATE_FLOAT) || $this->request->post['description_maxlength'] < 0) {
+
+        if ($this->request->post['description_maxlength'] != '0' && !filter_var($this->request->post['description_maxlength'], FILTER_VALIDATE_FLOAT) || $this->request->post['description_maxlength'] < 0) {
 			$this->error['description_maxlength'] = $this->language->get('error_description_maxlength');
 		}
 		if (!filter_var($this->request->post['width'],FILTER_VALIDATE_FLOAT) || $this->request->post['width'] < 0 || $this->request->post['width'] > 5000) {
@@ -492,24 +457,67 @@ class ControllerExtensionModuleSoextraslider extends Controller {
 		if ($this->request->post['category'] == null) {
 			$this->error['category'] = $this->language->get('error_category');
 		}
-		
-		if ($this->request->post['type_data'] == 1 && $this->request->post['product_feature'] == null) {
+
+        if ($this->request->post['type_data'] == 1 && $this->request->post['product_feature'] == null) {
 			$this->error['product_feature'] = $this->language->get('error_product_feature');
 		}
-		
-		if (utf8_strlen($this->request->post['placeholder_path']) < 1) {
+
+        if (utf8_strlen($this->request->post['placeholder_path']) < 1) {
 			$this->error['placeholder_path'] = $this->language->get('error_placeholder_path');
 		}
-		
-		if (!filter_var($this->request->post['date_day'],FILTER_VALIDATE_INT) || $this->request->post['date_day'] <= 0) {
+
+        if (!filter_var($this->request->post['date_day'], FILTER_VALIDATE_INT) || $this->request->post['date_day'] <= 0) {
 			$this->error['date_day'] = $this->language->get('error_date_day');
 		}
-		
-		if ($this->error && !isset($this->error['warning'])) {
+
+        if ($this->error && !isset($this->error['warning'])) {
 			$this->error['warning'] = $this->language->get('error_warning');
 		}
 		return !$this->error;
 	}
+
+    //=== Theme Custom Code====
+
+    public function getLayoutMod($name = null)
+    {
+        $log_directory = DIR_CATALOG . 'view/theme/' . $this->config->get('theme_default_directory') . '/template/extension/module/' . $name;
+        if (is_dir($log_directory)) {
+            $files = scandir($log_directory);
+            foreach ($files as $value) {
+                if (strpos($value, '.tpl') == true) {
+                    list($fileName) = explode('.tpl', $value);
+                    $fileNames[] = ucfirst($fileName);
+                }
+            }
+        }
+        $fileNames = isset($fileNames) ? $fileNames : '';
+        return $fileNames;
+    }
+
+    public function remove_cache()
+    {
+        /*$this->url->link('extension/module', 'token=' . $this->session->data['token'], 'SSL');*/
+        $folder_cache = DIR_CACHE . 'so/';
+        if (file_exists($folder_cache)) {
+            self::mageDelTree($folder_cache);
+        }
+    }
+
+    function mageDelTree($path)
+    {
+        if (is_dir($path)) {
+            $entries = scandir($path);
+            foreach ($entries as $entry) {
+                if ($entry != '.' && $entry != '..') {
+                    self::mageDelTree($path . '/' . $entry);
+                }
+            }
+            @rmdir($path);
+        } else {
+            @unlink($path);
+        }
+    }
+
 	public function autocomplete_category() {
 		$json = array();
 		

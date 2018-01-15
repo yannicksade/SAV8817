@@ -84,36 +84,17 @@ class ControllerExtensionOpenbayEbayProfile extends Controller {
 		$this->profileForm($data);
 	}
 
-	public function delete() {
-		$this->load->model('extension/openbay/ebay_profile');
-
+    private function profileValidate()
+    {
 		if (!$this->user->hasPermission('modify', 'extension/openbay/ebay_profile')) {
 			$this->error['warning'] = $this->language->get('error_permission');
-		} else {
-			if (isset($this->request->get['ebay_profile_id'])) {
-				$this->model_extension_openbay_ebay_profile->delete($this->request->get['ebay_profile_id']);
-			}
 		}
 
-		$this->response->redirect($this->url->link('extension/openbay/ebay_profile/profileAll', 'token=' . $this->session->data['token'], true));
-	}
+        if ($this->request->post['name'] == '') {
+            $this->error['name'] = $this->language->get('error_name');
+        }
 
-	public function edit() {
-		$this->load->model('extension/openbay/ebay_profile');
-
-		$this->load->language('extension/openbay/ebay_profile');
-
-		$data = $this->language->all();
-
-		if ($this->request->post && $this->profileValidate()) {
-			$this->session->data['success'] = $data['text_updated'];
-
-			$this->model_extension_openbay_ebay_profile->edit($this->request->post['ebay_profile_id'], $this->request->post);
-
-			$this->response->redirect($this->url->link('extension/openbay/ebay_profile/profileAll', 'token=' . $this->session->data['token'], true));
-		}
-
-		$this->profileForm($data);
+        return !$this->error;
 	}
 
 	public function profileForm($data) {
@@ -289,6 +270,40 @@ class ControllerExtensionOpenbayEbayProfile extends Controller {
 		$this->response->setOutput($this->load->view($data['types'][$type]['template'], $data));
 	}
 
+    public function delete()
+    {
+        $this->load->model('extension/openbay/ebay_profile');
+
+        if (!$this->user->hasPermission('modify', 'extension/openbay/ebay_profile')) {
+            $this->error['warning'] = $this->language->get('error_permission');
+        } else {
+            if (isset($this->request->get['ebay_profile_id'])) {
+                $this->model_extension_openbay_ebay_profile->delete($this->request->get['ebay_profile_id']);
+            }
+        }
+
+        $this->response->redirect($this->url->link('extension/openbay/ebay_profile/profileAll', 'token=' . $this->session->data['token'], true));
+    }
+
+    public function edit()
+    {
+        $this->load->model('extension/openbay/ebay_profile');
+
+        $this->load->language('extension/openbay/ebay_profile');
+
+        $data = $this->language->all();
+
+        if ($this->request->post && $this->profileValidate()) {
+            $this->session->data['success'] = $data['text_updated'];
+
+            $this->model_extension_openbay_ebay_profile->edit($this->request->post['ebay_profile_id'], $this->request->post);
+
+            $this->response->redirect($this->url->link('extension/openbay/ebay_profile/profileAll', 'token=' . $this->session->data['token'], true));
+        }
+
+        $this->profileForm($data);
+    }
+
 	public function profileGet() {
 		$this->load->model('extension/openbay/ebay_profile');
 		$this->load->model('extension/openbay/ebay');
@@ -349,17 +364,5 @@ class ControllerExtensionOpenbayEbayProfile extends Controller {
 
 		$this->response->addHeader('Content-Type: application/json');
 		$this->response->setOutput(json_encode($profile_info));
-	}
-
-	private function profileValidate() {
-		if (!$this->user->hasPermission('modify', 'extension/openbay/ebay_profile')) {
-			$this->error['warning'] = $this->language->get('error_permission');
-		}
-
-		if ($this->request->post['name'] == '') {
-			$this->error['name'] = $this->language->get('error_name');
-		}
-
-		return !$this->error;
 	}
 }

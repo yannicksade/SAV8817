@@ -141,7 +141,7 @@ transparent = true;
 
                 reader.onload = function (e) {
                     $('#wizardPicturePreview').attr('src', e.target.result).fadeIn('slow');
-                }
+                };
                 reader.readAsDataURL(input.files[0]);
             }
         }

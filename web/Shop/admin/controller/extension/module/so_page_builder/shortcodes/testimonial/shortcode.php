@@ -59,14 +59,14 @@ function testimonialYTShortcode($atts,$contentC,$module_id,$id,$database){
 						$testimonial .= testimonial_itemYTShortcode($value,$atts,$module_id,$id,$database);
 						$atts->dem += 1;
 					}
-				}	
-		
-		$testimonial .='	</div>
+				}
+
+        $testimonial .= '	</div>
 			</div>
 			<script type="text/javascript">
 				//<![CDATA[
 				jQuery(document).ready(function ($) {
-					;(function (element) {
+					(function (element) {
 						var $element = $(element),
 								$extraslider = $(".extraslider-inner", $element),
 								_delay = 800,
@@ -99,7 +99,7 @@ function testimonialYTShortcode($atts,$contentC,$module_id,$id,$database){
 						touchDrag: true,
 						autoWidth: false,
 						responsive: {
-							0: 	{ items: '.$atts->items_column4.' } ,
+							0: 	{ items: ' . $atts->items_column4 . ' } ,
 							480: { items: '.$atts->items_column3.' },
 							768: { items: '.$atts->items_column2.' },
 							992: { items: '.$atts->items_column1.' },

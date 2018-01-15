@@ -61,13 +61,13 @@ function google_mapYTShortcode($atts,$contentC,$module_id,$id,$database) {
 					mapTypeControl: false,
 					zoom: '. $atts->zoom.',
 					'.$atts->zoom_control_style. '
-					panControl : '.$atts->pan_control .',
-					streetViewControl: '.$atts->street_view_control.',
-					scrollwheel: '.$atts->zoom_on_scroll.',
-					keyMap:"AIzaSyAYvfhU3lQ4Z52FXziEBemhbiXzFycLj7U"
-				});
+					panControl; : ' . $atts->pan_control . ',
+					streetViewControl;: ' . $atts->street_view_control . ',
+					scrollwheel;: ' . $atts->zoom_on_scroll . ',
+					keyMap;:"AIzaSyAYvfhU3lQ4Z52FXziEBemhbiXzFycLj7U"
+				})
 
-				'.$atts->map_location_marker.'
+				' . $atts->map_location_marker . '
 			});</script>';
 		$return .= '<div id="'. $id .'" class="map_advanced '.$atts->yt_class.'"></div>';	
 	}

@@ -236,6 +236,27 @@ class ControllerExtensionPaymentG2APay extends Controller {
 		$this->response->setOutput($this->load->view('extension/payment/g2apay', $data));
 	}
 
+    protected function validate()
+    {
+        if (!$this->user->hasPermission('modify', 'extension/payment/g2apay')) {
+            $this->error['warning'] = $this->language->get('error_permission');
+        }
+
+        if (!$this->request->post['g2apay_username']) {
+            $this->error['username'] = $this->language->get('error_username');
+        }
+
+        if (!$this->request->post['g2apay_secret']) {
+            $this->error['secret'] = $this->language->get('error_secret');
+        }
+
+        if (!$this->request->post['g2apay_api_hash']) {
+            $this->error['api_hash'] = $this->language->get('error_api_hash');
+        }
+
+        return !$this->error;
+    }
+
 	public function order() {
 
 		if ($this->config->get('g2apay_status')) {
@@ -332,26 +353,6 @@ class ControllerExtensionPaymentG2APay extends Controller {
 	public function uninstall() {
 		$this->load->model('extension/payment/g2apay');
 		$this->model_extension_payment_g2apay->uninstall();
-	}
-
-	protected function validate() {
-		if (!$this->user->hasPermission('modify', 'extension/payment/g2apay')) {
-			$this->error['warning'] = $this->language->get('error_permission');
-		}
-
-		if (!$this->request->post['g2apay_username']) {
-			$this->error['username'] = $this->language->get('error_username');
-		}
-
-		if (!$this->request->post['g2apay_secret']) {
-			$this->error['secret'] = $this->language->get('error_secret');
-		}
-
-		if (!$this->request->post['g2apay_api_hash']) {
-			$this->error['api_hash'] = $this->language->get('error_api_hash');
-		}
-
-		return !$this->error;
 	}
 
 }

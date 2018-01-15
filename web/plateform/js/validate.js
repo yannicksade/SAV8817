@@ -8,7 +8,7 @@ unicodeCategories[p]=firstLetters[p];return function(regexpString,classes)
 (regexpString.ignoreCase?"i":"")+
 (regexpString.multiline?"m":"");regexpString=regexpString.source;}
 regexpString=regexpString.replace(/\\p\{(..?)\}/g,function(match,group){var unicode_categorie=unicodeCategories[group];if(!classes)
-unicode_category=unicode_categorie.replace(/\[(.*?)\]/g,"$1")
+    unicode_category = unicode_categorie.replace(/\[(.*?)\]/g, "$1");
 return unicode_category||match;});return new RegExp(regexpString,modifiers);};})();function validate_isName(s)
 {var reg=/^[^0-9!<>,;?=+()@#"°{}_$%:]+$/;return reg.test(s);}
 function validate_isGenericName(s)

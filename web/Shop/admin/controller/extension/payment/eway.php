@@ -208,23 +208,39 @@ class ControllerExtensionPaymentEway extends Controller {
 		$this->response->setOutput($this->load->view('extension/payment/eway', $data));
 	}
 
+    private function validate()
+    {
+        if (!$this->user->hasPermission('modify', 'extension/payment/eway')) {
+            $this->error['warning'] = $this->language->get('error_permission');
+        }
+        if (!$this->request->post['eway_username']) {
+            $this->error['username'] = $this->language->get('error_username');
+        }
+        if (!$this->request->post['eway_password']) {
+            $this->error['password'] = $this->language->get('error_password');
+        }
+        if (!isset($this->request->post['eway_payment_type'])) {
+            $this->error['payment_type'] = $this->language->get('error_payment_type');
+        }
+
+        return !$this->error;
+    }
+
 	public function install() {
 		$this->load->model('extension/payment/eway');
 		$this->model_extension_payment_eway->install();
 	}
+
+    // Legacy 2.0.0
 
 	public function uninstall() {
 		$this->load->model('extension/payment/eway');
 		$this->model_extension_payment_eway->uninstall();
 	}
 
-	// Legacy 2.0.0
-	public function orderAction() {
-		return $this->order();
-	}
+    // Legacy 2.0.3
 
-	// Legacy 2.0.3
-	public function action() {
+	public function orderAction() {
 		return $this->order();
 	}
 
@@ -279,6 +295,11 @@ class ControllerExtensionPaymentEway extends Controller {
 			}
 		}
 	}
+
+    public function action()
+    {
+        return $this->order();
+    }
 
 	public function refund() {
 		$this->load->language('extension/payment/eway');
@@ -390,23 +411,6 @@ class ControllerExtensionPaymentEway extends Controller {
 
 		$this->response->addHeader('Content-Type: application/json');
 		$this->response->setOutput(json_encode($json));
-	}
-
-	private function validate() {
-		if (!$this->user->hasPermission('modify', 'extension/payment/eway')) {
-			$this->error['warning'] = $this->language->get('error_permission');
-		}
-		if (!$this->request->post['eway_username']) {
-			$this->error['username'] = $this->language->get('error_username');
-		}
-		if (!$this->request->post['eway_password']) {
-			$this->error['password'] = $this->language->get('error_password');
-		}
-		if (!isset($this->request->post['eway_payment_type'])) {
-			$this->error['payment_type'] = $this->language->get('error_payment_type');
-		}
-
-		return !$this->error;
 	}
 
 }

@@ -301,6 +301,31 @@ class ControllerExtensionPaymentSecureTradingWs extends Controller {
 		$this->response->setOutput($this->load->view('extension/payment/securetrading_ws', $data));
 	}
 
+    protected function validate()
+    {
+        if (!$this->user->hasPermission('modify', 'extension/payment/securetrading_pp')) {
+            $this->error['warning'] = $this->language->get('error_permission');
+        }
+
+        if (!$this->request->post['securetrading_ws_site_reference']) {
+            $this->error['site_reference'] = $this->language->get('error_site_reference');
+        }
+
+        if (!$this->request->post['securetrading_ws_username']) {
+            $this->error['username'] = $this->language->get('error_username');
+        }
+
+        if (!$this->request->post['securetrading_ws_password']) {
+            $this->error['password'] = $this->language->get('error_password');
+        }
+
+        if (empty($this->request->post['securetrading_ws_cards_accepted'])) {
+            $this->error['cards_accepted'] = $this->language->get('error_cards_accepted');
+        }
+
+        return !$this->error;
+    }
+
 	public function install() {
 		$this->load->model('extension/payment/securetrading_ws');
 		$this->model_extension_payment_securetrading_ws->install();
@@ -443,8 +468,8 @@ class ControllerExtensionPaymentSecureTradingWs extends Controller {
 
 				$data['order_id'] = $this->request->get['order_id'];
 				$data['token'] = $this->request->get['token'];
-				
-				return $this->load->view('extension/payment/securetrading_ws_order', $data);
+
+                return $this->load->view('extension/payment/securetrading_ws_order', $data);
 			}
 		}
 	}
@@ -631,29 +656,5 @@ class ControllerExtensionPaymentSecureTradingWs extends Controller {
 		}
 
 		$this->response->setOutput(json_encode($json));
-	}
-
-	protected function validate() {
-		if (!$this->user->hasPermission('modify', 'extension/payment/securetrading_pp')) {
-			$this->error['warning'] = $this->language->get('error_permission');
-		}
-
-		if (!$this->request->post['securetrading_ws_site_reference']) {
-			$this->error['site_reference'] = $this->language->get('error_site_reference');
-		}
-
-		if (!$this->request->post['securetrading_ws_username']) {
-			$this->error['username'] = $this->language->get('error_username');
-		}
-
-		if (!$this->request->post['securetrading_ws_password']) {
-			$this->error['password'] = $this->language->get('error_password');
-		}
-
-		if (empty($this->request->post['securetrading_ws_cards_accepted'])) {
-			$this->error['cards_accepted'] = $this->language->get('error_cards_accepted');
-		}
-
-		return !$this->error;
 	}
 }

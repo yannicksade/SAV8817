@@ -552,6 +552,27 @@ class ControllerExtensionPaymentLaybuy extends Controller {
 		$this->response->setOutput($this->load->view('extension/payment/laybuy', $data));
 	}
 
+    protected function validate()
+    {
+        if (!$this->user->hasPermission('modify', 'extension/payment/laybuy')) {
+            $this->error['warning'] = $this->language->get('error_permission');
+        }
+
+        if (!$this->request->post['laybuys_membership_id']) {
+            $this->error['laybuys_membership_id'] = $this->language->get('error_membership_id');
+        }
+
+        if (!$this->request->post['laybuy_token']) {
+            $this->error['laybuy_token'] = $this->language->get('error_token');
+        }
+
+        if ($this->request->post['laybuy_min_deposit'] > $this->request->post['laybuy_max_deposit']) {
+            $this->error['laybuy_min_deposit'] = $this->language->get('error_min_deposit');
+        }
+
+        return !$this->error;
+    }
+
 	public function fetch() {
 		$this->load->model('extension/payment/laybuy');
 
@@ -727,178 +748,6 @@ class ControllerExtensionPaymentLaybuy extends Controller {
 
 			$this->model_extension_payment_laybuy->uninstall();
 		}
-	}
-
-	public function transaction($order_page = false) {
-		$this->load->model('extension/payment/laybuy');
-
-		$this->load->language('extension/payment/laybuy');
-
-		if (isset($this->request->get['id'])) {
-			$id = (int)$this->request->get['id'];
-		} else {
-			$id = 0;
-		}
-
-		$data['id'] = $id;
-
-		if (!$order_page) {
-			$this->document->setTitle($this->language->get('heading_transaction_title'));
-		}
-
-		$data['breadcrumbs'] = array();
-
-		$data['breadcrumbs'][] = array(
-			'text' => $this->language->get('text_home'),
-			'href' => $this->url->link('common/dashboard', 'token=' . $this->session->data['token'], true)
-		);
-
-		$data['breadcrumbs'][] = array(
-			'text' => $this->language->get('text_extension'),
-			'href' => $this->url->link('extension/extension', 'token=' . $this->session->data['token'], true)
-		);
-
-		$data['breadcrumbs'][] = array(
-			'text' => $this->language->get('heading_title'),
-			'href' => $this->url->link('extension/payment/laybuy', 'token=' . $this->session->data['token'] . '#reportstab', true)
-		);
-
-		$data['breadcrumbs'][] = array(
-			'text' => $this->language->get('heading_transaction_title'),
-			'href' => $this->url->link('extension/payment/laybuy/transaction', 'token=' . $this->session->data['token'] . '&id=' . $id, true)
-		);
-
-		$data['heading_title'] = $this->language->get('heading_transaction_title');
-
-		$data['button_cancel'] = $this->language->get('button_cancel');
-
-		$data['cancel'] = $this->url->link('extension/payment/laybuy', 'token=' . $this->session->data['token'] . '#reportstab', true);
-
-		$transaction_info = $this->model_extension_payment_laybuy->getTransaction($id);
-
-		if ($transaction_info) {
-			$data['tab_reference'] = $this->language->get('tab_reference');
-			$data['tab_customer'] = $this->language->get('tab_customer');
-			$data['tab_payment'] = $this->language->get('tab_payment');
-			$data['tab_modify'] = $this->language->get('tab_modify');
-
-			$data['text_transaction_details'] = $this->language->get('text_transaction_details');
-			$data['text_paypal_profile_id'] = $this->language->get('text_paypal_profile_id');
-			$data['text_laybuy_ref_no'] = $this->language->get('text_laybuy_ref_no');
-			$data['text_order_id'] = $this->language->get('text_order_id');
-			$data['text_firstname'] = $this->language->get('text_firstname');
-			$data['text_lastname'] = $this->language->get('text_lastname');
-			$data['text_email'] = $this->language->get('text_email');
-			$data['text_address'] = $this->language->get('text_address');
-			$data['text_suburb'] = $this->language->get('text_suburb');
-			$data['text_state'] = $this->language->get('text_state');
-			$data['text_country'] = $this->language->get('text_country');
-			$data['text_postcode'] = $this->language->get('text_postcode');
-			$data['text_status'] = $this->language->get('text_status');
-			$data['text_amount'] = $this->language->get('text_amount');
-			$data['text_downpayment_percent'] = $this->language->get('text_downpayment_percent');
-			$data['text_months'] = $this->language->get('text_months');
-			$data['text_downpayment_amount'] = $this->language->get('text_downpayment_amount');
-			$data['text_payment_amounts'] = $this->language->get('text_payment_amounts');
-			$data['text_first_payment_due'] = $this->language->get('text_first_payment_due');
-			$data['text_last_payment_due'] = $this->language->get('text_last_payment_due');
-			$data['text_report'] = $this->language->get('text_report');
-			$data['text_instalment'] = $this->language->get('text_instalment');
-			$data['text_month'] = $this->language->get('text_month');
-			$data['text_date'] = $this->language->get('text_date');
-			$data['text_pp_trans_id'] = $this->language->get('text_pp_trans_id');
-			$data['text_downpayment'] = $this->language->get('text_downpayment');
-			$data['text_revise_plan'] = $this->language->get('text_revise_plan');
-			$data['text_type_laybuy'] = $this->language->get('text_type_laybuy');
-			$data['text_type_buynow'] = $this->language->get('text_type_buynow');
-			$data['text_today'] = $this->language->get('text_today');
-			$data['text_payment'] = $this->language->get('text_payment');
-			$data['text_due_date'] = $this->language->get('text_due_date');
-			$data['text_cancel_plan'] = $this->language->get('text_cancel_plan');
-			$data['text_remaining'] = $this->language->get('text_remaining');
-
-			$data['button_revise_plan'] = $this->language->get('button_revise_plan');
-			$data['button_cancel_plan'] = $this->language->get('button_cancel_plan');
-
-			$data['initial_payments'] = $this->model_extension_payment_laybuy->getInitialPayments();
-
-			$data['months'] = $this->model_extension_payment_laybuy->getMonths();
-
-			$data['currency_symbol_left'] = $this->currency->getSymbolLeft($transaction_info['currency']);
-
-			$data['currency_symbol_right'] = $this->currency->getSymbolRight($transaction_info['currency']);
-
-			$data['store_url'] = HTTPS_CATALOG;
-
-			$data['api_key'] = $this->getApiKey();
-
-			$this->load->model('sale/order');
-
-			$order = $this->model_sale_order->getOrder($transaction_info['order_id']);
-
-			$data['order_info'] = array(
-				'currency_value' => $order['currency_value']
-			);
-
-			$data['total'] = $this->model_extension_payment_laybuy->getRemainingAmount($transaction_info['amount'], $transaction_info['downpayment_amount'], $transaction_info['payment_amounts'], $transaction_info['transaction']);
-
-			$data['transaction'] = array(
-				'paypal_profile_id' => $transaction_info['paypal_profile_id'],
-				'laybuy_ref_no' 	=> $transaction_info['laybuy_ref_no'],
-				'order_id'        	=> $transaction_info['order_id'],
-				'firstname'         => $transaction_info['firstname'],
-				'lastname'          => $transaction_info['lastname'],
-				'email'	  			=> $transaction_info['email'],
-				'address'	  		=> $transaction_info['address'],
-				'suburb'			=> $transaction_info['suburb'],
-				'state'				=> $transaction_info['state'],
-				'country' 			=> $transaction_info['country'],
-				'postcode'  		=> $transaction_info['postcode'],
-				'status_id'			=> $transaction_info['status'],
-				'status'          	=> $this->model_extension_payment_laybuy->getStatusLabel($transaction_info['status']),
-				'amount'          	=> $this->currency->format($transaction_info['amount'], $transaction_info['currency']),
-				'remaining'        	=> $this->currency->format($this->model_extension_payment_laybuy->getRemainingAmount($transaction_info['amount'], $transaction_info['downpayment_amount'], $transaction_info['payment_amounts'], $transaction_info['transaction']), $transaction_info['currency']),
-				'downpayment'	  	=> $transaction_info['downpayment'],
-				'months'	  		=> $transaction_info['months'],
-				'downpayment_amount'=> $this->currency->format($transaction_info['downpayment_amount'], $transaction_info['currency']),
-				'payment_amounts'	=> $this->currency->format($transaction_info['payment_amounts'], $transaction_info['currency']),
-				'first_payment_due' => date($this->language->get('date_format_short'), strtotime($transaction_info['first_payment_due'])),
-				'last_payment_due'  => date($this->language->get('date_format_short'), strtotime($transaction_info['last_payment_due'])),
-				'report'        	=> json_decode($transaction_info['report'], true)
-			);
-		} else {
-			$data['transaction'] = array();
-
-			$data['text_not_found'] = $this->language->get('text_not_found');
-		}
-
-		$data['token'] = $this->session->data['token'];
-
-		if (isset($this->session->data['success'])) {
-			$data['success'] = $this->session->data['success'];
-
-			unset($this->session->data['success']);
-		} else {
-			$data['success'] = '';
-		}
-
-		if (isset($this->session->data['error_warning'])) {
-			$data['error_warning'] = $this->session->data['error_warning'];
-
-			unset($this->session->data['error_warning']);
-		} else {
-			$data['error_warning'] = '';
-		}
-
-		$data['header'] = $this->load->controller('common/header');
-		$data['column_left'] = $this->load->controller('common/column_left');
-		$data['footer'] = $this->load->controller('common/footer');
-
-		if ($order_page) {
-			return $data;
-		}
-
-		$this->response->setOutput($this->load->view('extension/payment/laybuy_transaction', $data));
 	}
 
 	public function cancel() {
@@ -1198,6 +1047,179 @@ class ControllerExtensionPaymentLaybuy extends Controller {
 		}
 	}
 
+    public function transaction($order_page = false)
+    {
+        $this->load->model('extension/payment/laybuy');
+
+        $this->load->language('extension/payment/laybuy');
+
+        if (isset($this->request->get['id'])) {
+            $id = (int)$this->request->get['id'];
+        } else {
+            $id = 0;
+        }
+
+        $data['id'] = $id;
+
+        if (!$order_page) {
+            $this->document->setTitle($this->language->get('heading_transaction_title'));
+        }
+
+        $data['breadcrumbs'] = array();
+
+        $data['breadcrumbs'][] = array(
+            'text' => $this->language->get('text_home'),
+            'href' => $this->url->link('common/dashboard', 'token=' . $this->session->data['token'], true)
+        );
+
+        $data['breadcrumbs'][] = array(
+            'text' => $this->language->get('text_extension'),
+            'href' => $this->url->link('extension/extension', 'token=' . $this->session->data['token'], true)
+        );
+
+        $data['breadcrumbs'][] = array(
+            'text' => $this->language->get('heading_title'),
+            'href' => $this->url->link('extension/payment/laybuy', 'token=' . $this->session->data['token'] . '#reportstab', true)
+        );
+
+        $data['breadcrumbs'][] = array(
+            'text' => $this->language->get('heading_transaction_title'),
+            'href' => $this->url->link('extension/payment/laybuy/transaction', 'token=' . $this->session->data['token'] . '&id=' . $id, true)
+        );
+
+        $data['heading_title'] = $this->language->get('heading_transaction_title');
+
+        $data['button_cancel'] = $this->language->get('button_cancel');
+
+        $data['cancel'] = $this->url->link('extension/payment/laybuy', 'token=' . $this->session->data['token'] . '#reportstab', true);
+
+        $transaction_info = $this->model_extension_payment_laybuy->getTransaction($id);
+
+        if ($transaction_info) {
+            $data['tab_reference'] = $this->language->get('tab_reference');
+            $data['tab_customer'] = $this->language->get('tab_customer');
+            $data['tab_payment'] = $this->language->get('tab_payment');
+            $data['tab_modify'] = $this->language->get('tab_modify');
+
+            $data['text_transaction_details'] = $this->language->get('text_transaction_details');
+            $data['text_paypal_profile_id'] = $this->language->get('text_paypal_profile_id');
+            $data['text_laybuy_ref_no'] = $this->language->get('text_laybuy_ref_no');
+            $data['text_order_id'] = $this->language->get('text_order_id');
+            $data['text_firstname'] = $this->language->get('text_firstname');
+            $data['text_lastname'] = $this->language->get('text_lastname');
+            $data['text_email'] = $this->language->get('text_email');
+            $data['text_address'] = $this->language->get('text_address');
+            $data['text_suburb'] = $this->language->get('text_suburb');
+            $data['text_state'] = $this->language->get('text_state');
+            $data['text_country'] = $this->language->get('text_country');
+            $data['text_postcode'] = $this->language->get('text_postcode');
+            $data['text_status'] = $this->language->get('text_status');
+            $data['text_amount'] = $this->language->get('text_amount');
+            $data['text_downpayment_percent'] = $this->language->get('text_downpayment_percent');
+            $data['text_months'] = $this->language->get('text_months');
+            $data['text_downpayment_amount'] = $this->language->get('text_downpayment_amount');
+            $data['text_payment_amounts'] = $this->language->get('text_payment_amounts');
+            $data['text_first_payment_due'] = $this->language->get('text_first_payment_due');
+            $data['text_last_payment_due'] = $this->language->get('text_last_payment_due');
+            $data['text_report'] = $this->language->get('text_report');
+            $data['text_instalment'] = $this->language->get('text_instalment');
+            $data['text_month'] = $this->language->get('text_month');
+            $data['text_date'] = $this->language->get('text_date');
+            $data['text_pp_trans_id'] = $this->language->get('text_pp_trans_id');
+            $data['text_downpayment'] = $this->language->get('text_downpayment');
+            $data['text_revise_plan'] = $this->language->get('text_revise_plan');
+            $data['text_type_laybuy'] = $this->language->get('text_type_laybuy');
+            $data['text_type_buynow'] = $this->language->get('text_type_buynow');
+            $data['text_today'] = $this->language->get('text_today');
+            $data['text_payment'] = $this->language->get('text_payment');
+            $data['text_due_date'] = $this->language->get('text_due_date');
+            $data['text_cancel_plan'] = $this->language->get('text_cancel_plan');
+            $data['text_remaining'] = $this->language->get('text_remaining');
+
+            $data['button_revise_plan'] = $this->language->get('button_revise_plan');
+            $data['button_cancel_plan'] = $this->language->get('button_cancel_plan');
+
+            $data['initial_payments'] = $this->model_extension_payment_laybuy->getInitialPayments();
+
+            $data['months'] = $this->model_extension_payment_laybuy->getMonths();
+
+            $data['currency_symbol_left'] = $this->currency->getSymbolLeft($transaction_info['currency']);
+
+            $data['currency_symbol_right'] = $this->currency->getSymbolRight($transaction_info['currency']);
+
+            $data['store_url'] = HTTPS_CATALOG;
+
+            $data['api_key'] = $this->getApiKey();
+
+            $this->load->model('sale/order');
+
+            $order = $this->model_sale_order->getOrder($transaction_info['order_id']);
+
+            $data['order_info'] = array(
+                'currency_value' => $order['currency_value']
+            );
+
+            $data['total'] = $this->model_extension_payment_laybuy->getRemainingAmount($transaction_info['amount'], $transaction_info['downpayment_amount'], $transaction_info['payment_amounts'], $transaction_info['transaction']);
+
+            $data['transaction'] = array(
+                'paypal_profile_id' => $transaction_info['paypal_profile_id'],
+                'laybuy_ref_no' => $transaction_info['laybuy_ref_no'],
+                'order_id' => $transaction_info['order_id'],
+                'firstname' => $transaction_info['firstname'],
+                'lastname' => $transaction_info['lastname'],
+                'email' => $transaction_info['email'],
+                'address' => $transaction_info['address'],
+                'suburb' => $transaction_info['suburb'],
+                'state' => $transaction_info['state'],
+                'country' => $transaction_info['country'],
+                'postcode' => $transaction_info['postcode'],
+                'status_id' => $transaction_info['status'],
+                'status' => $this->model_extension_payment_laybuy->getStatusLabel($transaction_info['status']),
+                'amount' => $this->currency->format($transaction_info['amount'], $transaction_info['currency']),
+                'remaining' => $this->currency->format($this->model_extension_payment_laybuy->getRemainingAmount($transaction_info['amount'], $transaction_info['downpayment_amount'], $transaction_info['payment_amounts'], $transaction_info['transaction']), $transaction_info['currency']),
+                'downpayment' => $transaction_info['downpayment'],
+                'months' => $transaction_info['months'],
+                'downpayment_amount' => $this->currency->format($transaction_info['downpayment_amount'], $transaction_info['currency']),
+                'payment_amounts' => $this->currency->format($transaction_info['payment_amounts'], $transaction_info['currency']),
+                'first_payment_due' => date($this->language->get('date_format_short'), strtotime($transaction_info['first_payment_due'])),
+                'last_payment_due' => date($this->language->get('date_format_short'), strtotime($transaction_info['last_payment_due'])),
+                'report' => json_decode($transaction_info['report'], true)
+            );
+        } else {
+            $data['transaction'] = array();
+
+            $data['text_not_found'] = $this->language->get('text_not_found');
+        }
+
+        $data['token'] = $this->session->data['token'];
+
+        if (isset($this->session->data['success'])) {
+            $data['success'] = $this->session->data['success'];
+
+            unset($this->session->data['success']);
+        } else {
+            $data['success'] = '';
+        }
+
+        if (isset($this->session->data['error_warning'])) {
+            $data['error_warning'] = $this->session->data['error_warning'];
+
+            unset($this->session->data['error_warning']);
+        } else {
+            $data['error_warning'] = '';
+        }
+
+        $data['header'] = $this->load->controller('common/header');
+        $data['column_left'] = $this->load->controller('common/column_left');
+        $data['footer'] = $this->load->controller('common/footer');
+
+        if ($order_page) {
+            return $data;
+        }
+
+        $this->response->setOutput($this->load->view('extension/payment/laybuy_transaction', $data));
+    }
+
 	private function getApiKey() {
 		$this->load->model('extension/payment/laybuy');
 
@@ -1216,25 +1238,5 @@ class ControllerExtensionPaymentLaybuy extends Controller {
 
 			return;
 		}
-	}
-
-	protected function validate() {
-		if (!$this->user->hasPermission('modify', 'extension/payment/laybuy')) {
-			$this->error['warning'] = $this->language->get('error_permission');
-		}
-
-		if (!$this->request->post['laybuys_membership_id']) {
-			$this->error['laybuys_membership_id'] = $this->language->get('error_membership_id');
-		}
-
-		if (!$this->request->post['laybuy_token']) {
-			$this->error['laybuy_token'] = $this->language->get('error_token');
-		}
-
-		if ($this->request->post['laybuy_min_deposit'] > $this->request->post['laybuy_max_deposit']) {
-			$this->error['laybuy_min_deposit'] = $this->language->get('error_min_deposit');
-		}
-
-		return !$this->error;
 	}
 }

@@ -457,7 +457,7 @@ jQuery(document).ready(function ($) {
 						}
 						if (ids !== "") val = source + ": " + ids;
 						$val.val(val).trigger("change");
-					}
+                    };
 					// Switch source
 					$sources.on("change", function (e) {
 						var source = $(this).val();
@@ -498,7 +498,7 @@ jQuery(document).ready(function ($) {
 						$terms.hide().find("option").remove();
 						update();
 						// Taxonomy is not selected
-						if (tax === "0") return;
+                        if (tax === "0")
 						// Taxonomy selected
 						else {
 							var ajax_term_select = $.ajax({

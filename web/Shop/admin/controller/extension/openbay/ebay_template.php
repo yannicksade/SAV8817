@@ -83,43 +83,17 @@ class ControllerExtensionOpenbayEbayTemplate extends Controller {
 		$this->templateForm($data);
 	}
 
-	public function delete() {
-		$this->load->language('extension/openbay/ebay_template');
-		$this->load->model('extension/openbay/ebay_template');
-
+    private function templateValidate()
+    {
 		if (!$this->user->hasPermission('modify', 'extension/openbay/ebay_template')) {
 			$this->error['warning'] = $this->language->get('error_permission');
-		} else {
-			if (isset($this->request->get['template_id'])) {
-				$this->model_extension_openbay_ebay_template->delete($this->request->get['template_id']);
-
-				$this->session->data['success'] = $this->language->get('text_deleted');
-			}
-		}
-		$this->response->redirect($this->url->link('extension/openbay/ebay_template/listAll', 'token=' . $this->session->data['token'], true));
-	}
-
-	public function edit() {
-		$this->load->model('extension/openbay/ebay_template');
-
-		$this->load->language('extension/openbay/ebay_template');
-
-		$data = $this->language->all();
-
-		$data['page_title']   = $data['text_title_list_edit'];
-		$data['btn_save']     = $this->url->link('extension/openbay/ebay_template/edit', 'token=' . $this->session->data['token'], true);
-		$data['cancel']       = $this->url->link('extension/openbay/ebay_template/listAll', 'token=' . $this->session->data['token'], true);
-
-		if ($this->request->post && $this->templateValidate()) {
-
-			$this->session->data['success'] = $data['text_updated'];
-
-			$this->model_extension_openbay_ebay_template->edit($this->request->post['template_id'], $this->request->post);
-
-			$this->response->redirect($this->url->link('extension/openbay/ebay_template/listAll', 'token=' . $this->session->data['token'], true));
 		}
 
-		$this->templateForm($data);
+        if ($this->request->post['name'] == '') {
+            $this->error['warning'] = $this->language->get('error_name');
+		}
+
+        return !$this->error;
 	}
 
 	public function templateForm($data) {
@@ -196,15 +170,44 @@ class ControllerExtensionOpenbayEbayTemplate extends Controller {
 		$this->response->setOutput($this->load->view('extension/openbay/ebay_template_form', $data));
 	}
 
-	private function templateValidate() {
+    public function delete()
+    {
+        $this->load->language('extension/openbay/ebay_template');
+        $this->load->model('extension/openbay/ebay_template');
+
 		if (!$this->user->hasPermission('modify', 'extension/openbay/ebay_template')) {
 			$this->error['warning'] = $this->language->get('error_permission');
+        } else {
+            if (isset($this->request->get['template_id'])) {
+                $this->model_extension_openbay_ebay_template->delete($this->request->get['template_id']);
+
+                $this->session->data['success'] = $this->language->get('text_deleted');
+            }
+        }
+        $this->response->redirect($this->url->link('extension/openbay/ebay_template/listAll', 'token=' . $this->session->data['token'], true));
+    }
+
+    public function edit()
+    {
+        $this->load->model('extension/openbay/ebay_template');
+
+        $this->load->language('extension/openbay/ebay_template');
+
+        $data = $this->language->all();
+
+        $data['page_title'] = $data['text_title_list_edit'];
+        $data['btn_save'] = $this->url->link('extension/openbay/ebay_template/edit', 'token=' . $this->session->data['token'], true);
+        $data['cancel'] = $this->url->link('extension/openbay/ebay_template/listAll', 'token=' . $this->session->data['token'], true);
+
+        if ($this->request->post && $this->templateValidate()) {
+
+            $this->session->data['success'] = $data['text_updated'];
+
+            $this->model_extension_openbay_ebay_template->edit($this->request->post['template_id'], $this->request->post);
+
+            $this->response->redirect($this->url->link('extension/openbay/ebay_template/listAll', 'token=' . $this->session->data['token'], true));
 		}
 
-		if ($this->request->post['name'] == '') {
-			$this->error['warning'] = $this->language->get('error_name');
-		}
-
-		return !$this->error;
+        $this->templateForm($data);
 	}
 }

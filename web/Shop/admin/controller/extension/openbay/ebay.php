@@ -362,6 +362,15 @@ class ControllerExtensionOpenbayEbay extends Controller {
 		$this->response->setOutput($this->load->view('extension/openbay/ebay_settings', $data));
 	}
 
+    private function validate()
+    {
+        if (!$this->user->hasPermission('modify', 'extension/openbay/ebay')) {
+            $this->error['warning'] = $this->language->get('error_permission');
+        }
+
+        return !$this->error;
+    }
+
 	public function updateSettings() {
 		set_time_limit(0);
 
@@ -1069,22 +1078,6 @@ class ControllerExtensionOpenbayEbay extends Controller {
 		$this->response->setOutput(json_encode($json));
 	}
 
-	private function validate() {
-		if (!$this->user->hasPermission('modify', 'extension/openbay/ebay')) {
-			$this->error['warning'] = $this->language->get('error_permission');
-		}
-
-		return !$this->error;
-	}
-
-	private function checkConfig() {
-		if ($this->config->get('ebay_token') == '' || $this->config->get('ebay_secret') == '') {
-			return false;
-		} else {
-			return true;
-		}
-	}
-
 	public function edit() {
 		if ($this->checkConfig() == true) {
 			if (!empty($this->request->get['product_id'])) {
@@ -1139,6 +1132,15 @@ class ControllerExtensionOpenbayEbay extends Controller {
 			}
 		}
 	}
+
+    private function checkConfig()
+    {
+        if ($this->config->get('ebay_token') == '' || $this->config->get('ebay_secret') == '') {
+            return false;
+        } else {
+            return true;
+        }
+    }
 
 	public function editLoad() {
 		$this->load->model('catalog/product');

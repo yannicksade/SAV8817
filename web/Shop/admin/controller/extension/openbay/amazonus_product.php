@@ -208,6 +208,78 @@ class ControllerExtensionOpenbayAmazonusProduct extends Controller{
 		$this->response->setOutput($this->load->view('extension/openbay/amazonus_listing_advanced', $data));
 	}
 
+    private function validateForm()
+    {
+        return true;
+    }
+
+    private function uploadItems()
+    {
+        $this->load->language('extension/openbay/amazonus_listing');
+        $this->load->model('extension/openbay/amazonus');
+        $logger = new Log('amazonus_product.log');
+
+        $logger->write('Uploading process started . ');
+
+        $saved_products = $this->model_extension_openbay_amazonus->getSavedProductsData();
+
+        if (empty($saved_products)) {
+            $logger->write('No saved listings found. Uploading canceled . ');
+            $result['status'] = 'error';
+            $result['error_message'] = 'No saved listings. Nothing to upload. Aborting . ';
+            return $result;
+        }
+
+        foreach ($saved_products as $saved_product) {
+            $product_data_decoded = (array)json_decode($saved_product['data']);
+
+            $catalog = defined(HTTPS_CATALOG) ? HTTPS_CATALOG : HTTP_CATALOG;
+            $response_data = array("response_url" => $catalog . 'index.php?route=extension/openbay/amazonus/product');
+            $category_data = array('category' => (string)$saved_product['category']);
+            $fields_data = array('fields' => (array)$product_data_decoded['fields']);
+
+            $mp_array = array(); //Amazon US does not have marketplace selection
+            $marketplaces_data = array('marketplaces' => $mp_array);
+
+            $product_data = array_merge($category_data, $fields_data, $response_data, $marketplaces_data);
+            $insertion_response = $this->openbay->amazonus->insertProduct($product_data);
+
+            $logger->write("Uploading product with data:" . print_r($product_data, true) . "
+				Got response:" . print_r($insertion_response, true));
+
+            if (!isset($insertion_response['status']) || $insertion_response['status'] == 'error') {
+                $details = isset($insertion_response['info']) ? $insertion_response['info'] : 'Unknown';
+                $result['error_message'] = sprintf($this->language->get('error_upload_failed'), $saved_product['product_sku'], $details);
+                $result['status'] = 'error';
+                break;
+            }
+            $logger->write('Product upload success');
+            $this->model_extension_openbay_amazonus->setProductUploaded($saved_product['product_id'], $insertion_response['insertion_id'], $saved_product['sku']);
+        }
+
+        if (!isset($result['status'])) {
+            $result['status'] = 'ok';
+            $logger->write('Uploading process completed successfully . ');
+        } else {
+            $logger->write('Uploading process failed with message: ' . $result['error_message']);
+        }
+        return $result;
+    }
+
+    private function formatUrlsInText($text)
+    {
+        $regex_url = "/(http|https|ftp|ftps)\:\/\/[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(\/\S*)?/";
+        preg_match_all($regex_url, $text, $matches);
+        $used_patterns = array();
+        foreach ($matches[0] as $pattern) {
+            if (!array_key_exists($pattern, $used_patterns)) {
+                $used_patterns[$pattern] = true;
+                $text = str_replace($pattern, "<a target='_blank' href=" . $pattern . ">" . $pattern . "</a>", $text);
+            }
+        }
+        return $text;
+    }
+
 	public function removeErrors() {
 		$url = '';
 
@@ -295,58 +367,6 @@ class ControllerExtensionOpenbayAmazonusProduct extends Controller{
 
 		$this->response->addHeader('Content-Type: application/json');
 		$this->response->setOutput($json);
-	}
-
-	private function uploadItems() {
-		$this->load->language('extension/openbay/amazonus_listing');
-		$this->load->model('extension/openbay/amazonus');
-		$logger = new Log('amazonus_product.log');
-
-		$logger->write('Uploading process started . ');
-
-		$saved_products = $this->model_extension_openbay_amazonus->getSavedProductsData();
-
-		if (empty($saved_products)) {
-			$logger->write('No saved listings found. Uploading canceled . ');
-			$result['status'] = 'error';
-			$result['error_message'] = 'No saved listings. Nothing to upload. Aborting . ';
-			return $result;
-		}
-
-		foreach($saved_products as $saved_product) {
-			$product_data_decoded = (array)json_decode($saved_product['data']);
-
-			$catalog = defined(HTTPS_CATALOG) ? HTTPS_CATALOG : HTTP_CATALOG;
-			$response_data = array("response_url" => $catalog . 'index.php?route=extension/openbay/amazonus/product');
-			$category_data = array('category' => (string)$saved_product['category']);
-			$fields_data = array('fields' => (array)$product_data_decoded['fields']);
-
-			$mp_array = array(); //Amazon US does not have marketplace selection
-			$marketplaces_data = array('marketplaces' => $mp_array);
-
-			$product_data = array_merge($category_data, $fields_data, $response_data, $marketplaces_data);
-			$insertion_response = $this->openbay->amazonus->insertProduct($product_data);
-
-			$logger->write("Uploading product with data:" . print_r($product_data, true) . "
-				Got response:" . print_r($insertion_response, true));
-
-			if (!isset($insertion_response['status']) || $insertion_response['status'] == 'error') {
-				$details = isset($insertion_response['info']) ? $insertion_response['info'] : 'Unknown';
-				$result['error_message'] = sprintf($this->language->get('error_upload_failed'), $saved_product['product_sku'], $details);
-				$result['status'] = 'error';
-				break;
-			}
-			$logger->write('Product upload success');
-			$this->model_extension_openbay_amazonus->setProductUploaded($saved_product['product_id'], $insertion_response['insertion_id'], $saved_product['sku']);
-		}
-
-		if (!isset($result['status'])) {
-			$result['status'] = 'ok';
-			$logger->write('Uploading process completed successfully . ');
-		} else {
-			$logger->write('Uploading process failed with message: ' . $result['error_message']);
-		}
-		return $result;
 	}
 
 	public function parseTemplateAjax() {
@@ -538,22 +558,5 @@ class ControllerExtensionOpenbayAmazonusProduct extends Controller{
 
 	public function resetPending() {
 		$this->db->query("UPDATE `" . DB_PREFIX . "amazonus_product` SET `status` = 'saved' WHERE `status` = 'uploaded'");
-	}
-
-	private function validateForm() {
-		return true;
-	}
-
-	private function formatUrlsInText($text) {
-		$regex_url = "/(http|https|ftp|ftps)\:\/\/[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(\/\S*)?/";
-		preg_match_all($regex_url, $text, $matches);
-		$used_patterns = array();
-		foreach($matches[0] as $pattern) {
-			if (!array_key_exists($pattern, $used_patterns)) {
-				$used_patterns[$pattern]=true;
-				$text = str_replace($pattern, "<a target='_blank' href=" . $pattern . ">" . $pattern . "</a>", $text);
-			}
-		}
-		return $text;
 	}
 }
