@@ -9,14 +9,24 @@ parameters:
     locale: fr
     url_offre_images: assets/images/offres
     url_boutique_images: assets/images/boutiques
-    url_group_images: assets/images/group_users
+    url_group_users_images: assets/images/group_users
     url_user_images: assets/images/users
     url_animation_images: assets/images/animations
     url_animation_files: assets/files/animations
     url_boutique_files: assets/files/boutiques
     url_offre_files: assets/files/offres
 
-    basic_filter: loaded_image #image initial
+    url_offre_images_absolute: %kernel.root_dir%/../web/%url_offre_images%
+    url_boutique_images_absolute: %kernel.root_dir%/../web/%url_boutique_images%
+    url_group_users_images_absolute: %kernel.root_dir%/../web/%url_group_users_images%
+    url_user_images_absolute: %kernel.root_dir%/../web/%url_user_images%
+    url_animation_images_absolute: %kernel.root_dir%/../web/%url_animation_images%
+    url_animation_files_absolute: %kernel.root_dir%/../web/%url_animation_files%
+    url_boutique_files_absolute: %kernel.root_dir%/../web/%url_boutique_files%
+    url_offre_files_absolute: %kernel.root_dir%/../web/%url_offre_files%
+
+    ftp_server: https://images.weasytrade.com
+    basic_filter: base_images #image initial
     fos_user.resetting.token_ttl: 86400
 
     #nelmio api docs
@@ -83,11 +93,12 @@ doctrine:
         naming_strategy: doctrine.orm.naming_strategy.underscore
         auto_mapping: true
 
-#assetic:
-#    debug: %kernel.debug%
-#    use_controller: %kernel.debug%
-#    filters:
-#        cssrewrite: ~
+assetic:
+    #read_from: %kernel.root_dir%/../www
+    debug: %kernel.debug%
+    use_controller: %kernel.debug%
+    filters:
+        cssrewrite: ~
    # bundles: [ FOSCommentBundle ]
 
 # Swiftmailer Configuration
@@ -161,13 +172,66 @@ pugx_multi_user:
                      type: APM\UserBundle\Form\Type\ProfileUtilisateur_avmFormType
                      name: apm_utilisateur_avm_profile
                      validation_groups:  [Profile, Default]
+oneup_flysystem:
+    adapters:
+        offre_image_adapter:
+            local:
+                directory: %url_offre_images_absolute%
+        offre_file_adapter:
+            local:
+                directory: %url_offre_files_absolute%
+        boutique_image_adapter:
+            local:
+                directory: %url_boutique_images_absolute%
+        boutique_file_adapter:
+            local:
+                directory: %url_boutique_files_absolute%
+        group_users_image_adapter:
+            local:
+                directory: %url_group_users_images_absolute%
+        user_image_adapter:
+            local:
+                directory: %url_user_images_absolute%
+        animation_image_adapter:
+            local:
+                directory: %url_animation_images_absolute%
+        animation_file_adapter:
+            local:
+                directory: %url_animation_files_absolute%
+    filesystems:
+        offre_image:
+            adapter:    offre_image_adapter
+            mount:      offre_image
+        offre_file:
+            adapter:    offre_file_adapter
+            mount:      offre_file
+        boutique_image:
+            adapter:    boutique_image_adapter
+            mount:      boutique_image
+        boutique_file:
+            adapter:    boutique_file_adapter
+            mount:      boutique_file
+        group_users_image:
+            adapter:    group_users_image_adapter
+            mount:      group_users_image
+        user_image:
+            adapter:    user_image_adapter
+            mount:      user_image
+        animation_image:
+            adapter:    animation_image_adapter
+            mount:      animation_image
+        animation_file:
+            adapter:    animation_file_adapter
+            mount:      animation_file
 
 vich_uploader:
     db_driver: orm # or mongodb or propel or phpcr
+    storage: flysystem
+
     mappings:
         offre_images:
             uri_prefix:         %url_offre_images%
-            upload_destination: %kernel.root_dir%/../web/%url_offre_images%
+            upload_destination: offre_image
             inject_on_load: false
             delete_on_update: true
             delete_on_remove: true
@@ -176,7 +240,7 @@ vich_uploader:
             #options: {chars_per_dir: 1, dirs: 2} #vich_uploader.namer_directory_property
         offre_files:
             uri_prefix:         %url_offre_files%
-            upload_destination: %kernel.root_dir%/../web/%url_offre_files%
+            upload_destination: offre_file
             inject_on_load: false
             delete_on_update: true
             delete_on_remove: true
@@ -184,7 +248,7 @@ vich_uploader:
             directory_namer:     vich_uploader.directory_namer_subdir
         boutique_images:
             uri_prefix:         %url_boutique_images%
-            upload_destination: %kernel.root_dir%/../web/%url_boutique_images%
+            upload_destination:  boutique_image
             inject_on_load: false
             delete_on_update: true
             delete_on_remove: true
@@ -193,15 +257,15 @@ vich_uploader:
             #options: {chars_per_dir: 1, dirs: 2} #vich_uploader.namer_directory_property
         boutique_files:
             uri_prefix:         %url_boutique_files%
-            upload_destination: %kernel.root_dir%/../web/%url_boutique_files%
+            upload_destination: boutique_file
             inject_on_load: false
             delete_on_update: true
             delete_on_remove: true
             namer:               vich_uploader.namer_uniqid
             directory_namer:     vich_uploader.directory_namer_subdir
         group_users_images:
-            uri_prefix:         %url_group_images%
-            upload_destination: %kernel.root_dir%/../web/%url_group_images%
+            uri_prefix:         %url_group_users_images%
+            upload_destination: group_users_image
             inject_on_load: false
             delete_on_update: true
             delete_on_remove: true
@@ -210,7 +274,7 @@ vich_uploader:
             #options: {chars_per_dir: 1, dirs: 2} #vich_uploader.namer_directory_property
         user_images:
             uri_prefix:         %url_user_images%
-            upload_destination: %kernel.root_dir%/../web/%url_user_images%
+            upload_destination: user_image
             inject_on_load: false
             delete_on_update: true
             delete_on_remove: true
@@ -218,7 +282,7 @@ vich_uploader:
             directory_namer:     vich_uploader.directory_namer_subdir
         animation_images:
             uri_prefix:         %url_animation_images%
-            upload_destination: %kernel.root_dir%/../web/%url_animation_images%
+            upload_destination:  animation_image
             inject_on_load: false
             delete_on_update: true
             delete_on_remove: true
@@ -226,7 +290,7 @@ vich_uploader:
             directory_namer:     vich_uploader.directory_namer_subdir
         animation_files:
             uri_prefix:         %url_animation_files%
-            upload_destination: %kernel.root_dir%/../web/%url_animation_files%
+            upload_destination: animation_file
             inject_on_load: false
             delete_on_update: true
             delete_on_remove: true
@@ -235,16 +299,63 @@ vich_uploader:
 
 liip_imagine :
     # configure resolvers
-    resolvers :
-        # setup the default resolver
-        default :
-            # use the default web path
-            web_path : ~
+    resolvers:
+        offre_image:
+            flysystem:
+                filesystem_service: oneup_flysystem.offre_image_filesystem
+                root_url:           %url_offre_images_absolute%
+                cache_prefix:       /media/cache
+                visibility:         public
+        offre_files:
+            flysystem:
+                filesystem_service: oneup_flysystem.offre_file_filesystem
+                root_url:           %url_offre_files_absolute%
+                cache_prefix:       media/file
+                visibility:         public
+        boutique_images:
+            flysystem:
+                filesystem_service: oneup_flysystem.boutique_image_filesystem
+                root_url:           %url_boutique_images_absolute%
+                cache_prefix:       media/cache
+                visibility:         public
+        boutique_files:
+            flysystem:
+                filesystem_service: oneup_flysystem.boutique_file_filesystem
+                root_url:           %url_boutique_files_absolute%
+                cache_prefix:       media/cache
+                visibility:         public
+        group_users_images:
+            flysystem:
+                filesystem_service: oneup_flysystem.group_users_image_filesystem
+                root_url:           %url_group_users_images_absolute%
+                cache_prefix:       media/cache
+                visibility:         public
+        user_images:
+            flysystem:
+                filesystem_service: oneup_flysystem.user_image_filesystem
+                root_url:           %url_user_images_absolute%
+                cache_prefix:       media/cache
+                visibility:         public
+        animation_images:
+            flysystem:
+                filesystem_service: oneup_flysystem.animation_image_filesystem
+                root_url:           %url_animation_images_absolute%
+                cache_prefix:       media/cache
+                visibility:         public
+        animation_files:
+            flysystem:
+                filesystem_service: oneup_flysystem.animation_file_filesystem
+                root_url:           %url_animation_files_absolute%
+                cache_prefix:       media/cache
+                visibility:         public
+
     # your filter sets are defined here
+    #cache : offre_images
     filter_sets :
         # use the default cache configuration
         cache : ~
-        loaded_image :
+        base_images :
+            #cache : offre_images
 # adjust the image quality to 75%
             #quality : 75
  # list of transformations to apply (the filters)
@@ -258,24 +369,7 @@ liip_imagine :
                     # set the starting coordinates of the crop
                     #start: [ %_x_%, %_y_% ]
 
-#oneup_flysystem:
-#    adapters:
-#        my_adapter:
-#            local:
-#                directory: %kernel.root_dir%/cache
 
-#    filesystems:
-#        my_filesystem:
-#            adapter: my_adapter
-
-            # optional - defines the default visibility of the filesystem: `public` or `private`(default)
-#            visibility: private
-#knp_gaufrette:
-#    adapters:
-#        foo:
-#            safe_local:
-#                directory:  %resolve_images_url%
-#                create:     true
 # Nelmio  Cors
 nelmio_cors:
     defaults:

@@ -57,9 +57,7 @@ class Base_documentaire extends TradeFactory
 
     /**
      * @Exclude
-     * @Assert\File( maxSize = "1024k",
-     *     mimeTypes = {"application/x-pdf", "application/pdf", "text/plain", "text/html"},
-     *     mimeTypesMessage = "Please upload a valid PDF"
+     * @Assert\File( maxSize = "1660932k"
      * )
      * @Vich\UploadableField(mapping="animation_files", fileNameProperty="animation")
      * @var File

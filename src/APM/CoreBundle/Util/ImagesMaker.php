@@ -49,9 +49,10 @@ class ImagesMaker implements ContainerAwareInterface
         /** @var CacheManager $cacheManager */
         $cacheManager = $this->container->get('liip_imagine.cache.manager');
         $dataManager = $this->container->get('liip_imagine.data.manager');
-        if (!$cacheManager->isStored($path, $this->filter)) { // vérifie si l'image n'existe pas déjà
+        if (!$cacheManager->isStored($path, $this->filter)) { // vérifier si cette image n'existe pas déjà
             $configs = array();
-            if (isset($data[$imageIdFile . 'x']) &&
+            if ($isImage &&
+                isset($data[$imageIdFile . 'x']) &&
                 isset($data[$imageIdFile . 'y']) &&
                 isset($data[$imageIdFile . 'w']) &&
                 isset($data[$imageIdFile . 'h'])

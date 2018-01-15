@@ -241,9 +241,6 @@ class Base_documentaireController extends FOSRestController
      *    },
      *     "groups"={"owner_document_details", "owner_list"}
      * },
-     * requirements={
-     *      {"name"="id", "requirement"="\d+", "dataType"="integer", "description"="offre_id"}
-     * },
      * parameters= {
      *      {"name"="imagefilex", "dataType"="integer", "required"= true, "description"="horizontal start point"},
      *      {"name"="imagefiley", "dataType"="integer", "required"= true, "description"="vertical start point"},
@@ -277,7 +274,7 @@ class Base_documentaireController extends FOSRestController
             $em->persist($document);
             $em->flush();
 
-            return $this->routeRedirectView("api_documentation_show_document ", ['id' => $document->getId()], Response::HTTP_CREATED);
+            return $this->routeRedirectView("api_documentation_show_document", ['id' => $document->getId()], Response::HTTP_CREATED);
 
         } catch (ConstraintViolationException $cve) {
             return new JsonResponse([

@@ -57,8 +57,8 @@ class Offre extends TradeFactory
      * @Exclude
      * @Assert\File(
      *     maxSize = "10024k",
-     *     mimeTypes = {"application/x-pdf", "application/pdf", "text/plain"},
-     *     mimeTypesMessage = "Please upload a valid PDF"
+     *     mimeTypes = {"application/x-pdf", "application/pdf", "text/plain", },
+     *     mimeTypesMessage = "Please upload a valid file"
      * )
      * @Vich\UploadableField(mapping="offre_files", fileNameProperty="brochure")
      * @var File

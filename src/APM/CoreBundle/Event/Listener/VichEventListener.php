@@ -11,9 +11,10 @@ namespace APM\CoreBundle\Event\Listener;
 
 use APM\CoreBundle\Util\ImagesMaker;
 use Liip\ImagineBundle\Imagine\Cache\CacheManager;
+use Symfony\Component\HttpFoundation\File\Exception\AccessDeniedException;
 use Vich\UploaderBundle\Event\Event;
 use Vich\UploaderBundle\Storage\StorageInterface;
-use FOS\RestBundle\Request\ParamFetcher;
+use Symfony\Component\HttpFoundation\File;
 
 class VichEventListener
 {
@@ -21,7 +22,6 @@ class VichEventListener
      * @var CacheManager | null
      */
     private $mediaCaheManager; // cache liip
-    private $filter;
     /**
      * @var StorageInterface
      */
@@ -31,11 +31,10 @@ class VichEventListener
      */
     private $imagesMaker;
 
-    function setVars(ImagesMaker $imageMaker = null, StorageInterface $storage = null, CacheManager $mediaCaheManager = null, $filter = null)
+    function setVars(ImagesMaker $imageMaker = null, CacheManager $mediaCaheManager = null, StorageInterface $storage = null)
     {
         $this->storage = $storage;
         $this->mediaCaheManager = $mediaCaheManager;
-        $this->filter = $filter;
         $this->imagesMaker = $imageMaker;
 
     }
@@ -52,7 +51,7 @@ class VichEventListener
         $image = $mapping->getUploadDir($object) . '/' . $mapping->getFileName($object);
         $prefix = $mapping->getUriPrefix();
         $path = $prefix . '/' . $image;
-        $this->mediaCaheManager->remove($path, $this->filter);
+        $this->mediaCaheManager->remove($path);
     }
 
     public function onVichuploaderPreupload(Event $event)
@@ -78,11 +77,10 @@ class VichEventListener
         $object = $event->getObject();
         $mapping = $event->getMapping();
         $imageIdFile = $mapping->getFilePropertyName();
-        $fileMimeType = $mapping->getFile($object)->getMimeType();
-        if ($fileMimeType === "image/jpeg"
-            || $fileMimeType === "image/png"
-            || $fileMimeType === "image/gif"
-        ) {
+        $path = $mapping->getUriPrefix() . '/' . $mapping->getUploadDir($object) . '/' . $mapping->getFileName($object);
+        $file = new File\File($path);
+        $fileMimeType = $file->getMimeType();
+        if ($fileMimeType === "image/jpeg" || $fileMimeType === "image/png" || $fileMimeType === "image/gif") {
             $this->imagesMaker->treatImage($imageIdFile, $object);
         }
     }

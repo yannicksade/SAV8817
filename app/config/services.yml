@@ -4,7 +4,7 @@
 #parameters:
 #    parameter_name: value
 
-services:
+#services:
  #   app.form.registration:
   #      class: APMUserBundle\Form\RegistrationType
    #     tags:

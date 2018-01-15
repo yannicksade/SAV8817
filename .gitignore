@@ -4,12 +4,9 @@ symfony
 /var/
 composer.json
 /vendor/
-/web/bundles/
 /web/
 .idea/
 UPGRADE-4.0.md
-
-web/docs_bootstrap
 
 src/APM/MarketingReseauBundle/Entity/Reseau_conseillers.php~
 src/APM/TransportBundle/Entity/Livraison.php~

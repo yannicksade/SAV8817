@@ -159,7 +159,7 @@ abstract class Utilisateur extends BaseUser
      * @Assert\File(
      *     maxSize = "5024k",
      *     mimeTypes = {"image/jpeg", "image/png", "image/gif"},
-     *     mimeTypesMessage = "Please upload a valid PDF"
+     *     mimeTypesMessage = "Please upload a valid image"
      * )
      * @Vich\UploadableField(mapping="user_images", fileNameProperty="image")
      * @var UploadedFile

@@ -38,11 +38,11 @@ services:
               - ['setContainer', ['@service_container', %basic_filter%]]
 
     apm_core.vich_listener.pre_remove:
-        class: APM\CoreBundle\Event\Listener\VichEventListener
-        calls:
-             -  ['setVars', [null, null, '@liip_imagine.cache.manager', %basic_filter%]]
-        tags:
-             - { name: kernel.event_listener, event: vich_uploader.pre_remove, method: onVichuploaderPreremove }
+            class: APM\CoreBundle\Event\Listener\VichEventListener
+            calls:
+                 -  ['setVars', [null, '@liip_imagine.cache.manager']]
+            tags:
+                 - { name: kernel.event_listener, event: vich_uploader.pre_remove, method: onVichuploaderPreremove }
 
     apm_core.vich_listener.pre_upload:
         class: APM\CoreBundle\Event\Listener\VichEventListener
@@ -55,7 +55,7 @@ services:
     apm_core.vich_listener.post_upload:
             class: APM\CoreBundle\Event\Listener\VichEventListener
             calls:
-                 -  ['setVars', ['@apm_core.image_maker', '@vich_uploader.storage']]
+                 -  ['setVars', ['@apm_core.image_maker']]
             tags:
                  - { name: kernel.event_listener, event: vich_uploader.post_upload, method: onVichuploaderPostupload }
 
